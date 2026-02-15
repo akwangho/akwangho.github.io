@@ -1,1 +1,400 @@
-gallery test
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex's Magical Adventure on Canvas</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: sans-serif;
+        }
+        canvas {
+            border: 2px solid #333;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="interactiveCanvas" width="800" height="600"></canvas>
+
+<script>
+//============== SETUP ==============
+const canvas = document.getElementById('interactiveCanvas');
+const ctx = canvas.getContext('2d');
+
+const VOCAB_COLOR = '#d63384';
+const TEXT_COLOR = '#333';
+const BUTTON_COLOR = '#007bff';
+const BUTTON_TEXT_COLOR = '#fff';
+
+// Game state
+let gameState = 'STORY'; // STORY, QUIZ, RESULTS
+let currentPage = 0;
+let showTranslation = false;
+let userAnswers = {};
+
+// Speech Synthesis
+const synth = window.speechSynthesis;
+let utterance = new SpeechSynthesisUtterance();
+let wordsToHighlight = [];
+let currentHighlightIndex = -1;
+
+//============== DATA ==============
+const storyData = [
+    {
+        english: "One sunny morning, Alex put on a new T-shirt and shorts. He also wore his favorite sneakers. Alex wanted to go to the bookstore to buy a new book. He picked up his water bottle but forgot his umbrella.",
+        chinese: "一個陽光明媚的早晨，Alex 穿上了一件新的 T恤 和 短褲。他也穿上了他最愛的 運動鞋。Alex 想去 書店 買一本新書。他拿起了他的 水壺，卻忘了帶 雨傘。",
+        vocab: ["T-shirt", "shorts", "sneakers", "bookstore", "water bottle", "umbrella"]
+    },
+    {
+        english: "First, he rode his bike to the post office to mail a letter. The post office was next to a big bank. After that, he was hungry, so he went to a bakery to buy some bread.",
+        chinese: "首先，他騎著他的 腳踏車 到 郵局 寄信。那間 郵局 就在一間大 銀行 的旁邊。之後，他餓了，所以他去了一家 麵包店 買了些麵包。",
+        vocab: ["bike", "post office", "post", "office", "bank", "bakery"]
+    },
+    {
+        english: "To get to the bookstore, he had to take the MRT. He saw many people on the train. A woman was wearing a beautiful dress and a man was wearing a warm sweater and a jacket because he felt cold. Alex used his smartphone to call his mom.",
+        chinese: "為了去書店，他必須搭乘 捷運。他在 火車（這裡指捷運列車）上看到很多人。一位女士穿著漂亮的 洋裝，而一位男士因為覺得冷，穿著保暖的 毛衣 和 夾克。Alex 用他的 智慧型手機 打電話給媽媽。",
+        vocab: ["MRT", "train", "dress", "sweater", "jacket", "smartphone", "smart", "phone"]
+    },
+    {
+        english: "Suddenly, a man on the MRT felt sick. The train stopped and an ambulance took him to the hospital. Alex felt a little worried. He saw the man drop his glasses, which were made of glass.",
+        chinese: "突然，捷運上有個男人感覺不舒服。列車停了下來，一輛救護車把他送去了 醫院。Alex 感到有點擔心。他看到那個男人掉了他的 眼鏡，那是由 玻璃 製成的。",
+        vocab: ["hospital", "glasses", "glass"]
+    },
+    {
+        english: "After the delay, Alex finally got to the bookstore. For dinner, he went to a nice restaurant with his family. They didn't drive their car; they took a taxi instead. On the way, they saw a scooter and a big red bus. Alex thought about his future trip on a plane to see the world. He took off his long pants and went to bed.",
+        chinese: "經過一番耽擱，Alex 終於到了書店。晚餐時，他和家人去了一家很棒的 餐廳。他們沒有開自己的 汽車，而是搭了 計程車。在路上，他們看到一輛 機車 和一輛大紅色的 公車。Alex 想著他未來要搭 飛機 去環遊世界的旅行。他脫下 長褲 上床睡覺。",
+        vocab: ["restaurant", "car", "taxi", "scooter", "bus", "plane", "pants", "skirt"]
+    }
+];
+
+const quizData = [
+    {
+        question: "1. Where did Alex go to buy a book?",
+        options: ["A) Bakery", "B) Bookstore", "C) Hospital"],
+        answer: "B) Bookstore"
+    },
+    {
+        question: "2. What did Alex wear in the morning?",
+        options: ["A) A dress and a skirt", "B) A jacket and a sweater", "C) A T-shirt and shorts"],
+        answer: "C) A T-shirt and shorts"
+    },
+    {
+        question: "3. How did Alex get to the bookstore?",
+        options: ["A) By MRT", "B) By car", "C) By plane"],
+        answer: "A) By MRT"
+    }
+];
+
+// UI elements with clickable areas
+let clickableAreas = [];
+
+//============== DRAWING HELPERS ==============
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function wrapAndDrawText(text, x, y, maxWidth, lineHeight, vocab) {
+    const words = text.split(' ');
+    let line = '';
+    let currentY = y;
+    let currentX = x;
+    
+    ctx.font = '20px Arial';
+
+    words.forEach(word => {
+        let testLine = line + word + ' ';
+        let metrics = ctx.measureText(testLine);
+        let testWidth = metrics.width;
+        if (testWidth > maxWidth && line !== '') {
+            currentX = x;
+            currentY += lineHeight;
+            line = word + ' ';
+        } else {
+            line = testLine;
+        }
+    });
+
+    // Actual drawing
+    line = '';
+    currentY = y;
+    currentX = x;
+     words.forEach(word => {
+        let isVocab = vocab.some(v => word.includes(v));
+        let testLine = line + word + ' ';
+        let metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && line !== '') {
+             drawTextLine(line, x, currentY, vocab);
+             currentY += lineHeight;
+             line = word + ' ';
+        } else {
+             line = testLine;
+        }
+    });
+    drawTextLine(line, x, currentY, vocab);
+}
+
+function drawTextLine(line, x, y, vocab) {
+    let currentX = x;
+    const words = line.trim().split(' ');
+    words.forEach(word => {
+        const isVocab = vocab.some(v => word.includes(v));
+        ctx.fillStyle = (isVocab && !showTranslation) ? VOCAB_COLOR : TEXT_COLOR;
+        ctx.fillText(word, currentX, y);
+        currentX += ctx.measureText(word + ' ').width;
+    });
+}
+
+
+function drawButton(text, x, y, w, h, action) {
+    ctx.fillStyle = BUTTON_COLOR;
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = BUTTON_TEXT_COLOR;
+    ctx.font = '18px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, x + w / 2, y + h / 2);
+    clickableAreas.push({ x, y, w, h, action });
+}
+
+
+//============== GAME STATE DRAWING ==============
+function drawStory() {
+    const page = storyData[currentPage];
+    const textToDraw = showTranslation ? page.chinese : page.english;
+    const vocabToHighlight = showTranslation ? [] : page.vocab;
+
+    ctx.font = 'bold 32px Arial';
+    ctx.fillStyle = TEXT_COLOR;
+    ctx.textAlign = 'center';
+    ctx.fillText("Alex's Magical Adventure", canvas.width / 2, 50);
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    wrapAndDrawText(textToDraw, 50, 100, 700, 30, vocabToHighlight);
+    
+    // Draw page number
+    ctx.font = '16px Arial';
+    ctx.fillStyle = '#888';
+    ctx.textAlign = 'center';
+    ctx.fillText(`Page ${currentPage + 1} of ${storyData.length}`, canvas.width / 2, 520);
+    
+    // Buttons
+    if (currentPage > 0) {
+        drawButton("Previous", 50, 550, 120, 40, 'prev_page');
+    }
+    if (currentPage < storyData.length - 1) {
+        drawButton("Next", canvas.width - 170, 550, 120, 40, 'next_page');
+    } else {
+        drawButton("Start Quiz", canvas.width - 170, 550, 120, 40, 'start_quiz');
+    }
+    drawButton("Toggle Translation", canvas.width / 2 - 100, 550, 200, 40, 'toggle_translation');
+}
+
+function drawQuiz() {
+    ctx.font = 'bold 28px Arial';
+    ctx.fillStyle = TEXT_COLOR;
+    ctx.textAlign = 'center';
+    ctx.fillText("Reading Quiz", canvas.width / 2, 50);
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    
+    let yPos = 100;
+    quizData.forEach((q, index) => {
+        // Draw the question text
+        ctx.font = '22px Arial';
+        ctx.fillStyle = TEXT_COLOR;
+        
+        // Split text for highlighting
+        const questionWords = q.question.split(' ');
+        let xPos = 50;
+        questionWords.forEach((word, wordIndex) => {
+             // Check if this word should be highlighted
+            if (wordsToHighlight === q.question.split(' ') && currentHighlightIndex === wordIndex) {
+                 const metrics = ctx.measureText(word + ' ');
+                 ctx.fillStyle = 'yellow';
+                 ctx.fillRect(xPos, yPos - 5, metrics.width, 30);
+                 ctx.fillStyle = 'black';
+            } else {
+                 ctx.fillStyle = 'black';
+            }
+            ctx.fillText(word, xPos, yPos);
+            xPos += ctx.measureText(word + ' ').width;
+        });
+
+        // Draw speaker icon
+        ctx.font = '30px Arial';
+        const speakerX = xPos + 10;
+        ctx.fillText('🔊', speakerX, yPos - 5);
+        clickableAreas.push({ x: speakerX, y: yPos - 5, w: 30, h: 30, action: 'speak', text: q.question });
+
+        yPos += 40;
+        
+        // Draw options
+        ctx.font = '18px Arial';
+        q.options.forEach(opt => {
+            const isSelected = userAnswers[index] === opt;
+            ctx.fillStyle = isSelected ? '#e7f3ff' : '#fff';
+            ctx.fillRect(70, yPos - 5, 660, 30);
+
+            ctx.fillStyle = TEXT_COLOR;
+            ctx.fillText(opt, 80, yPos);
+            clickableAreas.push({ x: 70, y: yPos - 5, w: 660, h: 30, action: 'select_answer', qIndex: index, option: opt });
+            yPos += 35;
+        });
+        yPos += 20;
+    });
+
+    drawButton("Check Answers", canvas.width / 2 - 80, 550, 160, 40, 'check_answers');
+}
+
+
+function drawResults() {
+    let score = 0;
+    quizData.forEach((q, index) => {
+        if (userAnswers[index] === q.answer) {
+            score++;
+        }
+    });
+
+    ctx.font = 'bold 32px Arial';
+    ctx.fillStyle = TEXT_COLOR;
+    ctx.textAlign = 'center';
+    ctx.fillText("Quiz Results", canvas.width / 2, 150);
+    
+    const resultText = `You got ${score} out of ${quizData.length} correct!`;
+    ctx.font = '24px Arial';
+    ctx.fillText(resultText, canvas.width / 2, 250);
+
+    const feedback = (score === quizData.length) ? "🎉 Excellent work!" : "Keep trying!";
+    ctx.font = '28px Arial';
+    ctx.fillStyle = (score === quizData.length) ? 'green' : 'orange';
+    ctx.fillText(feedback, canvas.width / 2, 320);
+
+    drawButton("Try Again", canvas.width / 2 - 60, 400, 120, 40, 'restart');
+}
+
+
+//============== MAIN LOOP ==============
+function draw() {
+    clearCanvas();
+    clickableAreas = []; // Reset areas for each frame
+
+    switch (gameState) {
+        case 'STORY':
+            drawStory();
+            break;
+        case 'QUIZ':
+            drawQuiz();
+            break;
+        case 'RESULTS':
+            drawResults();
+            break;
+    }
+}
+
+
+//============== EVENT HANDLING ==============
+canvas.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    for (let i = clickableAreas.length - 1; i >= 0; i--) {
+        const area = clickableAreas[i];
+        if (mouseX >= area.x && mouseX <= area.x + area.w &&
+            mouseY >= area.y && mouseY <= area.y + area.h) {
+            handleAction(area);
+            break;
+        }
+    }
+});
+
+function handleAction(area) {
+    switch (area.action) {
+        case 'next_page':
+            if (currentPage < storyData.length - 1) currentPage++;
+            break;
+        case 'prev_page':
+            if (currentPage > 0) currentPage--;
+            break;
+        case 'toggle_translation':
+            showTranslation = !showTranslation;
+            break;
+        case 'start_quiz':
+            gameState = 'QUIZ';
+            userAnswers = {};
+            break;
+        case 'select_answer':
+            userAnswers[area.qIndex] = area.option;
+            break;
+        case 'speak':
+            speakWithHighlight(area.text);
+            break;
+        case 'check_answers':
+            gameState = 'RESULTS';
+            break;
+        case 'restart':
+            gameState = 'STORY';
+            currentPage = 0;
+            userAnswers = {};
+            break;
+    }
+    draw(); // Redraw the canvas after any action
+}
+
+
+//============== SPEECH SYNTHESIS with HIGHLIGHT ==============
+function speakWithHighlight(text) {
+    if (synth.speaking) {
+        synth.cancel();
+    }
+    
+    wordsToHighlight = text.split(' ');
+    currentHighlightIndex = -1;
+    utterance.text = text;
+    utterance.lang = 'en-US';
+    utterance.rate = 0.9;
+    
+    let charIndex = 0;
+    let wordBoundaries = wordsToHighlight.map(word => {
+        const start = charIndex;
+        charIndex += word.length + 1; // +1 for space
+        return { word, start };
+    });
+
+    utterance.onboundary = (event) => {
+        if (event.name === 'word') {
+            for(let i=0; i<wordBoundaries.length; i++) {
+                 if(event.charIndex >= wordBoundaries[i].start) {
+                     currentHighlightIndex = i;
+                 }
+            }
+            draw(); // Redraw with highlight
+        }
+    };
+
+    utterance.onend = () => {
+        currentHighlightIndex = -1;
+        wordsToHighlight = [];
+        draw(); // Redraw to remove highlight
+    };
+    
+    synth.speak(utterance);
+}
+
+
+//============== INITIALIZATION ==============
+draw();
+
+</script>
+</body>
+</html>
