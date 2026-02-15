@@ -1,501 +1,538 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leo's Busy Saturday - 忙碌的星期六</title>
-    <style>
-        :root {
-            --primary-color: #FF9F1C;
-            --secondary-color: #2EC4B6;
-            --accent-color: #FFBF69;
-            --text-color: #333;
-            --bg-color: #F0F7F4;
-            --highlight-color: #FFFF00;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌟 Amy's Big City Adventure — 英語故事學習</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky: #5BC8F5;
+  --sun: #FFD93D;
+  --grass: #6BCB77;
+  --coral: #FF6B6B;
+  --lavender: #C3A6FF;
+  --peach: #FFB347;
+  --white: #FFFFFF;
+  --ink: #2D3047;
+  --card-bg: #FFFDF5;
+  --shadow: 0 4px 20px rgba(45,48,71,0.10);
+  --radius: 20px;
+  --hl: #FFE566;
+  --hl-word: #B5F2FF;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(160deg, #e0f7fa 0%, #fff9e6 50%, #fce4f0 100%);
+  min-height: 100vh;
+  color: var(--ink);
+  padding-bottom: 60px;
+}
+header {
+  background: linear-gradient(135deg, var(--sky), var(--lavender));
+  padding: 28px 20px 22px;
+  text-align: center;
+  box-shadow: 0 6px 24px rgba(91,200,245,0.35);
+}
+header h1 {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(1.5rem, 5vw, 2.6rem);
+  color: #fff;
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+  line-height: 1.25;
+}
+header p { color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-top: 6px; font-weight: 600; }
 
-        body {
-            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-        }
+.speed-bar {
+  background: var(--white);
+  border-radius: var(--radius);
+  margin: 16px auto;
+  max-width: 700px;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+.speed-bar label { font-weight: 800; font-size: 0.95rem; white-space: nowrap; }
+.speed-bar input[type=range] { flex: 1; min-width: 120px; accent-color: var(--sky); cursor: pointer; }
+#speed-val { font-weight: 900; color: var(--coral); font-size: 1rem; min-width: 42px; text-align: center; }
+.speed-info { font-size: 0.78rem; color: #888; width: 100%; }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
+.wordlist-banner {
+  background: linear-gradient(90deg, var(--sun), var(--peach));
+  border-radius: var(--radius);
+  margin: 0 auto 18px;
+  max-width: 700px;
+  padding: 14px 20px;
+  box-shadow: var(--shadow);
+}
+.wordlist-banner h3 { font-family: 'Baloo 2', cursive; font-size: 1rem; color: var(--ink); margin-bottom: 8px; }
+.word-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: rgba(255,255,255,0.75);
+  border-radius: 50px;
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.9);
+  transition: background 0.2s, transform 0.15s;
+  color: var(--ink);
+  user-select: none;
+}
+.chip:hover { background: var(--white); transform: scale(1.05); }
+.chip.chip-on { background: var(--hl); }
 
-        h1 {
-            text-align: center;
-            color: var(--secondary-color);
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px var(--accent-color);
-        }
+.section-title {
+  text-align: center;
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(1.2rem, 4vw, 1.9rem);
+  margin: 24px 0 12px;
+  color: var(--ink);
+}
+.section-title span {
+  background: linear-gradient(135deg, var(--coral), var(--lavender));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-        /* Controls */
-        .controls {
-            background: #E0F7FA;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            text-align: center;
-            border: 2px solid var(--secondary-color);
-        }
+.story-container { max-width: 700px; margin: 0 auto; padding: 0 14px; }
+.para-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  border-left: 5px solid var(--sky);
+}
+.para-card:nth-child(4n+2) { border-left-color: var(--lavender); }
+.para-card:nth-child(4n+3) { border-left-color: var(--grass); }
+.para-card:nth-child(4n+4) { border-left-color: var(--coral); }
+.para-num {
+  display: inline-block;
+  background: var(--sky);
+  color: #fff;
+  border-radius: 50%;
+  width: 26px; height: 26px;
+  text-align: center; line-height: 26px;
+  font-size: 0.8rem; font-weight: 900;
+  margin-bottom: 8px;
+}
+.para-en { font-size: 1.05rem; line-height: 1.9; color: var(--ink); }
+.vocab-word {
+  color: #1A6ED8;
+  background: #E8F4FF;
+  border-radius: 6px;
+  padding: 1px 5px;
+  cursor: pointer;
+  font-weight: 800;
+  border-bottom: 2px solid #1A6ED8;
+  transition: background 0.18s, color 0.18s;
+}
+.vocab-word:hover { background: var(--hl-word); color: #0A3D8F; }
+.vocab-word.word-on { background: var(--hl); color: #7a4000; border-bottom-color: #E8A000; }
+.sent-span.sent-on { background: var(--hl); border-radius: 4px; }
 
-        .slider-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+.para-zh {
+  display: none;
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #f0fff4, #e8f4ff);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #444;
+  border: 1px dashed #aaa;
+}
+.para-controls { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 16px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+.btn:active { transform: scale(0.97); }
+.btn-zh   { background: linear-gradient(135deg, #a8e6cf, #67d7aa); color: #1a5c3a; }
+.btn-read { background: linear-gradient(135deg, var(--sky), #3AAFDF); color: #fff; }
+.btn-stop { background: linear-gradient(135deg, #ffb347, #ff8000); color: #fff; }
 
-        input[type="range"] {
-            width: 200px;
-            accent-color: var(--primary-color);
-        }
+.go-quiz-btn {
+  display: block;
+  margin: 14px auto 30px;
+  background: linear-gradient(135deg, var(--lavender), #9B59D8);
+  color: #fff;
+  padding: 12px 30px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(195,166,255,0.5);
+  transition: transform 0.15s;
+}
+.go-quiz-btn:hover { transform: scale(1.05); }
 
-        /* Story Section */
-        .story-section {
-            margin-bottom: 40px;
-        }
+.quiz-section { max-width: 700px; margin: 10px auto 0; padding: 0 14px; }
+.quiz-intro {
+  background: linear-gradient(135deg, var(--lavender), #e8c5ff);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin-bottom: 18px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.quiz-intro p { font-size: 0.95rem; font-weight: 700; color: var(--ink); }
+.quiz-intro p+p { font-size: 0.82rem; color: #555; margin-top: 5px; }
 
-        .paragraph-card {
-            background: #fff;
-            border: 2px solid #eee;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            transition: transform 0.2s;
-        }
+.q-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--lavender);
+}
+.q-card.q-correct { border-top-color: var(--grass); }
+.q-card.q-wrong   { border-top-color: var(--coral); }
+.q-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.q-num {
+  background: var(--lavender);
+  color: #fff;
+  border-radius: 50%;
+  width: 30px; height: 30px; min-width: 30px;
+  text-align: center; line-height: 30px;
+  font-size: 0.85rem; font-weight: 900;
+}
+.q-text { font-size: 1rem; font-weight: 700; line-height: 1.6; flex: 1; }
+.q-text.q-hl { background: var(--hl); border-radius: 8px; padding: 2px 6px; }
+.q-speak-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 2px 4px;
+  border-radius: 8px;
+  transition: transform 0.15s, background 0.2s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.q-speak-btn:hover { background: #eee; transform: scale(1.15); }
+.q-speak-btn.qsb-on { background: var(--hl); }
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+@media (max-width: 480px) { .options-grid { grid-template-columns: 1fr; } }
+.opt-btn {
+  background: #F4F0FF;
+  border: 2px solid #D4C8FF;
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  transition: background 0.18s, border-color 0.18s, transform 0.12s;
+  user-select: none;
+}
+.opt-btn:hover:not(:disabled) { background: #E4D8FF; border-color: #A78BE0; transform: scale(1.02); }
+.opt-btn.opt-sel     { background: #D4C8FF; border-color: #7C4DFF; font-weight: 800; }
+.opt-btn.opt-correct { background: #C8F5D5; border-color: var(--grass); color: #1a5c3a; font-weight: 800; }
+.opt-btn.opt-wrong   { background: #FFD6D6; border-color: var(--coral); color: #8B1A1A; font-weight: 800; }
+.opt-btn:disabled    { cursor: default; }
+.q-feedback { display: none; margin-top: 10px; padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 0.9rem; }
+.fb-ok { background: #d4edda; color: #155724; }
+.fb-no { background: #f8d7da; color: #721c24; }
 
-        .paragraph-card:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
+.submit-row { text-align: center; margin: 10px 0 24px; }
+.btn-submit {
+  background: linear-gradient(135deg, var(--grass), #4CAF50);
+  color: #fff;
+  font-size: 1.1rem;
+  padding: 14px 38px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  box-shadow: 0 4px 18px rgba(107,203,119,0.45);
+  transition: transform 0.15s, opacity 0.2s;
+}
+.btn-submit:hover { transform: scale(1.04); }
+.btn-submit:disabled { opacity: 0.5; cursor: default; transform: none; }
 
-        .english-text {
-            font-size: 1.4em;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-
-        .chinese-text {
-            font-size: 1.1em;
-            color: #7f8c8d;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 8px;
-            border-left: 5px solid var(--secondary-color);
-            margin-bottom: 15px;
-            display: none; /* Hidden by default */
-        }
-
-        .chinese-text.show {
-            display: block;
-        }
-
-        .para-controls {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        button {
-            cursor: pointer;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 20px;
-            font-family: inherit;
-            font-weight: bold;
-            font-size: 0.9em;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-read {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-read:hover {
-            background-color: #e68a00;
-        }
-
-        .btn-trans {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        .btn-trans:hover {
-            background-color: #25a094;
-        }
-
-        /* Interactive Words */
-        strong {
-            color: #d35400;
-            cursor: pointer;
-            border-bottom: 2px dotted #d35400;
-            transition: color 0.2s;
-        }
-
-        strong:hover {
-            color: #e67e22;
-            background-color: rgba(255, 191, 105, 0.3);
-        }
-
-        /* Highlighting */
-        .highlight {
-            background-color: var(--highlight-color);
-            border-radius: 3px;
-            box-shadow: 0 0 5px var(--highlight-color);
-        }
-
-        /* Quiz Section */
-        .quiz-section {
-            background: #fff8e1;
-            padding: 25px;
-            border-radius: 20px;
-            border: 2px dashed var(--primary-color);
-        }
-
-        .quiz-title {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-
-        .question-block {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .q-text {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .speaker-icon {
-            cursor: pointer;
-            font-size: 1.2em;
-            background: #eee;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .speaker-icon:hover {
-            background: #ddd;
-        }
-
-        .options label {
-            display: block;
-            margin: 5px 0;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 5px;
-        }
-
-        .options label:hover {
-            background-color: #f0f0f0;
-        }
-
-        input[type="radio"] {
-            margin-right: 10px;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 0.8em;
-            color: #aaa;
-        }
-    </style>
+.score-board {
+  display: none;
+  background: linear-gradient(135deg, var(--sun), var(--peach));
+  border-radius: var(--radius);
+  padding: 26px 22px;
+  margin: 18px auto 0;
+  max-width: 700px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.score-board.show { display: block; }
+.score-board h2 { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: var(--ink); margin-bottom: 8px; }
+.score-big { font-family: 'Baloo 2', cursive; font-size: 4rem; color: var(--coral); line-height: 1; text-shadow: 3px 3px 0 rgba(0,0,0,0.1); }
+.score-msg { font-size: 1rem; font-weight: 700; color: #555; margin-top: 8px; }
+.btn-retry {
+  margin-top: 16px;
+  background: linear-gradient(135deg, var(--coral), #FF3333);
+  color: #fff;
+  font-size: 1rem;
+  padding: 12px 28px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(255,107,107,0.4);
+  transition: transform 0.15s;
+}
+.btn-retry:hover { transform: scale(1.05); }
+footer { text-align: center; padding: 24px; color: #999; font-size: 0.8rem; margin-top: 10px; }
+footer span { color: var(--coral); }
+</style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Leo's Busy Saturday</h1>
+<header>
+  <h1>🌟 Amy's Big City Adventure 🌟</h1>
+  <p>四年級英語故事 &amp; 閱讀測驗 ｜ 點擊藍色單字可以聽發音 🔊</p>
+</header>
 
-    <div class="controls">
-        <div class="slider-container">
-            <span>🐢 Slow (慢)</span>
-            <input type="range" id="speedRange" min="0.5" max="1.5" step="0.1" value="0.9">
-            <span>Fast (快) 🐇</span>
-        </div>
-        <p style="margin-top: 5px; font-size: 0.9em;">調整朗讀速度 (Speed Adjustment)</p>
-    </div>
-
-    <div class="story-section" id="story-container">
-        
-        <div class="paragraph-card">
-            <p class="english-text">
-                <span class="sentence">Today is a special day.</span>
-                <span class="sentence">I am at my <strong>house</strong> for my <strong>birthday party</strong>.</span>
-                <span class="sentence">I want to look <strong>smart</strong>, so I dress up nicely.</span>
-                <span class="sentence">I wear a <strong>T-shirt</strong>, cool <strong>shorts</strong>, and my favorite <strong>sneakers</strong>.</span>
-                <span class="sentence">It is a little cold, so I put on a <strong>sweater</strong> and a <strong>jacket</strong>.</span>
-                <span class="sentence">I also put my new <strong>smartphone</strong> in my <strong>pants</strong> pocket.</span>
-            </p>
-            <p class="chinese-text">今天是一個特別的日子。我在我的房子裡舉辦我的生日派對。我想要看起來很聰明(帥氣)，所以我盛裝打扮。我穿著一件T恤、很酷的短褲，還有我最喜歡的運動鞋。天氣有點冷，所以我穿上了一件毛衣和一件夾克。我還把我新的智慧型手機放進褲子口袋裡。</p>
-            <div class="para-controls">
-                <button class="btn-trans" onclick="toggleTrans(this)">👁️ 顯示中文</button>
-                <button class="btn-read" onclick="readParagraph(this)">🔊 朗讀故事</button>
-            </div>
-        </div>
-
-        <div class="paragraph-card">
-            <p class="english-text">
-                <span class="sentence">My sister is here too.</span>
-                <span class="sentence">She wears a pink <strong>dress</strong> and a pretty <strong>skirt</strong>.</span>
-                <span class="sentence">She has her <strong>glasses</strong> and a <strong>phone</strong>.</span>
-                <span class="sentence">We need to go out to <strong>buy</strong> some things.</span>
-                <span class="sentence">Before we go, I take my <strong>water bottle</strong>, and she takes an <strong>umbrella</strong> because it might rain.</span>
-            </p>
-            <p class="chinese-text">我的妹妹也在這裡。她穿著粉紅色的洋裝和漂亮的裙子。她帶著她的眼鏡和電話。我們需要出門去買一些東西。在我們出發之前，我帶了我的水壺，而她帶了一把雨傘，因為可能會下雨。</p>
-            <div class="para-controls">
-                <button class="btn-trans" onclick="toggleTrans(this)">👁️ 顯示中文</button>
-                <button class="btn-read" onclick="readParagraph(this)">🔊 朗讀故事</button>
-            </div>
-        </div>
-
-        <div class="paragraph-card">
-            <p class="english-text">
-                <span class="sentence">There are many vehicles on the street.</span>
-                <span class="sentence">I see a <strong>car</strong>, a <strong>taxi</strong>, and a big <strong>bus</strong>.</span>
-                <span class="sentence">My friend rides a <strong>bike</strong>, and my uncle rides a <strong>scooter</strong>.</span>
-                <span class="sentence">We walk to the station to take the <strong>MRT</strong>.</span>
-                <span class="sentence">Outside the station, we also see a long <strong>train</strong> and a <strong>plane</strong> flying in the sky.</span>
-            </p>
-            <p class="chinese-text">街上有很多車輛。我看見一輛汽車、一輛計程車和一輛大公車。我的朋友騎著腳踏車，而我的叔叔騎著機車。我們走到車站去搭捷運。在車站外面，我們還看到一列長長的火車和一架在天空中飛行的飛機。</p>
-            <div class="para-controls">
-                <button class="btn-trans" onclick="toggleTrans(this)">👁️ 顯示中文</button>
-                <button class="btn-read" onclick="readParagraph(this)">🔊 朗讀故事</button>
-            </div>
-        </div>
-
-        <div class="paragraph-card">
-            <p class="english-text">
-                <span class="sentence">We arrive in the city.</span>
-                <span class="sentence">First, we go to the <strong>post office</strong> to send some <strong>post</strong>.</span>
-                <span class="sentence">Next to it, there is a large <strong>bank</strong> and my dad's <strong>office</strong>.</span>
-                <span class="sentence">There is also a <strong>hospital</strong> nearby, but we are <strong>healthy</strong> and do not need to go there.</span>
-            </p>
-            <p class="chinese-text">我們到達了城市。首先，我們去郵局寄一些郵件。在它旁邊，有一家大銀行和我爸爸的辦公室。附近也有一家醫院，但是我們很健康，不需要去那裡。</p>
-            <div class="para-controls">
-                <button class="btn-trans" onclick="toggleTrans(this)">👁️ 顯示中文</button>
-                <button class="btn-read" onclick="readParagraph(this)">🔊 朗讀故事</button>
-            </div>
-        </div>
-
-        <div class="paragraph-card">
-            <p class="english-text">
-                <span class="sentence">We are very hungry now.</span>
-                <span class="sentence">We go to a nice <strong>restaurant</strong> for lunch.</span>
-                <span class="sentence">The waiter brings me a <strong>glass</strong> of juice.</span>
-                <span class="sentence">After lunch, we go to a <strong>bakery</strong>.</span>
-                <span class="sentence">We buy some yummy <strong>bread</strong>.</span>
-                <span class="sentence">Finally, we go to a <strong>bookstore</strong> to buy a <strong>story</strong> book about a <strong>king</strong>.</span>
-                <span class="sentence">It is a happy day!</span>
-            </p>
-            <p class="chinese-text">我們現在非常餓。我們去一家很棒的餐廳吃午餐。服務生拿給我一杯果汁。午餐後，我們去了一家麵包店。我們買了一些美味的麵包。最後，我們去書店買了一本關於國王的故事書。這是一個快樂的一天！</p>
-            <div class="para-controls">
-                <button class="btn-trans" onclick="toggleTrans(this)">👁️ 顯示中文</button>
-                <button class="btn-read" onclick="readParagraph(this)">🔊 朗讀故事</button>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="quiz-section">
-        <h2 class="quiz-title">Reading Comprehension Quiz (閱讀測驗)</h2>
-
-        <div class="question-block" id="q1">
-            <div class="question-header">
-                <span class="q-text">1. Where is the main character at the beginning?</span>
-                <div class="speaker-icon" onclick="readQuestion('q1', 'Where is the main character at the beginning?', ['At a park', 'At his house', 'At a school'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q1" value="A"> A) At a park</label>
-                <label><input type="radio" name="q1" value="B"> B) At his house</label>
-                <label><input type="radio" name="q1" value="C"> C) At a school</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q2">
-            <div class="question-header">
-                <span class="q-text">2. What did the character wear on his feet?</span>
-                <div class="speaker-icon" onclick="readQuestion('q2', 'What did the character wear on his feet?', ['Boots', 'Sandals', 'Sneakers'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q2" value="A"> A) Boots</label>
-                <label><input type="radio" name="q2" value="B"> B) Sandals</label>
-                <label><input type="radio" name="q2" value="C"> C) Sneakers</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q3">
-            <div class="question-header">
-                <span class="q-text">3. What did the sister bring?</span>
-                <div class="speaker-icon" onclick="readQuestion('q3', 'What did the sister bring?', ['An umbrella', 'A bike', 'A computer'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q3" value="A"> A) An umbrella</label>
-                <label><input type="radio" name="q3" value="B"> B) A bike</label>
-                <label><input type="radio" name="q3" value="C"> C) A computer</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q4">
-            <div class="question-header">
-                <span class="q-text">4. What flying vehicle did they see?</span>
-                <div class="speaker-icon" onclick="readQuestion('q4', 'What flying vehicle did they see?', ['A bus', 'A plane', 'A boat'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q4" value="A"> A) A bus</label>
-                <label><input type="radio" name="q4" value="B"> B) A plane</label>
-                <label><input type="radio" name="q4" value="C"> C) A boat</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q5">
-            <div class="question-header">
-                <span class="q-text">5. Where did they go to send items?</span>
-                <div class="speaker-icon" onclick="readQuestion('q5', 'Where did they go to send items?', ['The bank', 'The hospital', 'The post office'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q5" value="A"> A) The bank</label>
-                <label><input type="radio" name="q5" value="B"> B) The hospital</label>
-                <label><input type="radio" name="q5" value="C"> C) The post office</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q6">
-            <div class="question-header">
-                <span class="q-text">6. Which building was near the bank?</span>
-                <div class="speaker-icon" onclick="readQuestion('q6', 'Which building was near the bank?', ['A zoo', 'An office', 'A farm'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q6" value="A"> A) A zoo</label>
-                <label><input type="radio" name="q6" value="B"> B) An office</label>
-                <label><input type="radio" name="q6" value="C"> C) A farm</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q7">
-            <div class="question-header">
-                <span class="q-text">7. What did the waiter give the character?</span>
-                <div class="speaker-icon" onclick="readQuestion('q7', 'What did the waiter give the character?', ['A glass of juice', 'A cup of tea', 'A bottle of milk'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q7" value="A"> A) A glass of juice</label>
-                <label><input type="radio" name="q7" value="B"> B) A cup of tea</label>
-                <label><input type="radio" name="q7" value="C"> C) A bottle of milk</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q8">
-            <div class="question-header">
-                <span class="q-text">8. What did they buy at the bakery?</span>
-                <div class="speaker-icon" onclick="readQuestion('q8', 'What did they buy at the bakery?', ['Rice', 'Bread', 'Pizza'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q8" value="A"> A) Rice</label>
-                <label><input type="radio" name="q8" value="B"> B) Bread</label>
-                <label><input type="radio" name="q8" value="C"> C) Pizza</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q9">
-            <div class="question-header">
-                <span class="q-text">9. What kind of book did they buy?</span>
-                <div class="speaker-icon" onclick="readQuestion('q9', 'What kind of book did they buy?', ['A math book', 'A story book', 'A music book'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q9" value="A"> A) A math book</label>
-                <label><input type="radio" name="q9" value="B"> B) A story book</label>
-                <label><input type="radio" name="q9" value="C"> C) A music book</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q10">
-            <div class="question-header">
-                <span class="q-text">10. Why did the character wear a sweater?</span>
-                <div class="speaker-icon" onclick="readQuestion('q10', 'Why did the character wear a sweater?', ['It was hot', 'It was rainy', 'It was cold'])">🔊</div>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q10" value="A"> A) It was hot</label>
-                <label><input type="radio" name="q10" value="B"> B) It was rainy</label>
-                <label><input type="radio" name="q10" value="C"> C) It was cold</label>
-            </div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        Designed for Grade 4 English Learning
-    </div>
+<div class="speed-bar">
+  <label for="speed-slider">🐢 發音速度</label>
+  <input type="range" id="speed-slider" min="0.5" max="1.5" step="0.1" value="0.9">
+  <span id="speed-val">0.9×</span>
+  <span class="speed-info">建議小朋友從 0.7× 開始，練熟了再調快 🚀</span>
 </div>
 
+<div class="wordlist-banner">
+  <h3>📚 本課重點單字 — 點一下就能聽發音！</h3>
+  <div class="word-chips" id="word-chips"></div>
+</div>
+
+<h2 class="section-title"><span>📖 故事開始囉！</span></h2>
+<div class="story-container" id="story-container"></div>
+
+<button class="go-quiz-btn" id="go-quiz-btn">🧩 開始閱讀測驗！</button>
+
+<h2 class="section-title" id="quiz-anchor"><span>📝 閱讀測驗 Reading Quiz</span></h2>
+<div class="quiz-section">
+  <div class="quiz-intro">
+    <p>📖 根據故事回答以下 10 題，每題選一個最正確的答案。</p>
+    <p>Read the story carefully and choose the best answer for each question.</p>
+  </div>
+  <div id="quiz-container"></div>
+  <div class="submit-row">
+    <button class="btn-submit" id="submit-btn">🎯 提交答案 Submit</button>
+  </div>
+</div>
+
+<div class="score-board" id="score-board">
+  <h2>🏆 測驗結果 Quiz Result 🏆</h2>
+  <div class="score-big" id="score-display">0 / 10</div>
+  <div class="score-msg" id="score-msg"></div>
+  <button class="btn-retry" id="retry-btn">🔄 再試一次 Try Again</button>
+</div>
+
+<footer><p>✨ 設計給努力學習英語的小朋友 ✨ ｜ <span>Amy's Big City Adventure</span> © 2025</p></footer>
+
 <script>
-    // Init Speech Synthesis
-    const synth = window.speechSynthesis;
-    let speaking = false;
+/* ============================================================
+   DATA
+   ============================================================ */
+var VOCAB = [
+  {w:"bookstore",    zh:"書店"},
+  {w:"restaurant",   zh:"餐廳"},
+  {w:"hospital",     zh:"醫院"},
+  {w:"bakery",       zh:"麵包店"},
+  {w:"bank",         zh:"銀行"},
+  {w:"post office",  zh:"郵局"},
+  {w:"post",         zh:"郵政/郵件"},
+  {w:"office",       zh:"辦公室"},
+  {w:"bike",         zh:"腳踏車"},
+  {w:"scooter",      zh:"機車"},
+  {w:"taxi",         zh:"計程車"},
+  {w:"bus",          zh:"公車"},
+  {w:"train",        zh:"火車"},
+  {w:"car",          zh:"汽車"},
+  {w:"MRT",          zh:"捷運"},
+  {w:"plane",        zh:"飛機"},
+  {w:"dress",        zh:"洋裝"},
+  {w:"skirt",        zh:"裙子"},
+  {w:"T-shirt",      zh:"T恤"},
+  {w:"shorts",       zh:"短褲"},
+  {w:"sneakers",     zh:"運動鞋"},
+  {w:"pants",        zh:"褲子/長褲"},
+  {w:"sweater",      zh:"毛衣"},
+  {w:"jacket",       zh:"夾克/外套"},
+  {w:"smartphone",   zh:"智慧型手機"},
+  {w:"phone",        zh:"電話/手機"},
+  {w:"smart",        zh:"聰明的"},
+  {w:"umbrella",     zh:"雨傘"},
+  {w:"water bottle", zh:"水壺/水瓶"},
+  {w:"glasses",      zh:"眼鏡"},
+  {w:"glass",        zh:"玻璃杯"}
+];
 
-    // Word Click Event
-    document.querySelectorAll('strong').forEach(word => {
-        word.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent bubbling if needed
-            speakText(this.innerText, this);
-        });
-    });
+var PARAS = [
+  {
+    en: "One Saturday morning, Amy put on her favorite dress — a bright yellow one — and grabbed her water bottle and umbrella. She also wore her sneakers and glasses. \"Today is a big adventure day!\" she said with a big smile.",
+    zh: "一個星期六的早上，艾咪穿上她最喜歡的洋裝——一件亮黃色的——然後拿起她的水壺和雨傘。她還穿上了運動鞋，戴上眼鏡。「今天是大冒險日！」她帶著大大的微笑說道。"
+  },
+  {
+    en: "Amy's mom said, \"We need to take the bus downtown. Later we can ride the MRT to the other side of the city.\" Amy nodded and picked up her smartphone to check the map. She was such a smart girl — she already knew which stop to get off at!",
+    zh: "艾咪的媽媽說：「我們需要搭公車去市區。之後我們可以搭捷運到城市的另一邊。」艾咪點點頭，拿起她的智慧型手機查看地圖。她真是個聰明的女孩——她已經知道要在哪一站下車了！"
+  },
+  {
+    en: "Their first stop was the bakery near the post office. Mom had to send a package at the post office — she said the post was very important for work in her office. While Mom stood in line, Amy enjoyed the sweet smell of fresh bread from the bakery next door.",
+    zh: "她們的第一站是郵局旁邊的麵包店。媽媽需要在郵局寄一個包裹——她說郵件對她在辦公室的工作非常重要。媽媽在排隊的時候，艾咪享受著隔壁麵包店飄來的新鮮麵包香氣。"
+  },
+  {
+    en: "Next, they walked to the bank so Mom could take out some money. A taxi almost splashed a puddle on Amy as it rushed past! Luckily, she jumped back just in time — her sneakers stayed dry. Nearby, a man on a scooter was delivering packages, and a girl on a bike rode by with a wave.",
+    zh: "接著，她們走去銀行讓媽媽領一些錢。一輛計程車呼嘯而過，差點把水濺在艾咪身上！幸好她及時跳開——她的運動鞋保持乾燥。附近，一個騎著機車的男人正在送包裹，一個騎腳踏車的女孩揮手經過。"
+  },
+  {
+    en: "After the bank, Amy and Mom ate lunch at a lovely restaurant near the MRT station. Amy ordered noodle soup and drank a glass of orange juice — she loved the tall glass it came in! \"This restaurant has such good food,\" said Amy, slurping happily.",
+    zh: "在銀行之後，艾咪和媽媽在捷運站附近一家可愛的餐廳吃午餐。艾咪點了湯麵，並喝了一杯柳橙汁——她好喜歡那個高高的玻璃杯！「這家餐廳的食物真的好好吃，」艾咪開心地吸著麵說。"
+  },
+  {
+    en: "In the afternoon, they took the train to a shopping district. Amy wanted to buy new clothes! She found a cute pink skirt, a cozy sweater, and a cool jacket. Her little brother back home had asked for a new T-shirt and some shorts, so she picked those up too. Mom also bought pants for Dad.",
+    zh: "下午，她們搭火車去購物區。艾咪想買新衣服！她找到了一條可愛的粉紅色裙子、一件舒適的毛衣，和一件帥氣的夾克。在家的弟弟要她幫買一件新的T恤和一條短褲，所以她也一起買了。媽媽也幫爸爸買了長褲。"
+  },
+  {
+    en: "After shopping, they passed a wonderful bookstore. Amy's eyes lit up! She ran in and found a book about planes and trains and how people travel the world. \"I want to ride every kind of transport someday — plane, train, bus, and even a car through the mountains!\" she said to the phone camera as she took a selfie with the book.",
+    zh: "購物之後，她們經過了一家美妙的書店。艾咪的眼睛亮了起來！她跑進去，找到了一本關於飛機和火車，以及人們如何環遊世界的書。「我有一天想要體驗各種交通工具——飛機、火車、公車，甚至是開著汽車穿越山脈！」她對著手機鏡頭說，同時拿著書自拍。"
+  },
+  {
+    en: "On the way home, it started to rain. Amy opened her umbrella proudly — she was glad she had brought it! Mom called a taxi on her phone because the bags were too heavy to carry on the bus. They rode home comfortably as the rain tapped on the car windows.",
+    zh: "回家的路上，開始下雨了。艾咪驕傲地撐開她的雨傘——她好慶幸帶來了！媽媽用手機叫了一輛計程車，因為袋子太重了，不方便搭公車。雨水輕輕敲打著汽車的窗戶，她們舒舒服服地搭車回家。"
+  },
+  {
+    en: "That night, Amy found out Mom had a fun surprise — they would fly on a plane next month to visit Grandma! Amy hugged her new book tightly and whispered, \"I can't wait to visit the hospital where Grandma works as a nurse, and explore more of the city!\" It had truly been an amazing day.",
+    zh: "那天晚上，艾咪發現媽媽有個有趣的驚喜——下個月她們要搭飛機去探望奶奶！艾咪緊緊抱著她的新書，輕聲說：「我等不及要去探望在醫院當護士的奶奶，還有探索更多這個城市！」這真的是美好的一天。"
+  }
+];
 
-    // Speak a single word or phrase
-    function speakText(text, element) {
-        if (synth.speaking) synth.cancel();
+var QUESTIONS = [
+  {
+    q: "What was Amy wearing on her adventure day?",
+    opts: ["A. A blue jacket and pants","B. A yellow dress, sneakers, and glasses","C. A skirt and a sweater","D. A T-shirt and shorts"],
+    ans: "B"
+  },
+  {
+    q: "How did Amy and her mom travel downtown first?",
+    opts: ["A. By taxi","B. By plane","C. By bus","D. By scooter"],
+    ans: "C"
+  },
+  {
+    q: "Why did Amy's mom go to the post office?",
+    opts: ["A. To buy stamps","B. To send a package","C. To pick up mail","D. To pay her phone bill"],
+    ans: "B"
+  },
+  {
+    q: "What almost happened to Amy near the bank?",
+    opts: ["A. She dropped her water bottle","B. She lost her glasses","C. A taxi almost splashed a puddle on her","D. A bike rider knocked her over"],
+    ans: "C"
+  },
+  {
+    q: "What did Amy eat for lunch at the restaurant?",
+    opts: ["A. Pizza and milk","B. Noodle soup and orange juice","C. Bread and water","D. Rice and tea"],
+    ans: "B"
+  },
+  {
+    q: "Which clothing items did Amy's brother ask her to buy?",
+    opts: ["A. A dress and sneakers","B. A jacket and sweater","C. A T-shirt and shorts","D. Pants and a skirt"],
+    ans: "C"
+  },
+  {
+    q: "What kind of book did Amy find in the bookstore?",
+    opts: ["A. A book about cooking","B. A book about planes, trains, and world travel","C. A book about animals","D. A book about smartphones"],
+    ans: "B"
+  },
+  {
+    q: "Why did Amy and her mom take a taxi home instead of the bus?",
+    opts: ["A. The bus was too slow","B. It was too hot outside","C. The bags were too heavy to carry on the bus","D. The bus station was closed"],
+    ans: "C"
+  },
+  {
+    q: "Where does Amy's grandma work?",
+    opts: ["A. At a restaurant","B. At a bookstore","C. At a bank","D. At a hospital"],
+    ans: "D"
+  },
+  {
+    q: "What is the best title for this story?",
+    opts: ["A. Amy Stays Home All Day","B. Amy's Big City Adventure","C. Amy Goes to School","D. Amy Rides a Plane"],
+    ans: "B"
+  }
+];
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = document.getElementById('speedRange').value;
+/* ============================================================
+   STATE
+   ============================================================ */
+var speechRate = 0.9;
+var userAnswers = {};
+var quizSubmitted = false;
+var activeReadBtn = null;   // the read-btn currently playing
 
-        // Highlight visual
-        if(element) {
-            utterance.onstart = () => element.classList.add('highlight');
-            utterance.onend = () => element.classList.remove('highlight');
-        }
+/* ============================================================
+   SPEECH
+   ============================================================ */
+function stopAll() {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll(".word-on").forEach(function(el){ el.classList.remove("word-on"); });
+  document.querySelectorAll(".sent-on").forEach(function(el){ el.classList.remove("sent-on"); });
+  document.querySelectorAll(".q-hl").forEach(function(el){ el.classList.remove("q-hl"); });
+  document.querySelectorAll(".qsb-on").forEach(function(el){ el.classList.remove("qsb-on"); });
+  document.querySelectorAll(".chip-on").forEach(function(el){ el.classList.remove("chip-on"); });
+  if (activeReadBtn) {
+    activeReadBtn.textContent = "🔊 朗讀故事";
+    activeReadBtn.className = "btn btn-read";
+    activeReadBtn = null;
+  }
+}
 
-        synth.speak(utterance);
-    }
+function speakText(text, onEnd) {
+  if (!window.speechSynthesis) { if(onEnd) onEnd(); return; }
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = speechRate;
+  u.onend = onEnd || null;
+  u.onerror = onEnd || null;
+  window.speechSynthesis.speak(u);
+  return u;
+}
 
-    // Toggle Translation
-    function toggleTrans(btn) {
-        const card = btn.closest('.paragraph-card');
-        const chineseText = card.querySelector('.chinese-text');
-        
-        if (chineseText.style.display === 'block') {
-            chineseText.style.display = 'none';
-            btn.innerHTML = '👁️ 顯示中文';
- 
+function speakParagraph(text, sentenceSpans, onEnd) {
+  if (!window.speechSynthesis) { if(onEnd) onEnd(); return; }
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = speechRate;
+
+  // Build cumulative char offsets for each span
+  var offsets = [];
+  var cum = 0;
+  for (var i = 0; i < sentenceSpans.length; i++) {
+    offsets.push(cum);
+    cum += sentenceSpans[i].textContent.length + 1;
+  }
+
+  var lastIdx = -1;
+  u.onboundary = function(e) {
+    var ci 
