@@ -350,8 +350,9 @@ function buildEnEl(text, paraIdx) {
     if(pt.type==="t"){
       p.appendChild(document.createTextNode(pt.v));
     } else {
-      (function(sp, word){
+      (function(sp, word, displayText){
         sp.className = "vw";
+        sp.textContent = displayText;
         var zhArr = [];
         for(var vi=0;vi<VOCAB.length;vi++) if(VOCAB[vi][0].toLowerCase()===word.toLowerCase()){ zhArr.push(VOCAB[vi][1]); break; }
         sp.title = word + " = " + (zhArr[0]||"");
@@ -362,7 +363,7 @@ function buildEnEl(text, paraIdx) {
           doSpeak(word, function(){ sp.classList.remove("on"); });
         });
         p.appendChild(sp);
-      })(document.createElement("span"), pt.word);
+      })(document.createElement("span"), pt.word, pt.v);
     }
   }
   return p;
@@ -527,20 +528,20 @@ function buildQuiz() {
     grid.className = "ogrid";
 
     for(var oi=0; oi<q.opts.length; oi++){
-      (function(qIdx, optIdx, optText, letter){
+      (function(qIdx, optIdx, optText, letter, myGrid){
         var ob = document.createElement("button");
         ob.className = "obtn";
         ob.textContent = optText;
         ob.addEventListener("click", function(){
           if(submitted) return;
           // deselect others in same question
-          var siblings = grid.querySelectorAll(".obtn");
+          var siblings = myGrid.querySelectorAll(".obtn");
           for(var s=0; s<siblings.length; s++) siblings[s].classList.remove("sel");
           ob.classList.add("sel");
           answers[qIdx] = letter;
         });
-        grid.appendChild(ob);
-      })(qi, oi, q.opts[oi], String.fromCharCode(65+oi));
+        myGrid.appendChild(ob);
+      })(qi, oi, q.opts[oi], String.fromCharCode(65+oi), grid);
     }
 
     card.appendChild(grid);
