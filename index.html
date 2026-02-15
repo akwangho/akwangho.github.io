@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Amy and the Treasure Map — 英語故事學習</title>
+<title>Amy's Rainy Day — 英語故事學習</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -43,7 +43,8 @@ header p{color:rgba(255,255,255,.9);font-size:.92rem;margin-top:6px;font-weight:
 .vw{color:#1A6ED8;background:#E8F4FF;border-radius:6px;padding:1px 5px;cursor:pointer;font-weight:800;border-bottom:2px solid #1A6ED8;transition:background .18s,color .18s}
 .vw:hover{background:var(--hlw);color:#0A3D8F}
 .vw.on{background:var(--hl);color:#7a4000;border-bottom-color:#E8A000}
-.ssen.on{background:var(--hl);border-radius:4px}
+.ssen{transition:background .25s;border-radius:4px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.ssen.on{background:var(--hl);padding:2px 0}
 .para-zh{display:none;margin-top:11px;padding:11px 13px;background:linear-gradient(135deg,#f0fff4,#e8f4ff);border-radius:12px;font-size:.92rem;line-height:1.8;color:#444;border:1px dashed #aaa}
 
 .pctrl{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
@@ -102,7 +103,7 @@ footer span{color:var(--coral)}
 <body>
 
 <header>
-  <h1>🌟 Amy and the Treasure Map 🌟</h1>
+  <h1>🌟 Amy's Rainy Day 🌟</h1>
   <p>四年級英語故事 &amp; 閱讀測驗 ｜ 點擊藍色單字可以聽發音 🔊</p>
 </header>
 
@@ -142,7 +143,7 @@ footer span{color:var(--coral)}
   <button class="bretry" id="retry-btn">🔄 再試一次 Try Again</button>
 </div>
 
-<footer><p>✨ 設計給努力學習英語的小朋友 ✨ ｜ <span>Amy and the Treasure Map</span> © 2025</p></footer>
+<footer><p>✨ 設計給努力學習英語的小朋友 ✨ ｜ <span>Amy's Rainy Day</span> © 2025</p></footer>
 
 <script>
 /* =========================================================
@@ -160,51 +161,35 @@ var VOCAB = [
   ["smart","聰明的"],["umbrella","雨傘"],["water bottle","水壺/水瓶"],
   ["glasses","眼鏡"],["glass","玻璃杯"]
 ];
-// sort longest first so "post office" matched before "post", "water bottle" before "water", "glasses" before "glass", "smartphone" before "phone", "T-shirt" before "shirt"
+// sort longest first so "post office" matched before "post", etc.
 VOCAB.sort(function(a,b){ return b[0].length - a[0].length; });
 
 var PARAS = [
   {
-    en:"Amy loved sunny mornings. She put on her favorite T-shirt and shorts, then put on her sneakers. She grabbed her water bottle and glasses. Her smartphone beeped — a message from her friend Ben said, \"Come to the bakery now! I have something fun for you!\"",
-    zh:"艾咪喜歡晴朗的早晨。她穿上她最喜歡的T恤和短褲，然後穿上運動鞋。她拿起水壺和眼鏡。她的智慧型手機響了一聲——朋友 Ben 傳來訊息：「快來麵包店！我有好玩的東西要給你！」"
+    en:"One morning, Amy put on her dress and sneakers and grabbed her umbrella. She rode her bike to the bakery to buy bread for Mom.",
+    zh:"一天早上，艾咪穿上洋裝和運動鞋，拿起雨傘。她騎腳踏車到麵包店幫媽媽買麵包。"
   },
   {
-    en:"Amy jumped on her bike and rode down the street. She passed the post office and saw a man on a scooter delivering letters. At the bakery, Ben was holding a small box. \"Look!\" he said. Inside was a small map. \"My dad made a treasure hunt for us!\" Ben said with a big smile.",
-    zh:"艾咪跳上腳踏車，沿著街道騎去。她經過郵局，看見一個騎機車的人正在送信。在麵包店，Ben 手裡拿著一個小盒子。「你看！」他說。裡面是一張小地圖。「我爸爸幫我們做了一個尋寶遊戲！」Ben 開心地笑著說。"
+    en:"At the bakery, she met her friend Lily. Lily was wearing glasses and reading a book. Amy said, \"Let's go to the bookstore!\" They took the bus to a big bookstore and looked at many books. Amy thought Lily was very smart because she knew so much.",
+    zh:"在麵包店，她遇到了朋友莉莉。莉莉戴著眼鏡，正在看一本書。艾咪說：「我們去書店吧！」她們搭公車到一家大書店，看了好多書。艾咪覺得莉莉很聰明，因為她懂好多東西。"
   },
   {
-    en:"The first clue said, \"Go to the place where people send post.\" They ran to the post office. The kind lady working in the office handed them the next clue. \"You two are so smart!\" she said. The new clue told them to find the place where people keep money, so they walked to the bank.",
-    zh:"第一條線索寫著：「去人們寄郵件的地方。」他們跑到郵局。在辦公室裡工作的好心阿姨把下一條線索交給他們。「你們兩個真聰明！」她說。新的線索叫他們去找人們存錢的地方，所以他們走到了銀行。"
-  },
-  {
-    en:"At the bank, a guard gave them another clue. It said, \"Take the bus to the big bookstore.\" They got on the bus and rode to the bookstore near the MRT station. A man with glasses showed them a clue hidden inside a book about planes and trains.",
-    zh:"在銀行，一位警衛給了他們另一條線索。上面寫著：「搭公車去那家大書店。」他們上了公車，坐到捷運站附近的書店。一個戴眼鏡的男人給他們看一本關於飛機和火車的書裡藏著的線索。"
-  },
-  {
-    en:"The next clue told them to go to the restaurant across the street. They sat down and each drank a glass of cold water. The waiter brought the next clue on a plate. \"Go to the place where doctors help people,\" it said. So they took the MRT to the hospital.",
-    zh:"下一條線索叫他們去街對面的餐廳。他們坐下來，各喝了一杯冰水。服務生把下一條線索放在盤子上端來。上面寫著：「去醫生幫助人們的地方。」於是他們搭捷運到了醫院。"
-  },
-  {
-    en:"At the hospital, a kind nurse gave them the last clue: \"Go back to where you started!\" Dark clouds came, so Amy opened her umbrella. They called a taxi on Amy's phone because the rain was very heavy. The taxi was a big yellow car, and they rode back to the bakery.",
-    zh:"在醫院，一位好心的護士給了他們最後一條線索：「回到你們出發的地方！」烏雲飄來了，艾咪撐開她的雨傘。他們用艾咪的手機叫了一輛計程車，因為雨下得很大。計程車是一輛大大的黃色汽車，他們坐回了麵包店。"
-  },
-  {
-    en:"When they walked in, Ben's dad was waiting with a big cake. \"You did it!\" he said. Amy's mom came with a surprise — a pretty dress, a warm sweater, and a cool jacket for Amy! Mom also had new pants for Dad and a cute skirt for Amy's sister. Amy picked up her phone and called Grandma. \"I want to ride a train or fly on a plane to visit you someday!\" she said. Grandma laughed. \"I can't wait!\" It was truly Amy's lucky day.",
-    zh:"當他們走進去的時候，Ben 的爸爸正拿著一個大蛋糕等著他們。「你們做到了！」他說。艾咪的媽媽也帶來了驚喜——一件漂亮的洋裝、一件溫暖的毛衣，和一件帥氣的夾克送給艾咪！媽媽也帶了新的長褲給爸爸，和一條可愛的裙子給艾咪的妹妹。艾咪拿起手機打電話給奶奶。「我想有一天搭火車或坐飛機去看你！」她說。奶奶笑著說：「我等不及了！」這真的是艾咪最幸運的一天。"
+    en:"After that, they walked to a small restaurant for lunch. Amy drank a glass of cold juice. Then it started to rain hard. Amy opened her umbrella, but Lily did not have one. Amy called a taxi on her phone. The taxi took them home safely. Amy smiled and said, \"What a fun day!\"",
+    zh:"之後，她們走到一家小餐廳吃午餐。艾咪喝了一杯冰果汁。接著開始下大雨。艾咪撐開雨傘，但莉莉沒有帶。艾咪用手機叫了一輛計程車。計程車安全地載她們回家。艾咪笑著說：「好開心的一天！」"
   }
 ];
 
 var QUESTIONS = [
-  {q:"What was Amy wearing when she left home?",
-   opts:["A. A dress and a sweater","B. A T-shirt, shorts, and sneakers","C. A skirt and a jacket","D. Pants and a sweater"],ans:"B"},
-  {q:"How did Amy go to the bakery to meet Ben?",
-   opts:["A. By bus","B. By taxi","C. By bike","D. By MRT"],ans:"C"},
-  {q:"Where did Amy and Ben go after the bank?",
-   opts:["A. To the hospital","B. To the restaurant","C. To the bookstore","D. To the post office"],ans:"C"},
-  {q:"Why did Amy and Ben take a taxi back to the bakery?",
-   opts:["A. They were tired of walking","B. It was raining very hard","C. The bus was too slow","D. The bakery was very far away"],ans:"B"},
-  {q:"What surprise did Amy's mom bring at the end of the story?",
-   opts:["A. A new smartphone and glasses","B. A big cake and some water","C. A dress, a sweater, and a jacket","D. A T-shirt and shorts"],ans:"C"}
+  {q:"What did Amy ride to the bakery?",
+   opts:["A. A bus","B. A taxi","C. A bike","D. A car"],ans:"C"},
+  {q:"What was Lily doing at the bakery?",
+   opts:["A. Buying bread","B. Wearing glasses and reading a book","C. Eating lunch","D. Drinking juice"],ans:"B"},
+  {q:"How did Amy and Lily go to the bookstore?",
+   opts:["A. By bike","B. By taxi","C. They walked","D. By bus"],ans:"D"},
+  {q:"What did Amy drink at the restaurant?",
+   opts:["A. A glass of water","B. A glass of milk","C. A glass of cold juice","D. A glass of tea"],ans:"C"},
+  {q:"Why did Amy call a taxi?",
+   opts:["A. She was tired","B. The bookstore was far away","C. It started to rain hard","D. Lily wanted to go shopping"],ans:"C"}
 ];
 
 /* =========================================================
@@ -220,8 +205,7 @@ var activeReadBtn = null;
    ========================================================= */
 function stopAll() {
   try { window.speechSynthesis.cancel(); } catch(e){}
-  var els;
-  els = document.getElementsByClassName("on");
+  var els = document.getElementsByClassName("on");
   while(els.length){ els[0].classList.remove("on"); }
   if(activeReadBtn){
     activeReadBtn.textContent = "🔊 朗讀故事";
@@ -241,38 +225,53 @@ function doSpeak(text, onDone) {
   return u;
 }
 
-function speakWithHL(text, spans, onDone) {
-  if(!window.speechSynthesis){ if(onDone) onDone(); return; }
-  var u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-US";
-  u.rate = rate;
-  // build char offsets
-  var offs = [];
-  var c = 0;
-  for(var i=0;i<spans.length;i++){
-    offs.push(c);
-    c += spans[i].textContent.length + 1;
+/* =========================================================
+   SENTENCE SPLITTER
+   ========================================================= */
+function splitSentences(text) {
+  var result = [];
+  var re = /[^.!?]*[.!?]+["']?/g;
+  var m;
+  while((m = re.exec(text)) !== null){
+    var s = m[0].trim();
+    if(s) result.push(s);
   }
-  var last = -1;
-  u.onboundary = function(e){
-    var ci = e.charIndex;
-    var idx = 0;
-    for(var i=0;i<offs.length;i++){ if(offs[i]<=ci) idx=i; }
-    if(idx!==last){
-      if(last>=0 && spans[last]) spans[last].classList.remove("on");
-      if(spans[idx]) spans[idx].classList.add("on");
-      last = idx;
+  if(result.length === 0) result.push(text);
+  return result;
+}
+
+/* =========================================================
+   SENTENCE-BY-SENTENCE READ ALOUD WITH HIGHLIGHT
+   ========================================================= */
+function readParaSentences(idx, enEl, br) {
+  var spans = enEl.querySelectorAll(".ssen");
+  if(spans.length === 0){
+    doSpeak(PARAS[idx].en, function(){
+      br.textContent = "🔊 朗讀故事";
+      br.className = "btn bread";
+      activeReadBtn = null;
+    });
+    return;
+  }
+  var si = 0;
+  function readNext(){
+    if(si >= spans.length || activeReadBtn !== br){
+      for(var i=0;i<spans.length;i++) spans[i].classList.remove("on");
+      if(activeReadBtn === br){
+        br.textContent = "🔊 朗讀故事";
+        br.className = "btn bread";
+        activeReadBtn = null;
+      }
+      return;
     }
-  };
-  u.onend = function(){
-    for(var i=0;i<spans.length;i++) if(spans[i]) spans[i].classList.remove("on");
-    if(onDone) onDone();
-  };
-  u.onerror = function(){
-    for(var i=0;i<spans.length;i++) if(spans[i]) spans[i].classList.remove("on");
-    if(onDone) onDone();
-  };
-  window.speechSynthesis.speak(u);
+    for(var i=0;i<spans.length;i++) spans[i].classList.remove("on");
+    spans[si].classList.add("on");
+    doSpeak(spans[si].textContent, function(){
+      si++;
+      readNext();
+    });
+  }
+  readNext();
 }
 
 /* =========================================================
@@ -284,7 +283,6 @@ function isWordChar(ch) {
   return (c>='a' && c<='z') || c==='-';
 }
 
-// Returns [{type:"t",v:string} | {type:"w",v:string,word:string}]
 function parseText(text) {
   var parts = [];
   var i = 0;
@@ -294,16 +292,13 @@ function parseText(text) {
     for(var vi=0; vi<VOCAB.length; vi++){
       var vw = VOCAB[vi][0];
       var vlen = vw.length;
-      // check match at position i (case-insensitive)
       if(i + vlen > tlen) continue;
       var seg = text.slice(i, i+vlen);
       if(seg.toLowerCase() !== vw.toLowerCase()) continue;
-      // check word boundaries
       var before = i>0 ? text[i-1] : '';
       var after  = (i+vlen < tlen) ? text[i+vlen] : '';
       if(isWordChar(before)) continue;
       if(isWordChar(after))  continue;
-      // matched!
       parts.push({type:"w", v:seg, word:vw});
       i += vlen;
       matched = true;
@@ -321,37 +316,50 @@ function parseText(text) {
   return parts;
 }
 
+/* =========================================================
+   BUILD ENGLISH PARAGRAPH  (sentences wrapped in .ssen)
+   ========================================================= */
 function buildEnEl(text, paraIdx) {
   var p = document.createElement("p");
   p.className = "para-en";
   p.id = "en"+paraIdx;
-  var parts = parseText(text);
-  for(var i=0;i<parts.length;i++){
-    var pt = parts[i];
-    if(pt.type==="t"){
-      p.appendChild(document.createTextNode(pt.v));
-    } else {
-      (function(sp, word, displayText){
-        sp.className = "vw";
-        sp.textContent = displayText;
-        var zhArr = [];
-        for(var vi=0;vi<VOCAB.length;vi++) if(VOCAB[vi][0].toLowerCase()===word.toLowerCase()){ zhArr.push(VOCAB[vi][1]); break; }
-        sp.title = word + " = " + (zhArr[0]||"");
-        sp.addEventListener("click", function(e){
-          e.stopPropagation();
-          stopAll();
-          sp.classList.add("on");
-          doSpeak(word, function(){ sp.classList.remove("on"); });
-        });
-        p.appendChild(sp);
-      })(document.createElement("span"), pt.word, pt.v);
+  var sentences = splitSentences(text);
+  for(var si=0; si<sentences.length; si++){
+    var sent = sentences[si];
+    var sspan = document.createElement("span");
+    sspan.className = "ssen";
+    var parts = parseText(sent);
+    for(var i=0;i<parts.length;i++){
+      var pt = parts[i];
+      if(pt.type==="t"){
+        sspan.appendChild(document.createTextNode(pt.v));
+      } else {
+        (function(sp, word, displayText){
+          sp.className = "vw";
+          sp.textContent = displayText;
+          var zhArr = [];
+          for(var vi=0;vi<VOCAB.length;vi++) if(VOCAB[vi][0].toLowerCase()===word.toLowerCase()){ zhArr.push(VOCAB[vi][1]); break; }
+          sp.title = word + " = " + (zhArr[0]||"");
+          sp.addEventListener("click", function(e){
+            e.stopPropagation();
+            stopAll();
+            sp.classList.add("on");
+            doSpeak(word, function(){ sp.classList.remove("on"); });
+          });
+          sspan.appendChild(sp);
+        })(document.createElement("span"), pt.word, pt.v);
+      }
+    }
+    p.appendChild(sspan);
+    if(si < sentences.length - 1){
+      p.appendChild(document.createTextNode(" "));
     }
   }
   return p;
 }
 
 /* =========================================================
-   BUILD STORY  (no paragraph numbers for natural reading feel)
+   BUILD STORY
    ========================================================= */
 function buildStory() {
   var cont = document.getElementById("story");
@@ -372,7 +380,6 @@ function buildStory() {
     var ctrl = document.createElement("div");
     ctrl.className = "pctrl";
 
-    // Chinese toggle button
     (function(idx, zhDiv){
       var bz = document.createElement("button");
       bz.className = "btn bzh";
@@ -389,7 +396,6 @@ function buildStory() {
       ctrl.appendChild(bz);
     })(pi, zhP);
 
-    // Read aloud button
     (function(idx, enEl){
       var br = document.createElement("button");
       br.className = "btn bread";
@@ -403,22 +409,7 @@ function buildStory() {
         activeReadBtn = br;
         br.textContent = "⏹ 停止朗讀";
         br.className = "btn bstop";
-        var spans = enEl.querySelectorAll(".ssen");
-        if(spans.length === 0){
-          // Wrap sentences in spans for highlighting
-          var text = PARAS[idx].en;
-          doSpeak(text, function(){
-            br.textContent = "🔊 朗讀故事";
-            br.className = "btn bread";
-            activeReadBtn = null;
-          });
-        } else {
-          speakWithHL(PARAS[idx].en, Array.prototype.slice.call(spans), function(){
-            br.textContent = "🔊 朗讀故事";
-            br.className = "btn bread";
-            activeReadBtn = null;
-          });
-        }
+        readParaSentences(idx, enEl, br);
       });
       ctrl.appendChild(br);
     })(pi, enP);
@@ -510,7 +501,6 @@ function buildQuiz() {
         ob.textContent = optText;
         ob.addEventListener("click", function(){
           if(submitted) return;
-          // deselect others in same question
           var siblings = myGrid.querySelectorAll(".obtn");
           for(var s=0; s<siblings.length; s++) siblings[s].classList.remove("sel");
           ob.classList.add("sel");
@@ -537,7 +527,6 @@ function buildQuiz() {
 function submitQuiz() {
   if(submitted) return;
 
-  // Check all answered
   var total = QUESTIONS.length;
   var answered = Object.keys(answers).length;
   if(answered < total){
@@ -570,7 +559,6 @@ function submitQuiz() {
     }
     fb.style.display = "block";
 
-    // Highlight correct/wrong options
     var btns = card.querySelectorAll(".obtn");
     for(var bi=0; bi<btns.length; bi++){
       btns[bi].disabled = true;
@@ -583,7 +571,6 @@ function submitQuiz() {
     }
   }
 
-  // Show scoreboard
   var sb = document.getElementById("scoreboard");
   document.getElementById("scorebig").textContent = score + " / " + total;
   var msg = "";
@@ -601,7 +588,6 @@ function submitQuiz() {
    INIT
    ========================================================= */
 document.addEventListener("DOMContentLoaded", function(){
-  // Speed slider
   var slider = document.getElementById("speed-slider");
   var sval = document.getElementById("speed-val");
   slider.addEventListener("input", function(){
@@ -609,20 +595,16 @@ document.addEventListener("DOMContentLoaded", function(){
     sval.textContent = rate.toFixed(1) + "×";
   });
 
-  // Build everything
   buildChips();
   buildStory();
   buildQuiz();
 
-  // Go to quiz button
   document.getElementById("go-quiz-btn").addEventListener("click", function(){
     document.getElementById("quiz-anchor").scrollIntoView({behavior:"smooth"});
   });
 
-  // Submit button
   document.getElementById("sub-btn").addEventListener("click", submitQuiz);
 
-  // Retry button
   document.getElementById("retry-btn").addEventListener("click", function(){
     buildQuiz();
     document.getElementById("quiz-anchor").scrollIntoView({behavior:"smooth"});
