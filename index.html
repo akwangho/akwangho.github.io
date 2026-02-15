@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Amy's Big City Adventure — 英語故事學習</title>
+<title>Amy and the Treasure Map — 英語故事學習</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -39,7 +39,6 @@ header p{color:rgba(255,255,255,.9);font-size:.92rem;margin-top:6px;font-weight:
 .pcard:nth-child(4n+2){border-left-color:var(--lavender)}
 .pcard:nth-child(4n+3){border-left-color:var(--grass)}
 .pcard:nth-child(4n+4){border-left-color:var(--coral)}
-.pnum{display:inline-block;background:var(--sky);color:#fff;border-radius:50%;width:26px;height:26px;text-align:center;line-height:26px;font-size:.78rem;font-weight:900;margin-bottom:7px}
 .para-en{font-size:1rem;line-height:1.95;color:var(--ink)}
 .vw{color:#1A6ED8;background:#E8F4FF;border-radius:6px;padding:1px 5px;cursor:pointer;font-weight:800;border-bottom:2px solid #1A6ED8;transition:background .18s,color .18s}
 .vw:hover{background:var(--hlw);color:#0A3D8F}
@@ -103,7 +102,7 @@ footer span{color:var(--coral)}
 <body>
 
 <header>
-  <h1>🌟 Amy's Big City Adventure 🌟</h1>
+  <h1>🌟 Amy and the Treasure Map 🌟</h1>
   <p>四年級英語故事 &amp; 閱讀測驗 ｜ 點擊藍色單字可以聽發音 🔊</p>
 </header>
 
@@ -127,7 +126,7 @@ footer span{color:var(--coral)}
 <h2 class="sec-title" id="quiz-anchor"><span>📝 閱讀測驗 Reading Quiz</span></h2>
 <div class="qsec">
   <div class="qintro">
-    <p>📖 根據故事回答以下 10 題，每題選一個最正確的答案。</p>
+    <p>📖 根據故事回答以下 5 題，每題選一個最正確的答案。</p>
     <p>Read the story carefully and choose the best answer for each question.</p>
   </div>
   <div id="qcont"></div>
@@ -138,12 +137,12 @@ footer span{color:var(--coral)}
 
 <div class="scoreboard" id="scoreboard">
   <h2>🏆 測驗結果 Quiz Result 🏆</h2>
-  <div class="scorebig" id="scorebig">0 / 10</div>
+  <div class="scorebig" id="scorebig">0 / 5</div>
   <div class="scoremsg" id="scoremsg"></div>
   <button class="bretry" id="retry-btn">🔄 再試一次 Try Again</button>
 </div>
 
-<footer><p>✨ 設計給努力學習英語的小朋友 ✨ ｜ <span>Amy's Big City Adventure</span> © 2025</p></footer>
+<footer><p>✨ 設計給努力學習英語的小朋友 ✨ ｜ <span>Amy and the Treasure Map</span> © 2025</p></footer>
 
 <script>
 /* =========================================================
@@ -166,64 +165,46 @@ VOCAB.sort(function(a,b){ return b[0].length - a[0].length; });
 
 var PARAS = [
   {
-    en:"One Saturday morning, Amy put on her favorite dress — a bright yellow one — and grabbed her water bottle and umbrella. She also wore her sneakers and glasses. \"Today is a big adventure day!\" she said with a big smile.",
-    zh:"一個星期六的早上，艾咪穿上她最喜歡的洋裝——一件亮黃色的——然後拿起她的水壺和雨傘。她還穿上了運動鞋，戴上眼鏡。「今天是大冒險日！」她帶著大大的微笑說道。"
+    en:"Amy loved sunny mornings. She put on her favorite T-shirt and shorts, then put on her sneakers. She grabbed her water bottle and glasses. Her smartphone beeped — a message from her friend Ben said, \"Come to the bakery now! I have something fun for you!\"",
+    zh:"艾咪喜歡晴朗的早晨。她穿上她最喜歡的T恤和短褲，然後穿上運動鞋。她拿起水壺和眼鏡。她的智慧型手機響了一聲——朋友 Ben 傳來訊息：「快來麵包店！我有好玩的東西要給你！」"
   },
   {
-    en:"Amy's mom said, \"We need to take the bus downtown. Later we can ride the MRT to the other side of the city.\" Amy nodded and picked up her smartphone to check the map. She was such a smart girl — she already knew which stop to get off at!",
-    zh:"艾咪的媽媽說：「我們需要搭公車去市區。之後我們可以搭捷運到城市的另一邊。」艾咪點點頭，拿起她的智慧型手機查看地圖。她真是個聰明的女孩——她已經知道要在哪一站下車了！"
+    en:"Amy jumped on her bike and rode down the street. She passed the post office and saw a man on a scooter delivering letters. At the bakery, Ben was holding a small box. \"Look!\" he said. Inside was a small map. \"My dad made a treasure hunt for us!\" Ben said with a big smile.",
+    zh:"艾咪跳上腳踏車，沿著街道騎去。她經過郵局，看見一個騎機車的人正在送信。在麵包店，Ben 手裡拿著一個小盒子。「你看！」他說。裡面是一張小地圖。「我爸爸幫我們做了一個尋寶遊戲！」Ben 開心地笑著說。"
   },
   {
-    en:"Their first stop was the bakery near the post office. Mom had to send a package at the post office — she said the post was very important for work in her office. While Mom stood in line, Amy enjoyed the sweet smell of fresh bread from the bakery next door.",
-    zh:"她們的第一站是郵局旁邊的麵包店。媽媽需要在郵局寄一個包裹——她說郵件對她在辦公室的工作非常重要。媽媽在排隊的時候，艾咪享受著隔壁麵包店飄來的新鮮麵包香氣。"
+    en:"The first clue said, \"Go to the place where people send post.\" They ran to the post office. The kind lady working in the office handed them the next clue. \"You two are so smart!\" she said. The new clue told them to find the place where people keep money, so they walked to the bank.",
+    zh:"第一條線索寫著：「去人們寄郵件的地方。」他們跑到郵局。在辦公室裡工作的好心阿姨把下一條線索交給他們。「你們兩個真聰明！」她說。新的線索叫他們去找人們存錢的地方，所以他們走到了銀行。"
   },
   {
-    en:"Next, they walked to the bank so Mom could take out some money. A taxi almost splashed a puddle on Amy as it rushed past! Luckily, she jumped back just in time — her sneakers stayed dry. Nearby, a man on a scooter was delivering packages, and a girl on a bike rode by with a wave.",
-    zh:"接著，她們走去銀行讓媽媽領一些錢。一輛計程車呼嘯而過，差點把水濺在艾咪身上！幸好她及時跳開——她的運動鞋保持乾燥。附近，一個騎著機車的男人正在送包裹，一個騎腳踏車的女孩揮手經過。"
+    en:"At the bank, a guard gave them another clue. It said, \"Take the bus to the big bookstore.\" They got on the bus and rode to the bookstore near the MRT station. A man with glasses showed them a clue hidden inside a book about planes and trains.",
+    zh:"在銀行，一位警衛給了他們另一條線索。上面寫著：「搭公車去那家大書店。」他們上了公車，坐到捷運站附近的書店。一個戴眼鏡的男人給他們看一本關於飛機和火車的書裡藏著的線索。"
   },
   {
-    en:"After the bank, Amy and Mom ate lunch at a lovely restaurant near the MRT station. Amy ordered noodle soup and drank a glass of orange juice — she loved the tall glass it came in! \"This restaurant has such good food,\" said Amy, slurping happily.",
-    zh:"在銀行之後，艾咪和媽媽在捷運站附近一家可愛的餐廳吃午餐。艾咪點了湯麵，並喝了一杯柳橙汁——她好喜歡那個高高的玻璃杯！「這家餐廳的食物真的好好吃，」艾咪開心地吸著麵說。"
+    en:"The next clue told them to go to the restaurant across the street. They sat down and each drank a glass of cold water. The waiter brought the next clue on a plate. \"Go to the place where doctors help people,\" it said. So they took the MRT to the hospital.",
+    zh:"下一條線索叫他們去街對面的餐廳。他們坐下來，各喝了一杯冰水。服務生把下一條線索放在盤子上端來。上面寫著：「去醫生幫助人們的地方。」於是他們搭捷運到了醫院。"
   },
   {
-    en:"In the afternoon, they took the train to a shopping district. Amy wanted to buy new clothes! She found a cute pink skirt, a cozy sweater, and a cool jacket. Her little brother back home had asked for a new T-shirt and some shorts, so she picked those up too. Mom also bought pants for Dad.",
-    zh:"下午，她們搭火車去購物區。艾咪想買新衣服！她找到了一條可愛的粉紅色裙子、一件舒適的毛衣，和一件帥氣的夾克。在家的弟弟要她幫買一件新的T恤和一條短褲，所以她也一起買了。媽媽也幫爸爸買了長褲。"
+    en:"At the hospital, a kind nurse gave them the last clue: \"Go back to where you started!\" Dark clouds came, so Amy opened her umbrella. They called a taxi on Amy's phone because the rain was very heavy. The taxi was a big yellow car, and they rode back to the bakery.",
+    zh:"在醫院，一位好心的護士給了他們最後一條線索：「回到你們出發的地方！」烏雲飄來了，艾咪撐開她的雨傘。他們用艾咪的手機叫了一輛計程車，因為雨下得很大。計程車是一輛大大的黃色汽車，他們坐回了麵包店。"
   },
   {
-    en:"After shopping, they passed a wonderful bookstore. Amy's eyes lit up! She ran in and found a book about planes and trains and how people travel the world. \"I want to ride every kind of transport someday — plane, train, bus, and even a car through the mountains!\" she said to the phone camera as she took a selfie with the book.",
-    zh:"購物之後，她們經過了一家美妙的書店。艾咪的眼睛亮了起來！她跑進去，找到了一本關於飛機和火車，以及人們如何環遊世界的書。「我有一天想要體驗各種交通工具——飛機、火車、公車，甚至是開著汽車穿越山脈！」她對著手機鏡頭說，同時拿著書自拍。"
-  },
-  {
-    en:"On the way home, it started to rain. Amy opened her umbrella proudly — she was glad she had brought it! Mom called a taxi on her phone because the bags were too heavy to carry on the bus. They rode home comfortably as the rain tapped on the car windows.",
-    zh:"回家的路上，開始下雨了。艾咪驕傲地撐開她的雨傘——她好慶幸帶來了！媽媽用手機叫了一輛計程車，因為袋子太重了，不方便搭公車。雨水輕輕敲打著汽車的窗戶，她們舒舒服服地搭車回家。"
-  },
-  {
-    en:"That night, Amy found out Mom had a fun surprise — they would fly on a plane next month to visit Grandma! Amy hugged her new book tightly and whispered, \"I can't wait to visit the hospital where Grandma works as a nurse, and explore more of the city!\" It had truly been an amazing day.",
-    zh:"那天晚上，艾咪發現媽媽有個有趣的驚喜——下個月她們要搭飛機去探望奶奶！艾咪緊緊抱著她的新書，輕聲說：「我等不及要去探望在醫院當護士的奶奶，還有探索更多這個城市！」這真的是美好的一天。"
+    en:"When they walked in, Ben's dad was waiting with a big cake. \"You did it!\" he said. Amy's mom came with a surprise — a pretty dress, a warm sweater, and a cool jacket for Amy! Mom also had new pants for Dad and a cute skirt for Amy's sister. Amy picked up her phone and called Grandma. \"I want to ride a train or fly on a plane to visit you someday!\" she said. Grandma laughed. \"I can't wait!\" It was truly Amy's lucky day.",
+    zh:"當他們走進去的時候，Ben 的爸爸正拿著一個大蛋糕等著他們。「你們做到了！」他說。艾咪的媽媽也帶來了驚喜——一件漂亮的洋裝、一件溫暖的毛衣，和一件帥氣的夾克送給艾咪！媽媽也帶了新的長褲給爸爸，和一條可愛的裙子給艾咪的妹妹。艾咪拿起手機打電話給奶奶。「我想有一天搭火車或坐飛機去看你！」她說。奶奶笑著說：「我等不及了！」這真的是艾咪最幸運的一天。"
   }
 ];
 
 var QUESTIONS = [
-  {q:"What was Amy wearing on her adventure day?",
-   opts:["A. A blue jacket and pants","B. A yellow dress, sneakers, and glasses","C. A skirt and a sweater","D. A T-shirt and shorts"],ans:"B"},
-  {q:"How did Amy and her mom travel downtown first?",
-   opts:["A. By taxi","B. By plane","C. By bus","D. By scooter"],ans:"C"},
-  {q:"Why did Amy's mom go to the post office?",
-   opts:["A. To buy stamps","B. To send a package","C. To pick up mail","D. To pay her phone bill"],ans:"B"},
-  {q:"What almost happened to Amy near the bank?",
-   opts:["A. She dropped her water bottle","B. She lost her glasses","C. A taxi almost splashed a puddle on her","D. A bike rider knocked her over"],ans:"C"},
-  {q:"What did Amy eat for lunch at the restaurant?",
-   opts:["A. Pizza and milk","B. Noodle soup and orange juice","C. Bread and water","D. Rice and tea"],ans:"B"},
-  {q:"Which clothing items did Amy's brother ask her to buy?",
-   opts:["A. A dress and sneakers","B. A jacket and sweater","C. A T-shirt and shorts","D. Pants and a skirt"],ans:"C"},
-  {q:"What kind of book did Amy find in the bookstore?",
-   opts:["A. A book about cooking","B. A book about planes, trains, and world travel","C. A book about animals","D. A book about smartphones"],ans:"B"},
-  {q:"Why did Amy and her mom take a taxi home instead of the bus?",
-   opts:["A. The bus was too slow","B. It was too hot outside","C. The bags were too heavy to carry on the bus","D. The bus station was closed"],ans:"C"},
-  {q:"Where does Amy's grandma work?",
-   opts:["A. At a restaurant","B. At a bookstore","C. At a bank","D. At a hospital"],ans:"D"},
-  {q:"What is the best title for this story?",
-   opts:["A. Amy Stays Home All Day","B. Amy's Big City Adventure","C. Amy Goes to School","D. Amy Rides a Plane"],ans:"B"}
+  {q:"What was Amy wearing when she left home?",
+   opts:["A. A dress and a sweater","B. A T-shirt, shorts, and sneakers","C. A skirt and a jacket","D. Pants and a sweater"],ans:"B"},
+  {q:"How did Amy go to the bakery to meet Ben?",
+   opts:["A. By bus","B. By taxi","C. By bike","D. By MRT"],ans:"C"},
+  {q:"Where did Amy and Ben go after the bank?",
+   opts:["A. To the hospital","B. To the restaurant","C. To the bookstore","D. To the post office"],ans:"C"},
+  {q:"Why did Amy and Ben take a taxi back to the bakery?",
+   opts:["A. They were tired of walking","B. It was raining very hard","C. The bus was too slow","D. The bakery was very far away"],ans:"B"},
+  {q:"What surprise did Amy's mom bring at the end of the story?",
+   opts:["A. A new smartphone and glasses","B. A big cake and some water","C. A dress, a sweater, and a jacket","D. A T-shirt and shorts"],ans:"C"}
 ];
 
 /* =========================================================
@@ -370,7 +351,7 @@ function buildEnEl(text, paraIdx) {
 }
 
 /* =========================================================
-   BUILD STORY
+   BUILD STORY  (no paragraph numbers for natural reading feel)
    ========================================================= */
 function buildStory() {
   var cont = document.getElementById("story");
@@ -378,11 +359,6 @@ function buildStory() {
   for(var pi=0; pi<PARAS.length; pi++){
     var card = document.createElement("div");
     card.className = "pcard";
-
-    var num = document.createElement("span");
-    num.className = "pnum";
-    num.textContent = (pi+1);
-    card.appendChild(num);
 
     var enP = buildEnEl(PARAS[pi].en, pi);
     card.appendChild(enP);
@@ -612,9 +588,9 @@ function submitQuiz() {
   document.getElementById("scorebig").textContent = score + " / " + total;
   var msg = "";
   if(score === total) msg = "🎉 滿分！你太厲害了！Perfect score!";
-  else if(score >= 8) msg = "👏 非常棒！Almost perfect!";
-  else if(score >= 6) msg = "😊 不錯喔！Good job!";
-  else if(score >= 4) msg = "💪 加油！再讀一次故事試試！Keep trying!";
+  else if(score >= 4) msg = "👏 非常棒！Almost perfect!";
+  else if(score >= 3) msg = "😊 不錯喔！Good job!";
+  else if(score >= 2) msg = "💪 加油！再讀一次故事試試！Keep trying!";
   else msg = "📖 再仔細讀一次故事吧！Read the story again!";
   document.getElementById("scoremsg").textContent = msg;
   sb.classList.add("show");
