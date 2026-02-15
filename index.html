@@ -3,630 +3,622 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tom's Busy City Adventure</title>
+<title>🌟 Amy's Big City Adventure — 英語故事學習</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+TC:wght@400;700&display=swap');
-    :root {
-        --primary-color: #4facfe;
-        --secondary-color: #00f2fe;
-        --accent-color: #ff9a9e;
-        --text-color: #333;
-        --bg-color: #f0f9ff;
-        --highlight-color: #fff176;
-        --button-hover: #e6f7ff;
-    }
+  :root {
+    --sky: #5BC8F5;
+    --sun: #FFD93D;
+    --grass: #6BCB77;
+    --coral: #FF6B6B;
+    --lavender: #C3A6FF;
+    --peach: #FFB347;
+    --mint: #A8E6CF;
+    --white: #FFFFFF;
+    --ink: #2D3047;
+    --card-bg: #FFFDF5;
+    --shadow: 0 4px 20px rgba(45,48,71,0.10);
+    --radius: 20px;
+    --highlight-active: #FFE566;
+    --highlight-word: #B5F2FF;
+  }
 
-    body {
-        font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
-        background: linear-gradient(120deg, var(--bg-color) 0%, #d6eaff 100%);
-        color: var(--text-color);
-        margin: 0;
-        padding: 20px;
-        line-height: 1.8;
-    }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-        background-color: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        padding: 30px;
-        border: 4px solid var(--primary-color);
-    }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(160deg, #e0f7fa 0%, #fff9e6 50%, #fce4f0 100%);
+    min-height: 100vh;
+    color: var(--ink);
+    padding-bottom: 60px;
+  }
 
-    h1 {
-        text-align: center;
-        color: #2c3e50;
-        font-size: 2.5em;
-        margin-bottom: 20px;
-        text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
-    }
+  /* === HEADER === */
+  header {
+    background: linear-gradient(135deg, var(--sky) 0%, var(--lavender) 100%);
+    padding: 28px 20px 22px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(91,200,245,0.35);
+  }
+  header::before {
+    content: '☁️☁️   ☁️        ☁️ ☁️';
+    position: absolute; top: 10px; left: 0; right: 0;
+    font-size: 22px; letter-spacing: 18px; opacity: 0.45;
+  }
+  header h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: clamp(1.6rem, 5vw, 2.8rem);
+    color: var(--white);
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+    line-height: 1.2;
+  }
+  header p.sub {
+    color: rgba(255,255,255,0.9);
+    font-size: 1rem;
+    margin-top: 6px;
+    font-weight: 600;
+  }
 
-    .controls {
-        background-color: #e3f2fd;
-        padding: 15px;
-        border-radius: 15px;
-        margin-bottom: 25px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        align-items: center;
-        justify-content: space-between;
-        border: 2px dashed var(--primary-color);
-    }
+  /* === SPEED CONTROL === */
+  .speed-bar {
+    background: var(--white);
+    border-radius: var(--radius);
+    margin: 18px auto;
+    max-width: 700px;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+  }
+  .speed-bar label {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .speed-bar input[type=range] {
+    flex: 1;
+    min-width: 120px;
+    accent-color: var(--sky);
+    height: 6px;
+    cursor: pointer;
+  }
+  .speed-bar #speed-val {
+    font-weight: 900;
+    color: var(--coral);
+    font-size: 1rem;
+    min-width: 38px;
+    text-align: center;
+  }
+  .speed-info {
+    font-size: 0.78rem;
+    color: #888;
+    width: 100%;
+    margin-top: -4px;
+  }
 
-    .control-group {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+  /* === WORD LIST BANNER === */
+  .wordlist-banner {
+    background: linear-gradient(90deg, var(--sun) 0%, var(--peach) 100%);
+    border-radius: var(--radius);
+    margin: 0 auto 20px;
+    max-width: 700px;
+    padding: 14px 20px;
+    box-shadow: var(--shadow);
+  }
+  .wordlist-banner h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .word-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    background: rgba(255,255,255,0.75);
+    border-radius: 50px;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.9);
+    transition: background 0.2s, transform 0.15s;
+    color: var(--ink);
+  }
+  .chip:hover { background: var(--white); transform: scale(1.05); }
+  .chip.playing { background: var(--highlight-active); }
 
-    button {
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 30px;
-        font-size: 1rem;
-        cursor: pointer;
-        font-family: inherit;
-        font-weight: 600;
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
+  /* === SECTION TITLES === */
+  .section-title {
+    text-align: center;
+    font-family: 'Baloo 2', cursive;
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    margin: 28px 0 14px;
+    color: var(--ink);
+  }
+  .section-title span {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--coral), var(--lavender));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-    button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-        background-color: #3b8dd1;
-    }
+  /* === STORY CARD === */
+  .story-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 14px;
+  }
 
-    button.secondary {
-        background-color: var(--accent-color);
-    }
+  .para-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border-left: 5px solid var(--sky);
+    transition: border-color 0.3s;
+    position: relative;
+  }
+  .para-card:nth-child(2n) { border-left-color: var(--lavender); }
+  .para-card:nth-child(3n) { border-left-color: var(--grass); }
+  .para-card:nth-child(4n) { border-left-color: var(--coral); }
 
-    button:active {
-        transform: translateY(0);
-    }
+  .para-num {
+    display: inline-block;
+    background: var(--sky);
+    color: white;
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    text-align: center; line-height: 26px;
+    font-size: 0.8rem; font-weight: 900;
+    margin-bottom: 8px;
+  }
 
-    input[type="range"] {
-        width: 150px;
-        cursor: pointer;
-    }
+  .para-en {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--ink);
+  }
 
-    .story-section {
-        margin-bottom: 40px;
-    }
+  .para-en strong {
+    color: #1A6ED8;
+    background: #E8F4FF;
+    border-radius: 6px;
+    padding: 1px 5px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    font-weight: 800;
+    border-bottom: 2px solid #1A6ED8;
+  }
+  .para-en strong:hover, .para-en strong.playing {
+    background: var(--highlight-word);
+    color: #0A3D8F;
+  }
+  .para-en strong.highlight {
+    background: var(--highlight-active);
+    color: #8B4513;
+    border-bottom-color: #E8A000;
+  }
 
-    .paragraph-card {
-        background: #fff;
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border: 2px solid #eee;
-        position: relative;
-        transition: border-color 0.3s;
-    }
+  .para-zh {
+    display: none;
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #f0fff4, #e8f4ff);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: #444;
+    border: 1px dashed #aaa;
+  }
 
-    .paragraph-card:hover {
-        border-color: var(--primary-color);
-    }
+  .para-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
 
-    .eng-text {
-        font-size: 1.25rem;
-        margin-bottom: 10px;
-    }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 700;
+    transition: transform 0.15s, opacity 0.2s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+  .btn:active { transform: scale(0.97); }
 
-    strong {
-        color: #d35400;
-        cursor: pointer;
-        border-bottom: 2px dotted #d35400;
-        transition: all 0.2s;
-        display: inline-block; /* Helps with transform */
-    }
+  .btn-zh { background: linear-gradient(135deg, #a8e6cf, #67d7aa); color: #1a5c3a; }
+  .btn-read { background: linear-gradient(135deg, var(--sky), #3AAFDF); color: white; }
+  .btn-stop { background: linear-gradient(135deg, #ffb347, #ff8c00); color: white; }
 
-    strong:hover {
-        color: #e67e22;
-        transform: scale(1.1);
-        background-color: rgba(255, 230, 0, 0.3);
-    }
+  /* === QUIZ SECTION === */
+  .quiz-section {
+    max-width: 700px;
+    margin: 10px auto 0;
+    padding: 0 14px;
+  }
 
-    .zh-text {
-        display: none; /* Hidden by default */
-        color: #555;
-        font-size: 1rem;
-        background-color: #f9f9f9;
-        padding: 10px;
-        border-radius: 8px;
-        border-left: 4px solid var(--accent-color);
-        margin-top: 10px;
-    }
+  .quiz-intro {
+    background: linear-gradient(135deg, var(--lavender), #e8c5ff);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 18px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .quiz-intro p { font-size: 0.95rem; font-weight: 700; color: var(--ink); }
 
-    .para-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background-color: transparent;
-        color: var(--primary-color);
-        border: 2px solid var(--primary-color);
-        padding: 5px 10px;
-        font-size: 0.9rem;
-        box-shadow: none;
-    }
+  .q-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border-top: 4px solid var(--lavender);
+    transition: border-color 0.3s;
+  }
+  .q-card.correct-card { border-top-color: var(--grass); }
+  .q-card.wrong-card { border-top-color: var(--coral); }
 
-    .para-btn:hover {
-        background-color: var(--primary-color);
-        color: white;
-    }
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .q-num {
+    background: var(--lavender);
+    color: white;
+    border-radius: 50%;
+    width: 30px; height: 30px; min-width: 30px;
+    text-align: center; line-height: 30px;
+    font-size: 0.85rem; font-weight: 900;
+  }
+  .q-text {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.6;
+    flex: 1;
+  }
+  .q-text.highlight {
+    background: var(--highlight-active);
+    border-radius: 8px;
+    padding: 2px 6px;
+  }
 
-    /* Quiz Section */
-    .quiz-section {
-        background-color: #fff8e1;
-        padding: 25px;
-        border-radius: 20px;
-        border: 3px solid #ffecb3;
-    }
+  .q-speak-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.3rem;
+    padding: 2px 4px;
+    border-radius: 8px;
+    transition: transform 0.15s, background 0.2s;
+    line-height: 1;
+  }
+  .q-speak-btn:hover { background: #f0f0f0; transform: scale(1.15); }
+  .q-speak-btn.playing { background: var(--highlight-active); }
 
-    .quiz-title {
-        text-align: center;
-        color: #f57f17;
-        margin-bottom: 20px;
-    }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  @media (max-width: 480px) { .options-grid { grid-template-columns: 1fr; } }
 
-    .question-card {
-        background: white;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 15px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
+  .option-btn {
+    background: #F4F0FF;
+    border: 2px solid #D4C8FF;
+    border-radius: 12px;
+    padding: 10px 14px;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    color: var(--ink);
+  }
+  .option-btn:hover:not(:disabled) { background: #E4D8FF; border-color: #A78BE0; transform: scale(1.02); }
+  .option-btn.correct { background: #C8F5D5; border-color: var(--grass); color: #1a5c3a; font-weight: 800; }
+  .option-btn.wrong { background: #FFD6D6; border-color: var(--coral); color: #8B1A1A; font-weight: 800; }
+  .option-btn:disabled { cursor: default; }
+  .option-btn.highlight { background: var(--highlight-active); border-color: #E8A000; }
 
-    .question-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        margin-bottom: 10px;
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
+  .q-feedback {
+    margin-top: 10px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .feedback-correct { background: #d4edda; color: #155724; }
+  .feedback-wrong { background: #f8d7da; color: #721c24; }
 
-    .speak-icon {
-        cursor: pointer;
-        font-size: 1.2rem;
-        background: none;
-        border: none;
-        padding: 0;
-        box-shadow: none;
-        color: var(--primary-color);
-    }
+  /* === SCORE BOARD === */
+  .score-board {
+    background: linear-gradient(135deg, var(--sun), var(--peach));
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 20px auto 0;
+    max-width: 700px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    display: none;
+  }
+  .score-board.show { display: block; }
+  .score-board h2 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.8rem;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .score-big {
+    font-family: 'Baloo 2', cursive;
+    font-size: 4rem;
+    color: var(--coral);
+    line-height: 1;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+  }
+  .score-msg { font-size: 1rem; font-weight: 700; color: #555; margin-top: 8px; }
+  .btn-retry {
+    margin-top: 16px;
+    background: linear-gradient(135deg, var(--coral), #FF4444);
+    color: white;
+    font-size: 1rem;
+    padding: 12px 28px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    box-shadow: 0 4px 14px rgba(255,107,107,0.4);
+    transition: transform 0.15s;
+  }
+  .btn-retry:hover { transform: scale(1.05); }
 
-    .speak-icon:hover {
-        transform: scale(1.2);
-        background: none;
-    }
+  /* === SUBMIT BUTTON === */
+  .submit-row {
+    text-align: center;
+    margin: 10px 0 24px;
+  }
+  .btn-submit {
+    background: linear-gradient(135deg, var(--grass), #4CAF50);
+    color: white;
+    font-size: 1.1rem;
+    padding: 14px 36px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    box-shadow: 0 4px 18px rgba(107,203,119,0.45);
+    transition: transform 0.15s, opacity 0.2s;
+  }
+  .btn-submit:hover { transform: scale(1.04); }
+  .btn-submit:disabled { opacity: 0.5; cursor: default; transform: none; }
 
-    .options label {
-        display: block;
-        padding: 8px 10px;
-        margin: 5px 0;
-        background-color: #f4f4f4;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
+  /* === HIGHLIGHT for reading === */
+  .reading-highlight {
+    background: var(--highlight-active) !important;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
 
-    .options label:hover {
-        background-color: #e0f7fa;
-    }
+  /* === FOOTER === */
+  footer {
+    text-align: center;
+    padding: 22px;
+    color: #999;
+    font-size: 0.8rem;
+    margin-top: 20px;
+  }
+  footer span { color: var(--coral); }
 
-    input[type="radio"] {
-        margin-right: 10px;
-    }
+  /* Emoji decoration */
+  .deco { font-size: 1.4rem; margin: 0 4px; }
 
-    /* The Highlight Class - Critical for Requirement */
-    .highlight {
-        background-color: var(--highlight-color);
-        border-radius: 4px;
-        box-shadow: 0 0 5px var(--highlight-color);
-        transition: background-color 0.2s;
-    }
-
-    /* Footer */
-    .footer {
-        text-align: center;
-        margin-top: 30px;
-        color: #888;
-        font-size: 0.9rem;
-    }
-
-    @media (max-width: 600px) {
-        h1 { font-size: 1.8em; }
-        .controls { flex-direction: column; align-items: stretch; }
-        .para-btn { position: relative; top: 0; right: 0; margin-bottom: 10px; display: inline-block; }
-    }
+  /* Scroll to quiz button */
+  .go-quiz-btn {
+    display: block;
+    margin: 10px auto 0;
+    background: linear-gradient(135deg, var(--lavender), #9B59D8);
+    color: white;
+    padding: 12px 28px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    box-shadow: 0 4px 14px rgba(195,166,255,0.5);
+    transition: transform 0.15s;
+  }
+  .go-quiz-btn:hover { transform: scale(1.05); }
 </style>
-
 </head>
 <body>
-<div class="container">
-<h1>🏙️ Tom's Busy City Adventure</h1>
-<div class="controls">
-    <div class="control-group">
-        <button onclick="toggleTranslations()" class="secondary">👁️ Show/Hide Chinese</button>
-    </div>
-    <div class="control-group">
-        <label for="rate">Speed:</label>
-        <input type="range" id="rate" min="0.5" max="1.5" value="0.9" step="0.1" oninput="updateRateLabel()">
-        <span id="rate-label">0.9x</span>
-    </div>
+
+<header>
+  <h1>🌟 Amy's Big City Adventure 🌟</h1>
+  <p class="sub">四年級英語故事 &amp; 閱讀測驗 | 點擊藍色單字可以聽發音 🔊</p>
+</header>
+
+<!-- SPEED CONTROL -->
+<div class="speed-bar" style="max-width:700px;margin:18px auto 14px;">
+  <label>🐢 發音速度</label>
+  <input type="range" id="speed-slider" min="0.5" max="1.5" step="0.1" value="0.9"
+    oninput="updateSpeed(this.value)">
+  <span id="speed-val">0.9×</span>
+  <span class="speed-info">建議小朋友從 0.7× 開始，練熟了再調快 🚀</span>
 </div>
 
-<div class="story-section" id="story-container">
-
-    <div class="paragraph-card">
-        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
-        <div class="eng-text">
-            <span class="sentence">Tom is a <strong onclick="speakWord(this)">smart</strong> boy who lives in the city.</span>
-            <span class="sentence">Today, he gets dressed for a busy day.</span>
-            <span class="sentence">He puts on a green <strong onclick="speakWord(this)">T-shirt</strong> and blue <strong onclick="speakWord(this)">shorts</strong>.</span>
-            <span class="sentence">Since it is a bit cold, he also wears a <strong onclick="speakWord(this)">sweater</strong> and a warm <strong onclick="speakWord(this)">jacket</strong>.</span>
-            <span class="sentence">He ties his <strong onclick="speakWord(this)">sneakers</strong> and puts his <strong onclick="speakWord(this)">smartphone</strong> in his pocket.</span>
-        </div>
-        <div class="zh-text">Tom 是一個住在城市裡的聰明男孩。今天，他為了忙碌的一天穿好衣服。他穿上一件綠色的 T恤和藍色的短褲。因為有點冷，他還穿了一件毛衣和一件溫暖的夾克。他繫好運動鞋，並把他的智慧型手機放進口袋。</div>
-    </div>
-
-    <div class="paragraph-card">
-        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
-        <div class="eng-text">
-            <span class="sentence">Tom wants to go to the city center.</span>
-            <span class="sentence">First, he rides his <strong onclick="speakWord(this)">bike</strong> to the station.</span>
-            <span class="sentence">He sees a yellow <strong onclick="speakWord(this)">taxi</strong> and a huge <strong onclick="speakWord(this)">bus</strong> on the street.</span>
-            <span class="sentence">A fast <strong onclick="speakWord(this)">scooter</strong> zooms by!</span>
-            <span class="sentence">Tom parks his bike and takes the <strong onclick="speakWord(this)">MRT</strong>.</span>
-            <span class="sentence">Later, he will take a <strong onclick="speakWord(this)">train</strong> to visit his grandma.</span>
-        </div>
-        <div class="zh-text">Tom 想要去市中心。首先，他騎著腳踏車去車站。他在街上看到一輛黃色的計程車和一輛巨大的公車。一輛快速的機車呼嘯而過！Tom 停好腳踏車並搭乘捷運。稍後，他將搭火車去拜訪他的奶奶。</div>
-    </div>
-
-    <div class="paragraph-card">
-        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
-        <div class="eng-text">
-            <span class="sentence">Tom has many errands.</span>
-            <span class="sentence">He goes to the <strong onclick="speakWord(this)">bank</strong> to get some money.</span>
-            <span class="sentence">Next, he walks to the <strong onclick="speakWord(this)">post office</strong>.</span>
-            <span class="sentence">He sees a man working in the <strong onclick="speakWord(this)">office</strong>.</span>
-            <span class="sentence">Tom sends a letter at the <strong onclick="speakWord(this)">post</strong> counter.</span>
-        </div>
-        <div class="zh-text">Tom 有很多差事。他去銀行領一些錢。接著，他走到郵局。他看到一位男士在辦公室裡工作。Tom 在郵政櫃台寄了一封信。</div>
-    </div>
-
-    <div class="paragraph-card">
-        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
-        <div class="eng-text">
-            <span class="sentence">Tom walks to the <strong onclick="speakWord(this)">bookstore</strong> to buy a comic book.</span>
-            <span class="sentence">The <strong onclick="speakWord(this)">bakery</strong> next door smells so good!</span>
-            <span class="sentence">He is hungry, so he decides to go to a <strong onclick="speakWord(this)">restaurant</strong> for lunch.</span>
-        </div>
-        <div class="zh-text">Tom 走到書店買了一本漫畫書。隔壁的麵包店聞起來好香！他餓了，所以他決定去餐廳吃午餐。</div>
-    </div>
-
-    <div class="paragraph-card">
-        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
-        <div class="eng-text">
-            <span class="sentence">At the restaurant, the waiter brings a <strong onclick="speakWord(this)">glass</strong> of water.</span>
-            <span class="sentence">Tom has his own <strong onclick="speakWord(this)">water bottle</strong> too.</span>
-            <span class="sentence">Suddenly, it starts to rain.</span>
-            <span class="sentence">Oh no! Tom forgot his <strong onclick="speakWord(this)">umbrella</strong> at home.</span>
-            <span class="sentence">He uses his <strong onclick="speakWord(this)">phone</strong> to call his dad.</span>
-        </div>
-        <div class="zh-text">在餐廳裡，服務生端來一杯水。Tom 也有他自己的水壺。突然，開始下雨了。喔不！Tom 把他的雨傘忘在家裡了。他用電話打給他的爸爸。</div>
-    </div>
-
-    <div class="paragraph-card">
-        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
-        <div class="eng-text">
-            <span class="sentence">While waiting, Tom sees a girl in a pretty <strong onclick="speakWord(this)">dress</strong> and a pink <strong onclick="speakWord(this)">skirt</strong>.</span>
-            <span class="sentence">She is wearing <strong onclick="speakWord(this)">glasses</strong>.</span>
-            <span class="sentence">She trips and hurts her leg near the <strong onclick="speakWord(this)">hospital</strong>.</span>
-            <span class="sentence">Tom helps her stand up.</span>
-            <span class="sentence">Look! A <strong onclick="speakWord(this)">plane</strong> is flying in the sky.</span>
-            <span class="sentence">Finally, Tom's dad arrives in his <strong onclick="speakWord(this)">car</strong>.</span>
-            <span class="sentence">Tom is tired but happy because he wears comfortable <strong onclick="speakWord(this)">pants</strong> now.</span>
-        </div>
-        <div class="zh-text">在等待的時候，Tom 看到一個穿著漂亮洋裝和粉紅色裙子的女孩。她戴著眼鏡。她在醫院附近跌倒並傷到了腿。Tom 扶她站起來。看！一架飛機正在天空中飛行。終於，Tom 的爸爸開著他的汽車到了。Tom 很累但很開心，因為他現在穿著舒適的長褲。</div>
-    </div>
-
+<!-- WORD LIST BANNER -->
+<div class="wordlist-banner">
+  <h3>📚 本課重點單字 — 點一下就能聽發音！</h3>
+  <div class="word-chips" id="word-chips"></div>
 </div>
 
-<div class="quiz-section">
-    <h2 class="quiz-title">🧠 Fun Quiz Time!</h2>
-    
-    <div id="quiz-container">
-        <div class="question-card" data-correct="A">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>1. Where did Tom go to buy a comic book?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q1" value="A"> A. Bookstore</label>
-                <label><input type="radio" name="q1" value="B"> B. Bakery</label>
-                <label><input type="radio" name="q1" value="C"> C. Hospital</label>
-            </div>
-        </div>
+<!-- STORY -->
+<h2 class="section-title"><span>📖 故事開始囉！</span></h2>
+<div class="story-container" id="story-container">
 
-        <div class="question-card" data-correct="B">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>2. What did Tom wear because it was cold?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q2" value="A"> A. T-shirt and shorts</label>
-                <label><input type="radio" name="q2" value="B"> B. Sweater and jacket</label>
-                <label><input type="radio" name="q2" value="C"> C. Dress and skirt</label>
-            </div>
-        </div>
-
-        <div class="question-card" data-correct="C">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>3. How did Tom go to the station first?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q3" value="A"> A. By taxi</label>
-                <label><input type="radio" name="q3" value="B"> B. By bus</label>
-                <label><input type="radio" name="q3" value="C"> C. By bike</label>
-            </div>
-        </div>
-
-        <div class="question-card" data-correct="A">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>4. Where can you send a letter?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q4" value="A"> A. Post office</label>
-                <label><input type="radio" name="q4" value="B"> B. Bank</label>
-                <label><input type="radio" name="q4" value="C"> C. Restaurant</label>
-            </div>
-        </div>
-
-        <div class="question-card" data-correct="B">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>5. What did Tom forget at home when it rained?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q5" value="A"> A. Smartphone</label>
-                <label><input type="radio" name="q5" value="B"> B. Umbrella</label>
-                <label><input type="radio" name="q5" value="C"> C. Sneakers</label>
-            </div>
-        </div>
-
-         <div class="question-card" data-correct="C">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>6. Where did Tom get money?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q6" value="A"> A. Office</label>
-                <label><input type="radio" name="q6" value="B"> B. Hospital</label>
-                <label><input type="radio" name="q6" value="C"> C. Bank</label>
-            </div>
-        </div>
-
-        <div class="question-card" data-correct="A">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>7. What did the waiter bring to Tom?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q7" value="A"> A. A glass of water</label>
-                <label><input type="radio" name="q7" value="B"> B. A water bottle</label>
-                <label><input type="radio" name="q7" value="C"> C. A coffee</label>
-            </div>
-        </div>
-
-        <div class="question-card" data-correct="B">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>8. What was the girl wearing?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q8" value="A"> A. Shorts and sneakers</label>
-                <label><input type="radio" name="q8" value="B"> B. Dress and skirt</label>
-                <label><input type="radio" name="q8" value="C"> C. Jacket and pants</label>
-            </div>
-        </div>
-
-        <div class="question-card" data-correct="C">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>9. Who picked Tom up at the end?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q9" value="A"> A. His mom in a bus</label>
-                <label><input type="radio" name="q9" value="B"> B. His sister on a scooter</label>
-                <label><input type="radio" name="q9" value="C"> C. His dad in a car</label>
-            </div>
-        </div>
-
-        <div class="question-card" data-correct="A">
-            <div class="question-header">
-                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
-                <span>10. Which vehicle flies in the sky?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q10" value="A"> A. Plane</label>
-                <label><input type="radio" name="q10" value="B"> B. MRT</label>
-                <label><input type="radio" name="q10" value="C"> C. Train</label>
-            </div>
-        </div>
+  <!-- Para 1 -->
+  <div class="para-card" id="para-0">
+    <div class="para-num">1</div>
+    <p class="para-en" id="en-0">
+      One Saturday morning, Amy put on her favorite <strong data-word="dress">dress</strong> — a bright yellow one — and grabbed her <strong data-word="water bottle">water bottle</strong> and <strong data-word="umbrella">umbrella</strong>.
+      She also wore her <strong data-word="sneakers">sneakers</strong> and <strong data-word="glasses">glasses</strong>.
+      "Today is a big adventure day!" she said with a big smile.
+    </p>
+    <p class="para-zh" id="zh-0">
+      一個星期六的早上，艾咪穿上她最喜歡的<b>洋裝</b>——一件亮黃色的——然後拿起她的<b>水壺</b>和<b>雨傘</b>。
+      她還穿上了<b>運動鞋</b>和戴上<b>眼鏡</b>。
+      「今天是大冒險日！」她帶著大大的微笑說道。
+    </p>
+    <div class="para-controls">
+      <button class="btn btn-zh" onclick="toggleZh(0)">🀄 顯示/隱藏中文</button>
+      <button class="btn btn-read" id="read-btn-0" onclick="readParagraph(0)">🔊 朗讀故事</button>
     </div>
-    
-    <button onclick="checkAnswers()" style="width: 100%; margin-top: 20px; font-size: 1.2rem;">📝 Check Answers</button>
-    <div id="result" style="text-align: center; margin-top: 15px; font-weight: bold; font-size: 1.2rem;"></div>
-</div>
+  </div>
 
-<div class="footer">
-    Created for 4th Grade English Learning
-</div>
+  <!-- Para 2 -->
+  <div class="para-card" id="para-1">
+    <div class="para-num">2</div>
+    <p class="para-en" id="en-1">
+      Amy's mom said, "We need to take the <strong data-word="bus">bus</strong> downtown. Later we can ride the <strong data-word="MRT">MRT</strong> to the other side of the city."
+      Amy nodded and picked up her <strong data-word="smartphone">smartphone</strong> to check the map.
+      She was such a <strong data-word="smart">smart</strong> girl — she already knew which stop to get off at!
+    </p>
+    <p class="para-zh" id="zh-1">
+      艾咪的媽媽說：「我們需要搭<b>公車</b>去市區。之後我們可以搭<b>捷運</b>到城市的另一邊。」
+      艾咪點點頭，拿起她的<b>智慧型手機</b>查看地圖。
+      她真是個<b>聰明的</b>女孩——她已經知道要在哪一站下車了！
+    </p>
+    <div class="para-controls">
+      <button class="btn btn-zh" onclick="toggleZh(1)">🀄 顯示/隱藏中文</button>
+      <button class="btn btn-read" id="read-btn-1" onclick="readParagraph(1)">🔊 朗讀故事</button>
+    </div>
+  </div>
 
-</div>
-<script>
-// Speech Synthesis Setup
-const synth = window.speechSynthesis;
-let voices = [];
-// Load voices
-function populateVoices() {
-    voices = synth.getVoices().filter(voice =&gt; voice.lang.includes(&#39;en&#39;));
-}
+  <!-- Para 3 -->
+  <div class="para-card" id="para-2">
+    <div class="para-num">3</div>
+    <p class="para-en" id="en-2">
+      Their first stop was the <strong data-word="bakery">bakery</strong> near the <strong data-word="post office">post office</strong>.
+      Mom had to send a package at the <strong data-word="post office">post office</strong> — she said the <strong data-word="post">post</strong> was very important for work in her <strong data-word="office">office</strong>.
+      While Mom stood in line, Amy enjoyed the sweet smell of fresh bread from the <strong data-word="bakery">bakery</strong> next door.
+    </p>
+    <p class="para-zh" id="zh-2">
+      他們的第一站是<b>郵局</b>旁邊的<b>麵包店</b>。
+      媽媽需要在<b>郵局</b>寄一個包裹——她說<b>郵件</b>對她在<b>辦公室</b>的工作非常重要。
+      媽媽在排隊的時候，艾咪享受著隔壁<b>麵包店</b>飄來的新鮮麵包香氣。
+    </p>
+    <div class="para-controls">
+      <button class="btn btn-zh" onclick="toggleZh(2)">🀄 顯示/隱藏中文</button>
+      <button class="btn btn-read" id="read-btn-2" onclick="readParagraph(2)">🔊 朗讀故事</button>
+    </div>
+  </div>
 
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = populateVoices;
-}
+  <!-- Para 4 -->
+  <div class="para-card" id="para-3">
+    <div class="para-num">4</div>
+    <p class="para-en" id="en-3">
+      Next, they walked to the <strong data-word="bank">bank</strong> so Mom could take out some money.
+      A <strong data-word="taxi">taxi</strong> almost splashed a puddle on Amy as it rushed past!
+      Luckily, she jumped back just in time — her <strong data-word="sneakers">sneakers</strong> stayed dry.
+      Nearby, a man on a <strong data-word="scooter">scooter</strong> was delivering packages, and a girl on a <strong data-word="bike">bike</strong> rode by with a wave.
+    </p>
+    <p class="para-zh" id="zh-3">
+      接著，他們走去<b>銀行</b>讓媽媽領一些錢。
+      一輛<b>計程車</b>呼嘯而過，差點把水濺在艾咪身上！
+      幸好她及時跳開——她的<b>運動鞋</b>保持乾燥。
+      附近，一個騎著<b>機車</b>的男人正在送包裹，一個騎<b>腳踏車</b>的女孩揮手經過。
+    </p>
+    <div class="para-controls">
+      <button class="btn btn-zh" onclick="toggleZh(3)">🀄 顯示/隱藏中文</button>
+      <button class="btn btn-read" id="read-btn-3" onclick="readParagraph(3)">🔊 朗讀故事</button>
+    </div>
+  </div>
 
-// Configuration
-function getSpeechRate() {
-    return document.getElementById(&#39;rate&#39;).value;
-}
+  <!-- Para 5 -->
+  <div class="para-card" id="para-4">
+    <div class="para-num">5</div>
+    <p class="para-en" id="en-4">
+      After the <strong data-word="bank">bank</strong>, Amy and Mom ate lunch at a lovely <strong data-word="restaurant">restaurant</strong> near the <strong data-word="MRT">MRT</strong> station.
+      Amy ordered noodle soup and drank a glass of orange juice — she loved the tall <strong data-word="glass">glass</strong> it came in!
+      "This <strong data-word="restaurant">restaurant</strong> has such good food," said Amy, slurping happily.
+    </p>
+    <p class="para-zh" id="zh-4">
+      在<b>銀行</b>之後，艾咪和媽媽在<b>捷運</b>站附近一家可愛的<b>餐廳</b>吃午餐。
+      艾咪點了湯麵，並喝了一杯柳橙汁——她好喜歡那個高高的<b>玻璃杯</b>！
+      「這家<b>餐廳</b>的食物真的好好吃，」艾咪開心地吸著麵說。
+    </p>
+    <div class="para-controls">
+      <button class="btn btn-zh" onclick="toggleZh(4)">🀄 顯示/隱藏中文</button>
+      <button class="btn btn-read" id="read-btn-4" onclick="readParagraph(4)">🔊 朗讀故事</button>
+    </div>
+  </div>
 
-function updateRateLabel() {
-    document.getElementById(&#39;rate-label&#39;).innerText = document.getElementById(&#39;rate&#39;).value + &#39;x&#39;;
-}
+  <!-- Para 6 -->
+  <div class="para-card" id="para-5">
+    <div class="para-num">6</div>
+    <p class="para-en" id="en-5">
+      In the afternoon, they took the <strong data-word="train">train</strong> to a shopping district.
+      Amy wanted to buy new clothes!
+      She found a cute pink <strong data-word="skirt">skirt</strong>, a cozy <strong data-word="sweater">sweater</strong>, and a cool <strong data-word="jacket">jacket</strong>.
+      Her little brother back home had asked for a new <strong data-word="T-shirt">T-shirt</strong> and some <strong data-word="shorts">shorts</strong>, so she picked those up too.
+      Mom also bought <strong data-word="pants">pants</strong> for Dad.
+    </p>
+    <p class="para-zh" id="zh-5">
+      下午，她們搭<b>火車</b>去購物區。
+      艾咪想買新衣服！
+      她找到了一條可愛的粉紅色<b>裙子</b>、一件舒適的<b>毛衣</b>，和一件帥氣的<b>夾克</b>。
+      在家的弟弟要她幫買一件新的<b>T恤</b>和一條<b>短褲</b>，所以她也一起買了。
+      媽媽也幫爸爸買了<b>長褲</b>。
+    </p>
+    <div class="para-controls">
+      <button class="btn btn-zh" onclick="toggleZh(5)">🀄 顯示/隱藏中文</button>
+      <button class="btn btn-read" id="read-btn-5" onclick="readParagraph(5)">🔊 朗讀故事</button>
+    </div>
+  </div>
 
-// Toggle Translations
-function toggleTranslations() {
-    const zhTexts = document.querySelectorAll(&#39;.zh-text&#39;);
-    zhTexts.forEach(el =&gt; {
-        if (el.style.display === &#39;block&#39;) {
-            el.style.display = &#39;none&#39;;
-        } else {
-            el.style.display = &#39;block&#39;;
-        }
-    });
-}
-
-// Helper: Stop any current speech
-function stopSpeech() {
-    if (synth.speaking) {
-        synth.cancel();
-    }
-    // Remove all highlights
-    document.querySelectorAll(&#39;.highlight&#39;).forEach(el =&gt; el.classList.remove(&#39;highlight&#39;));
-}
-
-// 1. Speak Single Word (Click on bold words)
-function speakWord(element) {
-    stopSpeech();
-    const text = element.innerText;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = &#39;en-US&#39;;
-    utterance.rate = getSpeechRate(); // Use slower speed for words if needed, or global setting
-
-    // Visual Feedback
-    utterance.onstart = () =&gt; element.classList.add(&#39;highlight&#39;);
-    utterance.onend = () =&gt; element.classList.remove(&#39;highlight&#39;);
-
-    synth.speak(utterance);
-}
-
-// 2. Read Paragraph (Sentence by Sentence for Accurate Highlighting)
-function readParagraph(buttonEl) {
-    stopSpeech();
-    
-    // Find the parent card
-    const card = buttonEl.closest(&#39;.paragraph-card&#39;);
-    const sentences = card.querySelectorAll(&#39;.sentence&#39;);
-    
-    let index = 0;
-
-    function speakNextSentence() {
-        if (index &gt;= sentences.length) return;
-
-        const sentenceEl = sentences[index];
-        const text = sentenceEl.innerText;
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = &#39;en-US&#39;;
-        utterance.rate = getSpeechRate();
-
-        utterance.onstart = () =&gt; {
-            sentenceEl.classList.add(&#39;highlight&#39;);
-            // Also scroll into view smoothly if needed
-            // sentenceEl.scrollIntoView({behavior: &quot;smooth&quot;, block: &quot;center&quot;}); 
-        };
-
-        utterance.onend = () =&gt; {
-            sentenceEl.classList.remove(&#39;highlight&#39;);
-            index++;
-            speakNextSentence();
-        };
-
-        utterance.onerror = () =&gt; {
-            sentenceEl.classList.remove(&#39;highlight&#39;);
-        }
-
-        synth.speak(utterance);
-    }
-
-    speakNextSentence();
-}
-
-// 3. Read Question (Title + Options)
-function readQuestion(btn) {
-    stopSpeech();
-    
-    const card = btn.closest(&#39;.question-card&#39;);
-    const questionText = card.querySelector(&#39;.question-header span&#39;).innerText;
-    const options = card.querySelectorAll(&#39;.options label&#39;);
-    
-    let textToRead = questionText + &quot;. &quot;;
-    options.forEach(opt =&gt; {
-        textToRead += opt.innerText + &quot;. &quot;;
-    });
-
-    const utterance = new SpeechSynthesisUtterance(textToRead);
-    utterance.lang = &#39;en-US&#39;;
-    utterance.rate = getSpeechRate();
-    
-    // Highlight the card while reading
-    utterance.onstart = () =&gt; card.classList.add(&#39;highlight&#39;);
-    utterance.onend = () =&gt; card.classList.remove(&#39;highlight&#39;);
-
-    synth.speak(utterance);
-}
-
-// Check Quiz Answers
-function checkAnswers() {
-    let score = 0;
-    const cards = document.querySelectorAll(&#39;.question-card&#39;);
-    
-    cards.forEach((card, index) =&gt; {
-        const correctAnswer = card.getAttribute(&#39;data-correct&#39;);
-        const selected = card.querySelector(`input[name=&quot;q${index+1}&quot;]:checked`);
-        
-        // Reset styles
-        card.style.border = &#39;none&#39;;
-        
-        if (selected) {
-            if (selected.value === correctAnswer) {
-                score++;
-                card.style.border = &#39;2px solid #4caf50&#39;; // Green border for correct
-            } else {
-                card.style.border = &#39;2px solid #f44336&#39;; // Red border for wrong
-            }
-        }
-    });
-
-    const resultDiv = document.getElementById(&#39;result&#39;);
-    resultDiv.innerText = `You scored ${score} out of 10! ${score === 10 ? &#39;🌟 Perfect!&#39; : &#39;Keep practicing!&#39;}`;
-    resultDiv.style.color = score &gt; 6 ? &#39;#2e7d32&#39; : &#39;#d32f2f&#39;;
-}
-
-// Initialize voices once loaded
-populateVoices();
-
-</script>
-</body>
-</html>
+  <!-- Para 7 -->
+  <div class="para-card" id="para-6">
+    <div class="para-num">7</div>
+    <p class="para-en" id="en-6">
+      After shopping, they passed a wonderful <strong data-word="bookstore">bookstore</strong>.
+      Amy's eyes lit up!
+      She ran in and found a book about <strong data-word="plane">plane</strong>s and <strong data-word="train">train</strong>s and how people travel the world.
+      "I want to ride every kind of transport someday — <strong data-word="plane">plane</strong>, <strong data-word="train">train</strong>, <strong data-word="bus">bus</strong>, and even a <strong data-word="car">car</strong> through the mountains!" she said to the <strong data-word="phone">phone</strong> camera as she took a selfie with the book.
+    </p>
+    <p class="para-zh" id="zh-6">
+      購物之後，她們經過了一家美妙的<b>書店</b>。
+      艾咪的眼睛亮了起來！
+      她跑進去，找到了一本關於<b>飛機</b>和<b>火車</b>，以及人們如何環遊世界的書。
+      「我有一天想要體驗各種交通工具——<b>飛機</b>、<b>火車</b>、<b>公車</b>，甚至是開著<b>汽車</b>穿越山脈！」她對著<b>手機</b>鏡頭說，同時拿著書自拍。
+    </p>
+    <div class="para-controls">
+      <button class="btn btn-zh" onclick="toggleZh(6)">🀄 顯示/隱藏中文</button>
+      <button class="btn btn-read" id="read-btn-6" onclick="readParagraph(6)">🔊 朗讀故事</button>
+    </div>
