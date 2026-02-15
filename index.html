@@ -1,471 +1,632 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leo's Busy City Adventure</title>
-    <style>
-        :root {
-            --primary-color: #FF9F1C;
-            --secondary-color: #2EC4B6;
-            --accent-color: #E71D36;
-            --bg-color: #CBF3F0;
-            --text-color: #333;
-            --card-bg: #ffffff;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tom's Busy City Adventure</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+TC:wght@400;700&display=swap');
+    :root {
+        --primary-color: #4facfe;
+        --secondary-color: #00f2fe;
+        --accent-color: #ff9a9e;
+        --text-color: #333;
+        --bg-color: #f0f9ff;
+        --highlight-color: #fff176;
+        --button-hover: #e6f7ff;
+    }
 
-        body {
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-        }
+    body {
+        font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+        background: linear-gradient(120deg, var(--bg-color) 0%, #d6eaff 100%);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+        line-height: 1.8;
+    }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        padding: 30px;
+        border: 4px solid var(--primary-color);
+    }
 
-        h1 {
-            text-align: center;
-            color: var(--accent-color);
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 0px #FFD700;
-        }
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+    }
 
-        /* Controls */
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
+    .controls {
+        background-color: #e3f2fd;
+        padding: 15px;
+        border-radius: 15px;
+        margin-bottom: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+        justify-content: space-between;
+        border: 2px dashed var(--primary-color);
+    }
 
-        button {
-            padding: 12px 24px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .control-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
+    button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 1rem;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
 
-        .btn-translate {
-            background-color: var(--primary-color);
-            color: white;
-        }
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        background-color: #3b8dd1;
+    }
 
-        .btn-read {
-            background-color: var(--secondary-color);
-            color: white;
-        }
+    button.secondary {
+        background-color: var(--accent-color);
+    }
 
-        .btn-stop {
-            background-color: var(--accent-color);
-            color: white;
-        }
+    button:active {
+        transform: translateY(0);
+    }
 
-        /* Story Styles */
-        .story-section {
-            font-size: 1.2rem;
-            margin-bottom: 40px;
-        }
+    input[type="range"] {
+        width: 150px;
+        cursor: pointer;
+    }
 
-        .paragraph {
-            margin-bottom: 25px;
-            padding: 15px;
-            border-left: 5px solid var(--secondary-color);
-            background-color: #f9f9f9;
-            border-radius: 0 10px 10px 0;
-        }
+    .story-section {
+        margin-bottom: 40px;
+    }
 
-        .vocab-word {
-            color: #0077b6;
-            font-weight: bold;
-            cursor: pointer;
-            border-bottom: 2px dotted #0077b6;
-            transition: color 0.2s;
-        }
+    .paragraph-card {
+        background: #fff;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 2px solid #eee;
+        position: relative;
+        transition: border-color 0.3s;
+    }
 
-        .vocab-word:hover {
-            color: var(--accent-color);
-            background-color: #ffe5e5;
-        }
+    .paragraph-card:hover {
+        border-color: var(--primary-color);
+    }
 
-        .translation {
-            display: none;
-            color: #666;
-            font-size: 1rem;
-            margin-top: 10px;
-            font-weight: normal;
-            border-top: 1px dashed #ccc;
-            padding-top: 8px;
-        }
+    .eng-text {
+        font-size: 1.25rem;
+        margin-bottom: 10px;
+    }
 
-        .show-translation .translation {
-            display: block;
-        }
+    strong {
+        color: #d35400;
+        cursor: pointer;
+        border-bottom: 2px dotted #d35400;
+        transition: all 0.2s;
+        display: inline-block; /* Helps with transform */
+    }
 
-        /* Highlight Style for Reading */
-        .highlight {
-            background-color: #fffacd; /* Yellowish */
-            box-shadow: 0 0 5px #ffd700;
-            border-radius: 3px;
-        }
+    strong:hover {
+        color: #e67e22;
+        transform: scale(1.1);
+        background-color: rgba(255, 230, 0, 0.3);
+    }
 
-        /* Quiz Styles */
-        .quiz-section {
-            background-color: #f0f8ff;
-            padding: 25px;
-            border-radius: 15px;
-            border: 3px dashed var(--primary-color);
-        }
+    .zh-text {
+        display: none; /* Hidden by default */
+        color: #555;
+        font-size: 1rem;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 8px;
+        border-left: 4px solid var(--accent-color);
+        margin-top: 10px;
+    }
 
-        .quiz-title {
-            text-align: center;
-            color: var(--primary-color);
-        }
+    .para-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        padding: 5px 10px;
+        font-size: 0.9rem;
+        box-shadow: none;
+    }
 
-        .question-block {
-            margin-bottom: 20px;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-        }
+    .para-btn:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
 
-        .question-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
+    /* Quiz Section */
+    .quiz-section {
+        background-color: #fff8e1;
+        padding: 25px;
+        border-radius: 20px;
+        border: 3px solid #ffecb3;
+    }
 
-        .speaker-icon {
-            cursor: pointer;
-            font-size: 1.2rem;
-            background: #eee;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
+    .quiz-title {
+        text-align: center;
+        color: #f57f17;
+        margin-bottom: 20px;
+    }
 
-        .speaker-icon:hover {
-            background: #ddd;
-        }
+    .question-card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
 
-        .options label {
-            display: block;
-            margin: 8px 0;
-            cursor: pointer;
-        }
+    .question-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
 
-        .result-area {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-top: 20px;
-            min-height: 40px;
-        }
+    .speak-icon {
+        cursor: pointer;
+        font-size: 1.2rem;
+        background: none;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+        color: var(--primary-color);
+    }
 
-        .correct { color: green; }
-        .wrong { color: red; }
+    .speak-icon:hover {
+        transform: scale(1.2);
+        background: none;
+    }
 
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8rem; }
-            .container { padding: 15px; }
-            button { width: 100%; justify-content: center; }
-        }
-    </style>
+    .options label {
+        display: block;
+        padding: 8px 10px;
+        margin: 5px 0;
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .options label:hover {
+        background-color: #e0f7fa;
+    }
+
+    input[type="radio"] {
+        margin-right: 10px;
+    }
+
+    /* The Highlight Class - Critical for Requirement */
+    .highlight {
+        background-color: var(--highlight-color);
+        border-radius: 4px;
+        box-shadow: 0 0 5px var(--highlight-color);
+        transition: background-color 0.2s;
+    }
+
+    /* Footer */
+    .footer {
+        text-align: center;
+        margin-top: 30px;
+        color: #888;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+        h1 { font-size: 1.8em; }
+        .controls { flex-direction: column; align-items: stretch; }
+        .para-btn { position: relative; top: 0; right: 0; margin-bottom: 10px; display: inline-block; }
+    }
+</style>
+
 </head>
 <body>
-
 <div class="container">
-    <h1>Leo's Smart City Day</h1>
-
-    <div class="controls">
-        <button class="btn-translate" onclick="toggleTranslation()">🌐 中文翻譯 Show/Hide</button>
-        <button class="btn-read" onclick="readFullStory()">📖 朗讀故事 Read Story</button>
-        <button class="btn-stop" onclick="stopAudio()">🛑 停止 Stop</button>
+<h1>🏙️ Tom's Busy City Adventure</h1>
+<div class="controls">
+    <div class="control-group">
+        <button onclick="toggleTranslations()" class="secondary">👁️ Show/Hide Chinese</button>
     </div>
-
-    <div id="story-content" class="story-section">
-        <div class="paragraph">
-            <span class="sentence">Today is a special day for Leo.</span>
-            <span class="sentence">He gets up and puts on his <span class="vocab-word" onclick="speakWord(this)">glasses</span>.</span>
-            <span class="sentence">He wants to look good.</span>
-            <span class="sentence">He opens his closet and sees a <span class="vocab-word" onclick="speakWord(this)">dress</span> and a <span class="vocab-word" onclick="speakWord(this)">skirt</span>, but those belong to his sister.</span>
-            <span class="sentence">Leo chooses a cool <span class="vocab-word" onclick="speakWord(this)">T-shirt</span> and blue <span class="vocab-word" onclick="speakWord(this)">shorts</span>.</span>
-            <span class="sentence">Because it is a little cold, he also puts on a <span class="vocab-word" onclick="speakWord(this)">sweater</span> and a <span class="vocab-word" onclick="speakWord(this)">jacket</span>.</span>
-            <span class="sentence">He changes his shorts to long <span class="vocab-word" onclick="speakWord(this)">pants</span>.</span>
-            <span class="sentence">Finally, he ties his <span class="vocab-word" onclick="speakWord(this)">sneakers</span>.</span>
-            <div class="translation">
-                今天是 Leo 特別的一天。他起床並戴上他的眼鏡。他想要看起來很帥氣。他打開衣櫥看到一件洋裝和一條裙子，但那是他姐姐的。Leo 選了一件很酷的 T恤和藍色的短褲。因為有點冷，他還穿上了毛衣和夾克。他把短褲換成了長褲。最後，他綁好他的運動鞋。
-            </div>
-        </div>
-
-        <div class="paragraph">
-            <span class="sentence">Leo goes to the kitchen.</span>
-            <span class="sentence">He drinks a <span class="vocab-word" onclick="speakWord(this)">glass</span> of milk.</span>
-            <span class="sentence">He checks his bag.</span>
-            <span class="sentence">He has his <span class="vocab-word" onclick="speakWord(this)">water bottle</span> and an <span class="vocab-word" onclick="speakWord(this)">umbrella</span> in case it rains.</span>
-            <span class="sentence">He takes his <span class="vocab-word" onclick="speakWord(this)">smartphone</span>.</span>
-            <span class="sentence">It is a very <span class="vocab-word" onclick="speakWord(this)">smart</span> <span class="vocab-word" onclick="speakWord(this)">phone</span>!</span>
-            <div class="translation">
-                Leo 走到廚房。他喝了一杯牛奶。他檢查他的包包。他帶了他的水壺，還有為了以防下雨帶的雨傘。他拿了他的智慧型手機。它是一支非常聰明的手機！
-            </div>
-        </div>
-
-        <div class="paragraph">
-            <span class="sentence">Leo walks outside.</span>
-            <span class="sentence">The street is busy.</span>
-            <span class="sentence">He sees a fast <span class="vocab-word" onclick="speakWord(this)">car</span> and a yellow <span class="vocab-word" onclick="speakWord(this)">taxi</span>.</span>
-            <span class="sentence">A big <span class="vocab-word" onclick="speakWord(this)">bus</span> stops near him.</span>
-            <span class="sentence">Some people ride a <span class="vocab-word" onclick="speakWord(this)">bike</span> and a <span class="vocab-word" onclick="speakWord(this)">scooter</span>.</span>
-            <span class="sentence">Leo does not drive.</span>
-            <span class="sentence">He walks to the <span class="vocab-word" onclick="speakWord(this)">MRT</span> station.</span>
-            <span class="sentence">He likes the <span class="vocab-word" onclick="speakWord(this)">train</span> because it is fast.</span>
-            <span class="sentence">In the sky, he sees a huge <span class="vocab-word" onclick="speakWord(this)">plane</span> flying high.</span>
-            <div class="translation">
-                Leo 走到外面。街道很繁忙。他看到一輛快車和一輛黃色的計程車。一輛大公車停在他附近。有些人騎腳踏車和機車。Leo 不開車。他走到捷運站。他喜歡火車因為它很快。在天空中，他看到一架巨大的飛機飛得很高。
-            </div>
-        </div>
-
-        <div class="paragraph">
-            <span class="sentence">First, Leo goes to the <span class="vocab-word" onclick="speakWord(this)">bakery</span> to buy bread.</span>
-            <span class="sentence">Then, he visits the <span class="vocab-word" onclick="speakWord(this)">bookstore</span> to buy a comic book.</span>
-            <span class="sentence">He walks past the <span class="vocab-word" onclick="speakWord(this)">bank</span> and the <span class="vocab-word" onclick="speakWord(this)">post office</span>.</span>
-            <span class="sentence">He needs to check the <span class="vocab-word" onclick="speakWord(this)">post</span>.</span>
-            <span class="sentence">Later, he visits his dad at his <span class="vocab-word" onclick="speakWord(this)">office</span>.</span>
-            <span class="sentence">His mom is not there because she works at the <span class="vocab-word" onclick="speakWord(this)">hospital</span>.</span>
-            <span class="sentence">Finally, the family meets at a nice <span class="vocab-word" onclick="speakWord(this)">restaurant</span> for dinner.</span>
-            <div class="translation">
-                首先，Leo 去麵包店買麵包。然後，他去書店買一本漫畫書。他走過銀行和郵局。他需要檢查郵件。稍後，他去爸爸的辦公室找他。他媽媽不在那裡，因為她在醫院工作。最後，全家人在一間很棒的餐廳集合吃晚餐。
-            </div>
-        </div>
-    </div>
-
-    <div class="quiz-section">
-        <h2 class="quiz-title">🧩 Reading Quiz</h2>
-        
-        <div class="question-block" id="q1">
-            <div class="question-header">
-                <div class="speaker-icon" onclick="speakQuestion('q1')">🔊</div>
-                <span>1. What did Leo put on his feet?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q1" value="wrong"> A) Sandals</label>
-                <label><input type="radio" name="q1" value="correct"> B) Sneakers</label>
-                <label><input type="radio" name="q1" value="wrong"> C) Boots</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q2">
-            <div class="question-header">
-                <div class="speaker-icon" onclick="speakQuestion('q2')">🔊</div>
-                <span>2. How did Leo travel to the city?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q2" value="wrong"> A) By taxi</label>
-                <label><input type="radio" name="q2" value="correct"> B) By MRT</label>
-                <label><input type="radio" name="q2" value="wrong"> C) By scooter</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q3">
-            <div class="question-header">
-                <div class="speaker-icon" onclick="speakQuestion('q3')">🔊</div>
-                <span>3. Where did Leo buy bread?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q3" value="wrong"> A) At the bookstore</label>
-                <label><input type="radio" name="q3" value="wrong"> B) At the bank</label>
-                <label><input type="radio" name="q3" value="correct"> C) At the bakery</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q4">
-            <div class="question-header">
-                <div class="speaker-icon" onclick="speakQuestion('q4')">🔊</div>
-                <span>4. Where does Leo's mom work?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q4" value="correct"> A) At the hospital</label>
-                <label><input type="radio" name="q4" value="wrong"> B) At the office</label>
-                <label><input type="radio" name="q4" value="wrong"> C) At the post office</label>
-            </div>
-        </div>
-
-        <div class="question-block" id="q5">
-            <div class="question-header">
-                <div class="speaker-icon" onclick="speakQuestion('q5')">🔊</div>
-                <span>5. What does Leo have in case it rains?</span>
-            </div>
-            <div class="options">
-                <label><input type="radio" name="q5" value="wrong"> A) A smartphone</label>
-                <label><input type="radio" name="q5" value="correct"> B) An umbrella</label>
-                <label><input type="radio" name="q5" value="wrong"> C) A water bottle</label>
-            </div>
-        </div>
-
-        <div style="text-align: center;">
-            <button class="btn-read" onclick="checkAnswers()" style="margin: 0 auto; background-color: #4CAF50;">✅ Check Answers</button>
-        </div>
-        <div id="result" class="result-area"></div>
+    <div class="control-group">
+        <label for="rate">Speed:</label>
+        <input type="range" id="rate" min="0.5" max="1.5" value="0.9" step="0.1" oninput="updateRateLabel()">
+        <span id="rate-label">0.9x</span>
     </div>
 </div>
 
+<div class="story-section" id="story-container">
+
+    <div class="paragraph-card">
+        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
+        <div class="eng-text">
+            <span class="sentence">Tom is a <strong onclick="speakWord(this)">smart</strong> boy who lives in the city.</span>
+            <span class="sentence">Today, he gets dressed for a busy day.</span>
+            <span class="sentence">He puts on a green <strong onclick="speakWord(this)">T-shirt</strong> and blue <strong onclick="speakWord(this)">shorts</strong>.</span>
+            <span class="sentence">Since it is a bit cold, he also wears a <strong onclick="speakWord(this)">sweater</strong> and a warm <strong onclick="speakWord(this)">jacket</strong>.</span>
+            <span class="sentence">He ties his <strong onclick="speakWord(this)">sneakers</strong> and puts his <strong onclick="speakWord(this)">smartphone</strong> in his pocket.</span>
+        </div>
+        <div class="zh-text">Tom 是一個住在城市裡的聰明男孩。今天，他為了忙碌的一天穿好衣服。他穿上一件綠色的 T恤和藍色的短褲。因為有點冷，他還穿了一件毛衣和一件溫暖的夾克。他繫好運動鞋，並把他的智慧型手機放進口袋。</div>
+    </div>
+
+    <div class="paragraph-card">
+        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
+        <div class="eng-text">
+            <span class="sentence">Tom wants to go to the city center.</span>
+            <span class="sentence">First, he rides his <strong onclick="speakWord(this)">bike</strong> to the station.</span>
+            <span class="sentence">He sees a yellow <strong onclick="speakWord(this)">taxi</strong> and a huge <strong onclick="speakWord(this)">bus</strong> on the street.</span>
+            <span class="sentence">A fast <strong onclick="speakWord(this)">scooter</strong> zooms by!</span>
+            <span class="sentence">Tom parks his bike and takes the <strong onclick="speakWord(this)">MRT</strong>.</span>
+            <span class="sentence">Later, he will take a <strong onclick="speakWord(this)">train</strong> to visit his grandma.</span>
+        </div>
+        <div class="zh-text">Tom 想要去市中心。首先，他騎著腳踏車去車站。他在街上看到一輛黃色的計程車和一輛巨大的公車。一輛快速的機車呼嘯而過！Tom 停好腳踏車並搭乘捷運。稍後，他將搭火車去拜訪他的奶奶。</div>
+    </div>
+
+    <div class="paragraph-card">
+        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
+        <div class="eng-text">
+            <span class="sentence">Tom has many errands.</span>
+            <span class="sentence">He goes to the <strong onclick="speakWord(this)">bank</strong> to get some money.</span>
+            <span class="sentence">Next, he walks to the <strong onclick="speakWord(this)">post office</strong>.</span>
+            <span class="sentence">He sees a man working in the <strong onclick="speakWord(this)">office</strong>.</span>
+            <span class="sentence">Tom sends a letter at the <strong onclick="speakWord(this)">post</strong> counter.</span>
+        </div>
+        <div class="zh-text">Tom 有很多差事。他去銀行領一些錢。接著，他走到郵局。他看到一位男士在辦公室裡工作。Tom 在郵政櫃台寄了一封信。</div>
+    </div>
+
+    <div class="paragraph-card">
+        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
+        <div class="eng-text">
+            <span class="sentence">Tom walks to the <strong onclick="speakWord(this)">bookstore</strong> to buy a comic book.</span>
+            <span class="sentence">The <strong onclick="speakWord(this)">bakery</strong> next door smells so good!</span>
+            <span class="sentence">He is hungry, so he decides to go to a <strong onclick="speakWord(this)">restaurant</strong> for lunch.</span>
+        </div>
+        <div class="zh-text">Tom 走到書店買了一本漫畫書。隔壁的麵包店聞起來好香！他餓了，所以他決定去餐廳吃午餐。</div>
+    </div>
+
+    <div class="paragraph-card">
+        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
+        <div class="eng-text">
+            <span class="sentence">At the restaurant, the waiter brings a <strong onclick="speakWord(this)">glass</strong> of water.</span>
+            <span class="sentence">Tom has his own <strong onclick="speakWord(this)">water bottle</strong> too.</span>
+            <span class="sentence">Suddenly, it starts to rain.</span>
+            <span class="sentence">Oh no! Tom forgot his <strong onclick="speakWord(this)">umbrella</strong> at home.</span>
+            <span class="sentence">He uses his <strong onclick="speakWord(this)">phone</strong> to call his dad.</span>
+        </div>
+        <div class="zh-text">在餐廳裡，服務生端來一杯水。Tom 也有他自己的水壺。突然，開始下雨了。喔不！Tom 把他的雨傘忘在家裡了。他用電話打給他的爸爸。</div>
+    </div>
+
+    <div class="paragraph-card">
+        <button class="para-btn" onclick="readParagraph(this)">🔊 Read Story</button>
+        <div class="eng-text">
+            <span class="sentence">While waiting, Tom sees a girl in a pretty <strong onclick="speakWord(this)">dress</strong> and a pink <strong onclick="speakWord(this)">skirt</strong>.</span>
+            <span class="sentence">She is wearing <strong onclick="speakWord(this)">glasses</strong>.</span>
+            <span class="sentence">She trips and hurts her leg near the <strong onclick="speakWord(this)">hospital</strong>.</span>
+            <span class="sentence">Tom helps her stand up.</span>
+            <span class="sentence">Look! A <strong onclick="speakWord(this)">plane</strong> is flying in the sky.</span>
+            <span class="sentence">Finally, Tom's dad arrives in his <strong onclick="speakWord(this)">car</strong>.</span>
+            <span class="sentence">Tom is tired but happy because he wears comfortable <strong onclick="speakWord(this)">pants</strong> now.</span>
+        </div>
+        <div class="zh-text">在等待的時候，Tom 看到一個穿著漂亮洋裝和粉紅色裙子的女孩。她戴著眼鏡。她在醫院附近跌倒並傷到了腿。Tom 扶她站起來。看！一架飛機正在天空中飛行。終於，Tom 的爸爸開著他的汽車到了。Tom 很累但很開心，因為他現在穿著舒適的長褲。</div>
+    </div>
+
+</div>
+
+<div class="quiz-section">
+    <h2 class="quiz-title">🧠 Fun Quiz Time!</h2>
+    
+    <div id="quiz-container">
+        <div class="question-card" data-correct="A">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>1. Where did Tom go to buy a comic book?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q1" value="A"> A. Bookstore</label>
+                <label><input type="radio" name="q1" value="B"> B. Bakery</label>
+                <label><input type="radio" name="q1" value="C"> C. Hospital</label>
+            </div>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>2. What did Tom wear because it was cold?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q2" value="A"> A. T-shirt and shorts</label>
+                <label><input type="radio" name="q2" value="B"> B. Sweater and jacket</label>
+                <label><input type="radio" name="q2" value="C"> C. Dress and skirt</label>
+            </div>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>3. How did Tom go to the station first?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q3" value="A"> A. By taxi</label>
+                <label><input type="radio" name="q3" value="B"> B. By bus</label>
+                <label><input type="radio" name="q3" value="C"> C. By bike</label>
+            </div>
+        </div>
+
+        <div class="question-card" data-correct="A">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>4. Where can you send a letter?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q4" value="A"> A. Post office</label>
+                <label><input type="radio" name="q4" value="B"> B. Bank</label>
+                <label><input type="radio" name="q4" value="C"> C. Restaurant</label>
+            </div>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>5. What did Tom forget at home when it rained?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q5" value="A"> A. Smartphone</label>
+                <label><input type="radio" name="q5" value="B"> B. Umbrella</label>
+                <label><input type="radio" name="q5" value="C"> C. Sneakers</label>
+            </div>
+        </div>
+
+         <div class="question-card" data-correct="C">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>6. Where did Tom get money?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q6" value="A"> A. Office</label>
+                <label><input type="radio" name="q6" value="B"> B. Hospital</label>
+                <label><input type="radio" name="q6" value="C"> C. Bank</label>
+            </div>
+        </div>
+
+        <div class="question-card" data-correct="A">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>7. What did the waiter bring to Tom?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q7" value="A"> A. A glass of water</label>
+                <label><input type="radio" name="q7" value="B"> B. A water bottle</label>
+                <label><input type="radio" name="q7" value="C"> C. A coffee</label>
+            </div>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>8. What was the girl wearing?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q8" value="A"> A. Shorts and sneakers</label>
+                <label><input type="radio" name="q8" value="B"> B. Dress and skirt</label>
+                <label><input type="radio" name="q8" value="C"> C. Jacket and pants</label>
+            </div>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>9. Who picked Tom up at the end?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q9" value="A"> A. His mom in a bus</label>
+                <label><input type="radio" name="q9" value="B"> B. His sister on a scooter</label>
+                <label><input type="radio" name="q9" value="C"> C. His dad in a car</label>
+            </div>
+        </div>
+
+        <div class="question-card" data-correct="A">
+            <div class="question-header">
+                <button class="speak-icon" onclick="readQuestion(this)">🔊</button>
+                <span>10. Which vehicle flies in the sky?</span>
+            </div>
+            <div class="options">
+                <label><input type="radio" name="q10" value="A"> A. Plane</label>
+                <label><input type="radio" name="q10" value="B"> B. MRT</label>
+                <label><input type="radio" name="q10" value="C"> C. Train</label>
+            </div>
+        </div>
+    </div>
+    
+    <button onclick="checkAnswers()" style="width: 100%; margin-top: 20px; font-size: 1.2rem;">📝 Check Answers</button>
+    <div id="result" style="text-align: center; margin-top: 15px; font-weight: bold; font-size: 1.2rem;"></div>
+</div>
+
+<div class="footer">
+    Created for 4th Grade English Learning
+</div>
+
+</div>
 <script>
-    const synth = window.speechSynthesis;
-    let currentUtterance = null;
+// Speech Synthesis Setup
+const synth = window.speechSynthesis;
+let voices = [];
+// Load voices
+function populateVoices() {
+    voices = synth.getVoices().filter(voice =&gt; voice.lang.includes(&#39;en&#39;));
+}
 
-    // 1. Toggle Translation
-    function toggleTranslation() {
-        const content = document.getElementById('story-content');
-        content.classList.toggle('show-translation');
-    }
+if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = populateVoices;
+}
 
-    // 2. Stop Audio
-    function stopAudio() {
+// Configuration
+function getSpeechRate() {
+    return document.getElementById(&#39;rate&#39;).value;
+}
+
+function updateRateLabel() {
+    document.getElementById(&#39;rate-label&#39;).innerText = document.getElementById(&#39;rate&#39;).value + &#39;x&#39;;
+}
+
+// Toggle Translations
+function toggleTranslations() {
+    const zhTexts = document.querySelectorAll(&#39;.zh-text&#39;);
+    zhTexts.forEach(el =&gt; {
+        if (el.style.display === &#39;block&#39;) {
+            el.style.display = &#39;none&#39;;
+        } else {
+            el.style.display = &#39;block&#39;;
+        }
+    });
+}
+
+// Helper: Stop any current speech
+function stopSpeech() {
+    if (synth.speaking) {
         synth.cancel();
-        removeHighlights();
     }
+    // Remove all highlights
+    document.querySelectorAll(&#39;.highlight&#39;).forEach(el =&gt; el.classList.remove(&#39;highlight&#39;));
+}
 
-    // Helper: Remove all highlights
-    function removeHighlights() {
-        const highlighted = document.querySelectorAll('.highlight');
-        highlighted.forEach(el => el.classList.remove('highlight'));
-    }
+// 1. Speak Single Word (Click on bold words)
+function speakWord(element) {
+    stopSpeech();
+    const text = element.innerText;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = &#39;en-US&#39;;
+    utterance.rate = getSpeechRate(); // Use slower speed for words if needed, or global setting
 
-    // 3. Speak Single Word
-    function speakWord(element) {
-        stopAudio();
-        const word = element.innerText;
-        element.classList.add('highlight');
+    // Visual Feedback
+    utterance.onstart = () =&gt; element.classList.add(&#39;highlight&#39;);
+    utterance.onend = () =&gt; element.classList.remove(&#39;highlight&#39;);
+
+    synth.speak(utterance);
+}
+
+// 2. Read Paragraph (Sentence by Sentence for Accurate Highlighting)
+function readParagraph(buttonEl) {
+    stopSpeech();
+    
+    // Find the parent card
+    const card = buttonEl.closest(&#39;.paragraph-card&#39;);
+    const sentences = card.querySelectorAll(&#39;.sentence&#39;);
+    
+    let index = 0;
+
+    function speakNextSentence() {
+        if (index &gt;= sentences.length) return;
+
+        const sentenceEl = sentences[index];
+        const text = sentenceEl.innerText;
         
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.8;
-        
-        utterance.onend = () => {
-            element.classList.remove('highlight');
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = &#39;en-US&#39;;
+        utterance.rate = getSpeechRate();
+
+        utterance.onstart = () =&gt; {
+            sentenceEl.classList.add(&#39;highlight&#39;);
+            // Also scroll into view smoothly if needed
+            // sentenceEl.scrollIntoView({behavior: &quot;smooth&quot;, block: &quot;center&quot;}); 
         };
 
-        synth.speak(utterance);
-    }
+        utterance.onend = () =&gt; {
+            sentenceEl.classList.remove(&#39;highlight&#39;);
+            index++;
+            speakNextSentence();
+        };
 
-    // 4. Read Full Story (Sentence by Sentence)
-    function readFullStory() {
-        stopAudio();
-        const sentences = document.querySelectorAll('.sentence');
-        let index = 0;
-
-        function speakSentence() {
-            if (index >= sentences.length) return;
-
-            const el = sentences[index];
-            el.classList.add('highlight');
-            
-            // Get text, ignoring the translation hidden inside if structure changes, 
-            // but currently structure is span.sentence contains span.vocab. TextContent is safe.
-            const text = el.textContent; 
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.9;
-
-            utterance.onend = () => {
-                el.classList.remove('highlight');
-                index++;
-                speakSentence();
-            };
-
-            utterance.onerror = () => {
-                el.classList.remove('highlight');
-            };
-
-            currentUtterance = utterance;
-            synth.speak(utterance);
+        utterance.onerror = () =&gt; {
+            sentenceEl.classList.remove(&#39;highlight&#39;);
         }
 
-        speakSentence();
-    }
-
-    // 5. Read Question
-    function speakQuestion(questionId) {
-        stopAudio();
-        const container = document.getElementById(questionId);
-        
-        // Construct text to read: Question + Options
-        const questionText = container.querySelector('.question-header span').innerText;
-        const labels = container.querySelectorAll('.options label');
-        let fullText = questionText + ". ";
-        labels.forEach(label => {
-            fullText += label.innerText + ". ";
-        });
-
-        container.classList.add('highlight');
-
-        const utterance = new SpeechSynthesisUtterance(fullText);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.9;
-
-        utterance.onend = () => {
-            container.classList.remove('highlight');
-        };
-
         synth.speak(utterance);
     }
 
-    // 6. Check Answers
-    function checkAnswers() {
-        let score = 0;
-        const total = 5;
-        const resultDiv = document.getElementById('result');
-        
-        // Clear previous colors
-        document.querySelectorAll('.options label').forEach(l => l.style.color = 'inherit');
+    speakNextSentence();
+}
 
-        for (let i = 1; i <= total; i++) {
-            const q = document.querySelector(`input[name="q${i}"]:checked`);
-            if (q) {
-                if (q.value === "correct") {
-                    score++;
-                    q.parentElement.style.color = "green";
-                    q.parentElement.style.fontWeight = "bold";
-                } else {
-                    q.parentElement.style.color = "red";
-                }
+// 3. Read Question (Title + Options)
+function readQuestion(btn) {
+    stopSpeech();
+    
+    const card = btn.closest(&#39;.question-card&#39;);
+    const questionText = card.querySelector(&#39;.question-header span&#39;).innerText;
+    const options = card.querySelectorAll(&#39;.options label&#39;);
+    
+    let textToRead = questionText + &quot;. &quot;;
+    options.forEach(opt =&gt; {
+        textToRead += opt.innerText + &quot;. &quot;;
+    });
+
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.lang = &#39;en-US&#39;;
+    utterance.rate = getSpeechRate();
+    
+    // Highlight the card while reading
+    utterance.onstart = () =&gt; card.classList.add(&#39;highlight&#39;);
+    utterance.onend = () =&gt; card.classList.remove(&#39;highlight&#39;);
+
+    synth.speak(utterance);
+}
+
+// Check Quiz Answers
+function checkAnswers() {
+    let score = 0;
+    const cards = document.querySelectorAll(&#39;.question-card&#39;);
+    
+    cards.forEach((card, index) =&gt; {
+        const correctAnswer = card.getAttribute(&#39;data-correct&#39;);
+        const selected = card.querySelector(`input[name=&quot;q${index+1}&quot;]:checked`);
+        
+        // Reset styles
+        card.style.border = &#39;none&#39;;
+        
+        if (selected) {
+            if (selected.value === correctAnswer) {
+                score++;
+                card.style.border = &#39;2px solid #4caf50&#39;; // Green border for correct
+            } else {
+                card.style.border = &#39;2px solid #f44336&#39;; // Red border for wrong
             }
         }
+    });
 
-        resultDiv.innerText = `You got ${score} out of ${total} correct! ${score === 5 ? '🌟 Excellent!' : 'Keep practicing!'}`;
-        resultDiv.className = "result-area " + (score === 5 ? "correct" : "");
-    }
+    const resultDiv = document.getElementById(&#39;result&#39;);
+    resultDiv.innerText = `You scored ${score} out of 10! ${score === 10 ? &#39;🌟 Perfect!&#39; : &#39;Keep practicing!&#39;}`;
+    resultDiv.style.color = score &gt; 6 ? &#39;#2e7d32&#39; : &#39;#d32f2f&#39;;
+}
+
+// Initialize voices once loaded
+populateVoices();
+
 </script>
-
 </body>
 </html>
-
