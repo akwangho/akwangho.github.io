@@ -358,4 +358,299 @@ function buildEnEl(text, paraIdx) {
         sp.addEventListener("click", function(e){
           e.stopPropagation();
           stopAll();
-          sp.classList.
+          sp.classList.add("on");
+          doSpeak(word, function(){ sp.classList.remove("on"); });
+        });
+        p.appendChild(sp);
+      })(document.createElement("span"), pt.word);
+    }
+  }
+  return p;
+}
+
+/* =========================================================
+   BUILD STORY
+   ========================================================= */
+function buildStory() {
+  var cont = document.getElementById("story");
+  cont.innerHTML = "";
+  for(var pi=0; pi<PARAS.length; pi++){
+    var card = document.createElement("div");
+    card.className = "pcard";
+
+    var num = document.createElement("span");
+    num.className = "pnum";
+    num.textContent = (pi+1);
+    card.appendChild(num);
+
+    var enP = buildEnEl(PARAS[pi].en, pi);
+    card.appendChild(enP);
+
+    var zhP = document.createElement("div");
+    zhP.className = "para-zh";
+    zhP.id = "zh"+pi;
+    zhP.textContent = PARAS[pi].zh;
+    card.appendChild(zhP);
+
+    var ctrl = document.createElement("div");
+    ctrl.className = "pctrl";
+
+    // Chinese toggle button
+    (function(idx, zhDiv){
+      var bz = document.createElement("button");
+      bz.className = "btn bzh";
+      bz.textContent = "🔤 顯示中文";
+      bz.addEventListener("click", function(){
+        if(zhDiv.style.display === "block"){
+          zhDiv.style.display = "none";
+          bz.textContent = "🔤 顯示中文";
+        } else {
+          zhDiv.style.display = "block";
+          bz.textContent = "🔤 隱藏中文";
+        }
+      });
+      ctrl.appendChild(bz);
+    })(pi, zhP);
+
+    // Read aloud button
+    (function(idx, enEl){
+      var br = document.createElement("button");
+      br.className = "btn bread";
+      br.textContent = "🔊 朗讀故事";
+      br.addEventListener("click", function(){
+        if(activeReadBtn === br){
+          stopAll();
+          return;
+        }
+        stopAll();
+        activeReadBtn = br;
+        br.textContent = "⏹ 停止朗讀";
+        br.className = "btn bstop";
+        var spans = enEl.querySelectorAll(".ssen");
+        if(spans.length === 0){
+          // Wrap sentences in spans for highlighting
+          var text = PARAS[idx].en;
+          doSpeak(text, function(){
+            br.textContent = "🔊 朗讀故事";
+            br.className = "btn bread";
+            activeReadBtn = null;
+          });
+        } else {
+          speakWithHL(PARAS[idx].en, Array.prototype.slice.call(spans), function(){
+            br.textContent = "🔊 朗讀故事";
+            br.className = "btn bread";
+            activeReadBtn = null;
+          });
+        }
+      });
+      ctrl.appendChild(br);
+    })(pi, enP);
+
+    card.appendChild(ctrl);
+    cont.appendChild(card);
+  }
+}
+
+/* =========================================================
+   BUILD WORD CHIPS
+   ========================================================= */
+function buildChips() {
+  var cont = document.getElementById("wchips");
+  cont.innerHTML = "";
+  for(var i=0; i<VOCAB.length; i++){
+    (function(word, zh){
+      var chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = word + " " + zh;
+      chip.title = word + " = " + zh;
+      chip.addEventListener("click", function(){
+        stopAll();
+        chip.classList.add("on");
+        doSpeak(word, function(){ chip.classList.remove("on"); });
+      });
+      cont.appendChild(chip);
+    })(VOCAB[i][0], VOCAB[i][1]);
+  }
+}
+
+/* =========================================================
+   BUILD QUIZ
+   ========================================================= */
+function buildQuiz() {
+  var cont = document.getElementById("qcont");
+  cont.innerHTML = "";
+  answers = {};
+  submitted = false;
+  document.getElementById("sub-btn").disabled = false;
+  document.getElementById("scoreboard").classList.remove("show");
+
+  for(var qi=0; qi<QUESTIONS.length; qi++){
+    var q = QUESTIONS[qi];
+    var card = document.createElement("div");
+    card.className = "qcard";
+    card.id = "qcard"+qi;
+
+    var hdr = document.createElement("div");
+    hdr.className = "qhdr";
+
+    var qnum = document.createElement("span");
+    qnum.className = "qnum";
+    qnum.textContent = (qi+1);
+    hdr.appendChild(qnum);
+
+    var qtxt = document.createElement("span");
+    qtxt.className = "qtxt";
+    qtxt.id = "qtxt"+qi;
+    qtxt.textContent = q.q;
+    hdr.appendChild(qtxt);
+
+    var spkBtn = document.createElement("button");
+    spkBtn.className = "qspk";
+    spkBtn.textContent = "🔊";
+    spkBtn.title = "聽題目";
+    (function(text, btn, txt){
+      btn.addEventListener("click", function(){
+        stopAll();
+        btn.classList.add("on");
+        txt.classList.add("on");
+        doSpeak(text, function(){
+          btn.classList.remove("on");
+          txt.classList.remove("on");
+        });
+      });
+    })(q.q, spkBtn, qtxt);
+    hdr.appendChild(spkBtn);
+
+    card.appendChild(hdr);
+
+    var grid = document.createElement("div");
+    grid.className = "ogrid";
+
+    for(var oi=0; oi<q.opts.length; oi++){
+      (function(qIdx, optIdx, optText, letter){
+        var ob = document.createElement("button");
+        ob.className = "obtn";
+        ob.textContent = optText;
+        ob.addEventListener("click", function(){
+          if(submitted) return;
+          // deselect others in same question
+          var siblings = grid.querySelectorAll(".obtn");
+          for(var s=0; s<siblings.length; s++) siblings[s].classList.remove("sel");
+          ob.classList.add("sel");
+          answers[qIdx] = letter;
+        });
+        grid.appendChild(ob);
+      })(qi, oi, q.opts[oi], String.fromCharCode(65+oi));
+    }
+
+    card.appendChild(grid);
+
+    var fb = document.createElement("div");
+    fb.className = "qfb";
+    fb.id = "qfb"+qi;
+    card.appendChild(fb);
+
+    cont.appendChild(card);
+  }
+}
+
+/* =========================================================
+   SUBMIT QUIZ
+   ========================================================= */
+function submitQuiz() {
+  if(submitted) return;
+
+  // Check all answered
+  var total = QUESTIONS.length;
+  var answered = Object.keys(answers).length;
+  if(answered < total){
+    alert("請先回答所有 " + total + " 題喔！\nPlease answer all " + total + " questions first!");
+    return;
+  }
+
+  submitted = true;
+  document.getElementById("sub-btn").disabled = true;
+
+  var score = 0;
+  for(var qi=0; qi<QUESTIONS.length; qi++){
+    var q = QUESTIONS[qi];
+    var card = document.getElementById("qcard"+qi);
+    var fb = document.getElementById("qfb"+qi);
+    var userAns = answers[qi];
+    var correct = q.ans;
+    var isCorrect = (userAns === correct);
+
+    if(isCorrect){
+      score++;
+      card.classList.add("qok");
+      fb.className = "qfb fbok";
+      fb.textContent = "✅ 正確！Great job!";
+    } else {
+      card.classList.add("qno");
+      fb.className = "qfb fbno";
+      var correctIdx = correct.charCodeAt(0) - 65;
+      fb.textContent = "❌ 正確答案是 " + q.opts[correctIdx];
+    }
+    fb.style.display = "block";
+
+    // Highlight correct/wrong options
+    var btns = card.querySelectorAll(".obtn");
+    for(var bi=0; bi<btns.length; bi++){
+      btns[bi].disabled = true;
+      var letter = String.fromCharCode(65+bi);
+      if(letter === correct){
+        btns[bi].classList.add("ok");
+      } else if(letter === userAns && !isCorrect){
+        btns[bi].classList.add("no");
+      }
+    }
+  }
+
+  // Show scoreboard
+  var sb = document.getElementById("scoreboard");
+  document.getElementById("scorebig").textContent = score + " / " + total;
+  var msg = "";
+  if(score === total) msg = "🎉 滿分！你太厲害了！Perfect score!";
+  else if(score >= 8) msg = "👏 非常棒！Almost perfect!";
+  else if(score >= 6) msg = "😊 不錯喔！Good job!";
+  else if(score >= 4) msg = "💪 加油！再讀一次故事試試！Keep trying!";
+  else msg = "📖 再仔細讀一次故事吧！Read the story again!";
+  document.getElementById("scoremsg").textContent = msg;
+  sb.classList.add("show");
+  sb.scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", function(){
+  // Speed slider
+  var slider = document.getElementById("speed-slider");
+  var sval = document.getElementById("speed-val");
+  slider.addEventListener("input", function(){
+    rate = parseFloat(slider.value);
+    sval.textContent = rate.toFixed(1) + "×";
+  });
+
+  // Build everything
+  buildChips();
+  buildStory();
+  buildQuiz();
+
+  // Go to quiz button
+  document.getElementById("go-quiz-btn").addEventListener("click", function(){
+    document.getElementById("quiz-anchor").scrollIntoView({behavior:"smooth"});
+  });
+
+  // Submit button
+  document.getElementById("sub-btn").addEventListener("click", submitQuiz);
+
+  // Retry button
+  document.getElementById("retry-btn").addEventListener("click", function(){
+    buildQuiz();
+    document.getElementById("quiz-anchor").scrollIntoView({behavior:"smooth"});
+  });
+});
+</script>
+</body>
+</html>
