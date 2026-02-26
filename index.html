@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Wizard's Magic Garden — English Listening Story Quiz</title>
+<title>The Camping Trip at Wizard Castle — English Listening Story Quiz</title>
 <style>
 :root {
   --sky: #5BC8F5; --sun: #FFD93D; --grass: #6BCB77; --coral: #FF6B6B;
@@ -19,15 +19,15 @@ body {
 }
 
 header {
-  background: linear-gradient(135deg, var(--sky), var(--lavender));
+  background: linear-gradient(135deg, #7B68EE, var(--sky));
   padding: 28px 20px 22px; text-align: center;
   box-shadow: 0 6px 24px rgba(91,200,245,.35);
 }
 header h1 {
-  font-size: clamp(1.5rem, 5vw, 2.5rem); color: #fff; font-weight: 900;
+  font-size: clamp(1.4rem, 5vw, 2.4rem); color: #fff; font-weight: 900;
   text-shadow: 3px 3px 0 rgba(0,0,0,.12); line-height: 1.3;
 }
-header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font-weight: 700; }
+header p { color: rgba(255,255,255,.92); font-size: .88rem; margin-top: 6px; font-weight: 700; }
 
 .container { max-width: 740px; margin: 0 auto; padding: 0 14px; }
 
@@ -83,9 +83,7 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 }
 
 /* === PROGRESS BAR === */
-.progress-wrap {
-  max-width: 740px; margin: 0 auto 14px; padding: 0 14px;
-}
+.progress-wrap { max-width: 740px; margin: 0 auto 14px; padding: 0 14px; }
 .progress-bar-outer {
   background: #e8e8e8; border-radius: 50px; height: 28px; position: relative;
   overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,.08);
@@ -108,7 +106,7 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 .pcard:nth-child(4n+2) { border-left-color: var(--lavender); }
 .pcard:nth-child(4n+3) { border-left-color: var(--grass); }
 .pcard:nth-child(4n) { border-left-color: var(--coral); }
-.para-en { font-size: 1.05rem; line-height: 2.1; color: var(--ink); }
+.para-en { font-size: 1.05rem; line-height: 2.2; color: var(--ink); }
 .vw {
   color: #1A6ED8; background: #E8F4FF; border-radius: 6px; padding: 1px 5px;
   cursor: pointer; font-weight: 800; border-bottom: 2px solid #1A6ED8;
@@ -116,8 +114,12 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 }
 .vw:hover { background: #B5F2FF; color: #0A3D8F; }
 .vw.speaking { background: #FFE566; color: #7a4000; border-bottom-color: #E8A000; }
-.ssen { transition: background .25s; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.ssen.highlight { background: #FFE566; padding: 2px 0; }
+.ssen {
+  transition: background .3s; border-radius: 4px;
+  box-decoration-break: clone; -webkit-box-decoration-break: clone;
+}
+.ssen.highlight { background: #FFF3CD; padding: 2px 0; }
+.ssen.playing-sentence { background: #E3F2FD; padding: 3px 2px; border-radius: 6px; }
 .para-zh {
   display: none; margin-top: 10px; padding: 10px 14px;
   background: linear-gradient(135deg, #f0fff4, #e8f4ff); border-radius: 12px;
@@ -127,24 +129,29 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 /* === BLANK MECHANIC === */
 .blank-wrap { display: inline-block; vertical-align: baseline; position: relative; }
 .blank-speaker {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
   background: linear-gradient(135deg, #FFE0B2, #FFCC80); border: 2.5px dashed #FF9800;
-  border-radius: 10px; padding: 2px 10px; cursor: pointer; font-size: 1.1rem;
+  border-radius: 10px; padding: 3px 12px; cursor: pointer; font-size: .92rem;
   transition: transform .15s, box-shadow .2s; user-select: none;
   animation: pulse-blank 2s infinite;
-  min-width: 44px; min-height: 32px; line-height: 1;
+  min-width: 60px; min-height: 34px; line-height: 1; font-weight: 700;
+  color: #E65100; letter-spacing: 1px;
 }
-.blank-speaker:hover { transform: scale(1.08); box-shadow: 0 2px 10px rgba(255,152,0,.3); }
+.blank-speaker:hover { transform: scale(1.06); box-shadow: 0 2px 12px rgba(255,152,0,.35); }
 .blank-speaker:active { transform: scale(.96); }
 @keyframes pulse-blank {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255,152,0,.35); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,152,0,.3); }
   50% { box-shadow: 0 0 0 6px rgba(255,152,0,0); }
+}
+.blank-hint {
+  display: block; text-align: center; font-size: .7rem; color: #999;
+  padding: 4px 0 2px; font-weight: 600;
 }
 .blank-opts-popup {
   display: none; position: absolute; top: calc(100% + 6px); left: 50%;
   transform: translateX(-50%); z-index: 200; background: #fff;
-  border-radius: 14px; box-shadow: 0 6px 28px rgba(0,0,0,.18);
-  padding: 8px; min-width: 200px; animation: pop-in .2s ease;
+  border-radius: 14px; box-shadow: 0 6px 28px rgba(0,0,0,.2);
+  padding: 10px; min-width: 210px; animation: pop-in .25s ease;
 }
 .blank-opts-popup.show { display: flex; flex-direction: column; gap: 5px; }
 .blank-opts-popup::before {
@@ -153,23 +160,23 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
   border-bottom: 8px solid #fff;
 }
 .blank-opt-btn {
-  padding: 8px 14px; border-radius: 10px; border: 2px solid #ddd; background: #f9f9f9;
-  cursor: pointer; font-family: inherit; font-size: .88rem; font-weight: 700;
+  padding: 9px 14px; border-radius: 10px; border: 2px solid #ddd; background: #f9f9f9;
+  cursor: pointer; font-family: inherit; font-size: .9rem; font-weight: 700;
   color: var(--ink); transition: all .15s; text-align: center; user-select: none;
 }
-.blank-opt-btn:hover { background: #E8F4FF; border-color: var(--sky); transform: scale(1.03); }
+.blank-opt-btn:hover:not(.wrong) { background: #E8F4FF; border-color: var(--sky); transform: scale(1.03); }
 .blank-opt-btn.correct {
   background: #d4edda; border-color: var(--grass); color: #155724;
   animation: pop-in .3s ease;
 }
 .blank-opt-btn.wrong {
   background: #f8d7da; border-color: var(--coral); color: #721c24;
-  animation: shake .4s ease; pointer-events: none; opacity: .5;
+  animation: shake .4s ease; pointer-events: none; opacity: .45;
 }
 .blank-solved {
   display: inline; color: #155724; background: #d4edda; border-radius: 6px;
   padding: 1px 6px; font-weight: 800; border-bottom: 2px solid var(--grass);
-  animation: pop-in .3s ease;
+  animation: pop-in .3s ease; cursor: pointer;
 }
 
 /* === PARAGRAPH CONTROLS === */
@@ -304,9 +311,9 @@ footer span { color: var(--coral); }
 }
 @keyframes celebrate {
   0% { transform: scale(1); }
-  25% { transform: scale(1.2) rotate(-3deg); }
-  50% { transform: scale(1.3) rotate(3deg); }
-  75% { transform: scale(1.2) rotate(-2deg); }
+  25% { transform: scale(1.1) rotate(-2deg); }
+  50% { transform: scale(1.15) rotate(2deg); }
+  75% { transform: scale(1.1) rotate(-1deg); }
   100% { transform: scale(1); }
 }
 
@@ -315,7 +322,7 @@ footer span { color: var(--coral); }
   header { padding: 20px 14px 16px; }
   .ctrl-panel, .chip-banner { margin-left: 10px; margin-right: 10px; }
   .pcard { padding: 14px 14px; }
-  .para-en { font-size: .97rem; line-height: 2; }
+  .para-en { font-size: .95rem; line-height: 2; }
   .blank-opts-popup { min-width: 160px; left: 0; transform: none; }
   .blank-opts-popup::before { left: 20px; transform: none; }
 }
@@ -324,8 +331,8 @@ footer span { color: var(--coral); }
 <body>
 
 <header>
-  <h1>🧙‍♂️ The Wizard's Magic Garden 🌸</h1>
-  <p>四年級英語聽力故事學習 ｜ 聽音填空 + 閱讀測驗</p>
+  <h1>🏕️ The Camping Trip at Wizard Castle 🧙‍♂️</h1>
+  <p>四年級英語聽力故事 ｜ 聽完整句子，找出空格中的單字！</p>
 </header>
 
 <div class="ctrl-panel container">
@@ -342,7 +349,7 @@ footer span { color: var(--coral); }
     <input type="range" id="speed-slider" min="0.5" max="1.2" step="0.05" value="0.85">
     <span id="speed-val">0.85x</span>
   </div>
-  <div class="ctrl-hint">難度控制故事挖空與測驗聽力比例 ｜ 建議從 Easy + 0.7x 開始練習</div>
+  <div class="ctrl-hint">點擊故事中的 🔊 會朗讀「整個句子」，仔細聽，找出空格裡的單字！</div>
 </div>
 
 <div class="chip-banner container">
@@ -350,12 +357,12 @@ footer span { color: var(--coral); }
   <div class="chips" id="chips"></div>
 </div>
 
-<h2 class="sec-title"><span>📖 故事：巫師的魔法花園</span></h2>
+<h2 class="sec-title"><span>📖 故事：巫師城堡的露營之旅</span></h2>
 
 <div class="progress-wrap">
   <div class="progress-bar-outer">
     <div class="progress-bar-inner" id="prog-bar" style="width:0%">
-      <span class="progress-text" id="prog-text">0 / 0 blanks filled</span>
+      <span class="progress-text" id="prog-text">0 / 0</span>
     </div>
   </div>
 </div>
@@ -383,11 +390,11 @@ footer span { color: var(--coral); }
   <button class="bretry" id="retry-btn">🔄 再來一次 Try Again</button>
 </div>
 
-<footer><p>✨ 專為努力學英語的小朋友設計 ✨ ｜ <span>The Wizard's Magic Garden</span> © 2025</p></footer>
+<footer><p>✨ 專為努力學英語的小朋友設計 ✨ ｜ <span>The Camping Trip at Wizard Castle</span> © 2025</p></footer>
 
 <script>
 /* ============================================================
-   VOCABULARY DATA
+   VOCABULARY DATA  (sorted longest-first for matching)
    ============================================================ */
 var VOCAB = [
   ['butterfly net','捕蟲網'],['insect box','昆蟲箱'],
@@ -419,96 +426,96 @@ var EXTRA_CHIPS = [
 ];
 
 /* ============================================================
-   STORY PARAGRAPHS
+   STORY PARAGRAPHS  (new story)
    ============================================================ */
 var PARAS = [
   {
-    en: "Once upon a time, near a beautiful castle, there lived a kind wizard. He had a big garden with all kinds of flowers and a clean stream. Every morning in January, the wizard would walk to the stream and think about new magic.",
-    zh: "從前從前，在一座美麗的城堡附近，住著一位善良的巫師。他有一座大花園，裡面有各式各樣的花和一條乾淨的小溪。每年一月的每個早晨，巫師都會走到小溪邊思考新的魔法。"
+    en: "Tim the turtle and Katie the kangaroo lived near a beautiful castle. A kind wizard was their best friend. In January, he said, \"I will teach you all kinds of magic this year!\" Tim loved to walk in the garden every morning.",
+    zh: "烏龜提姆和袋鼠乖乖住在一座美麗的城堡附近。一位善良的巫師是他們最好的朋友。一月時，他說：「今年我要教你們各種魔法！」提姆喜歡每天早上在花園裡散步。"
   },
   {
-    en: "One cold day in February, the wizard found something funny by the stream. There was a soft pillow and a hard rock on the ground. \"This pillow is soft and light, but that rock is hard and heavy!\" he laughed. He picked up the rock and put it in his basket.",
-    zh: "二月的一個寒冷日子，巫師在溪邊發現了好玩的東西。地上有一顆柔軟的枕頭和一塊堅硬的石頭。「這顆枕頭又軟又輕，但那塊石頭又硬又重！」他笑著說。他撿起石頭放進籃子裡。"
+    en: "In February, the wizard gave them a magic present. The magic present was a big surprise! It was a talking pillow! The pillow was soft and light. Katie also found a rock near the stream. \"That rock is hard and heavy,\" she laughed. Tim picked it up and put it in his basket.",
+    zh: "二月，巫師給了他們一份神奇的禮物。那個神奇的禮物是一個大驚喜！是一顆會說話的枕頭！枕頭又軟又輕。乖乖也在溪邊發現了一塊石頭。「那塊石頭又硬又重，」她笑著說。提姆撿起來放進他的籃子。"
   },
   {
-    en: "In March, the wizard made a magic present for his two best friends — a turtle named Tim and a kangaroo named Katie. The magic present was a big surprise! \"Please wait in the garden,\" the wizard told them. \"I will bring something special!\"",
-    zh: "三月，巫師為他最好的兩個朋友做了一份神奇的禮物——一隻叫提姆的烏龜和一隻叫乖乖的袋鼠。那個神奇的禮物是一個大驚喜！「請在花園裡稍候，」巫師告訴他們。「我會帶來特別的東西！」"
+    en: "In March, they went camping. \"We are camping and fishing near a beautiful stream!\" said Tim. Katie brought a butterfly net and an insect box. The wizard brought food for a barbecue. \"Please wait in the garden,\" he said. \"Let me start the fire!\"",
+    zh: "三月，他們去露營。「我們正在一條美麗的溪流附近露營和釣魚！」提姆說。乖乖帶了捕蟲網和昆蟲箱。巫師帶了烤肉的食物。「請在花園裡稍候，」他說。「讓我來生火！」"
   },
   {
-    en: "In April, they all went on a trip. \"We are camping and fishing near a beautiful stream!\" said Katie the kangaroo. They brought a butterfly net, an insect box, and food for a barbecue. Tim the turtle walked slowly, but he loved every step.",
-    zh: "四月，他們一起去旅行。「我們正在一條美麗的溪流附近露營和釣魚！」袋鼠乖乖說。他們帶了捕蟲網、昆蟲箱，還有烤肉用的食物。烏龜提姆走得很慢，但他享受每一步。"
+    en: "In April, Katie played a trick on Tim. She bought a dirty lollipop from a shop and put it in his breakfast! Poor Tim was in big trouble. \"Don't worry,\" the wizard said. \"Let me help!\" But without thinking, the wizard made a mistake. He made the lollipop very heavy! Everyone laughed.",
+    zh: "四月，乖乖對提姆惡作劇。她從商店買了一根髒棒棒糖放進他的早餐裡！可憐的提姆遇到大麻煩。「別擔心，」巫師說。「讓我來幫忙！」但不假思索的巫師犯了一個錯。他把棒棒糖變得超級重！大家都笑了。"
   },
   {
-    en: "In May, Katie played a trick on Tim. She hid his favorite lollipop in a shop near the castle! Poor Tim was in big trouble. \"Don't worry,\" said the wizard. \"Let me help!\" Without thinking, he used magic to find the lollipop. But he made a mistake — the lollipop was now very heavy!",
-    zh: "五月，乖乖對提姆惡作劇。她把提姆最愛的棒棒糖藏在城堡附近的一家商店裡！可憐的提姆遇到大麻煩了。「別擔心，」巫師說，「讓我來幫忙！」他不假思索地使用魔法找到了棒棒糖。但他犯了一個錯——棒棒糖變得超重！"
+    en: "In May, the wizard taught them about keeping clean. \"Always brush your teeth before breakfast,\" he said. \"Keep your teeth clean!\" Tim showed one dirty tooth. \"May I use your brush?\" he asked. \"A clean tooth is a happy tooth!\" the wizard smiled.",
+    zh: "五月，巫師教他們保持乾淨的重要性。「早餐前一定要刷牙，」他說。「保持牙齒乾淨！」提姆露出一顆髒兮兮的牙齒。「我可以用你的刷子嗎？」他問。「乾淨的牙齒就是快樂的牙齒！」巫師微笑著說。"
   },
   {
-    en: "In June, the wizard taught his friends a lesson. \"Always brush your teeth before breakfast,\" he said. \"Keep your teeth clean!\" Tim showed one dirty tooth. \"May I use your brush?\" he asked. The wizard smiled. \"A clean tooth is a happy tooth!\"",
-    zh: "六月，巫師教朋友們一個道理。「吃早餐前一定要刷牙，」他說，「保持牙齒乾淨！」提姆露出一顆髒髒的牙齒。「我可以用你的刷子嗎？」他問。巫師微笑說：「乾淨的牙齒就是快樂的牙齒！」"
+    en: "In June, July, and August, they played all kinds of sports in the garden. They played volleyball, basketball, and badminton! Katie loved basketball because she could jump so high. The wizard always said, \"Do your homework before you play!\" Tim walked slowly but never gave up.",
+    zh: "六月、七月和八月，他們在花園裡做各種運動。他們打排球、籃球和羽毛球！乖乖最愛籃球，因為她跳得好高。巫師總是說：「先做完功課再去玩！」提姆走得慢但從不放棄。"
   },
   {
-    en: "In July and August, the weather was hot and beautiful. They played all kinds of sports in the garden — volleyball, basketball, and badminton! Katie loved basketball because she could jump so high. In September, the wizard said, \"Let us do our homework before we play!\"",
-    zh: "七月和八月，天氣又熱又晴朗。他們在花園裡玩各種運動——排球、籃球和羽毛球！乖乖最愛籃球，因為她跳得好高。到了九月，巫師說：「先做完作業再去玩吧！」"
+    en: "In September, they went fishing near the stream again. In October, the wizard told a long funny story. \"He picked a story without a point!\" Katie laughed. In November, they had a big barbecue near the castle. Tim said, \"I think this is the best year!\"",
+    zh: "九月，他們又去溪邊釣魚。十月，巫師講了一個又長又好笑的故事。「他挑了一個沒有重點的故事！」乖乖大笑。十一月，他們在城堡附近辦了一場大烤肉。提姆說：「我覺得這是最棒的一年！」"
   },
   {
-    en: "In October, the wizard told a long, funny story. Katie laughed. \"He picked a story without a point!\" In November, they had a big barbecue near the stream. And in December, the wizard said, \"I will always love you all. The point is to love all kinds of friends and keep them near!\" Tim and Katie hugged the wizard. What a wonderful year!",
-    zh: "十月，巫師講了一個又長又好笑的故事。乖乖大笑說：「他挑了一個沒有重點的故事！」十一月，他們在溪邊辦了一場大烤肉。十二月，巫師說：「我會永遠愛你們。重點是要愛所有的朋友，讓他們在身邊！」提姆和乖乖擁抱了巫師。多麼美好的一年啊！"
+    en: "In December, the wizard said, \"I will always love you all. The point is to love all kinds of friends and keep them near. You may bring your friends to the castle!\" Tim and Katie hugged the wizard. \"We love you too!\" they said. What a wonderful year!",
+    zh: "十二月，巫師說：「我會永遠愛你們所有人。重點是要愛各式各樣的朋友，讓他們待在身邊。你們可以帶朋友來城堡！」提姆和乖乖擁抱了巫師。「我們也愛你！」他們說。多麼美好的一年啊！"
   }
 ];
 
 /* ============================================================
-   QUIZ DATA (10 questions)
+   QUIZ DATA  (10 questions — new)
    ============================================================ */
 var QUIZ = [
   {
-    q: "Where did the wizard live?",
-    opts: ["Near a shop","Near a beautiful castle","Near a school","In a forest"],
+    q: "Who lived near the beautiful castle?",
+    opts: ["A wizard and a butterfly","Tim the turtle and Katie the kangaroo","A rock and a pillow","A shop keeper and a wizard"],
     ans: 1
   },
   {
-    q: "What did the wizard find by the stream in February?",
-    opts: ["A butterfly net and a basket","A lollipop and a kangaroo","A soft pillow and a hard rock","A turtle and a brush"],
+    q: "What was the magic present the wizard gave in February?",
+    opts: ["A talking pillow","A hard rock","A butterfly net","A lollipop"],
+    ans: 0
+  },
+  {
+    q: "What did Katie find near the stream?",
+    opts: ["A soft pillow","A basket","A hard and heavy rock","A dirty brush"],
     ans: 2
   },
   {
-    q: "Who were the wizard's two best friends?",
-    opts: ["A turtle and a butterfly","A kangaroo and a wizard","A turtle and a kangaroo","A rock and a pillow"],
-    ans: 2
-  },
-  {
-    q: "What was the magic present?",
-    opts: ["A big trouble","A big surprise","A big mistake","A big trick"],
+    q: "What did they bring for camping in March?",
+    opts: ["Pillows and rocks","A butterfly net, an insect box, and food","Homework and books","Volleyball and basketball"],
     ans: 1
   },
   {
-    q: "What did they bring for the camping trip?",
-    opts: ["Pillows and rocks","Homework and books","A butterfly net, an insect box, and food","Lollipops and baskets"],
+    q: "What trick did Katie play on Tim in April?",
+    opts: ["She hid his homework","She took his butterfly net","She put a dirty lollipop in his breakfast","She made his pillow heavy"],
     ans: 2
-  },
-  {
-    q: "Who played a trick on Tim the turtle?",
-    opts: ["The wizard","A butterfly","Katie the kangaroo","A shop keeper"],
-    ans: 2
-  },
-  {
-    q: "What mistake did the wizard make with the lollipop?",
-    opts: ["He lost it","He ate it","He made it dirty","He made it very heavy"],
-    ans: 3
   },
   {
     q: "What should you do before breakfast?",
-    opts: ["Do homework","Brush your teeth","Go fishing","Play basketball"],
-    ans: 1
+    opts: ["Play basketball","Go camping near a stream","Do your homework","Brush your teeth"],
+    ans: 3
   },
   {
-    q: "What sports did they play in the garden?",
-    opts: ["Camping and fishing","Walking and swimming","Volleyball, basketball, and badminton","Badminton and homework"],
+    q: "What sports did they play in summer?",
+    opts: ["Fishing and camping","Walking and swimming","Volleyball, basketball, and badminton","Badminton and homework"],
     ans: 2
   },
   {
-    q: "What was the point of the wizard's story at the end?",
-    opts: ["To always do homework","To keep your teeth clean","To play tricks on friends","To love all kinds of friends"],
-    ans: 3
+    q: "What did the wizard always say about homework?",
+    opts: ["Do it in December","Do your homework before you play","Homework is not important","Give your homework to Katie"],
+    ans: 1
+  },
+  {
+    q: "What kind of story did the wizard tell in October?",
+    opts: ["A scary story","A magic story","A story without a point","A story about camping"],
+    ans: 2
+  },
+  {
+    q: "What was the wizard's message at the end of the year?",
+    opts: ["Always brush your teeth","Do your homework every day","Love all kinds of friends and keep them near","Go camping every month"],
+    ans: 2
   }
 ];
 
@@ -525,6 +532,7 @@ var quizSubmitted = false;
 var quizListenModes = {};
 var activePopup = null;
 var activeReadBtn = null;
+var activeSentenceEl = null;
 
 /* ============================================================
    SPEECH SYNTHESIS
@@ -535,6 +543,9 @@ function stopAll() {
   for (var i = 0; i < els.length; i++) els[i].classList.remove('speaking');
   var hls = document.querySelectorAll('.highlight');
   for (var i = 0; i < hls.length; i++) hls[i].classList.remove('highlight');
+  var ps = document.querySelectorAll('.playing-sentence');
+  for (var i = 0; i < ps.length; i++) ps[i].classList.remove('playing-sentence');
+  activeSentenceEl = null;
   if (activeReadBtn) {
     activeReadBtn.textContent = '🔊 朗讀';
     activeReadBtn.className = 'btn btn-read';
@@ -639,12 +650,15 @@ function generateOptions(correctWord) {
 }
 
 /* ============================================================
-   CLOSE ALL POPUPS
+   CLOSE ALL POPUPS & SENTENCE HIGHLIGHTS
    ============================================================ */
 function closeAllPopups() {
   var popups = document.querySelectorAll('.blank-opts-popup.show');
   for (var i = 0; i < popups.length; i++) popups[i].classList.remove('show');
+  var ps = document.querySelectorAll('.playing-sentence');
+  for (var i = 0; i < ps.length; i++) ps[i].classList.remove('playing-sentence');
   activePopup = null;
+  activeSentenceEl = null;
 }
 
 /* ============================================================
@@ -655,7 +669,7 @@ function updateProgress() {
   var txt = document.getElementById('prog-text');
   var pct = totalBlanks > 0 ? Math.round((solvedBlanks / totalBlanks) * 100) : 0;
   bar.style.width = Math.max(pct, 8) + '%';
-  txt.textContent = solvedBlanks + ' / ' + totalBlanks + ' blanks filled';
+  txt.textContent = solvedBlanks + ' / ' + totalBlanks;
   if (solvedBlanks === totalBlanks && totalBlanks > 0) {
     bar.parentElement.style.animation = 'celebrate .6s ease';
     setTimeout(function() { bar.parentElement.style.animation = ''; }, 700);
@@ -690,7 +704,11 @@ function buildStory() {
       var parts = parseText(sentences[si]);
       for (var k = 0; k < parts.length; k++) {
         if (parts[k].type === 'w') {
-          paraVocabPositions.push({ si: si, ki: k, word: parts[k].word, v: parts[k].v, zh: parts[k].zh });
+          paraVocabPositions.push({
+            si: si, ki: k,
+            word: parts[k].word, v: parts[k].v, zh: parts[k].zh,
+            sentence: sentences[si]
+          });
         }
       }
     }
@@ -702,7 +720,6 @@ function buildStory() {
       blankSet[shuffledPositions[b]] = true;
     }
 
-    var posCounter = 0;
     for (var si = 0; si < sentences.length; si++) {
       var sspan = document.createElement('span');
       sspan.className = 'ssen';
@@ -725,34 +742,50 @@ function buildStory() {
           if (vocabIdx >= 0 && blankSet[vocabIdx]) {
             var bid = 'blank-' + blankIdCounter++;
             totalBlanks++;
-            blanksData[bid] = { word: pt.word, display: pt.v, zh: pt.zh, solved: false };
+            blanksData[bid] = {
+              word: pt.word,
+              display: pt.v,
+              zh: pt.zh,
+              solved: false,
+              sentence: sentences[si]
+            };
             var wrap = document.createElement('span');
             wrap.className = 'blank-wrap';
             wrap.id = bid;
 
             var speakerBtn = document.createElement('button');
             speakerBtn.className = 'blank-speaker';
-            speakerBtn.textContent = '🔊';
-            speakerBtn.title = '點擊聽發音，再選答案';
-            speakerBtn.setAttribute('aria-label', 'Listen to the hidden word');
-            (function(blankId, word) {
+            speakerBtn.innerHTML = '____&nbsp;🔊';
+            speakerBtn.title = '聽整句話，找出空格的單字';
+            speakerBtn.setAttribute('aria-label', 'Listen to the full sentence and find the missing word');
+            (function(blankId, sentenceText, ssEl) {
               speakerBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 stopAll();
                 closeAllPopups();
-                speak(word);
+                ssEl.classList.add('playing-sentence');
+                activeSentenceEl = ssEl;
+                speak(sentenceText, function() {
+                  if (activeSentenceEl === ssEl) {
+                    /* keep highlight while popup is open */
+                  }
+                });
                 var popup = document.getElementById(blankId + '-opts');
                 if (popup) {
                   popup.classList.add('show');
                   activePopup = popup;
                 }
               });
-            })(bid, pt.word);
+            })(bid, sentences[si], sspan);
             wrap.appendChild(speakerBtn);
 
             var popup = document.createElement('div');
             popup.className = 'blank-opts-popup';
             popup.id = bid + '-opts';
+            var hintDiv = document.createElement('div');
+            hintDiv.className = 'blank-hint';
+            hintDiv.textContent = '👂 哪個單字不見了？';
+            popup.appendChild(hintDiv);
             var options = generateOptions(pt.word);
             for (var oi = 0; oi < options.length; oi++) {
               var optBtn = document.createElement('button');
@@ -872,6 +905,7 @@ function checkBlankAnswer(blankId, selected, btnEl) {
   if (selected.toLowerCase() === data.word.toLowerCase()) {
     data.solved = true;
     solvedBlanks++;
+    closeAllPopups();
     var wrap = document.getElementById(blankId);
     var solved = document.createElement('span');
     solved.className = 'blank-solved';
@@ -887,6 +921,7 @@ function checkBlankAnswer(blankId, selected, btnEl) {
     })(solved, data.word);
     wrap.parentNode.replaceChild(solved, wrap);
     updateProgress();
+    stopAll();
     speak(data.word);
   } else {
     btnEl.classList.add('wrong');
@@ -1103,7 +1138,7 @@ function submitQuiz() {
 }
 
 /* ============================================================
-   REBUILD ALL (when difficulty changes)
+   REBUILD ALL
    ============================================================ */
 function rebuildAll() {
   stopAll();
