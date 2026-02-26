@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Wizard's Magic Garden — English Listening Story Quiz</title>
+<title>The King's Summer Camp — English Listening Story Quiz</title>
 <style>
 :root {
   --sky: #5BC8F5; --sun: #FFD93D; --grass: #6BCB77; --coral: #FF6B6B;
@@ -19,19 +19,18 @@ body {
 }
 
 header {
-  background: linear-gradient(135deg, var(--sky), var(--lavender));
+  background: linear-gradient(135deg, #7B68EE, var(--sky));
   padding: 28px 20px 22px; text-align: center;
   box-shadow: 0 6px 24px rgba(91,200,245,.35);
 }
 header h1 {
-  font-size: clamp(1.5rem, 5vw, 2.5rem); color: #fff; font-weight: 900;
+  font-size: clamp(1.4rem, 5vw, 2.4rem); color: #fff; font-weight: 900;
   text-shadow: 3px 3px 0 rgba(0,0,0,.12); line-height: 1.3;
 }
-header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font-weight: 700; }
+header p { color: rgba(255,255,255,.92); font-size: .88rem; margin-top: 6px; font-weight: 700; }
 
 .container { max-width: 740px; margin: 0 auto; padding: 0 14px; }
 
-/* === CONTROL PANEL === */
 .ctrl-panel {
   background: #fff; border-radius: var(--r); margin: 16px auto; max-width: 740px;
   padding: 16px 20px; box-shadow: var(--shadow);
@@ -56,7 +55,6 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 }
 .ctrl-hint { font-size: .75rem; color: #999; width: 100%; margin-top: 2px; }
 
-/* === WORD CHIPS === */
 .chip-banner {
   background: linear-gradient(90deg, var(--sun), var(--peach));
   border-radius: var(--r); margin: 0 auto 12px; max-width: 740px;
@@ -72,7 +70,6 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 .chip:hover { background: #fff; transform: scale(1.05); }
 .chip.speaking { background: #FFE566; }
 
-/* === SECTION TITLES === */
 .sec-title {
   text-align: center; font-size: clamp(1.2rem, 4vw, 1.8rem); font-weight: 900;
   margin: 22px 0 12px; color: var(--ink);
@@ -82,10 +79,7 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
-/* === PROGRESS BAR === */
-.progress-wrap {
-  max-width: 740px; margin: 0 auto 14px; padding: 0 14px;
-}
+.progress-wrap { max-width: 740px; margin: 0 auto 14px; padding: 0 14px; }
 .progress-bar-outer {
   background: #e8e8e8; border-radius: 50px; height: 28px; position: relative;
   overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,.08);
@@ -100,7 +94,6 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
   text-shadow: 1px 1px 1px rgba(0,0,0,.2); white-space: nowrap; padding: 0 10px;
 }
 
-/* === STORY CARDS === */
 .pcard {
   background: var(--card); border-radius: var(--r); padding: 18px 20px;
   margin-bottom: 14px; box-shadow: var(--shadow); border-left: 5px solid var(--sky);
@@ -108,7 +101,7 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 .pcard:nth-child(4n+2) { border-left-color: var(--lavender); }
 .pcard:nth-child(4n+3) { border-left-color: var(--grass); }
 .pcard:nth-child(4n) { border-left-color: var(--coral); }
-.para-en { font-size: 1.05rem; line-height: 2.1; color: var(--ink); }
+.para-en { font-size: 1.05rem; line-height: 2.2; color: var(--ink); }
 .vw {
   color: #1A6ED8; background: #E8F4FF; border-radius: 6px; padding: 1px 5px;
   cursor: pointer; font-weight: 800; border-bottom: 2px solid #1A6ED8;
@@ -116,35 +109,43 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 }
 .vw:hover { background: #B5F2FF; color: #0A3D8F; }
 .vw.speaking { background: #FFE566; color: #7a4000; border-bottom-color: #E8A000; }
-.ssen { transition: background .25s; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.ssen.highlight { background: #FFE566; padding: 2px 0; }
+.ssen {
+  transition: background .3s; border-radius: 4px;
+  box-decoration-break: clone; -webkit-box-decoration-break: clone;
+}
+.ssen.highlight { background: #FFF3CD; padding: 2px 0; }
+.ssen.playing-sentence { background: #E3F2FD; padding: 3px 2px; border-radius: 6px; }
 .para-zh {
   display: none; margin-top: 10px; padding: 10px 14px;
   background: linear-gradient(135deg, #f0fff4, #e8f4ff); border-radius: 12px;
   font-size: .9rem; line-height: 1.8; color: #555; border: 1px dashed #bbb;
 }
 
-/* === BLANK MECHANIC === */
 .blank-wrap { display: inline-block; vertical-align: baseline; position: relative; }
 .blank-speaker {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
   background: linear-gradient(135deg, #FFE0B2, #FFCC80); border: 2.5px dashed #FF9800;
-  border-radius: 10px; padding: 2px 10px; cursor: pointer; font-size: 1.1rem;
+  border-radius: 10px; padding: 3px 12px; cursor: pointer; font-size: .92rem;
   transition: transform .15s, box-shadow .2s; user-select: none;
   animation: pulse-blank 2s infinite;
-  min-width: 44px; min-height: 32px; line-height: 1;
+  min-width: 60px; min-height: 34px; line-height: 1; font-weight: 700;
+  color: #E65100; letter-spacing: 1px;
 }
-.blank-speaker:hover { transform: scale(1.08); box-shadow: 0 2px 10px rgba(255,152,0,.3); }
+.blank-speaker:hover { transform: scale(1.06); box-shadow: 0 2px 12px rgba(255,152,0,.35); }
 .blank-speaker:active { transform: scale(.96); }
 @keyframes pulse-blank {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255,152,0,.35); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,152,0,.3); }
   50% { box-shadow: 0 0 0 6px rgba(255,152,0,0); }
+}
+.blank-hint {
+  display: block; text-align: center; font-size: .7rem; color: #999;
+  padding: 4px 0 2px; font-weight: 600;
 }
 .blank-opts-popup {
   display: none; position: absolute; top: calc(100% + 6px); left: 50%;
   transform: translateX(-50%); z-index: 200; background: #fff;
-  border-radius: 14px; box-shadow: 0 6px 28px rgba(0,0,0,.18);
-  padding: 8px; min-width: 200px; animation: pop-in .2s ease;
+  border-radius: 14px; box-shadow: 0 6px 28px rgba(0,0,0,.2);
+  padding: 10px; min-width: 210px; animation: pop-in .25s ease;
 }
 .blank-opts-popup.show { display: flex; flex-direction: column; gap: 5px; }
 .blank-opts-popup::before {
@@ -153,26 +154,25 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
   border-bottom: 8px solid #fff;
 }
 .blank-opt-btn {
-  padding: 8px 14px; border-radius: 10px; border: 2px solid #ddd; background: #f9f9f9;
-  cursor: pointer; font-family: inherit; font-size: .88rem; font-weight: 700;
+  padding: 9px 14px; border-radius: 10px; border: 2px solid #ddd; background: #f9f9f9;
+  cursor: pointer; font-family: inherit; font-size: .9rem; font-weight: 700;
   color: var(--ink); transition: all .15s; text-align: center; user-select: none;
 }
-.blank-opt-btn:hover { background: #E8F4FF; border-color: var(--sky); transform: scale(1.03); }
+.blank-opt-btn:hover:not(.wrong) { background: #E8F4FF; border-color: var(--sky); transform: scale(1.03); }
 .blank-opt-btn.correct {
   background: #d4edda; border-color: var(--grass); color: #155724;
   animation: pop-in .3s ease;
 }
 .blank-opt-btn.wrong {
   background: #f8d7da; border-color: var(--coral); color: #721c24;
-  animation: shake .4s ease; pointer-events: none; opacity: .5;
+  animation: shake .4s ease; pointer-events: none; opacity: .45;
 }
 .blank-solved {
   display: inline; color: #155724; background: #d4edda; border-radius: 6px;
   padding: 1px 6px; font-weight: 800; border-bottom: 2px solid var(--grass);
-  animation: pop-in .3s ease;
+  animation: pop-in .3s ease; cursor: pointer;
 }
 
-/* === PARAGRAPH CONTROLS === */
 .pctrl { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .btn {
   display: inline-flex; align-items: center; gap: 5px; padding: 7px 15px;
@@ -186,7 +186,6 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 .btn-read { background: linear-gradient(135deg, var(--sky), #3AAFDF); color: #fff; }
 .btn-stop { background: linear-gradient(135deg, #ffb347, #ff8000); color: #fff; }
 
-/* === GO-TO-QUIZ BUTTON === */
 .go-quiz {
   display: block; margin: 16px auto 30px;
   background: linear-gradient(135deg, var(--lavender), #9B59D8); color: #fff;
@@ -196,7 +195,6 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 }
 .go-quiz:hover { transform: scale(1.05); }
 
-/* === QUIZ SECTION === */
 .qsec { max-width: 740px; margin: 8px auto 0; padding: 0 14px; }
 .qintro {
   background: linear-gradient(135deg, var(--lavender), #e8c5ff);
@@ -254,7 +252,6 @@ header p { color: rgba(255,255,255,.92); font-size: .9rem; margin-top: 6px; font
 .fbok { background: #d4edda; color: #155724; }
 .fbno { background: #f8d7da; color: #721c24; }
 
-/* === SUBMIT & SCORE === */
 .submit-row { text-align: center; margin: 12px 0 22px; }
 .bsub {
   background: linear-gradient(135deg, var(--grass), #4CAF50); color: #fff;
@@ -289,7 +286,6 @@ footer {
 }
 footer span { color: var(--coral); }
 
-/* === ANIMATIONS === */
 @keyframes pop-in {
   0% { transform: scale(.7); opacity: 0; }
   60% { transform: scale(1.08); }
@@ -304,18 +300,17 @@ footer span { color: var(--coral); }
 }
 @keyframes celebrate {
   0% { transform: scale(1); }
-  25% { transform: scale(1.2) rotate(-3deg); }
-  50% { transform: scale(1.3) rotate(3deg); }
-  75% { transform: scale(1.2) rotate(-2deg); }
+  25% { transform: scale(1.1) rotate(-2deg); }
+  50% { transform: scale(1.15) rotate(2deg); }
+  75% { transform: scale(1.1) rotate(-1deg); }
   100% { transform: scale(1); }
 }
 
-/* === RESPONSIVE === */
 @media (max-width: 480px) {
   header { padding: 20px 14px 16px; }
   .ctrl-panel, .chip-banner { margin-left: 10px; margin-right: 10px; }
   .pcard { padding: 14px 14px; }
-  .para-en { font-size: .97rem; line-height: 2; }
+  .para-en { font-size: .95rem; line-height: 2; }
   .blank-opts-popup { min-width: 160px; left: 0; transform: none; }
   .blank-opts-popup::before { left: 20px; transform: none; }
 }
@@ -324,8 +319,8 @@ footer span { color: var(--coral); }
 <body>
 
 <header>
-  <h1>🧙‍♂️ The Wizard's Magic Garden 🌸</h1>
-  <p>四年級英語聽力故事學習 ｜ 聽音填空 + 閱讀測驗</p>
+  <h1>🏕️ The King's Summer Camp 👑</h1>
+  <p>四年級英語聽力故事 ｜ 聽完整句子，找出空格中的單字！</p>
 </header>
 
 <div class="ctrl-panel container">
@@ -342,7 +337,7 @@ footer span { color: var(--coral); }
     <input type="range" id="speed-slider" min="0.5" max="1.2" step="0.05" value="0.85">
     <span id="speed-val">0.85x</span>
   </div>
-  <div class="ctrl-hint">難度控制故事挖空與測驗聽力比例 ｜ 建議從 Easy + 0.7x 開始練習</div>
+  <div class="ctrl-hint">點擊故事中的 🔊 會朗讀「整個句子」，仔細聽，找出空格裡的單字！</div>
 </div>
 
 <div class="chip-banner container">
@@ -350,12 +345,12 @@ footer span { color: var(--coral); }
   <div class="chips" id="chips"></div>
 </div>
 
-<h2 class="sec-title"><span>📖 故事：巫師的魔法花園</span></h2>
+<h2 class="sec-title"><span>📖 故事：國王的夏日露營</span></h2>
 
 <div class="progress-wrap">
   <div class="progress-bar-outer">
     <div class="progress-bar-inner" id="prog-bar" style="width:0%">
-      <span class="progress-text" id="prog-text">0 / 0 blanks filled</span>
+      <span class="progress-text" id="prog-text">0 / 0</span>
     </div>
   </div>
 </div>
@@ -383,39 +378,62 @@ footer span { color: var(--coral); }
   <button class="bretry" id="retry-btn">🔄 再來一次 Try Again</button>
 </div>
 
-<footer><p>✨ 專為努力學英語的小朋友設計 ✨ ｜ <span>The Wizard's Magic Garden</span> © 2025</p></footer>
+<footer><p>✨ 專為努力學英語的小朋友設計 ✨ ｜ <span>The King's Summer Camp</span> © 2025</p></footer>
 
 <script>
 /* ============================================================
-   VOCABULARY DATA
+   VOCABULARY  (sorted longest-first for greedy matching)
    ============================================================ */
 var VOCAB = [
-  ['butterfly net','捕蟲網'],['insect box','昆蟲箱'],
-  ['basketball','籃球'],['volleyball','排球'],['badminton','羽毛球'],
-  ['September','九月'],['beautiful','美麗的'],['barbecue','烤肉'],
-  ['breakfast','早餐'],['lollipop','棒棒糖'],['November','十一月'],
+  ['birthday party','生日派對'],['butterfly net','捕蟲網'],
+  ['insect box','昆蟲箱'],['basketball','籃球'],['volleyball','排球'],
+  ['binoculars','雙筒望遠鏡'],['try again','再試一次'],
+  ['September','九月'],['beautiful','美麗的'],['breakfast','早餐'],
+  ['newspaper','報紙'],['badminton','羽毛球'],['tangerine','柑橘'],
+  ['barbecue','烤肉'],['lollipop','棒棒糖'],['November','十一月'],
   ['December','十二月'],['February','二月'],['homework','家庭作業'],
-  ['kangaroo','袋鼠'],['surprise','驚喜'],['October','十月'],
-  ['January','一月'],['without','沒有'],['camping','露營'],
-  ['fishing','釣魚'],['trouble','麻煩'],['mistake','錯誤'],
-  ['present','禮物'],['pillow','枕頭'],['stream','小溪'],
+  ['kangaroo','袋鼠'],['smallest','最小的'],['campfire','營火'],
+  ['homemade','自製的'],['surprise','驚喜'],['tomorrow','明天'],
+  ['one day','有一天'],['look at','看著'],
+  ['cleaner','清潔劑'],['camping','露營'],['fishing','釣魚'],
+  ['trouble','麻煩'],['mistake','錯誤'],['present','禮物'],
+  ['October','十月'],['January','一月'],['without','沒有'],
+  ['picture','照片'],['healthy','健康的'],
   ['garden','花園'],['castle','城堡'],['basket','籃子'],
   ['always','總是'],['turtle','烏龜'],['August','八月'],
-  ['before','在...之前'],['wizard','巫師'],['March','三月'],
-  ['April','四月'],['dirty','髒的'],['brush','刷'],
+  ['before','在...之前'],['wizard','巫師'],['stream','小溪'],
+  ['pillow','枕頭'],['forest','森林'],['summer','夏天'],
+  ['enough','足夠的'],['horses','馬(複數)'],
+  ['smoke','煙'],['dirty','髒的'],['brush','刷'],
   ['teeth','牙齒(複數)'],['tooth','牙齒(單數)'],['clean','清潔'],
   ['heavy','重的'],['light','輕的'],['magic','神奇的'],
   ['point','重點'],['trick','把戲'],['think','想'],
-  ['worry','擔心'],['bring','帶來'],['July','七月'],
-  ['June','六月'],['love','愛'],['walk','走路'],
-  ['wait','等待'],['shop','商店'],['keep','保持'],
-  ['pick','挑選'],['near','靠近'],['soft','柔軟的'],
-  ['hard','堅硬的'],['kind','種類'],['rock','石頭'],
-  ['will','將會'],['may','可以'],['let','讓'],['all','所有的']
+  ['worry','擔心'],['bring','帶來'],['smile','微笑'],
+  ['bread','麵包'],['short','矮的'],['paper','紙張'],
+  ['watch','手錶'],['habit','習慣'],['still','仍然'],
+  ['house','房子'],['study','學習'],['story','故事'],
+  ['March','三月'],['April','四月'],
+  ['July','七月'],['June','六月'],['love','愛'],
+  ['walk','走路'],['wait','等待'],['shop','商店'],
+  ['keep','保持'],['pick','挑選'],['near','靠近'],
+  ['soft','柔軟的'],['hard','堅硬的'],['kind','種類'],
+  ['rock','石頭'],['will','將會'],['test','考試'],
+  ['fast','快'],['idea','主意'],['have','有'],
+  ['game','遊戲'],['come','來'],['easy','容易的'],
+  ['wish','希望'],['much','很多'],['plan','計畫'],
+  ['tall','高的'],['long','長的'],['thin','瘦的'],
+  ['with','跟；用'],['hair','頭髮'],['wall','牆壁'],
+  ['rode','ride的過去式'],['more','更多'],['only','僅僅'],
+  ['peel','剝皮'],['tent','帳篷'],['ride','騎'],
+  ['king','國王'],['may','可以'],['let','讓'],
+  ['all','所有的'],['fat','胖的'],['buy','買'],
+  ['try','試'],['ax','斧頭']
 ];
 
 var EXTRA_CHIPS = [
-  ['make a mistake','犯錯'],['play a trick','惡作劇']
+  ['make a mistake','犯錯'],['play a trick','惡作劇'],
+  ['saw','see的過去式'],['Why','為什麼'],['When','何時'],
+  ['Where','在哪裡'],['How','如何']
 ];
 
 /* ============================================================
@@ -423,92 +441,92 @@ var EXTRA_CHIPS = [
    ============================================================ */
 var PARAS = [
   {
-    en: "Once upon a time, near a beautiful castle, there lived a kind wizard. He had a big garden with all kinds of flowers and a clean stream. Every morning in January, the wizard would walk to the stream and think about new magic.",
-    zh: "從前從前，在一座美麗的城堡附近，住著一位善良的巫師。他有一座大花園，裡面有各式各樣的花和一條乾淨的小溪。每年一月的每個早晨，巫師都會走到小溪邊思考新的魔法。"
+    en: "One day, a tall king lived in a big castle with his friends. He had an idea for the summer. \"I wish to go camping in the forest!\" he said with a big smile. He made a plan. They rode horses to find a beautiful spot near a stream. The ride was fast and easy!",
+    zh: "有一天，一位高大的國王和朋友們住在一座大城堡裡。他有一個夏天的點子。「我想去森林露營！」他笑著說。他做了一個計畫。他們騎馬去找一條美麗的溪流附近的好地方。騎馬又快又輕鬆！"
   },
   {
-    en: "One cold day in February, the wizard found something funny by the stream. There was a soft pillow and a hard rock on the ground. \"This pillow is soft and light, but that rock is hard and heavy!\" he laughed. He picked up the rock and put it in his basket.",
-    zh: "二月的一個寒冷日子，巫師在溪邊發現了好玩的東西。地上有一顆柔軟的枕頭和一塊堅硬的石頭。「這顆枕頭又軟又輕，但那塊石頭又硬又重！」他笑著說。他撿起石頭放進籃子裡。"
+    en: "A thin wizard and a short turtle came too. The wizard brought a tent, an ax, and binoculars. The turtle brought a soft pillow and a basket of tangerines. \"This pillow is soft and light, but look at that rock — it is hard and heavy!\" said the turtle.",
+    zh: "一位瘦瘦的巫師和一隻矮矮的烏龜也來了。巫師帶了帳篷、斧頭和望遠鏡。烏龜帶了一顆柔軟的枕頭和一籃柑橘。「這顆枕頭又軟又輕，但你看那塊石頭——又硬又重！」烏龜說。"
   },
   {
-    en: "In March, the wizard made a magic present for his two best friends — a turtle named Tim and a kangaroo named Katie. The magic present was a big surprise! \"Please wait in the garden,\" the wizard told them. \"I will bring something special!\"",
-    zh: "三月，巫師為他最好的兩個朋友做了一份神奇的禮物——一隻叫提姆的烏龜和一隻叫乖乖的袋鼠。那個神奇的禮物是一個大驚喜！「請在花園裡稍候，」巫師告訴他們。「我會帶來特別的東西！」"
+    en: "They set up the tent near the stream. The wizard used the ax to cut wood for a campfire. The smoke went up high into the sky. \"Let me make a barbecue!\" said the king. He brought homemade bread and enough food for everyone. \"Please wait — I still need to peel the tangerines!\" said the turtle.",
+    zh: "他們在溪邊搭起帳篷。巫師用斧頭砍木頭生營火。煙霧高高升起。「讓我來烤肉！」國王說。他帶了自製麵包和足夠所有人吃的食物。「請等一下——我還在剝柑橘皮！」烏龜說。"
   },
   {
-    en: "In April, they all went on a trip. \"We are camping and fishing near a beautiful stream!\" said Katie the kangaroo. They brought a butterfly net, an insect box, and food for a barbecue. Tim the turtle walked slowly, but he loved every step.",
-    zh: "四月，他們一起去旅行。「我們正在一條美麗的溪流附近露營和釣魚！」袋鼠乖乖說。他們帶了捕蟲網、昆蟲箱，還有烤肉用的食物。烏龜提姆走得很慢，但他享受每一步。"
+    en: "A fat kangaroo came with a butterfly net and an insect box. She played a trick on the turtle. She hid his lollipop in the forest! The turtle was in big trouble. \"Don't worry,\" said the wizard. \"Let me help!\" Without thinking, the wizard made a mistake. He used magic and the lollipop became very heavy!",
+    zh: "一隻胖胖的袋鼠帶著捕蟲網和昆蟲箱來了。她對烏龜惡作劇，把他的棒棒糖藏在森林裡！烏龜遇到大麻煩。「別擔心，」巫師說。「讓我來幫忙！」不假思索，巫師犯了一個錯。他用魔法讓棒棒糖變得超級重！"
   },
   {
-    en: "In May, Katie played a trick on Tim. She hid his favorite lollipop in a shop near the castle! Poor Tim was in big trouble. \"Don't worry,\" said the wizard. \"Let me help!\" Without thinking, he used magic to find the lollipop. But he made a mistake — the lollipop was now very heavy!",
-    zh: "五月，乖乖對提姆惡作劇。她把提姆最愛的棒棒糖藏在城堡附近的一家商店裡！可憐的提姆遇到大麻煩了。「別擔心，」巫師說，「讓我來幫忙！」他不假思索地使用魔法找到了棒棒糖。但他犯了一個錯——棒棒糖變得超重！"
+    en: "They went fishing near the stream. The king tried to catch a big fish, but it was not easy. \"Try again!\" the kangaroo said. The king tried and tried. At last, he caught one! \"The magic present was a big surprise!\" the wizard joked. They all had a big smile.",
+    zh: "他們在溪邊釣魚。國王試著抓一條大魚，但不太容易。「再試一次！」袋鼠說。國王一試再試。終於，他抓到一條！「這個神奇的禮物真是大驚喜！」巫師開玩笑。大家都露出了大大的微笑。"
   },
   {
-    en: "In June, the wizard taught his friends a lesson. \"Always brush your teeth before breakfast,\" he said. \"Keep your teeth clean!\" Tim showed one dirty tooth. \"May I use your brush?\" he asked. The wizard smiled. \"A clean tooth is a happy tooth!\"",
-    zh: "六月，巫師教朋友們一個道理。「吃早餐前一定要刷牙，」他說，「保持牙齒乾淨！」提姆露出一顆髒髒的牙齒。「我可以用你的刷子嗎？」他問。巫師微笑說：「乾淨的牙齒就是快樂的牙齒！」"
+    en: "In the evening, they played games near the campfire. They played basketball and badminton. The king found a newspaper and saw a picture of his castle on the wall. \"I wish we could have a birthday party here!\" he said. The wizard told a funny story. \"He picked a story without a point!\" the kangaroo laughed.",
+    zh: "傍晚，他們在營火旁玩遊戲。他們打籃球和羽毛球。國王看到一份報紙，上面有一張他城堡的照片掛在牆上。「我真希望我們能在這裡辦生日派對！」他說。巫師講了一個好笑的故事。「他挑了一個沒有重點的故事！」袋鼠大笑。"
   },
   {
-    en: "In July and August, the weather was hot and beautiful. They played all kinds of sports in the garden — volleyball, basketball, and badminton! Katie loved basketball because she could jump so high. In September, the wizard said, \"Let us do our homework before we play!\"",
-    zh: "七月和八月，天氣又熱又晴朗。他們在花園裡玩各種運動——排球、籃球和羽毛球！乖乖最愛籃球，因為她跳得好高。到了九月，巫師說：「先做完作業再去玩吧！」"
+    en: "Before breakfast the next morning, the king said, \"Always brush your teeth! Keep your teeth clean and healthy!\" The turtle showed one dirty tooth. \"May I buy a new brush from the shop?\" he asked. \"You may,\" said the king. \"A clean tooth is a happy tooth!\"",
+    zh: "隔天早餐前，國王說：「一定要刷牙！保持牙齒乾淨又健康！」烏龜露出一顆髒兮兮的牙齒。「我可以去商店買一把新刷子嗎？」他問。「可以，」國王說。「乾淨的牙齒就是快樂的牙齒！」"
   },
   {
-    en: "In October, the wizard told a long, funny story. Katie laughed. \"He picked a story without a point!\" In November, they had a big barbecue near the stream. And in December, the wizard said, \"I will always love you all. The point is to love all kinds of friends and keep them near!\" Tim and Katie hugged the wizard. What a wonderful year!",
-    zh: "十月，巫師講了一個又長又好笑的故事。乖乖大笑說：「他挑了一個沒有重點的故事！」十一月，他們在溪邊辦了一場大烤肉。十二月，巫師說：「我會永遠愛你們。重點是要愛所有的朋友，讓他們在身邊！」提姆和乖乖擁抱了巫師。多麼美好的一年啊！"
+    en: "\"We still have homework and a test tomorrow,\" said the turtle. \"We need to study!\" They walked back to the castle. The king said, \"I will always love all kinds of friends! This was the best summer plan!\" Everyone smiled and hugged. They rode the horses home fast. What a wonderful camping trip!",
+    zh: "「我們還有功課和明天的考試，」烏龜說。「我們得唸書了！」他們走回城堡。國王說：「我會永遠愛所有的朋友！這是最棒的夏日計畫！」大家微笑擁抱。他們快速騎馬回家。多麼美好的露營之旅！"
   }
 ];
 
 /* ============================================================
-   QUIZ DATA (10 questions)
+   QUIZ  (10 questions)
    ============================================================ */
 var QUIZ = [
   {
-    q: "Where did the wizard live?",
-    opts: ["Near a shop","Near a beautiful castle","Near a school","In a forest"],
+    q: "Where did the king want to go camping?",
+    opts: ["Near a shop","In the forest","At a castle","In the garden"],
     ans: 1
   },
   {
-    q: "What did the wizard find by the stream in February?",
-    opts: ["A butterfly net and a basket","A lollipop and a kangaroo","A soft pillow and a hard rock","A turtle and a brush"],
+    q: "What did the turtle bring for the trip?",
+    opts: ["A tent and an ax","Binoculars and a newspaper","A soft pillow and tangerines","A butterfly net and an insect box"],
     ans: 2
   },
   {
-    q: "Who were the wizard's two best friends?",
-    opts: ["A turtle and a butterfly","A kangaroo and a wizard","A turtle and a kangaroo","A rock and a pillow"],
-    ans: 2
-  },
-  {
-    q: "What was the magic present?",
-    opts: ["A big trouble","A big surprise","A big mistake","A big trick"],
-    ans: 1
-  },
-  {
-    q: "What did they bring for the camping trip?",
-    opts: ["Pillows and rocks","Homework and books","A butterfly net, an insect box, and food","Lollipops and baskets"],
-    ans: 2
-  },
-  {
-    q: "Who played a trick on Tim the turtle?",
-    opts: ["The wizard","A butterfly","Katie the kangaroo","A shop keeper"],
-    ans: 2
-  },
-  {
-    q: "What mistake did the wizard make with the lollipop?",
-    opts: ["He lost it","He ate it","He made it dirty","He made it very heavy"],
+    q: "What was hard and heavy?",
+    opts: ["The pillow","The tangerine","The tent","The rock"],
     ans: 3
+  },
+  {
+    q: "What did the wizard use to cut wood for the campfire?",
+    opts: ["A rock","An ax","A butterfly net","A brush"],
+    ans: 1
+  },
+  {
+    q: "What trick did the kangaroo play on the turtle?",
+    opts: ["She hid his lollipop in the forest","She ate his breakfast","She broke his brush","She took his pillow"],
+    ans: 0
+  },
+  {
+    q: "What mistake did the wizard make?",
+    opts: ["He burned the food","He broke the tent","He made the lollipop very heavy","He lost the binoculars"],
+    ans: 2
+  },
+  {
+    q: "What did the king catch near the stream?",
+    opts: ["A butterfly","A turtle","A rock","A fish"],
+    ans: 3
+  },
+  {
+    q: "What did the king find in the newspaper?",
+    opts: ["A funny story","A picture of his castle","A plan for homework","A game about camping"],
+    ans: 1
   },
   {
     q: "What should you do before breakfast?",
-    opts: ["Do homework","Brush your teeth","Go fishing","Play basketball"],
-    ans: 1
-  },
-  {
-    q: "What sports did they play in the garden?",
-    opts: ["Camping and fishing","Walking and swimming","Volleyball, basketball, and badminton","Badminton and homework"],
-    ans: 2
-  },
-  {
-    q: "What was the point of the wizard's story at the end?",
-    opts: ["To always do homework","To keep your teeth clean","To play tricks on friends","To love all kinds of friends"],
+    opts: ["Play basketball","Go camping near a stream","Do your homework","Brush your teeth"],
     ans: 3
+  },
+  {
+    q: "Why did they need to go back to the castle?",
+    opts: ["They were hungry","They still had homework and a test","The campfire went out","It started to rain"],
+    ans: 1
   }
 ];
 
@@ -525,6 +543,7 @@ var quizSubmitted = false;
 var quizListenModes = {};
 var activePopup = null;
 var activeReadBtn = null;
+var activeSentenceEl = null;
 
 /* ============================================================
    SPEECH SYNTHESIS
@@ -535,6 +554,9 @@ function stopAll() {
   for (var i = 0; i < els.length; i++) els[i].classList.remove('speaking');
   var hls = document.querySelectorAll('.highlight');
   for (var i = 0; i < hls.length; i++) hls[i].classList.remove('highlight');
+  var ps = document.querySelectorAll('.playing-sentence');
+  for (var i = 0; i < ps.length; i++) ps[i].classList.remove('playing-sentence');
+  activeSentenceEl = null;
   if (activeReadBtn) {
     activeReadBtn.textContent = '🔊 朗讀';
     activeReadBtn.className = 'btn btn-read';
@@ -587,7 +609,7 @@ function splitSentences(text) {
 }
 
 /* ============================================================
-   TEXT PARSER — finds vocab words in text
+   TEXT PARSER
    ============================================================ */
 function parseText(text) {
   var parts = [];
@@ -621,7 +643,7 @@ function parseText(text) {
 }
 
 /* ============================================================
-   GENERATE DISTRACTOR OPTIONS
+   GENERATE OPTIONS
    ============================================================ */
 function generateOptions(correctWord) {
   var opts = [correctWord];
@@ -639,23 +661,26 @@ function generateOptions(correctWord) {
 }
 
 /* ============================================================
-   CLOSE ALL POPUPS
+   CLOSE POPUPS
    ============================================================ */
 function closeAllPopups() {
   var popups = document.querySelectorAll('.blank-opts-popup.show');
   for (var i = 0; i < popups.length; i++) popups[i].classList.remove('show');
+  var ps = document.querySelectorAll('.playing-sentence');
+  for (var i = 0; i < ps.length; i++) ps[i].classList.remove('playing-sentence');
   activePopup = null;
+  activeSentenceEl = null;
 }
 
 /* ============================================================
-   UPDATE PROGRESS BAR
+   PROGRESS BAR
    ============================================================ */
 function updateProgress() {
   var bar = document.getElementById('prog-bar');
   var txt = document.getElementById('prog-text');
   var pct = totalBlanks > 0 ? Math.round((solvedBlanks / totalBlanks) * 100) : 0;
   bar.style.width = Math.max(pct, 8) + '%';
-  txt.textContent = solvedBlanks + ' / ' + totalBlanks + ' blanks filled';
+  txt.textContent = solvedBlanks + ' / ' + totalBlanks;
   if (solvedBlanks === totalBlanks && totalBlanks > 0) {
     bar.parentElement.style.animation = 'celebrate .6s ease';
     setTimeout(function() { bar.parentElement.style.animation = ''; }, 700);
@@ -663,7 +688,7 @@ function updateProgress() {
 }
 
 /* ============================================================
-   BUILD STORY
+   BUILD STORY  (blank plays FULL SENTENCE)
    ============================================================ */
 function buildStory() {
   var cont = document.getElementById('story');
@@ -672,13 +697,11 @@ function buildStory() {
   totalBlanks = 0;
   solvedBlanks = 0;
   var blankIdCounter = 0;
-
   var blankRatio = { easy: 0.2, medium: 0.4, hard: 0.6 }[difficulty];
 
   for (var pi = 0; pi < PARAS.length; pi++) {
     var card = document.createElement('div');
     card.className = 'pcard';
-
     var enP = document.createElement('p');
     enP.className = 'para-en';
     enP.id = 'en' + pi;
@@ -690,7 +713,11 @@ function buildStory() {
       var parts = parseText(sentences[si]);
       for (var k = 0; k < parts.length; k++) {
         if (parts[k].type === 'w') {
-          paraVocabPositions.push({ si: si, ki: k, word: parts[k].word, v: parts[k].v, zh: parts[k].zh });
+          paraVocabPositions.push({
+            si: si, ki: k,
+            word: parts[k].word, v: parts[k].v, zh: parts[k].zh,
+            sentence: sentences[si]
+          });
         }
       }
     }
@@ -702,7 +729,6 @@ function buildStory() {
       blankSet[shuffledPositions[b]] = true;
     }
 
-    var posCounter = 0;
     for (var si = 0; si < sentences.length; si++) {
       var sspan = document.createElement('span');
       sspan.className = 'ssen';
@@ -725,34 +751,39 @@ function buildStory() {
           if (vocabIdx >= 0 && blankSet[vocabIdx]) {
             var bid = 'blank-' + blankIdCounter++;
             totalBlanks++;
-            blanksData[bid] = { word: pt.word, display: pt.v, zh: pt.zh, solved: false };
+            blanksData[bid] = {
+              word: pt.word, display: pt.v, zh: pt.zh,
+              solved: false, sentence: sentences[si]
+            };
             var wrap = document.createElement('span');
             wrap.className = 'blank-wrap';
             wrap.id = bid;
 
             var speakerBtn = document.createElement('button');
             speakerBtn.className = 'blank-speaker';
-            speakerBtn.textContent = '🔊';
-            speakerBtn.title = '點擊聽發音，再選答案';
-            speakerBtn.setAttribute('aria-label', 'Listen to the hidden word');
-            (function(blankId, word) {
+            speakerBtn.innerHTML = '____&nbsp;🔊';
+            speakerBtn.title = '聽整句話，找出空格的單字';
+            (function(blankId, sentenceText, ssEl) {
               speakerBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 stopAll();
                 closeAllPopups();
-                speak(word);
+                ssEl.classList.add('playing-sentence');
+                activeSentenceEl = ssEl;
+                speak(sentenceText, function() {});
                 var popup = document.getElementById(blankId + '-opts');
-                if (popup) {
-                  popup.classList.add('show');
-                  activePopup = popup;
-                }
+                if (popup) { popup.classList.add('show'); activePopup = popup; }
               });
-            })(bid, pt.word);
+            })(bid, sentences[si], sspan);
             wrap.appendChild(speakerBtn);
 
             var popup = document.createElement('div');
             popup.className = 'blank-opts-popup';
             popup.id = bid + '-opts';
+            var hintDiv = document.createElement('div');
+            hintDiv.className = 'blank-hint';
+            hintDiv.textContent = '👂 哪個單字不見了？';
+            popup.appendChild(hintDiv);
             var options = generateOptions(pt.word);
             for (var oi = 0; oi < options.length; oi++) {
               var optBtn = document.createElement('button');
@@ -776,8 +807,7 @@ function buildStory() {
             (function(el, word) {
               el.addEventListener('click', function(e) {
                 e.stopPropagation();
-                stopAll();
-                closeAllPopups();
+                stopAll(); closeAllPopups();
                 el.classList.add('speaking');
                 speak(word, function() { el.classList.remove('speaking'); });
               });
@@ -805,11 +835,9 @@ function buildStory() {
       bz.textContent = '🔤 中文翻譯';
       bz.addEventListener('click', function() {
         if (zhDiv.style.display === 'block') {
-          zhDiv.style.display = 'none';
-          bz.textContent = '🔤 中文翻譯';
+          zhDiv.style.display = 'none'; bz.textContent = '🔤 中文翻譯';
         } else {
-          zhDiv.style.display = 'block';
-          bz.textContent = '🔤 隱藏中文';
+          zhDiv.style.display = 'block'; bz.textContent = '🔤 隱藏中文';
         }
       });
       ctrl.appendChild(bz);
@@ -821,17 +849,13 @@ function buildStory() {
       br.textContent = '🔊 朗讀';
       br.addEventListener('click', function() {
         if (activeReadBtn === br) { stopAll(); return; }
-        stopAll();
-        closeAllPopups();
+        stopAll(); closeAllPopups();
         activeReadBtn = br;
-        br.textContent = '⏹ 停止';
-        br.className = 'btn btn-stop';
+        br.textContent = '⏹ 停止'; br.className = 'btn btn-stop';
         var spans = enEl.querySelectorAll('.ssen');
         if (spans.length === 0) {
           speak(PARAS[idx].en, function() {
-            br.textContent = '🔊 朗讀';
-            br.className = 'btn btn-read';
-            activeReadBtn = null;
+            br.textContent = '🔊 朗讀'; br.className = 'btn btn-read'; activeReadBtn = null;
           });
           return;
         }
@@ -840,9 +864,7 @@ function buildStory() {
           if (si >= spans.length || activeReadBtn !== br) {
             for (var j = 0; j < spans.length; j++) spans[j].classList.remove('highlight');
             if (activeReadBtn === br) {
-              br.textContent = '🔊 朗讀';
-              br.className = 'btn btn-read';
-              activeReadBtn = null;
+              br.textContent = '🔊 朗讀'; br.className = 'btn btn-read'; activeReadBtn = null;
             }
             return;
           }
@@ -863,15 +885,15 @@ function buildStory() {
 }
 
 /* ============================================================
-   CHECK BLANK ANSWER
+   CHECK BLANK
    ============================================================ */
 function checkBlankAnswer(blankId, selected, btnEl) {
   var data = blanksData[blankId];
   if (!data || data.solved) return;
-
   if (selected.toLowerCase() === data.word.toLowerCase()) {
     data.solved = true;
     solvedBlanks++;
+    closeAllPopups();
     var wrap = document.getElementById(blankId);
     var solved = document.createElement('span');
     solved.className = 'blank-solved';
@@ -879,14 +901,14 @@ function checkBlankAnswer(blankId, selected, btnEl) {
     solved.title = data.word + ' = ' + data.zh;
     (function(el, word) {
       el.addEventListener('click', function(e) {
-        e.stopPropagation();
-        stopAll();
+        e.stopPropagation(); stopAll();
         el.classList.add('speaking');
         speak(word, function() { el.classList.remove('speaking'); });
       });
     })(solved, data.word);
     wrap.parentNode.replaceChild(solved, wrap);
     updateProgress();
+    stopAll();
     speak(data.word);
   } else {
     btnEl.classList.add('wrong');
@@ -894,7 +916,7 @@ function checkBlankAnswer(blankId, selected, btnEl) {
 }
 
 /* ============================================================
-   BUILD WORD CHIPS
+   WORD CHIPS
    ============================================================ */
 function buildChips() {
   var cont = document.getElementById('chips');
@@ -907,8 +929,7 @@ function buildChips() {
       chip.textContent = en + ' ' + zh;
       chip.title = en + ' = ' + zh;
       chip.addEventListener('click', function() {
-        stopAll();
-        closeAllPopups();
+        stopAll(); closeAllPopups();
         chip.classList.add('speaking');
         speak(en, function() { chip.classList.remove('speaking'); });
       });
@@ -941,28 +962,22 @@ function buildQuiz() {
   for (var qi = 0; qi < QUIZ.length; qi++) {
     var q = QUIZ[qi];
     var listenMode = quizListenModes[qi] || 'none';
-
     var card = document.createElement('div');
-    card.className = 'qcard';
-    card.id = 'qcard' + qi;
+    card.className = 'qcard'; card.id = 'qcard' + qi;
 
     var hdr = document.createElement('div');
     hdr.className = 'qhdr';
-
     var qnum = document.createElement('span');
-    qnum.className = 'qnum';
-    qnum.textContent = (qi + 1);
+    qnum.className = 'qnum'; qnum.textContent = (qi + 1);
     hdr.appendChild(qnum);
 
     var qtxt = document.createElement('span');
-    qtxt.className = 'qtxt';
-    qtxt.id = 'qtxt' + qi;
-
+    qtxt.className = 'qtxt'; qtxt.id = 'qtxt' + qi;
     if (listenMode === 'stem') {
-      var hiddenLabel = document.createElement('span');
-      hiddenLabel.className = 'qtxt-hidden';
-      hiddenLabel.textContent = '👂 Click 🔊 to listen to the question';
-      qtxt.appendChild(hiddenLabel);
+      var hl = document.createElement('span');
+      hl.className = 'qtxt-hidden';
+      hl.textContent = '👂 Click 🔊 to listen to the question';
+      qtxt.appendChild(hl);
       qtxt.dataset.fullText = q.q;
     } else {
       qtxt.textContent = q.q;
@@ -970,13 +985,10 @@ function buildQuiz() {
     hdr.appendChild(qtxt);
 
     var spkBtn = document.createElement('button');
-    spkBtn.className = 'qspk';
-    spkBtn.textContent = '🔊';
-    spkBtn.title = '聽題目';
+    spkBtn.className = 'qspk'; spkBtn.textContent = '🔊'; spkBtn.title = '聽題目';
     (function(text, btn) {
       btn.addEventListener('click', function() {
-        stopAll();
-        closeAllPopups();
+        stopAll(); closeAllPopups();
         btn.classList.add('speaking');
         speak(text, function() { btn.classList.remove('speaking'); });
       });
@@ -986,40 +998,29 @@ function buildQuiz() {
 
     var grid = document.createElement('div');
     grid.className = 'ogrid';
-
     for (var oi = 0; oi < q.opts.length; oi++) {
       (function(qIdx, optIdx, optText, myGrid, mode) {
         var ob = document.createElement('button');
-        ob.className = 'obtn';
-        ob.id = 'obtn-' + qIdx + '-' + optIdx;
-
+        ob.className = 'obtn'; ob.id = 'obtn-' + qIdx + '-' + optIdx;
         if (mode === 'options') {
-          var optSpeaker = document.createElement('span');
-          optSpeaker.className = 'opt-speaker';
-          optSpeaker.textContent = '🔊';
-          ob.appendChild(optSpeaker);
-          var optLabel = document.createTextNode(' 聽選項 ' + String.fromCharCode(65 + optIdx));
-          ob.appendChild(optLabel);
+          var os = document.createElement('span');
+          os.className = 'opt-speaker'; os.textContent = '🔊';
+          ob.appendChild(os);
+          ob.appendChild(document.createTextNode(' 聽選項 ' + String.fromCharCode(65 + optIdx)));
           ob.dataset.fullText = optText;
           ob.addEventListener('mouseenter', function() {
-            if (quizSubmitted) return;
-            stopAll();
-            speak(optText);
+            if (quizSubmitted) return; stopAll(); speak(optText);
           });
         } else {
           ob.textContent = String.fromCharCode(65 + optIdx) + '. ' + optText;
         }
-
         ob.addEventListener('click', function() {
           if (quizSubmitted) return;
-          var siblings = myGrid.querySelectorAll('.obtn');
-          for (var s = 0; s < siblings.length; s++) siblings[s].classList.remove('sel');
+          var sibs = myGrid.querySelectorAll('.obtn');
+          for (var s = 0; s < sibs.length; s++) sibs[s].classList.remove('sel');
           ob.classList.add('sel');
           quizAnswers[qIdx] = optIdx;
-          if (mode === 'options') {
-            stopAll();
-            speak(optText);
-          }
+          if (mode === 'options') { stopAll(); speak(optText); }
         });
         myGrid.appendChild(ob);
       })(qi, oi, q.opts[oi], grid, listenMode);
@@ -1027,10 +1028,8 @@ function buildQuiz() {
     card.appendChild(grid);
 
     var fb = document.createElement('div');
-    fb.className = 'qfb';
-    fb.id = 'qfb' + qi;
+    fb.className = 'qfb'; fb.id = 'qfb' + qi;
     card.appendChild(fb);
-
     cont.appendChild(card);
   }
 }
@@ -1041,8 +1040,7 @@ function buildQuiz() {
 function submitQuiz() {
   if (quizSubmitted) return;
   var total = QUIZ.length;
-  var answered = Object.keys(quizAnswers).length;
-  if (answered < total) {
+  if (Object.keys(quizAnswers).length < total) {
     alert('請先回答所有 ' + total + ' 題喔！\nPlease answer all ' + total + ' questions!');
     return;
   }
@@ -1059,9 +1057,7 @@ function submitQuiz() {
     var isCorrect = (userAns === correctIdx);
 
     var qtxt = document.getElementById('qtxt' + qi);
-    if (qtxt.dataset.fullText) {
-      qtxt.textContent = q.q;
-    }
+    if (qtxt.dataset.fullText) qtxt.textContent = q.q;
 
     if (isCorrect) {
       score++;
@@ -1078,14 +1074,9 @@ function submitQuiz() {
     var btns = card.querySelectorAll('.obtn');
     for (var bi = 0; bi < btns.length; bi++) {
       btns[bi].disabled = true;
-      if (btns[bi].dataset.fullText) {
-        btns[bi].textContent = String.fromCharCode(65 + bi) + '. ' + q.opts[bi];
-      }
-      if (bi === correctIdx) {
-        btns[bi].classList.add('ok');
-      } else if (bi === userAns && !isCorrect) {
-        btns[bi].classList.add('no');
-      }
+      if (btns[bi].dataset.fullText) btns[bi].textContent = String.fromCharCode(65 + bi) + '. ' + q.opts[bi];
+      if (bi === correctIdx) btns[bi].classList.add('ok');
+      else if (bi === userAns && !isCorrect) btns[bi].classList.add('no');
     }
   }
 
@@ -1103,33 +1094,20 @@ function submitQuiz() {
 }
 
 /* ============================================================
-   REBUILD ALL (when difficulty changes)
+   REBUILD / DIFFICULTY / INIT
    ============================================================ */
-function rebuildAll() {
-  stopAll();
-  closeAllPopups();
-  buildStory();
-  buildQuiz();
-}
+function rebuildAll() { stopAll(); closeAllPopups(); buildStory(); buildQuiz(); }
 
-/* ============================================================
-   DIFFICULTY BUTTONS
-   ============================================================ */
 function setDifficulty(diff) {
   difficulty = diff;
   var btns = document.querySelectorAll('.diff-btn');
   for (var i = 0; i < btns.length; i++) {
     btns[i].className = 'diff-btn';
-    if (btns[i].dataset.diff === diff) {
-      btns[i].classList.add('active-' + diff);
-    }
+    if (btns[i].dataset.diff === diff) btns[i].classList.add('active-' + diff);
   }
   rebuildAll();
 }
 
-/* ============================================================
-   INIT
-   ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
   if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = function() {};
@@ -1145,24 +1123,18 @@ document.addEventListener('DOMContentLoaded', function() {
   var diffBtns = document.querySelectorAll('.diff-btn');
   for (var i = 0; i < diffBtns.length; i++) {
     (function(btn) {
-      btn.addEventListener('click', function() {
-        setDifficulty(btn.dataset.diff);
-      });
+      btn.addEventListener('click', function() { setDifficulty(btn.dataset.diff); });
     })(diffBtns[i]);
   }
 
   document.addEventListener('click', function(e) {
-    if (activePopup && !e.target.closest('.blank-wrap')) {
-      closeAllPopups();
-    }
+    if (activePopup && !e.target.closest('.blank-wrap')) closeAllPopups();
   });
 
   document.getElementById('go-quiz-btn').addEventListener('click', function() {
     document.getElementById('quiz-anchor').scrollIntoView({ behavior: 'smooth' });
   });
-
   document.getElementById('sub-btn').addEventListener('click', submitQuiz);
-
   document.getElementById('retry-btn').addEventListener('click', function() {
     buildQuiz();
     document.getElementById('quiz-anchor').scrollIntoView({ behavior: 'smooth' });
