@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>巫師奇奇的森林露營記 — 英語聽力測驗</title>
+<style>
+:root {
+  --purple: #7B68EE; --sky: #5BC8F5; --sun: #FFD93D; --grass: #6BCB77;
+  --coral: #FF6B6B; --lavender: #C3A6FF; --peach: #FFB347; --ink: #2D3047;
+  --card: #FFFDF5; --shadow: 0 4px 20px rgba(45,48,71,.10); --r: 18px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', 'Noto Sans TC', 'PingFang TC', -apple-system, sans-serif;
+  background: linear-gradient(160deg, #f0e6ff, #fff9e6 50%, #e6f9f0);
+  min-height: 100vh; color: var(--ink); padding-bottom: 60px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+header {
+  background: linear-gradient(135deg, #6a3de8, #9b59d8, var(--lavender));
+  padding: 30px 20px 24px; text-align: center;
+  box-shadow: 0 6px 24px rgba(155,89,216,.35);
+}
+header h1 {
+  font-size: clamp(1.4rem, 5vw, 2.4rem); color: #fff; font-weight: 900;
+  text-shadow: 3px 3px 0 rgba(0,0,0,.12); line-height: 1.3;
+}
+header p { color: rgba(255,255,255,.92); font-size: .88rem; margin-top: 6px; font-weight: 700; }
+
+.container { max-width: 740px; margin: 0 auto; padding: 0 14px; }
+
+.ctrl-panel {
+  background: #fff; border-radius: var(--r); margin: 16px auto; max-width: 740px;
+  padding: 16px 20px; box-shadow: var(--shadow);
+}
+.ctrl-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.ctrl-row:last-child { margin-bottom: 0; }
+.ctrl-label { font-weight: 800; font-size: .9rem; white-space: nowrap; min-width: 100px; }
+#speed-slider { flex: 1; min-width: 100px; accent-color: var(--lavender); cursor: pointer; height: 6px; }
+#speed-val {
+  font-weight: 900; color: var(--purple); font-size: .95rem; min-width: 42px;
+  text-align: center; background: #f3eeff; border-radius: 8px; padding: 3px 8px;
+}
+.ctrl-hint { font-size: .75rem; color: #999; width: 100%; margin-top: 2px; }
+
+.chip-banner {
+  background: linear-gradient(90deg, var(--lavender), #d4b8ff);
+  border-radius: var(--r); margin: 0 auto 12px; max-width: 740px;
+  padding: 14px 18px; box-shadow: var(--shadow);
+}
+.chip-banner h3 { font-size: .95rem; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: rgba(255,255,255,.78); border-radius: 50px; padding: 4px 12px;
+  font-size: .8rem; font-weight: 700; cursor: pointer; border: 2px solid rgba(255,255,255,.9);
+  transition: background .2s, transform .15s; color: var(--ink); user-select: none;
+}
+.chip:hover { background: #fff; transform: scale(1.05); }
+.chip.speaking { background: #FFE566; }
+
+.sec-title {
+  text-align: center; font-size: clamp(1.2rem, 4vw, 1.8rem); font-weight: 900;
+  margin: 22px 0 12px; color: var(--ink);
+}
+.sec-title span {
+  background: linear-gradient(135deg, #6a3de8, var(--coral));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.pcard {
+  background: var(--card); border-radius: var(--r); padding: 18px 20px;
+  margin-bottom: 14px; box-shadow: var(--shadow); border-left: 5px solid var(--lavender);
+}
+.pcard:nth-child(3n+2) { border-left-color: var(--sky); }
+.pcard:nth-child(3n) { border-left-color: var(--grass); }
+.para-en { font-size: 1.05rem; line-height: 2.2; color: var(--ink); }
+.vw {
+  color: #6a3de8; background: #f0e6ff; border-radius: 6px; padding: 1px 5px;
+  cursor: pointer; font-weight: 800; border-bottom: 2px solid #6a3de8;
+  transition: background .18s, color .18s;
+}
+.vw:hover { background: #d4b8ff; color: #3a0d8f; }
+.vw.speaking { background: #FFE566; color: #7a4000; border-bottom-color: #E8A000; }
+.para-zh {
+  display: none; margin-top: 10px; padding: 10px 14px;
+  background: linear-gradient(135deg, #f0fff4, #e8f4ff); border-radius: 12px;
+  font-size: .9rem; line-height: 1.8; color: #555; border: 1px dashed #bbb;
+}
+.pctrl { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 5px; padding: 7px 15px;
+  border-radius: 50px; border: none; cursor: pointer; font-family: inherit;
+  font-size: .82rem; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  transition: transform .15s, box-shadow .15s; user-select: none;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.16); }
+.btn:active { transform: scale(.97); }
+.btn-zh { background: linear-gradient(135deg, #a8e6cf, #67d7aa); color: #1a5c3a; }
+.btn-read { background: linear-gradient(135deg, var(--lavender), #9B59D8); color: #fff; }
+.btn-stop { background: linear-gradient(135deg, #ffb347, #ff8000); color: #fff; }
+
+.go-quiz {
+  display: block; margin: 20px auto 30px;
+  background: linear-gradient(135deg, var(--coral), #ff4444); color: #fff;
+  padding: 14px 32px; border-radius: 50px; border: none; cursor: pointer;
+  font-family: inherit; font-size: 1.1rem; font-weight: 800;
+  box-shadow: 0 4px 14px rgba(255,107,107,.5); transition: transform .15s;
+}
+.go-quiz:hover { transform: scale(1.05); }
+
+.qsec { max-width: 740px; margin: 8px auto 0; padding: 0 14px; }
+.qintro {
+  background: linear-gradient(135deg, #ffe0e0, #ffecd2);
+  border-radius: var(--r); padding: 18px 22px; margin-bottom: 18px;
+  text-align: center; box-shadow: var(--shadow);
+}
+.qintro p { font-size: .95rem; font-weight: 700; color: var(--ink); }
+.qintro p + p { font-size: .82rem; color: #666; margin-top: 6px; }
+.qintro .big-ear { font-size: 2rem; display: block; margin-bottom: 6px; }
+
+.qcard {
+  background: var(--card); border-radius: var(--r); padding: 20px 22px;
+  margin-bottom: 16px; box-shadow: var(--shadow); border-top: 4px solid #ddd;
+  transition: border-color .3s;
+}
+.qcard.qok { border-top-color: var(--grass); }
+.qcard.qno { border-top-color: var(--coral); }
+
+.qhdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.qnum {
+  background: linear-gradient(135deg, var(--lavender), #9B59D8); color: #fff;
+  border-radius: 50%; width: 34px; height: 34px; min-width: 34px; text-align: center;
+  line-height: 34px; font-size: .9rem; font-weight: 900;
+}
+
+.sentence-blank {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border: 2.5px dashed #FF9800; border-radius: 12px;
+  padding: 10px 16px; min-height: 48px;
+  animation: pulse-blank 2s infinite;
+}
+.sentence-blank .blank-text {
+  flex: 1; font-size: .95rem; font-weight: 700; color: #E65100;
+  letter-spacing: 2px;
+}
+.sentence-blank .listen-btn {
+  background: linear-gradient(135deg, #FF9800, #F57C00); color: #fff;
+  border: none; border-radius: 50px; padding: 8px 16px; cursor: pointer;
+  font-family: inherit; font-size: .88rem; font-weight: 800;
+  box-shadow: 0 2px 8px rgba(255,152,0,.3);
+  transition: transform .15s, box-shadow .15s; white-space: nowrap;
+}
+.sentence-blank .listen-btn:hover { transform: scale(1.06); box-shadow: 0 3px 12px rgba(255,152,0,.45); }
+.sentence-blank .listen-btn:active { transform: scale(.95); }
+.sentence-blank .listen-btn.speaking { background: linear-gradient(135deg, #FFE566, #FFC107); color: #7a4000; }
+@keyframes pulse-blank {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,152,0,.2); }
+  50% { box-shadow: 0 0 0 6px rgba(255,152,0,0); }
+}
+
+.sentence-blank.solved {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border-color: var(--grass); animation: none;
+}
+.sentence-blank.solved .blank-text { color: #2e7d32; letter-spacing: 0; font-size: .9rem; }
+
+.ogrid { display: flex; flex-direction: column; gap: 8px; }
+.obtn {
+  background: #f8f5ff; border: 2.5px solid #e0d4ff; border-radius: 14px;
+  padding: 12px 16px; text-align: left; cursor: pointer; font-family: inherit;
+  font-size: .9rem; font-weight: 600; color: var(--ink);
+  transition: all .18s; user-select: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.obtn:hover:not(:disabled) { background: #ece4ff; border-color: #b39ddb; transform: scale(1.01); }
+.obtn .opt-label {
+  background: var(--lavender); color: #fff; border-radius: 50%;
+  width: 28px; height: 28px; min-width: 28px; text-align: center;
+  line-height: 28px; font-size: .8rem; font-weight: 900;
+}
+.obtn .opt-text { flex: 1; line-height: 1.5; }
+.obtn .opt-diff {
+  color: var(--coral); font-weight: 900; text-decoration: underline;
+  text-decoration-color: rgba(255,107,107,.3); text-decoration-thickness: 2px;
+}
+.obtn.sel { background: #e0d4ff; border-color: var(--purple); font-weight: 800; }
+.obtn.ok {
+  background: #c8f5d5; border-color: var(--grass); color: #1a5c3a; font-weight: 800;
+}
+.obtn.no {
+  background: #ffd6d6; border-color: var(--coral); color: #8b1a1a; font-weight: 800;
+  opacity: .7;
+}
+.obtn:disabled { cursor: default; }
+
+.qfb {
+  display: none; margin-top: 10px; padding: 10px 14px;
+  border-radius: 12px; font-weight: 700; font-size: .88rem;
+}
+.fbok { background: #d4edda; color: #155724; }
+.fbno { background: #f8d7da; color: #721c24; }
+
+.submit-row { text-align: center; margin: 16px 0 22px; }
+.bsub {
+  background: linear-gradient(135deg, var(--grass), #4CAF50); color: #fff;
+  font-size: 1.1rem; padding: 14px 40px; border-radius: 50px; border: none;
+  cursor: pointer; font-family: inherit; font-weight: 800;
+  box-shadow: 0 4px 18px rgba(107,203,119,.45); transition: transform .15s, opacity .2s;
+}
+.bsub:hover { transform: scale(1.04); }
+.bsub:disabled { opacity: .5; cursor: default; transform: none; }
+
+.scoreboard {
+  display: none; background: linear-gradient(135deg, var(--sun), var(--peach));
+  border-radius: var(--r); padding: 28px 22px; margin: 18px auto 0;
+  max-width: 740px; text-align: center; box-shadow: var(--shadow);
+}
+.scoreboard.show { display: block; animation: pop-in .4s ease; }
+.scoreboard h2 { font-size: 1.6rem; font-weight: 900; color: var(--ink); margin-bottom: 8px; }
+.score-big {
+  font-size: 3.8rem; font-weight: 900; color: var(--coral); line-height: 1;
+  text-shadow: 3px 3px 0 rgba(0,0,0,.08);
+}
+.score-msg { font-size: 1rem; font-weight: 700; color: #555; margin-top: 10px; }
+.bretry {
+  margin-top: 16px; background: linear-gradient(135deg, var(--purple), #6a3de8); color: #fff;
+  font-size: 1rem; padding: 12px 28px; border-radius: 50px; border: none; cursor: pointer;
+  font-family: inherit; font-weight: 800; box-shadow: 0 4px 14px rgba(155,89,216,.4);
+  transition: transform .15s;
+}
+.bretry:hover { transform: scale(1.05); }
+
+.back-link {
+  display: block; text-align: center; margin: 16px 0;
+  color: var(--purple); font-weight: 700; font-size: .9rem;
+  text-decoration: none;
+}
+.back-link:hover { text-decoration: underline; }
+
+footer {
+  text-align: center; padding: 22px; color: #aaa; font-size: .76rem; margin-top: 8px;
+}
+footer span { color: var(--purple); }
+
+@keyframes pop-in {
+  0% { transform: scale(.7); opacity: 0; }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@media (max-width: 480px) {
+  header { padding: 20px 14px 18px; }
+  .pcard, .qcard { padding: 14px 14px; }
+  .sentence-blank { flex-direction: column; gap: 6px; text-align: center; }
+  .para-en { font-size: .95rem; line-height: 2; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧙‍♂️ 巫師奇奇的森林露營記</h1>
+  <p>Wizard Qiqi's Forest Camping Adventure ｜ 四年級英語聽力測驗</p>
+</header>
+
+<div class="ctrl-panel container">
+  <div class="ctrl-row">
+    <span class="ctrl-label">🐢 發音速度</span>
+    <input type="range" id="speed-slider" min="0.5" max="1.2" step="0.05" value="0.8">
+    <span id="speed-val">0.80x</span>
+  </div>
+  <div class="ctrl-hint">點擊故事中藍紫色的單字可以聽發音，點 🔊 朗讀按鈕可以聽整段故事！</div>
+</div>
+
+<div class="chip-banner container">
+  <h3>📚 本課重點單字 — 點一下聽發音！</h3>
+  <div class="chips" id="chips"></div>
+</div>
+
+<h2 class="sec-title"><span>📖 故事：巫師奇奇的森林露營記</span></h2>
+
+<div class="container" id="story"></div>
+
+<button class="go-quiz" id="go-quiz-btn">🎧 開始聽力測驗！Start Listening Quiz</button>
+
+<h2 class="sec-title" id="quiz-anchor"><span>🎧 聽力測驗 Listening Quiz</span></h2>
+<div class="qsec">
+  <div class="qintro">
+    <span class="big-ear">👂</span>
+    <p>點擊 🔊 聽句子，從四個選項中選出你聽到的句子。</p>
+    <p>每個選項只有一點點不一樣，要仔細聽喔！</p>
+  </div>
+  <div id="qcont"></div>
+  <div class="submit-row">
+    <button class="bsub" id="sub-btn">🎯 提交答案 Submit</button>
+  </div>
+</div>
+
+<div class="scoreboard" id="scoreboard">
+  <h2>🏆 測驗結果 Quiz Result 🏆</h2>
+  <div class="score-big" id="score-big">0 / 10</div>
+  <div class="score-msg" id="score-msg"></div>
+  <button class="bretry" id="retry-btn">🔄 再來一次 Try Again</button>
+</div>
+
+<a class="back-link" href="index.html">⬅ 回到國王的夏日露營 Back to King's Summer Camp</a>
+
+<footer><p>✨ 專為努力學英語的小朋友設計 ✨ ｜ <span>Wizard Qiqi's Forest Camping</span> © 2025</p></footer>
+
+<script>
+var VOCAB = [
+  ['butterfly net','捕蟲網'],['insect box','昆蟲箱'],['water bottle','水壺'],
+  ['post office','郵局'],['binoculars','雙筒望遠鏡'],['smartphone','智慧型手機'],
+  ['beautiful','美麗的'],['barbecue','烤肉'],['campfire','營火'],
+  ['surprise','驚喜'],['squirrel','松鼠'],['bookstore','書店'],
+  ['restaurant','餐廳'],['hospital','醫院'],['sneakers','運動鞋'],
+  ['umbrella','雨傘'],['sweater','毛衣'],['camping','露營'],
+  ['fishing','釣魚'],['trouble','麻煩'],['mistake','錯誤'],
+  ['present','禮物'],['without','沒有'],['glasses','眼鏡'],
+  ['scooter','機車'],['garden','花園'],['forest','森林'],
+  ['pillow','枕頭'],['stream','小溪'],['bakery','麵包店'],
+  ['wizard','巫師'],['shorts','短褲'],['jacket','夾克'],
+  ['snacks','點心'],['should','應該'],['smoke','煙'],
+  ['heavy','重的'],['light','輕的'],['magic','神奇的'],
+  ['point','重點'],['trick','把戲'],['phone','電話'],
+  ['dress','洋裝'],['skirt','裙子'],['pants','褲子'],
+  ['train','火車'],['plane','飛機'],
+  ['near','靠近'],['soft','柔軟的'],['hard','堅硬的'],
+  ['rock','石頭'],['wait','等待'],['pick','挑選'],
+  ['tent','帳篷'],['nuts','堅果'],['bank','銀行'],
+  ['bike','腳踏車'],['taxi','計程車'],['post','郵件'],
+  ['smart','聰明的'],['use','使用'],['bus','公車'],
+  ['car','汽車'],['MRT','捷運'],['ax','斧頭']
+];
+
+var EXTRA_CHIPS = [
+  ['T-shirt','T恤'],['make a mistake','犯錯'],
+  ['play a trick','惡作劇'],['glass','玻璃杯'],['office','辦公室']
+];
+
+var PARAS = [
+  {
+    en: "Wizard Qiqi lived in a small house near a beautiful forest. One morning, he put on his T-shirt, shorts, and sneakers. He picked up his glasses, umbrella, and water bottle. \"I should go camping today!\" he said with a big smile.",
+    zh: "巫師奇奇住在一座美麗的森林附近的小房子裡。一天早上，他穿上T恤、短褲和運動鞋。他拿起眼鏡、雨傘和水壺。「我今天應該去露營！」他笑著說。"
+  },
+  {
+    en: "First, he rode his bike to the bakery to buy some snacks. Then he took a bus to the bookstore to get a book. \"I need a good book for the campfire!\" he said. He was very busy, but very happy.",
+    zh: "首先，他騎腳踏車去麵包店買了一些點心。然後他搭公車去書店買書。「我需要一本好書在營火旁看！」他說。他非常忙碌，但非常開心。"
+  },
+  {
+    en: "Qiqi went camping near a beautiful stream in the forest. He set up his tent and used an ax to cut some wood. He made a big campfire. The smoke went up high into the sky. A little squirrel came to watch!",
+    zh: "奇奇在森林裡一條美麗的小溪附近露營。他搭好帳篷，用斧頭砍了一些木頭。他生了一堆大營火。煙升得好高好高。一隻小松鼠跑來看熱鬧！"
+  },
+  {
+    en: "\"Please wait here,\" said Qiqi to the squirrel. He picked some nuts from the garden for the squirrel. Then he went fishing in the stream. He used his binoculars to look at the beautiful forest. He started a barbecue near the campfire.",
+    zh: "「請在這裡等一下，」奇奇對松鼠說。他從花園裡摘了一些堅果給松鼠。然後他去小溪釣魚。他用望遠鏡看美麗的森林。他在營火旁開始烤肉。"
+  },
+  {
+    en: "Qiqi wanted to play a trick on the squirrel. \"This magic present is a surprise!\" he said. He used magic to make a soft, light pillow appear! But he made a mistake. The pillow turned into a rock! The rock was hard and heavy! \"Oh no, big trouble!\" said Qiqi.",
+    zh: "奇奇想對松鼠惡作劇。「這個神奇的禮物是一個驚喜！」他說。他用魔法變出了一顆又軟又輕的枕頭！但他犯了一個錯誤。枕頭變成了石頭！石頭又硬又重！「糟糕，大麻煩了！」奇奇說。"
+  },
+  {
+    en: "\"Don't worry! Let me try without magic this time,\" said Qiqi. He picked up his phone and called his friend. His friend came by scooter with a real soft pillow. The squirrel loved the pillow! They sat near the campfire, ate snacks and nuts, and looked at the stars. What a wonderful camping trip!",
+    zh: "「別擔心！這次我不用魔法試試，」奇奇說。他拿起電話打給朋友。朋友騎機車帶來一顆真正柔軟的枕頭。松鼠好愛那顆枕頭！他們坐在營火旁，吃點心和堅果，看星星。多麼美好的露營之旅！"
+  }
+];
+
+var QUIZ = [
+  {
+    correct: "Wizard Qiqi lived near a beautiful forest.",
+    opts: [
+      "Wizard Qiqi lived near a beautiful forest.",
+      "Wizard Qiqi lived near a beautiful garden.",
+      "Wizard Qiqi lived in a beautiful forest.",
+      "Wizard Qiqi waited near a beautiful forest."
+    ],
+    ans: 0,
+    zh: "巫師奇奇住在一座美麗的森林附近。"
+  },
+  {
+    correct: "He put on his T-shirt, shorts, and sneakers.",
+    opts: [
+      "He put on his T-shirt, pants, and sneakers.",
+      "He put on his sweater, shorts, and sneakers.",
+      "He put on his T-shirt, shorts, and sneakers.",
+      "He put on his T-shirt, skirt, and sneakers."
+    ],
+    ans: 2,
+    zh: "他穿上T恤、短褲和運動鞋。"
+  },
+  {
+    correct: "He rode his bike to the bakery.",
+    opts: [
+      "He rode his bike to the bookstore.",
+      "He rode his bike to the bakery.",
+      "He rode his bus to the bakery.",
+      "He rode his scooter to the bakery."
+    ],
+    ans: 1,
+    zh: "他騎腳踏車去麵包店。"
+  },
+  {
+    correct: "He went camping near a beautiful stream.",
+    opts: [
+      "He went fishing near a beautiful stream.",
+      "He went camping near a beautiful forest.",
+      "He went camping in a beautiful stream.",
+      "He went camping near a beautiful stream."
+    ],
+    ans: 3,
+    zh: "他在一條美麗的小溪附近露營。"
+  },
+  {
+    correct: "This pillow is soft and light.",
+    opts: [
+      "This pillow is soft and heavy.",
+      "This pillow is hard and light.",
+      "This rock is soft and light.",
+      "This pillow is soft and light."
+    ],
+    ans: 3,
+    zh: "這顆枕頭又軟又輕。"
+  },
+  {
+    correct: "The rock was hard and heavy.",
+    opts: [
+      "The rock was hard and heavy.",
+      "The rock was hard and light.",
+      "The rock was soft and heavy.",
+      "The pillow was hard and heavy."
+    ],
+    ans: 0,
+    zh: "石頭又硬又重。"
+  },
+  {
+    correct: "He picked some nuts from the garden.",
+    opts: [
+      "He picked some snacks from the garden.",
+      "He picked some nuts from the forest.",
+      "He picked some nuts from the garden.",
+      "He picked some nuts from the stream."
+    ],
+    ans: 2,
+    zh: "他從花園裡摘了一些堅果。"
+  },
+  {
+    correct: "The magic present was a big surprise.",
+    opts: [
+      "The magic present was a big mistake.",
+      "The magic trick was a big surprise.",
+      "The magic present was a big trouble.",
+      "The magic present was a big surprise."
+    ],
+    ans: 3,
+    zh: "那個神奇的禮物是一個大驚喜。"
+  },
+  {
+    correct: "Please wait near the campfire.",
+    opts: [
+      "Please wait near the campfire.",
+      "Please walk near the campfire.",
+      "Please wait near the tent.",
+      "Please wait in the garden."
+    ],
+    ans: 0,
+    zh: "請在營火旁邊等一下。"
+  },
+  {
+    correct: "His friend came by scooter with a soft pillow.",
+    opts: [
+      "His friend came by scooter with a soft rock.",
+      "His friend came by bike with a soft pillow.",
+      "His friend came by taxi with a soft pillow.",
+      "His friend came by scooter with a soft pillow."
+    ],
+    ans: 3,
+    zh: "他的朋友騎機車帶來一顆柔軟的枕頭。"
+  }
+];
+
+var speechRate = 0.8;
+var quizAnswers = {};
+var quizSubmitted = false;
+
+function stopAll() {
+  try { speechSynthesis.cancel(); } catch(e) {}
+  var els = document.querySelectorAll('.speaking');
+  for (var i = 0; i < els.length; i++) els[i].classList.remove('speaking');
+}
+
+function speak(text, onEnd) {
+  if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = speechRate;
+  var voices = speechSynthesis.getVoices();
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].lang && voices[i].lang.indexOf('en') === 0) { u.voice = voices[i]; break; }
+  }
+  u.onend = function() { if (onEnd) onEnd(); };
+  u.onerror = function() { if (onEnd) onEnd(); };
+  speechSynthesis.speak(u);
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function isWordChar(ch) {
+  if (!ch) return false;
+  var c = ch.charCodeAt(0);
+  return (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || ch === '-' || ch === '\'';
+}
+
+function splitSentences(text) {
+  var result = [];
+  var re = /[^.!?"]*[.!?"]+['"]?\s*/g;
+  var m;
+  while ((m = re.exec(text)) !== null) {
+    var s = m[0].trim();
+    if (s) result.push(s);
+  }
+  if (result.length === 0 && text.trim()) result.push(text.trim());
+  return result;
+}
+
+function parseText(text) {
+  var allV = VOCAB.slice();
+  allV.sort(function(a, b) { return b[0].length - a[0].length; });
+  var parts = [];
+  var i = 0;
+  while (i < text.length) {
+    var matched = false;
+    for (var vi = 0; vi < allV.length; vi++) {
+      var vw = allV[vi][0];
+      var vlen = vw.length;
+      if (i + vlen > text.length) continue;
+      var seg = text.slice(i, i + vlen);
+      if (seg.toLowerCase() !== vw.toLowerCase()) continue;
+      var before = i > 0 ? text[i - 1] : '';
+      var after = (i + vlen < text.length) ? text[i + vlen] : '';
+      if (isWordChar(before) || isWordChar(after)) continue;
+      parts.push({ type: 'w', v: seg, word: vw, zh: allV[vi][1] });
+      i += vlen; matched = true; break;
+    }
+    if (!matched) {
+      if (parts.length && parts[parts.length - 1].type === 't') {
+        parts[parts.length - 1].v += text[i];
+      } else {
+        parts.push({ type: 't', v: text[i] });
+      }
+      i++;
+    }
+  }
+  return parts;
+}
+
+function buildChips() {
+  var cont = document.getElementById('chips');
+  cont.innerHTML = '';
+  var allWords = VOCAB.concat(EXTRA_CHIPS);
+  for (var i = 0; i < allWords.length; i++) {
+    (function(en, zh) {
+      var chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = en + ' ' + zh;
+      chip.title = en + ' = ' + zh;
+      chip.addEventListener('click', function() {
+        stopAll();
+        chip.classList.add('speaking');
+        speak(en, function() { chip.classList.remove('speaking'); });
+      });
+      cont.appendChild(chip);
+    })(allWords[i][0], allWords[i][1]);
+  }
+}
+
+function buildStory() {
+  var cont = document.getElementById('story');
+  cont.innerHTML = '';
+  for (var pi = 0; pi < PARAS.length; pi++) {
+    var card = document.createElement('div');
+    card.className = 'pcard';
+    var enP = document.createElement('p');
+    enP.className = 'para-en';
+
+    var sentences = splitSentences(PARAS[pi].en);
+    for (var si = 0; si < sentences.length; si++) {
+      var parts = parseText(sentences[si]);
+      for (var k = 0; k < parts.length; k++) {
+        var pt = parts[k];
+        if (pt.type === 't') {
+          enP.appendChild(document.createTextNode(pt.v));
+        } else {
+          var sp = document.createElement('span');
+          sp.className = 'vw';
+          sp.textContent = pt.v;
+          sp.title = pt.word + ' = ' + pt.zh;
+          (function(el, word) {
+            el.addEventListener('click', function(e) {
+              e.stopPropagation(); stopAll();
+              el.classList.add('speaking');
+              speak(word, function() { el.classList.remove('speaking'); });
+            });
+          })(sp, pt.word);
+          enP.appendChild(sp);
+        }
+      }
+      if (si < sentences.length - 1) enP.appendChild(document.createTextNode(' '));
+    }
+    card.appendChild(enP);
+
+    var zhP = document.createElement('div');
+    zhP.className = 'para-zh';
+    zhP.textContent = PARAS[pi].zh;
+    card.appendChild(zhP);
+
+    var ctrl = document.createElement('div');
+    ctrl.className = 'pctrl';
+
+    (function(zhDiv) {
+      var bz = document.createElement('button');
+      bz.className = 'btn btn-zh';
+      bz.textContent = '🔤 中文翻譯';
+      bz.addEventListener('click', function() {
+        if (zhDiv.style.display === 'block') {
+          zhDiv.style.display = 'none'; bz.textContent = '🔤 中文翻譯';
+        } else {
+          zhDiv.style.display = 'block'; bz.textContent = '🔤 隱藏中文';
+        }
+      });
+      ctrl.appendChild(bz);
+    })(zhP);
+
+    (function(idx) {
+      var br = document.createElement('button');
+      br.className = 'btn btn-read';
+      br.textContent = '🔊 朗讀';
+      var reading = false;
+      br.addEventListener('click', function() {
+        if (reading) { stopAll(); br.textContent = '🔊 朗讀'; br.className = 'btn btn-read'; reading = false; return; }
+        stopAll(); reading = true;
+        br.textContent = '⏹ 停止'; br.className = 'btn btn-stop';
+        speak(PARAS[idx].en, function() {
+          br.textContent = '🔊 朗讀'; br.className = 'btn btn-read'; reading = false;
+        });
+      });
+      ctrl.appendChild(br);
+    })(pi);
+
+    card.appendChild(ctrl);
+    cont.appendChild(card);
+  }
+}
+
+function buildQuiz() {
+  var cont = document.getElementById('qcont');
+  cont.innerHTML = '';
+  quizAnswers = {};
+  quizSubmitted = false;
+  document.getElementById('sub-btn').disabled = false;
+  document.getElementById('scoreboard').classList.remove('show');
+
+  for (var qi = 0; qi < QUIZ.length; qi++) {
+    var q = QUIZ[qi];
+    var card = document.createElement('div');
+    card.className = 'qcard'; card.id = 'qcard' + qi;
+
+    var hdr = document.createElement('div');
+    hdr.className = 'qhdr';
+
+    var qnum = document.createElement('span');
+    qnum.className = 'qnum'; qnum.textContent = (qi + 1);
+    hdr.appendChild(qnum);
+
+    var blankArea = document.createElement('div');
+    blankArea.className = 'sentence-blank';
+    blankArea.id = 'sblank' + qi;
+
+    var blankText = document.createElement('span');
+    blankText.className = 'blank-text';
+    blankText.textContent = '＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿';
+    blankArea.appendChild(blankText);
+
+    var listenBtn = document.createElement('button');
+    listenBtn.className = 'listen-btn';
+    listenBtn.textContent = '🔊 聽句子';
+    (function(sentence, btn) {
+      btn.addEventListener('click', function() {
+        stopAll();
+        btn.classList.add('speaking');
+        speak(sentence, function() { btn.classList.remove('speaking'); });
+      });
+    })(q.correct, listenBtn);
+    blankArea.appendChild(listenBtn);
+
+    hdr.appendChild(blankArea);
+    card.appendChild(hdr);
+
+    var grid = document.createElement('div');
+    grid.className = 'ogrid';
+    var labels = ['A', 'B', 'C', 'D'];
+
+    for (var oi = 0; oi < q.opts.length; oi++) {
+      (function(qIdx, optIdx, optText, myGrid) {
+        var ob = document.createElement('button');
+        ob.className = 'obtn'; ob.id = 'obtn-' + qIdx + '-' + optIdx;
+
+        var label = document.createElement('span');
+        label.className = 'opt-label';
+        label.textContent = labels[optIdx];
+        ob.appendChild(label);
+
+        var textSpan = document.createElement('span');
+        textSpan.className = 'opt-text';
+        textSpan.textContent = optText;
+        ob.appendChild(textSpan);
+
+        ob.addEventListener('click', function() {
+          if (quizSubmitted) return;
+          var sibs = myGrid.querySelectorAll('.obtn');
+          for (var s = 0; s < sibs.length; s++) sibs[s].classList.remove('sel');
+          ob.classList.add('sel');
+          quizAnswers[qIdx] = optIdx;
+        });
+        myGrid.appendChild(ob);
+      })(qi, oi, q.opts[oi], grid);
+    }
+    card.appendChild(grid);
+
+    var fb = document.createElement('div');
+    fb.className = 'qfb'; fb.id = 'qfb' + qi;
+    card.appendChild(fb);
+    cont.appendChild(card);
+  }
+}
+
+function submitQuiz() {
+  if (quizSubmitted) return;
+  var total = QUIZ.length;
+  if (Object.keys(quizAnswers).length < total) {
+    alert('請先回答所有 ' + total + ' 題喔！\nPlease answer all ' + total + ' questions!');
+    return;
+  }
+  quizSubmitted = true;
+  document.getElementById('sub-btn').disabled = true;
+  var score = 0;
+
+  for (var qi = 0; qi < QUIZ.length; qi++) {
+    var q = QUIZ[qi];
+    var card = document.getElementById('qcard' + qi);
+    var fb = document.getElementById('qfb' + qi);
+    var userAns = quizAnswers[qi];
+    var correctIdx = q.ans;
+    var isCorrect = (userAns === correctIdx);
+
+    var blankArea = document.getElementById('sblank' + qi);
+    blankArea.classList.add('solved');
+    var blankText = blankArea.querySelector('.blank-text');
+    blankText.textContent = q.correct;
+
+    if (isCorrect) {
+      score++;
+      card.classList.add('qok');
+      fb.className = 'qfb fbok';
+      fb.innerHTML = '✅ 正確！' + q.zh;
+    } else {
+      card.classList.add('qno');
+      fb.className = 'qfb fbno';
+      var labels = ['A','B','C','D'];
+      fb.innerHTML = '❌ 正確答案是 ' + labels[correctIdx] + '。' + q.zh;
+    }
+    fb.style.display = 'block';
+
+    var btns = card.querySelectorAll('.obtn');
+    for (var bi = 0; bi < btns.length; bi++) {
+      btns[bi].disabled = true;
+      if (bi === correctIdx) btns[bi].classList.add('ok');
+      else if (bi === userAns && !isCorrect) btns[bi].classList.add('no');
+    }
+  }
+
+  var sb = document.getElementById('scoreboard');
+  document.getElementById('score-big').textContent = score + ' / ' + total;
+  var msg = '';
+  if (score === total) msg = '🎉 滿分！你的耳朵超級厲害！Perfect!';
+  else if (score >= 8) msg = '👏 非常棒！Almost perfect!';
+  else if (score >= 6) msg = '😊 不錯喔！Good job!';
+  else if (score >= 4) msg = '💪 繼續加油！Keep trying!';
+  else msg = '📖 再聽幾次故事吧！Listen again!';
+  document.getElementById('score-msg').textContent = msg;
+  sb.classList.add('show');
+  sb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = function() {};
+  }
+
+  var slider = document.getElementById('speed-slider');
+  var sval = document.getElementById('speed-val');
+  slider.addEventListener('input', function() {
+    speechRate = parseFloat(slider.value);
+    sval.textContent = speechRate.toFixed(2) + 'x';
+  });
+
+  document.getElementById('go-quiz-btn').addEventListener('click', function() {
+    document.getElementById('quiz-anchor').scrollIntoView({ behavior: 'smooth' });
+  });
+  document.getElementById('sub-btn').addEventListener('click', submitQuiz);
+  document.getElementById('retry-btn').addEventListener('click', function() {
+    buildQuiz();
+    document.getElementById('quiz-anchor').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  buildChips();
+  buildStory();
+  buildQuiz();
+});
+</script>
+</body>
+</html>
