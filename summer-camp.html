@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="date-created" content="2025-09-29T15:16:47+08:00">
+<title>The King's Summer Camp — English Listening Story Quiz</title>
+<style>
+:root {
+  --sky: #5BC8F5; --sun: #FFD93D; --grass: #6BCB77; --coral: #FF6B6B;
+  --lavender: #C3A6FF; --peach: #FFB347; --ink: #2D3047; --card: #FFFDF5;
+  --shadow: 0 4px 20px rgba(45,48,71,.10); --r: 18px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', 'Noto Sans TC', 'PingFang TC', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(160deg, #e0f7fa, #fff9e6 50%, #fce4f0);
+  min-height: 100vh; color: var(--ink); padding-bottom: 60px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+header {
+  background: linear-gradient(135deg, #7B68EE, var(--sky));
+  padding: 28px 20px 22px; text-align: center;
+  box-shadow: 0 6px 24px rgba(91,200,245,.35);
+}
+header h1 {
+  font-size: clamp(1.4rem, 5vw, 2.4rem); color: #fff; font-weight: 900;
+  text-shadow: 3px 3px 0 rgba(0,0,0,.12); line-height: 1.3;
+}
+header p { color: rgba(255,255,255,.92); font-size: .88rem; margin-top: 6px; font-weight: 700; }
+
+.container { max-width: 740px; margin: 0 auto; padding: 0 14px; }
+
+.ctrl-panel {
+  background: #fff; border-radius: var(--r); margin: 16px auto; max-width: 740px;
+  padding: 16px 20px; box-shadow: var(--shadow);
+}
+.ctrl-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.ctrl-row:last-child { margin-bottom: 0; }
+.ctrl-label { font-weight: 800; font-size: .9rem; white-space: nowrap; min-width: 100px; }
+.diff-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.diff-btn {
+  padding: 7px 18px; border-radius: 50px; border: 2.5px solid #ddd; cursor: pointer;
+  font-family: inherit; font-size: .85rem; font-weight: 800; background: #f8f8f8;
+  transition: all .2s; user-select: none;
+}
+.diff-btn:hover { transform: scale(1.04); }
+.diff-btn.active-easy { background: #d4edda; border-color: var(--grass); color: #155724; }
+.diff-btn.active-medium { background: #fff3cd; border-color: var(--peach); color: #856404; }
+.diff-btn.active-hard { background: #f8d7da; border-color: var(--coral); color: #721c24; }
+#speed-slider { flex: 1; min-width: 100px; accent-color: var(--sky); cursor: pointer; height: 6px; }
+#speed-val {
+  font-weight: 900; color: var(--coral); font-size: .95rem; min-width: 42px;
+  text-align: center; background: #fff5f5; border-radius: 8px; padding: 3px 8px;
+}
+.ctrl-hint { font-size: .75rem; color: #999; width: 100%; margin-top: 2px; }
+
+.chip-banner {
+  background: linear-gradient(90deg, var(--sun), var(--peach));
+  border-radius: var(--r); margin: 0 auto 12px; max-width: 740px;
+  padding: 14px 18px; box-shadow: var(--shadow);
+}
+.chip-banner h3 { font-size: .95rem; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: rgba(255,255,255,.78); border-radius: 50px; padding: 4px 12px;
+  font-size: .8rem; font-weight: 700; cursor: pointer; border: 2px solid rgba(255,255,255,.9);
+  transition: background .2s, transform .15s; color: var(--ink); user-select: none;
+}
+.chip:hover { background: #fff; transform: scale(1.05); }
+.chip.speaking { background: #FFE566; }
+
+.sec-title {
+  text-align: center; font-size: clamp(1.2rem, 4vw, 1.8rem); font-weight: 900;
+  margin: 22px 0 12px; color: var(--ink);
+}
+.sec-title span {
+  background: linear-gradient(135deg, var(--coral), var(--lavender));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.progress-wrap { max-width: 740px; margin: 0 auto 14px; padding: 0 14px; }
+.progress-bar-outer {
+  background: #e8e8e8; border-radius: 50px; height: 28px; position: relative;
+  overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,.08);
+}
+.progress-bar-inner {
+  background: linear-gradient(90deg, var(--grass), #4CAF50);
+  height: 100%; border-radius: 50px; transition: width .5s ease;
+  display: flex; align-items: center; justify-content: center; min-width: 40px;
+}
+.progress-text {
+  font-size: .78rem; font-weight: 800; color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.2); white-space: nowrap; padding: 0 10px;
+}
+
+.pcard {
+  background: var(--card); border-radius: var(--r); padding: 18px 20px;
+  margin-bottom: 14px; box-shadow: var(--shadow); border-left: 5px solid var(--sky);
+}
+.pcard:nth-child(4n+2) { border-left-color: var(--lavender); }
+.pcard:nth-child(4n+3) { border-left-color: var(--grass); }
+.pcard:nth-child(4n) { border-left-color: var(--coral); }
+.para-en { font-size: 1.05rem; line-height: 2.2; color: var(--ink); }
+.vw {
+  color: #1A6ED8; background: #E8F4FF; border-radius: 6px; padding: 1px 5px;
+  cursor: pointer; font-weight: 800; border-bottom: 2px solid #1A6ED8;
+  transition: background .18s, color .18s;
+}
+.vw:hover { background: #B5F2FF; color: #0A3D8F; }
+.vw.speaking { background: #FFE566; color: #7a4000; border-bottom-color: #E8A000; }
+.ssen {
+  transition: background .3s; border-radius: 4px;
+  box-decoration-break: clone; -webkit-box-decoration-break: clone;
+}
+.ssen.highlight { background: #FFF3CD; padding: 2px 0; }
+.ssen.playing-sentence { background: #E3F2FD; padding: 3px 2px; border-radius: 6px; }
+.para-zh {
+  display: none; margin-top: 10px; padding: 10px 14px;
+  background: linear-gradient(135deg, #f0fff4, #e8f4ff); border-radius: 12px;
+  font-size: .9rem; line-height: 1.8; color: #555; border: 1px dashed #bbb;
+}
+
+.blank-wrap { display: inline-block; vertical-align: baseline; position: relative; }
+.blank-speaker {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  background: linear-gradient(135deg, #FFE0B2, #FFCC80); border: 2.5px dashed #FF9800;
+  border-radius: 10px; padding: 3px 12px; cursor: pointer; font-size: .92rem;
+  transition: transform .15s, box-shadow .2s; user-select: none;
+  animation: pulse-blank 2s infinite;
+  min-width: 60px; min-height: 34px; line-height: 1; font-weight: 700;
+  color: #E65100; letter-spacing: 1px;
+}
+.blank-speaker:hover { transform: scale(1.06); box-shadow: 0 2px 12px rgba(255,152,0,.35); }
+.blank-speaker:active { transform: scale(.96); }
+@keyframes pulse-blank {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,152,0,.3); }
+  50% { box-shadow: 0 0 0 6px rgba(255,152,0,0); }
+}
+.blank-hint {
+  display: block; text-align: center; font-size: .7rem; color: #999;
+  padding: 4px 0 2px; font-weight: 600;
+}
+.blank-opts-popup {
+  display: none; position: absolute; top: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%); z-index: 200; background: #fff;
+  border-radius: 14px; box-shadow: 0 6px 28px rgba(0,0,0,.2);
+  padding: 10px; min-width: 210px; animation: pop-in .25s ease;
+}
+.blank-opts-popup.show { display: flex; flex-direction: column; gap: 5px; }
+.blank-opts-popup::before {
+  content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  border-left: 8px solid transparent; border-right: 8px solid transparent;
+  border-bottom: 8px solid #fff;
+}
+.blank-opt-btn {
+  padding: 9px 14px; border-radius: 10px; border: 2px solid #ddd; background: #f9f9f9;
+  cursor: pointer; font-family: inherit; font-size: .9rem; font-weight: 700;
+  color: var(--ink); transition: all .15s; text-align: center; user-select: none;
+}
+.blank-opt-btn:hover:not(.wrong) { background: #E8F4FF; border-color: var(--sky); transform: scale(1.03); }
+.blank-opt-btn.correct {
+  background: #d4edda; border-color: var(--grass); color: #155724;
+  animation: pop-in .3s ease;
+}
+.blank-opt-btn.wrong {
+  background: #f8d7da; border-color: var(--coral); color: #721c24;
+  animation: shake .4s ease; pointer-events: none; opacity: .45;
+}
+.blank-solved {
+  display: inline; color: #155724; background: #d4edda; border-radius: 6px;
+  padding: 1px 6px; font-weight: 800; border-bottom: 2px solid var(--grass);
+  animation: pop-in .3s ease; cursor: pointer;
+}
+
+.pctrl { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 5px; padding: 7px 15px;
+  border-radius: 50px; border: none; cursor: pointer; font-family: inherit;
+  font-size: .82rem; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  transition: transform .15s, box-shadow .15s; user-select: none;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.16); }
+.btn:active { transform: scale(.97); }
+.btn-zh { background: linear-gradient(135deg, #a8e6cf, #67d7aa); color: #1a5c3a; }
+.btn-read { background: linear-gradient(135deg, var(--sky), #3AAFDF); color: #fff; }
+.btn-stop { background: linear-gradient(135deg, #ffb347, #ff8000); color: #fff; }
+
+.go-quiz {
+  display: block; margin: 16px auto 30px;
+  background: linear-gradient(135deg, var(--lavender), #9B59D8); color: #fff;
+  padding: 13px 30px; border-radius: 50px; border: none; cursor: pointer;
+  font-family: inherit; font-size: 1.05rem; font-weight: 800;
+  box-shadow: 0 4px 14px rgba(195,166,255,.5); transition: transform .15s;
+}
+.go-quiz:hover { transform: scale(1.05); }
+
+.qsec { max-width: 740px; margin: 8px auto 0; padding: 0 14px; }
+.qintro {
+  background: linear-gradient(135deg, var(--lavender), #e8c5ff);
+  border-radius: var(--r); padding: 16px 20px; margin-bottom: 16px;
+  text-align: center; box-shadow: var(--shadow);
+}
+.qintro p { font-size: .92rem; font-weight: 700; color: var(--ink); }
+.qintro p + p { font-size: .8rem; color: #555; margin-top: 4px; }
+.qcard {
+  background: var(--card); border-radius: var(--r); padding: 18px 20px;
+  margin-bottom: 14px; box-shadow: var(--shadow); border-top: 4px solid var(--lavender);
+}
+.qcard.qok { border-top-color: var(--grass); }
+.qcard.qno { border-top-color: var(--coral); }
+.qhdr { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 10px; }
+.qnum {
+  background: var(--lavender); color: #fff; border-radius: 50%;
+  width: 30px; height: 30px; min-width: 30px; text-align: center;
+  line-height: 30px; font-size: .85rem; font-weight: 900;
+}
+.qtxt { font-size: .95rem; font-weight: 700; line-height: 1.6; flex: 1; }
+.qtxt-hidden {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: #FF9800; font-style: italic;
+}
+.qspk {
+  background: none; border: none; cursor: pointer; font-size: 1.2rem;
+  padding: 2px 6px; border-radius: 8px; transition: transform .15s, background .2s;
+  line-height: 1; flex-shrink: 0;
+}
+.qspk:hover { background: #eee; transform: scale(1.15); }
+.qspk.speaking { background: #FFE566; }
+.ogrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+@media (max-width: 500px) { .ogrid { grid-template-columns: 1fr; } }
+.obtn {
+  background: #F4F0FF; border: 2px solid #D4C8FF; border-radius: 12px;
+  padding: 10px 14px; text-align: left; cursor: pointer; font-family: inherit;
+  font-size: .88rem; font-weight: 600; color: var(--ink);
+  transition: background .18s, border-color .18s, transform .12s; user-select: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.obtn:hover:not(:disabled) { background: #E4D8FF; border-color: #A78BE0; transform: scale(1.02); }
+.obtn.sel { background: #D4C8FF; border-color: #7C4DFF; font-weight: 800; }
+.obtn.ok { background: #C8F5D5; border-color: var(--grass); color: #1a5c3a; font-weight: 800; }
+.obtn.no { background: #FFD6D6; border-color: var(--coral); color: #8B1A1A; font-weight: 800; }
+.obtn:disabled { cursor: default; }
+.obtn .opt-speaker {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; cursor: pointer; padding: 2px; flex-shrink: 0;
+}
+.qfb {
+  display: none; margin-top: 9px; padding: 8px 14px;
+  border-radius: 10px; font-weight: 700; font-size: .85rem;
+}
+.fbok { background: #d4edda; color: #155724; }
+.fbno { background: #f8d7da; color: #721c24; }
+
+.submit-row { text-align: center; margin: 12px 0 22px; }
+.bsub {
+  background: linear-gradient(135deg, var(--grass), #4CAF50); color: #fff;
+  font-size: 1.05rem; padding: 13px 38px; border-radius: 50px; border: none;
+  cursor: pointer; font-family: inherit; font-weight: 800;
+  box-shadow: 0 4px 18px rgba(107,203,119,.45); transition: transform .15s, opacity .2s;
+}
+.bsub:hover { transform: scale(1.04); }
+.bsub:disabled { opacity: .5; cursor: default; transform: none; }
+.scoreboard {
+  display: none; background: linear-gradient(135deg, var(--sun), var(--peach));
+  border-radius: var(--r); padding: 26px 20px; margin: 16px auto 0;
+  max-width: 740px; text-align: center; box-shadow: var(--shadow);
+}
+.scoreboard.show { display: block; }
+.scoreboard h2 { font-size: 1.6rem; font-weight: 900; color: var(--ink); margin-bottom: 8px; }
+.score-big {
+  font-size: 3.5rem; font-weight: 900; color: var(--coral); line-height: 1;
+  text-shadow: 3px 3px 0 rgba(0,0,0,.08);
+}
+.score-msg { font-size: .95rem; font-weight: 700; color: #555; margin-top: 8px; }
+.bretry {
+  margin-top: 14px; background: linear-gradient(135deg, var(--coral), #FF3333); color: #fff;
+  font-size: 1rem; padding: 11px 26px; border-radius: 50px; border: none; cursor: pointer;
+  font-family: inherit; font-weight: 800; box-shadow: 0 4px 14px rgba(255,107,107,.4);
+  transition: transform .15s;
+}
+.bretry:hover { transform: scale(1.05); }
+
+footer {
+  text-align: center; padding: 22px; color: #aaa; font-size: .76rem; margin-top: 8px;
+}
+footer span { color: var(--coral); }
+
+@keyframes pop-in {
+  0% { transform: scale(.7); opacity: 0; }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+@keyframes celebrate {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.1) rotate(-2deg); }
+  50% { transform: scale(1.15) rotate(2deg); }
+  75% { transform: scale(1.1) rotate(-1deg); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 480px) {
+  header { padding: 20px 14px 16px; }
+  .ctrl-panel, .chip-banner { margin-left: 10px; margin-right: 10px; }
+  .pcard { padding: 14px 14px; }
+  .para-en { font-size: .95rem; line-height: 2; }
+  .blank-opts-popup { min-width: 160px; left: 0; transform: none; }
+  .blank-opts-popup::before { left: 20px; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏕️ The King's Summer Camp 👑</h1>
+  <p>四年級英語聽力故事 ｜ 聽完整句子，找出空格中的單字！</p>
+  <p style="margin-top:8px;font-size:.78rem;opacity:.75;">📅 建立日期：2025-09-29 15:16</p>
+</header>
+
+<div class="ctrl-panel container">
+  <div class="ctrl-row">
+    <span class="ctrl-label">🎯 聽力難度</span>
+    <div class="diff-btns" id="diff-btns">
+      <button class="diff-btn" data-diff="easy">Easy 簡單</button>
+      <button class="diff-btn" data-diff="medium">Medium 中等</button>
+      <button class="diff-btn" data-diff="hard">Hard 困難</button>
+    </div>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">🐢 發音速度</span>
+    <input type="range" id="speed-slider" min="0.5" max="1.2" step="0.05" value="0.85">
+    <span id="speed-val">0.85x</span>
+  </div>
+  <div class="ctrl-hint">點擊故事中的 🔊 會朗讀「整個句子」，仔細聽，找出空格裡的單字！</div>
+</div>
+
+<div class="chip-banner container">
+  <h3>📚 本課重點單字 — 點一下聽發音！</h3>
+  <div class="chips" id="chips"></div>
+</div>
+
+<h2 class="sec-title"><span>📖 故事：國王的夏日露營</span></h2>
+
+<div class="progress-wrap">
+  <div class="progress-bar-outer">
+    <div class="progress-bar-inner" id="prog-bar" style="width:0%">
+      <span class="progress-text" id="prog-text">0 / 0</span>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="story"></div>
+
+<button class="go-quiz" id="go-quiz-btn">🧩 開始閱讀測驗！Go to Quiz</button>
+
+<h2 class="sec-title" id="quiz-anchor"><span>📝 閱讀測驗 Reading Quiz</span></h2>
+<div class="qsec">
+  <div class="qintro">
+    <p>📖 根據故事回答以下 10 題，選出最正確的答案。</p>
+    <p>部分題目或選項只有 🔊 圖示，請仔細聽！</p>
+  </div>
+  <div id="qcont"></div>
+  <div class="submit-row">
+    <button class="bsub" id="sub-btn">🎯 提交答案 Submit</button>
+  </div>
+</div>
+
+<div class="scoreboard" id="scoreboard">
+  <h2>🏆 測驗結果 Quiz Result 🏆</h2>
+  <div class="score-big" id="score-big">0 / 10</div>
+  <div class="score-msg" id="score-msg"></div>
+  <button class="bretry" id="retry-btn">🔄 再來一次 Try Again</button>
+</div>
+
+<div style="text-align:center;margin:16px 0;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:0 14px;">
+  <a href="index.html" style="display:inline-block;background:linear-gradient(135deg,#FF6B6B,#ee5a24);color:#fff;padding:13px 30px;border-radius:50px;text-decoration:none;font-weight:800;font-size:1rem;box-shadow:0 4px 14px rgba(255,107,107,.4);transition:transform .15s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🏠 回到故事首頁 Story Index</a>
+  <a href="listening-quiz.html" style="display:inline-block;background:linear-gradient(135deg,#9B59D8,#6a3de8);color:#fff;padding:13px 30px;border-radius:50px;text-decoration:none;font-weight:800;font-size:1rem;box-shadow:0 4px 14px rgba(155,89,216,.4);transition:transform .15s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🧙‍♂️ 巫師奇奇的聽力測驗 Wizard Qiqi's Listening Quiz →</a>
+  <a href="birthday-story.html" style="display:inline-block;background:linear-gradient(135deg,#e91e8c,#ff6b9d);color:#fff;padding:13px 30px;border-radius:50px;text-decoration:none;font-weight:800;font-size:1rem;box-shadow:0 4px 14px rgba(233,30,140,.4);transition:transform .15s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🎂 Miki的露營生日派對 Miki's Birthday →</a>
+</div>
+
+<footer><p>✨ 專為努力學英語的小朋友設計 ✨ ｜ <span>The King's Summer Camp</span> © 2025</p></footer>
+
+<script>
+/* ============================================================
+   VOCABULARY  (sorted longest-first for greedy matching)
+   ============================================================ */
+var VOCAB = [
+  ['birthday party','生日派對'],['butterfly net','捕蟲網'],
+  ['insect box','昆蟲箱'],['basketball','籃球'],['volleyball','排球'],
+  ['binoculars','雙筒望遠鏡'],['try again','再試一次'],
+  ['September','九月'],['beautiful','美麗的'],['breakfast','早餐'],
+  ['newspaper','報紙'],['badminton','羽毛球'],['tangerine','柑橘'],
+  ['barbecue','烤肉'],['lollipop','棒棒糖'],['November','十一月'],
+  ['December','十二月'],['February','二月'],['homework','家庭作業'],
+  ['kangaroo','袋鼠'],['smallest','最小的'],['campfire','營火'],
+  ['homemade','自製的'],['surprise','驚喜'],['tomorrow','明天'],
+  ['one day','有一天'],['look at','看著'],
+  ['cleaner','清潔劑'],['camping','露營'],['fishing','釣魚'],
+  ['trouble','麻煩'],['mistake','錯誤'],['present','禮物'],
+  ['October','十月'],['January','一月'],['without','沒有'],
+  ['picture','照片'],['healthy','健康的'],
+  ['garden','花園'],['castle','城堡'],['basket','籃子'],
+  ['always','總是'],['turtle','烏龜'],['August','八月'],
+  ['before','在...之前'],['wizard','巫師'],['stream','小溪'],
+  ['pillow','枕頭'],['forest','森林'],['summer','夏天'],
+  ['enough','足夠的'],['horses','馬(複數)'],
+  ['smoke','煙'],['dirty','髒的'],['brush','刷'],
+  ['teeth','牙齒(複數)'],['tooth','牙齒(單數)'],['clean','清潔'],
+  ['heavy','重的'],['light','輕的'],['magic','神奇的'],
+  ['point','重點'],['trick','把戲'],['think','想'],
+  ['worry','擔心'],['bring','帶來'],['smile','微笑'],
+  ['bread','麵包'],['short','矮的'],['paper','紙張'],
+  ['watch','手錶'],['habit','習慣'],['still','仍然'],
+  ['house','房子'],['study','學習'],['story','故事'],
+  ['March','三月'],['April','四月'],
+  ['July','七月'],['June','六月'],['love','愛'],
+  ['walk','走路'],['wait','等待'],['shop','商店'],
+  ['keep','保持'],['pick','挑選'],['near','靠近'],
+  ['soft','柔軟的'],['hard','堅硬的'],['kind','種類'],
+  ['rock','石頭'],['will','將會'],['test','考試'],
+  ['fast','快'],['idea','主意'],['have','有'],
+  ['game','遊戲'],['come','來'],['easy','容易的'],
+  ['wish','希望'],['much','很多'],['plan','計畫'],
+  ['tall','高的'],['long','長的'],['thin','瘦的'],
+  ['with','跟；用'],['hair','頭髮'],['wall','牆壁'],
+  ['rode','ride的過去式'],['more','更多'],['only','僅僅'],
+  ['peel','剝皮'],['tent','帳篷'],['ride','騎'],
+  ['king','國王'],['may','可以'],['let','讓'],
+  ['all','所有的'],['fat','胖的'],['buy','買'],
+  ['try','試'],['ax','斧頭']
+];
+
+var EXTRA_CHIPS = [
+  ['make a mistake','犯錯'],['play a trick','惡作劇'],
+  ['saw','see的過去式'],['Why','為什麼'],['When','何時'],
+  ['Where','在哪裡'],['How','如何']
+];
+
+/* ============================================================
+   STORY PARAGRAPHS
+   ============================================================ */
+var PARAS = [
+  {
+    en: "One day, a tall king lived in a big castle with his friends. He had an idea for the summer. \"I wish to go camping in the forest!\" he said with a big smile. He made a plan. They rode horses to find a beautiful spot near a stream. The ride was fast and easy!",
+    zh: "有一天，一位高大的國王和朋友們住在一座大城堡裡。他有一個夏天的點子。「我想去森林露營！」他笑著說。他做了一個計畫。他們騎馬去找一條美麗的溪流附近的好地方。騎馬又快又輕鬆！"
+  },
+  {
+    en: "A thin wizard and a short turtle came too. The wizard brought a tent, an ax, and binoculars. The turtle brought a soft pillow and a basket of tangerines. \"This pillow is soft and light, but look at that rock — it is hard and heavy!\" said the turtle.",
+    zh: "一位瘦瘦的巫師和一隻矮矮的烏龜也來了。巫師帶了帳篷、斧頭和望遠鏡。烏龜帶了一顆柔軟的枕頭和一籃柑橘。「這顆枕頭又軟又輕，但你看那塊石頭——又硬又重！」烏龜說。"
+  },
+  {
+    en: "They set up the tent near the stream. The wizard used the ax to cut wood for a campfire. The smoke went up high into the sky. \"Let me make a barbecue!\" said the king. He brought homemade bread and enough food for everyone. \"Please wait — I still need to peel the tangerines!\" said the turtle.",
+    zh: "他們在溪邊搭起帳篷。巫師用斧頭砍木頭生營火。煙霧高高升起。「讓我來烤肉！」國王說。他帶了自製麵包和足夠所有人吃的食物。「請等一下——我還在剝柑橘皮！」烏龜說。"
+  },
+  {
+    en: "A fat kangaroo came with a butterfly net and an insect box. She played a trick on the turtle. She hid his lollipop in the forest! The turtle was in big trouble. \"Don't worry,\" said the wizard. \"Let me help!\" Without thinking, the wizard made a mistake. He used magic and the lollipop became very heavy!",
+    zh: "一隻胖胖的袋鼠帶著捕蟲網和昆蟲箱來了。她對烏龜惡作劇，把他的棒棒糖藏在森林裡！烏龜遇到大麻煩。「別擔心，」巫師說。「讓我來幫忙！」不假思索，巫師犯了一個錯。他用魔法讓棒棒糖變得超級重！"
+  },
+  {
+    en: "They went fishing near the stream. The king tried to catch a big fish, but it was not easy. \"Try again!\" the kangaroo said. The king tried and tried. At last, he caught one! \"The magic present was a big surprise!\" the wizard joked. They all had a big smile.",
+    zh: "他們在溪邊釣魚。國王試著抓一條大魚，但不太容易。「再試一次！」袋鼠說。國王一試再試。終於，他抓到一條！「這個神奇的禮物真是大驚喜！」巫師開玩笑。大家都露出了大大的微笑。"
+  },
+  {
+    en: "In the evening, they played games near the campfire. They played basketball and badminton. The king found a newspaper and saw a picture of his castle on the wall. \"I wish we could have a birthday party here!\" he said. The wizard told a funny story. \"He picked a story without a point!\" the kangaroo laughed.",
+    zh: "傍晚，他們在營火旁玩遊戲。他們打籃球和羽毛球。國王看到一份報紙，上面有一張他城堡的照片掛在牆上。「我真希望我們能在這裡辦生日派對！」他說。巫師講了一個好笑的故事。「他挑了一個沒有重點的故事！」袋鼠大笑。"
+  },
+  {
+    en: "Before breakfast the next morning, the king said, \"Always brush your teeth! Keep your teeth clean and healthy!\" The turtle showed one dirty tooth. \"May I buy a new brush from the shop?\" he asked. \"You may,\" said the king. \"A clean tooth is a happy tooth!\"",
+    zh: "隔天早餐前，國王說：「一定要刷牙！保持牙齒乾淨又健康！」烏龜露出一顆髒兮兮的牙齒。「我可以去商店買一把新刷子嗎？」他問。「可以，」國王說。「乾淨的牙齒就是快樂的牙齒！」"
+  },
+  {
+    en: "\"We still have homework and a test tomorrow,\" said the turtle. \"We need to study!\" They walked back to the castle. The king said, \"I will always love all kinds of friends! This was the best summer plan!\" Everyone smiled and hugged. They rode the horses home fast. What a wonderful camping trip!",
+    zh: "「我們還有功課和明天的考試，」烏龜說。「我們得唸書了！」他們走回城堡。國王說：「我會永遠愛所有的朋友！這是最棒的夏日計畫！」大家微笑擁抱。他們快速騎馬回家。多麼美好的露營之旅！"
+  }
+];
+
+/* ============================================================
+   QUIZ  (10 questions)
+   ============================================================ */
+var QUIZ = [
+  {
+    q: "Where did the king want to go camping?",
+    opts: ["Near a shop","In the forest","At a castle","In the garden"],
+    ans: 1
+  },
+  {
+    q: "What did the turtle bring for the trip?",
+    opts: ["A tent and an ax","Binoculars and a newspaper","A soft pillow and tangerines","A butterfly net and an insect box"],
+    ans: 2
+  },
+  {
+    q: "What was hard and heavy?",
+    opts: ["The pillow","The tangerine","The tent","The rock"],
+    ans: 3
+  },
+  {
+    q: "What did the wizard use to cut wood for the campfire?",
+    opts: ["A rock","An ax","A butterfly net","A brush"],
+    ans: 1
+  },
+  {
+    q: "What trick did the kangaroo play on the turtle?",
+    opts: ["She hid his lollipop in the forest","She ate his breakfast","She broke his brush","She took his pillow"],
+    ans: 0
+  },
+  {
+    q: "What mistake did the wizard make?",
+    opts: ["He burned the food","He broke the tent","He made the lollipop very heavy","He lost the binoculars"],
+    ans: 2
+  },
+  {
+    q: "What did the king catch near the stream?",
+    opts: ["A butterfly","A turtle","A rock","A fish"],
+    ans: 3
+  },
+  {
+    q: "What did the king find in the newspaper?",
+    opts: ["A funny story","A picture of his castle","A plan for homework","A game about camping"],
+    ans: 1
+  },
+  {
+    q: "What should you do before breakfast?",
+    opts: ["Play basketball","Go camping near a stream","Do your homework","Brush your teeth"],
+    ans: 3
+  },
+  {
+    q: "Why did they need to go back to the castle?",
+    opts: ["They were hungry","They still had homework and a test","The campfire went out","It started to rain"],
+    ans: 1
+  }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var difficulty = 'medium';
+var speechRate = 0.85;
+var blanksData = {};
+var totalBlanks = 0;
+var solvedBlanks = 0;
+var quizAnswers = {};
+var quizSubmitted = false;
+var quizListenModes = {};
+var activePopup = null;
+var activeReadBtn = null;
+var activeSentenceEl = null;
+
+/* ============================================================
+   SPEECH SYNTHESIS
+   ============================================================ */
+function stopAll() {
+  try { speechSynthesis.cancel(); } catch(e) {}
+  var els = document.querySelectorAll('.speaking');
+  for (var i = 0; i < els.length; i++) els[i].classList.remove('speaking');
+  var hls = document.querySelectorAll('.highlight');
+  for (var i = 0; i < hls.length; i++) hls[i].classList.remove('highlight');
+  var ps = document.querySelectorAll('.playing-sentence');
+  for (var i = 0; i < ps.length; i++) ps[i].classList.remove('playing-sentence');
+  activeSentenceEl = null;
+  if (activeReadBtn) {
+    activeReadBtn.textContent = '🔊 朗讀';
+    activeReadBtn.className = 'btn btn-read';
+    activeReadBtn = null;
+  }
+}
+
+function speak(text, onEnd) {
+  if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = speechRate;
+  var voices = speechSynthesis.getVoices();
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].lang && voices[i].lang.indexOf('en') === 0) { u.voice = voices[i]; break; }
+  }
+  u.onend = function() { if (onEnd) onEnd(); };
+  u.onerror = function() { if (onEnd) onEnd(); };
+  speechSynthesis.speak(u);
+}
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function isWordChar(ch) {
+  if (!ch) return false;
+  var c = ch.charCodeAt(0);
+  return (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || ch === '-' || ch === '\'';
+}
+
+function splitSentences(text) {
+  var result = [];
+  var re = /[^.!?"]*[.!?"]+['"]?\s*/g;
+  var m;
+  while ((m = re.exec(text)) !== null) {
+    var s = m[0].trim();
+    if (s) result.push(s);
+  }
+  if (result.length === 0 && text.trim()) result.push(text.trim());
+  return result;
+}
+
+/* ============================================================
+   TEXT PARSER
+   ============================================================ */
+function parseText(text) {
+  var parts = [];
+  var i = 0;
+  while (i < text.length) {
+    var matched = false;
+    for (var vi = 0; vi < VOCAB.length; vi++) {
+      var vw = VOCAB[vi][0];
+      var vlen = vw.length;
+      if (i + vlen > text.length) continue;
+      var seg = text.slice(i, i + vlen);
+      if (seg.toLowerCase() !== vw.toLowerCase()) continue;
+      var before = i > 0 ? text[i - 1] : '';
+      var after = (i + vlen < text.length) ? text[i + vlen] : '';
+      if (isWordChar(before) || isWordChar(after)) continue;
+      parts.push({ type: 'w', v: seg, word: vw, zh: VOCAB[vi][1] });
+      i += vlen;
+      matched = true;
+      break;
+    }
+    if (!matched) {
+      if (parts.length && parts[parts.length - 1].type === 't') {
+        parts[parts.length - 1].v += text[i];
+      } else {
+        parts.push({ type: 't', v: text[i] });
+      }
+      i++;
+    }
+  }
+  return parts;
+}
+
+/* ============================================================
+   GENERATE OPTIONS
+   ============================================================ */
+function generateOptions(correctWord) {
+  var opts = [correctWord];
+  var pool = [];
+  for (var i = 0; i < VOCAB.length; i++) {
+    if (VOCAB[i][0].toLowerCase() !== correctWord.toLowerCase()) {
+      pool.push(VOCAB[i][0]);
+    }
+  }
+  pool = shuffle(pool);
+  for (var i = 0; i < pool.length && opts.length < 4; i++) {
+    opts.push(pool[i]);
+  }
+  return shuffle(opts);
+}
+
+/* ============================================================
+   CLOSE POPUPS
+   ============================================================ */
+function closeAllPopups() {
+  var popups = document.querySelectorAll('.blank-opts-popup.show');
+  for (var i = 0; i < popups.length; i++) popups[i].classList.remove('show');
+  var ps = document.querySelectorAll('.playing-sentence');
+  for (var i = 0; i < ps.length; i++) ps[i].classList.remove('playing-sentence');
+  activePopup = null;
+  activeSentenceEl = null;
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+function updateProgress() {
+  var bar = document.getElementById('prog-bar');
+  var txt = document.getElementById('prog-text');
+  var pct = totalBlanks > 0 ? Math.round((solvedBlanks / totalBlanks) * 100) : 0;
+  bar.style.width = Math.max(pct, 8) + '%';
+  txt.textContent = solvedBlanks + ' / ' + totalBlanks;
+  if (solvedBlanks === totalBlanks && totalBlanks > 0) {
+    bar.parentElement.style.animation = 'celebrate .6s ease';
+    setTimeout(function() { bar.parentElement.style.animation = ''; }, 700);
+  }
+}
+
+/* ============================================================
+   BUILD STORY  (blank plays FULL SENTENCE)
+   ============================================================ */
+function buildStory() {
+  var cont = document.getElementById('story');
+  cont.innerHTML = '';
+  blanksData = {};
+  totalBlanks = 0;
+  solvedBlanks = 0;
+  var blankIdCounter = 0;
+  var blankRatio = { easy: 0.2, medium: 0.4, hard: 0.6 }[difficulty];
+
+  for (var pi = 0; pi < PARAS.length; pi++) {
+    var card = document.createElement('div');
+    card.className = 'pcard';
+    var enP = document.createElement('p');
+    enP.className = 'para-en';
+    enP.id = 'en' + pi;
+
+    var sentences = splitSentences(PARAS[pi].en);
+    var paraVocabPositions = [];
+
+    for (var si = 0; si < sentences.length; si++) {
+      var parts = parseText(sentences[si]);
+      for (var k = 0; k < parts.length; k++) {
+        if (parts[k].type === 'w') {
+          paraVocabPositions.push({
+            si: si, ki: k,
+            word: parts[k].word, v: parts[k].v, zh: parts[k].zh,
+            sentence: sentences[si]
+          });
+        }
+      }
+    }
+
+    var numBlanks = Math.max(1, Math.round(paraVocabPositions.length * blankRatio));
+    var shuffledPositions = shuffle(paraVocabPositions.map(function(_, idx) { return idx; }));
+    var blankSet = {};
+    for (var b = 0; b < numBlanks && b < shuffledPositions.length; b++) {
+      blankSet[shuffledPositions[b]] = true;
+    }
+
+    for (var si = 0; si < sentences.length; si++) {
+      var sspan = document.createElement('span');
+      sspan.className = 'ssen';
+      sspan.dataset.paraIdx = pi;
+      sspan.dataset.sentIdx = si;
+
+      var parts = parseText(sentences[si]);
+      for (var k = 0; k < parts.length; k++) {
+        var pt = parts[k];
+        if (pt.type === 't') {
+          sspan.appendChild(document.createTextNode(pt.v));
+        } else {
+          var vocabIdx = -1;
+          for (var q = 0; q < paraVocabPositions.length; q++) {
+            if (paraVocabPositions[q].si === si && paraVocabPositions[q].ki === k) {
+              vocabIdx = q; break;
+            }
+          }
+
+          if (vocabIdx >= 0 && blankSet[vocabIdx]) {
+            var bid = 'blank-' + blankIdCounter++;
+            totalBlanks++;
+            blanksData[bid] = {
+              word: pt.word, display: pt.v, zh: pt.zh,
+              solved: false, sentence: sentences[si]
+            };
+            var wrap = document.createElement('span');
+            wrap.className = 'blank-wrap';
+            wrap.id = bid;
+
+            var speakerBtn = document.createElement('button');
+            speakerBtn.className = 'blank-speaker';
+            speakerBtn.innerHTML = '____&nbsp;🔊';
+            speakerBtn.title = '聽整句話，找出空格的單字';
+            (function(blankId, sentenceText, ssEl) {
+              speakerBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                stopAll();
+                closeAllPopups();
+                ssEl.classList.add('playing-sentence');
+                activeSentenceEl = ssEl;
+                speak(sentenceText, function() {});
+                var popup = document.getElementById(blankId + '-opts');
+                if (popup) { popup.classList.add('show'); activePopup = popup; }
+              });
+            })(bid, sentences[si], sspan);
+            wrap.appendChild(speakerBtn);
+
+            var popup = document.createElement('div');
+            popup.className = 'blank-opts-popup';
+            popup.id = bid + '-opts';
+            var hintDiv = document.createElement('div');
+            hintDiv.className = 'blank-hint';
+            hintDiv.textContent = '👂 哪個單字不見了？';
+            popup.appendChild(hintDiv);
+            var options = generateOptions(pt.word);
+            for (var oi = 0; oi < options.length; oi++) {
+              var optBtn = document.createElement('button');
+              optBtn.className = 'blank-opt-btn';
+              optBtn.textContent = options[oi];
+              (function(blankId, selected, btn) {
+                optBtn.addEventListener('click', function(e) {
+                  e.stopPropagation();
+                  checkBlankAnswer(blankId, selected, btn);
+                });
+              })(bid, options[oi], optBtn);
+              popup.appendChild(optBtn);
+            }
+            wrap.appendChild(popup);
+            sspan.appendChild(wrap);
+          } else {
+            var sp = document.createElement('span');
+            sp.className = 'vw';
+            sp.textContent = pt.v;
+            sp.title = pt.word + ' = ' + pt.zh;
+            (function(el, word) {
+              el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                stopAll(); closeAllPopups();
+                el.classList.add('speaking');
+                speak(word, function() { el.classList.remove('speaking'); });
+              });
+            })(sp, pt.word);
+            sspan.appendChild(sp);
+          }
+        }
+      }
+      enP.appendChild(sspan);
+      if (si < sentences.length - 1) enP.appendChild(document.createTextNode(' '));
+    }
+    card.appendChild(enP);
+
+    var zhP = document.createElement('div');
+    zhP.className = 'para-zh';
+    zhP.textContent = PARAS[pi].zh;
+    card.appendChild(zhP);
+
+    var ctrl = document.createElement('div');
+    ctrl.className = 'pctrl';
+
+    (function(zhDiv) {
+      var bz = document.createElement('button');
+      bz.className = 'btn btn-zh';
+      bz.textContent = '🔤 中文翻譯';
+      bz.addEventListener('click', function() {
+        if (zhDiv.style.display === 'block') {
+          zhDiv.style.display = 'none'; bz.textContent = '🔤 中文翻譯';
+        } else {
+          zhDiv.style.display = 'block'; bz.textContent = '🔤 隱藏中文';
+        }
+      });
+      ctrl.appendChild(bz);
+    })(zhP);
+
+    (function(idx, enEl) {
+      var br = document.createElement('button');
+      br.className = 'btn btn-read';
+      br.textContent = '🔊 朗讀';
+      br.addEventListener('click', function() {
+        if (activeReadBtn === br) { stopAll(); return; }
+        stopAll(); closeAllPopups();
+        activeReadBtn = br;
+        br.textContent = '⏹ 停止'; br.className = 'btn btn-stop';
+        var spans = enEl.querySelectorAll('.ssen');
+        if (spans.length === 0) {
+          speak(PARAS[idx].en, function() {
+            br.textContent = '🔊 朗讀'; br.className = 'btn btn-read'; activeReadBtn = null;
+          });
+          return;
+        }
+        var si = 0;
+        function readNext() {
+          if (si >= spans.length || activeReadBtn !== br) {
+            for (var j = 0; j < spans.length; j++) spans[j].classList.remove('highlight');
+            if (activeReadBtn === br) {
+              br.textContent = '🔊 朗讀'; br.className = 'btn btn-read'; activeReadBtn = null;
+            }
+            return;
+          }
+          for (var j = 0; j < spans.length; j++) spans[j].classList.remove('highlight');
+          spans[si].classList.add('highlight');
+          var fullSentence = splitSentences(PARAS[idx].en)[si] || '';
+          speak(fullSentence, function() { si++; readNext(); });
+        }
+        readNext();
+      });
+      ctrl.appendChild(br);
+    })(pi, enP);
+
+    card.appendChild(ctrl);
+    cont.appendChild(card);
+  }
+  updateProgress();
+}
+
+/* ============================================================
+   CHECK BLANK
+   ============================================================ */
+function checkBlankAnswer(blankId, selected, btnEl) {
+  var data = blanksData[blankId];
+  if (!data || data.solved) return;
+  if (selected.toLowerCase() === data.word.toLowerCase()) {
+    data.solved = true;
+    solvedBlanks++;
+    closeAllPopups();
+    var wrap = document.getElementById(blankId);
+    var solved = document.createElement('span');
+    solved.className = 'blank-solved';
+    solved.textContent = data.display;
+    solved.title = data.word + ' = ' + data.zh;
+    (function(el, word) {
+      el.addEventListener('click', function(e) {
+        e.stopPropagation(); stopAll();
+        el.classList.add('speaking');
+        speak(word, function() { el.classList.remove('speaking'); });
+      });
+    })(solved, data.word);
+    wrap.parentNode.replaceChild(solved, wrap);
+    updateProgress();
+    stopAll();
+    speak(data.word);
+  } else {
+    btnEl.classList.add('wrong');
+  }
+}
+
+/* ============================================================
+   WORD CHIPS
+   ============================================================ */
+function buildChips() {
+  var cont = document.getElementById('chips');
+  cont.innerHTML = '';
+  var allWords = VOCAB.concat(EXTRA_CHIPS);
+  for (var i = 0; i < allWords.length; i++) {
+    (function(en, zh) {
+      var chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = en + ' ' + zh;
+      chip.title = en + ' = ' + zh;
+      chip.addEventListener('click', function() {
+        stopAll(); closeAllPopups();
+        chip.classList.add('speaking');
+        speak(en, function() { chip.classList.remove('speaking'); });
+      });
+      cont.appendChild(chip);
+    })(allWords[i][0], allWords[i][1]);
+  }
+}
+
+/* ============================================================
+   BUILD QUIZ
+   ============================================================ */
+function buildQuiz() {
+  var cont = document.getElementById('qcont');
+  cont.innerHTML = '';
+  quizAnswers = {};
+  quizSubmitted = false;
+  document.getElementById('sub-btn').disabled = false;
+  document.getElementById('scoreboard').classList.remove('show');
+
+  var listenRatio = { easy: 0.2, medium: 0.4, hard: 0.6 }[difficulty];
+  var numListen = Math.max(1, Math.round(QUIZ.length * listenRatio));
+  var indices = [];
+  for (var i = 0; i < QUIZ.length; i++) indices.push(i);
+  var shuffledIdx = shuffle(indices);
+  quizListenModes = {};
+  for (var i = 0; i < numListen && i < shuffledIdx.length; i++) {
+    quizListenModes[shuffledIdx[i]] = Math.random() < 0.5 ? 'stem' : 'options';
+  }
+
+  for (var qi = 0; qi < QUIZ.length; qi++) {
+    var q = QUIZ[qi];
+    var listenMode = quizListenModes[qi] || 'none';
+    var card = document.createElement('div');
+    card.className = 'qcard'; card.id = 'qcard' + qi;
+
+    var hdr = document.createElement('div');
+    hdr.className = 'qhdr';
+    var qnum = document.createElement('span');
+    qnum.className = 'qnum'; qnum.textContent = (qi + 1);
+    hdr.appendChild(qnum);
+
+    var qtxt = document.createElement('span');
+    qtxt.className = 'qtxt'; qtxt.id = 'qtxt' + qi;
+    if (listenMode === 'stem') {
+      var hl = document.createElement('span');
+      hl.className = 'qtxt-hidden';
+      hl.textContent = '👂 Click 🔊 to listen to the question';
+      qtxt.appendChild(hl);
+      qtxt.dataset.fullText = q.q;
+    } else {
+      qtxt.textContent = q.q;
+    }
+    hdr.appendChild(qtxt);
+
+    var spkBtn = document.createElement('button');
+    spkBtn.className = 'qspk'; spkBtn.textContent = '🔊'; spkBtn.title = '聽題目';
+    (function(text, btn) {
+      btn.addEventListener('click', function() {
+        stopAll(); closeAllPopups();
+        btn.classList.add('speaking');
+        speak(text, function() { btn.classList.remove('speaking'); });
+      });
+    })(q.q, spkBtn);
+    hdr.appendChild(spkBtn);
+    card.appendChild(hdr);
+
+    var grid = document.createElement('div');
+    grid.className = 'ogrid';
+    for (var oi = 0; oi < q.opts.length; oi++) {
+      (function(qIdx, optIdx, optText, myGrid, mode) {
+        var ob = document.createElement('button');
+        ob.className = 'obtn'; ob.id = 'obtn-' + qIdx + '-' + optIdx;
+        if (mode === 'options') {
+          var os = document.createElement('span');
+          os.className = 'opt-speaker'; os.textContent = '🔊';
+          ob.appendChild(os);
+          ob.appendChild(document.createTextNode(' 聽選項 ' + String.fromCharCode(65 + optIdx)));
+          ob.dataset.fullText = optText;
+          ob.addEventListener('mouseenter', function() {
+            if (quizSubmitted) return; stopAll(); speak(optText);
+          });
+        } else {
+          ob.textContent = String.fromCharCode(65 + optIdx) + '. ' + optText;
+        }
+        ob.addEventListener('click', function() {
+          if (quizSubmitted) return;
+          var sibs = myGrid.querySelectorAll('.obtn');
+          for (var s = 0; s < sibs.length; s++) sibs[s].classList.remove('sel');
+          ob.classList.add('sel');
+          quizAnswers[qIdx] = optIdx;
+          if (mode === 'options') { stopAll(); speak(optText); }
+        });
+        myGrid.appendChild(ob);
+      })(qi, oi, q.opts[oi], grid, listenMode);
+    }
+    card.appendChild(grid);
+
+    var fb = document.createElement('div');
+    fb.className = 'qfb'; fb.id = 'qfb' + qi;
+    card.appendChild(fb);
+    cont.appendChild(card);
+  }
+}
+
+/* ============================================================
+   SUBMIT QUIZ
+   ============================================================ */
+function submitQuiz() {
+  if (quizSubmitted) return;
+  var total = QUIZ.length;
+  if (Object.keys(quizAnswers).length < total) {
+    alert('請先回答所有 ' + total + ' 題喔！\nPlease answer all ' + total + ' questions!');
+    return;
+  }
+  quizSubmitted = true;
+  document.getElementById('sub-btn').disabled = true;
+  var score = 0;
+
+  for (var qi = 0; qi < QUIZ.length; qi++) {
+    var q = QUIZ[qi];
+    var card = document.getElementById('qcard' + qi);
+    var fb = document.getElementById('qfb' + qi);
+    var userAns = quizAnswers[qi];
+    var correctIdx = q.ans;
+    var isCorrect = (userAns === correctIdx);
+
+    var qtxt = document.getElementById('qtxt' + qi);
+    if (qtxt.dataset.fullText) qtxt.textContent = q.q;
+
+    if (isCorrect) {
+      score++;
+      card.classList.add('qok');
+      fb.className = 'qfb fbok';
+      fb.textContent = '✅ Correct! 正確！';
+    } else {
+      card.classList.add('qno');
+      fb.className = 'qfb fbno';
+      fb.textContent = '❌ Answer: ' + String.fromCharCode(65 + correctIdx) + '. ' + q.opts[correctIdx];
+    }
+    fb.style.display = 'block';
+
+    var btns = card.querySelectorAll('.obtn');
+    for (var bi = 0; bi < btns.length; bi++) {
+      btns[bi].disabled = true;
+      if (btns[bi].dataset.fullText) btns[bi].textContent = String.fromCharCode(65 + bi) + '. ' + q.opts[bi];
+      if (bi === correctIdx) btns[bi].classList.add('ok');
+      else if (bi === userAns && !isCorrect) btns[bi].classList.add('no');
+    }
+  }
+
+  var sb = document.getElementById('scoreboard');
+  document.getElementById('score-big').textContent = score + ' / ' + total;
+  var msg = '';
+  if (score === total) msg = '🎉 滿分！太厲害了！Perfect score!';
+  else if (score >= 8) msg = '👏 非常棒！Almost perfect!';
+  else if (score >= 6) msg = '😊 不錯喔！Good job!';
+  else if (score >= 4) msg = '💪 繼續加油！Keep trying!';
+  else msg = '📖 再仔細讀一次故事吧！Read the story again!';
+  document.getElementById('score-msg').textContent = msg;
+  sb.classList.add('show');
+  sb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ============================================================
+   REBUILD / DIFFICULTY / INIT
+   ============================================================ */
+function rebuildAll() { stopAll(); closeAllPopups(); buildStory(); buildQuiz(); }
+
+function setDifficulty(diff) {
+  difficulty = diff;
+  var btns = document.querySelectorAll('.diff-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].className = 'diff-btn';
+    if (btns[i].dataset.diff === diff) btns[i].classList.add('active-' + diff);
+  }
+  rebuildAll();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = function() {};
+  }
+
+  var slider = document.getElementById('speed-slider');
+  var sval = document.getElementById('speed-val');
+  slider.addEventListener('input', function() {
+    speechRate = parseFloat(slider.value);
+    sval.textContent = speechRate.toFixed(2) + 'x';
+  });
+
+  var diffBtns = document.querySelectorAll('.diff-btn');
+  for (var i = 0; i < diffBtns.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() { setDifficulty(btn.dataset.diff); });
+    })(diffBtns[i]);
+  }
+
+  document.addEventListener('click', function(e) {
+    if (activePopup && !e.target.closest('.blank-wrap')) closeAllPopups();
+  });
+
+  document.getElementById('go-quiz-btn').addEventListener('click', function() {
+    document.getElementById('quiz-anchor').scrollIntoView({ behavior: 'smooth' });
+  });
+  document.getElementById('sub-btn').addEventListener('click', submitQuiz);
+  document.getElementById('retry-btn').addEventListener('click', function() {
+    buildQuiz();
+    document.getElementById('quiz-anchor').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  buildChips();
+  setDifficulty('medium');
+});
+</script>
+</body>
+</html>
