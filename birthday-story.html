@@ -43,6 +43,13 @@ header p { color: rgba(255,255,255,.92); font-size: .88rem; margin-top: 6px; fon
   font-weight: 900; color: var(--pink); font-size: .95rem; min-width: 42px;
   text-align: center; background: #fff0f6; border-radius: 8px; padding: 3px 8px;
 }
+#voice-select {
+  flex: 1; min-width: 140px; padding: 6px 10px; border-radius: 10px;
+  border: 2px solid #f0c0d8; background: #fff0f6; font-family: inherit;
+  font-size: .85rem; font-weight: 700; color: var(--ink); cursor: pointer;
+  outline: none; transition: border-color .2s;
+}
+#voice-select:focus { border-color: var(--pink); }
 .ctrl-hint { font-size: .75rem; color: #999; width: 100%; margin-top: 2px; }
 
 .chip-banner {
@@ -366,6 +373,10 @@ footer span { color: var(--pink); }
 
 <div class="ctrl-panel container">
   <div class="ctrl-row">
+    <span class="ctrl-label">🗣️ 發音人員</span>
+    <select id="voice-select"><option value="">載入中…</option></select>
+  </div>
+  <div class="ctrl-row">
     <span class="ctrl-label">🐢 發音速度</span>
     <input type="range" id="speed-slider" min="0.5" max="1.2" step="0.05" value="0.8">
     <span id="speed-val">0.80x</span>
@@ -664,11 +675,47 @@ var READING = [
 ];
 
 var speechRate = 0.8;
+var selectedVoice = null;
+var enVoices = [];
 var solvedBlanks = {};
 var totalBlanks = LISTENING.length;
 var readingAnswers = {};
 var readingSubmitted = false;
 var readingListenModes = {};
+
+function populateVoices() {
+  if (!window.speechSynthesis) return;
+  var all = speechSynthesis.getVoices();
+  enVoices = [];
+  for (var i = 0; i < all.length; i++) {
+    if (all[i].lang && all[i].lang.indexOf('en') === 0) enVoices.push(all[i]);
+  }
+  var sel = document.getElementById('voice-select');
+  var prev = sel.value;
+  sel.innerHTML = '';
+  if (enVoices.length === 0) {
+    var op = document.createElement('option');
+    op.value = ''; op.textContent = '（無可用英語語音）';
+    sel.appendChild(op);
+    return;
+  }
+  for (var i = 0; i < enVoices.length; i++) {
+    var v = enVoices[i];
+    var op = document.createElement('option');
+    op.value = i;
+    var label = v.name;
+    if (v.lang !== 'en-US') label += ' (' + v.lang + ')';
+    if (v.localService) label += ' ★';
+    op.textContent = label;
+    sel.appendChild(op);
+  }
+  if (prev && prev < enVoices.length) {
+    sel.value = prev;
+  } else {
+    sel.value = '0';
+  }
+  selectedVoice = enVoices[parseInt(sel.value)] || null;
+}
 
 function stopAll() {
   try { speechSynthesis.cancel(); } catch(e) {}
@@ -682,10 +729,7 @@ function speak(text, onEnd) {
   if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
   var u = new SpeechSynthesisUtterance(text);
   u.lang = 'en-US'; u.rate = speechRate;
-  var voices = speechSynthesis.getVoices();
-  for (var i = 0; i < voices.length; i++) {
-    if (voices[i].lang && voices[i].lang.indexOf('en') === 0) { u.voice = voices[i]; break; }
-  }
+  if (selectedVoice) u.voice = selectedVoice;
   u.onend = function() { if (onEnd) onEnd(); };
   u.onerror = function() { if (onEnd) onEnd(); };
   speechSynthesis.speak(u);
@@ -1211,9 +1255,17 @@ function submitReadingQuiz() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  populateVoices();
   if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = function() {};
+    speechSynthesis.onvoiceschanged = populateVoices;
   }
+
+  document.getElementById('voice-select').addEventListener('change', function() {
+    var idx = parseInt(this.value);
+    selectedVoice = (idx >= 0 && idx < enVoices.length) ? enVoices[idx] : null;
+    stopAll();
+    speak('Hello!');
+  });
 
   var slider = document.getElementById('speed-slider');
   var sval = document.getElementById('speed-val');
