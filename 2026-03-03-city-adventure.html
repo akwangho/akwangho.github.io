@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="date-created" content="2026-03-03T12:00:00+00:00">
+<title>Lily's Big City Adventure — 英語聽力與閱讀測驗</title>
+<style>
+:root {
+  --pink: #E91E8C; --sky: #5BC8F5; --sun: #FFD93D; --grass: #6BCB77;
+  --coral: #FF6B6B; --lavender: #C3A6FF; --peach: #FFB347; --ink: #2D3047;
+  --card: #FFFDF5; --shadow: 0 4px 20px rgba(45,48,71,.10); --r: 18px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', 'Noto Sans TC', 'PingFang TC', -apple-system, sans-serif;
+  background: linear-gradient(160deg, #e6f0ff, #fff9e6 50%, #e6f9f0);
+  min-height: 100vh; color: var(--ink); padding-bottom: 60px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+header {
+  background: linear-gradient(135deg, #5BC8F5, #3AAFDF, var(--lavender));
+  padding: 30px 20px 24px; text-align: center;
+  box-shadow: 0 6px 24px rgba(91,200,245,.30);
+}
+header h1 {
+  font-size: clamp(1.4rem, 5vw, 2.4rem); color: #fff; font-weight: 900;
+  text-shadow: 3px 3px 0 rgba(0,0,0,.12); line-height: 1.3;
+}
+header p { color: rgba(255,255,255,.92); font-size: .88rem; margin-top: 6px; font-weight: 700; }
+
+.container { max-width: 740px; margin: 0 auto; padding: 0 14px; }
+
+.ctrl-panel {
+  background: #fff; border-radius: var(--r); margin: 16px auto; max-width: 740px;
+  padding: 16px 20px; box-shadow: var(--shadow);
+}
+.ctrl-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.ctrl-row:last-child { margin-bottom: 0; }
+.ctrl-label { font-weight: 800; font-size: .9rem; white-space: nowrap; min-width: 100px; }
+#speed-slider { flex: 1; min-width: 100px; accent-color: var(--sky); cursor: pointer; height: 6px; }
+#speed-val {
+  font-weight: 900; color: var(--sky); font-size: .95rem; min-width: 42px;
+  text-align: center; background: #e6f4ff; border-radius: 8px; padding: 3px 8px;
+}
+#voice-select {
+  flex: 1; min-width: 140px; padding: 6px 10px; border-radius: 10px;
+  border: 2px solid #b0d8f0; background: #e6f4ff; font-family: inherit;
+  font-size: .85rem; font-weight: 700; color: var(--ink); cursor: pointer;
+  outline: none; transition: border-color .2s;
+}
+#voice-select:focus { border-color: var(--sky); }
+.ctrl-hint { font-size: .75rem; color: #999; width: 100%; margin-top: 2px; }
+
+details.chip-banner {
+  background: linear-gradient(90deg, #b6d5ff, #d6e8ff);
+  border-radius: var(--r); margin: 0 auto 12px; max-width: 740px;
+  padding: 14px 18px; box-shadow: var(--shadow);
+}
+details.chip-banner summary {
+  font-size: .95rem; font-weight: 800; color: var(--ink);
+  cursor: pointer; user-select: none; list-style: none;
+  display: flex; align-items: center; gap: 6px;
+}
+details.chip-banner summary::-webkit-details-marker { display: none; }
+details.chip-banner summary::marker { display: none; content: ''; }
+details.chip-banner summary .arrow {
+  display: inline-block; transition: transform .3s ease; font-size: .7rem;
+}
+details.chip-banner[open] summary .arrow { transform: rotate(90deg); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  background: rgba(255,255,255,.78); border-radius: 50px; padding: 4px 12px;
+  font-size: .8rem; font-weight: 700; cursor: pointer; border: 2px solid rgba(255,255,255,.9);
+  transition: background .2s, transform .15s; color: var(--ink); user-select: none;
+}
+.chip:hover { background: #fff; transform: scale(1.05); }
+.chip.speaking { background: #FFE566; }
+
+.sec-title {
+  text-align: center; font-size: clamp(1.2rem, 4vw, 1.8rem); font-weight: 900;
+  margin: 22px 0 12px; color: var(--ink);
+}
+.sec-title span {
+  background: linear-gradient(135deg, #5BC8F5, var(--lavender));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.progress-wrap { max-width: 740px; margin: 0 auto 14px; padding: 0 14px; }
+.progress-bar-outer {
+  background: #e8e8e8; border-radius: 50px; height: 28px; position: relative;
+  overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,.08);
+}
+.progress-bar-inner {
+  background: linear-gradient(90deg, #5BC8F5, #3AAFDF);
+  height: 100%; border-radius: 50px; transition: width .5s ease;
+  display: flex; align-items: center; justify-content: center; min-width: 40px;
+}
+.progress-text {
+  font-size: .78rem; font-weight: 800; color: #fff;
+  text-shadow: 1px 1px 1px rgba(0,0,0,.2); white-space: nowrap; padding: 0 10px;
+}
+
+.pcard {
+  background: var(--card); border-radius: var(--r); padding: 18px 20px;
+  margin-bottom: 14px; box-shadow: var(--shadow); border-left: 5px solid var(--sky);
+}
+.pcard:nth-child(4n+2) { border-left-color: var(--lavender); }
+.pcard:nth-child(4n+3) { border-left-color: var(--grass); }
+.pcard:nth-child(4n) { border-left-color: var(--peach); }
+.para-en { font-size: 1.05rem; line-height: 2.2; color: var(--ink); }
+.vw {
+  color: #1565c0; background: #e3f2fd; border-radius: 6px; padding: 1px 5px;
+  cursor: pointer; font-weight: 800; border-bottom: 2px solid #1565c0;
+  transition: background .18s, color .18s;
+}
+.vw:hover { background: #bbdefb; color: #0d47a1; }
+.vw.speaking { background: #FFE566; color: #7a4000; border-bottom-color: #E8A000; }
+.ssen { transition: background .3s; border-radius: 4px; padding: 2px 0; }
+.ssen.highlight { background: #FFF3CD; }
+
+.story-blank {
+  display: inline-block; vertical-align: baseline;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border: 2.5px dashed #FF9800; border-radius: 10px;
+  padding: 4px 14px; cursor: pointer; font-size: .88rem;
+  font-weight: 700; color: #E65100; letter-spacing: 1px;
+  transition: transform .15s, box-shadow .2s; user-select: none;
+  animation: pulse-blank 2s infinite; line-height: 1.6;
+}
+.story-blank:hover { transform: scale(1.03); box-shadow: 0 2px 12px rgba(255,152,0,.35); }
+@keyframes pulse-blank {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,152,0,.3); }
+  50% { box-shadow: 0 0 0 6px rgba(255,152,0,0); }
+}
+.story-revealed {
+  display: inline; color: #1b5e20; background: #c8e6c9; border-radius: 6px;
+  padding: 2px 6px; font-weight: 800; border-bottom: 2px solid var(--grass);
+  cursor: pointer; animation: pop-in .4s ease; transition: background .3s;
+}
+.story-revealed:hover { background: #a5d6a7; }
+.story-revealed.speaking { background: #FFE566; color: #7a4000; border-bottom-color: #E8A000; }
+.story-revealed.highlight { background: #FFF3CD; color: #7a4000; border-bottom-color: #E8A000; }
+
+.para-zh {
+  display: none; margin-top: 10px; padding: 10px 14px;
+  background: linear-gradient(135deg, #f0fff4, #e8f4ff); border-radius: 12px;
+  font-size: .9rem; line-height: 1.8; color: #555; border: 1px dashed #bbb;
+}
+.pctrl { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 5px; padding: 7px 15px;
+  border-radius: 50px; border: none; cursor: pointer; font-family: inherit;
+  font-size: .82rem; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  transition: transform .15s, box-shadow .15s; user-select: none;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.16); }
+.btn:active { transform: scale(.97); }
+.btn-zh { background: linear-gradient(135deg, #a8e6cf, #67d7aa); color: #1a5c3a; }
+.btn-read { background: linear-gradient(135deg, #90caf9, #42a5f5); color: #fff; }
+.btn-stop { background: linear-gradient(135deg, #ffb347, #ff8000); color: #fff; }
+
+.go-quiz {
+  display: block; margin: 20px auto 10px;
+  background: linear-gradient(135deg, var(--sky), #3AAFDF); color: #fff;
+  padding: 14px 32px; border-radius: 50px; border: none; cursor: pointer;
+  font-family: inherit; font-size: 1.1rem; font-weight: 800;
+  box-shadow: 0 4px 14px rgba(91,200,245,.5); transition: transform .15s;
+}
+.go-quiz:hover { transform: scale(1.05); }
+.go-quiz.btn-purple {
+  background: linear-gradient(135deg, var(--lavender), #9B59D8);
+  box-shadow: 0 4px 14px rgba(195,166,255,.5);
+}
+
+.qsec { max-width: 740px; margin: 8px auto 0; padding: 0 14px; }
+.qintro {
+  background: linear-gradient(135deg, #e0ecff, #d2e8ff);
+  border-radius: var(--r); padding: 18px 22px; margin-bottom: 18px;
+  text-align: center; box-shadow: var(--shadow);
+}
+.qintro p { font-size: .95rem; font-weight: 700; color: var(--ink); }
+.qintro p + p { font-size: .82rem; color: #666; margin-top: 6px; }
+.qintro .big-icon { font-size: 2rem; display: block; margin-bottom: 6px; }
+
+.qcard {
+  background: var(--card); border-radius: var(--r); padding: 20px 22px;
+  margin-bottom: 16px; box-shadow: var(--shadow); border-top: 4px solid #ddd;
+  transition: border-color .3s;
+}
+.qcard.qok { border-top-color: var(--grass); }
+.qcard.qno { border-top-color: var(--coral); }
+.qcard.solved { border-top-color: var(--grass); }
+
+.qhdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.qnum {
+  background: linear-gradient(135deg, #5BC8F5, #3AAFDF); color: #fff;
+  border-radius: 50%; width: 34px; height: 34px; min-width: 34px; text-align: center;
+  line-height: 34px; font-size: .9rem; font-weight: 900;
+}
+
+.sentence-blank {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border: 2.5px dashed #FF9800; border-radius: 12px;
+  padding: 10px 16px; min-height: 48px;
+  animation: pulse-blank 2s infinite;
+}
+.sentence-blank.solved {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border-color: var(--grass); animation: none;
+}
+.sentence-blank .blank-text {
+  flex: 1; font-size: .95rem; font-weight: 700; color: #E65100;
+  letter-spacing: 2px;
+}
+.sentence-blank.solved .blank-text { color: #2e7d32; letter-spacing: 0; font-size: .9rem; }
+.sentence-blank .listen-btn {
+  background: linear-gradient(135deg, #FF9800, #F57C00); color: #fff;
+  border: none; border-radius: 50px; padding: 8px 16px; cursor: pointer;
+  font-family: inherit; font-size: .88rem; font-weight: 800;
+  box-shadow: 0 2px 8px rgba(255,152,0,.3);
+  transition: transform .15s, box-shadow .15s; white-space: nowrap;
+}
+.sentence-blank .listen-btn:hover { transform: scale(1.06); }
+.sentence-blank .listen-btn:active { transform: scale(.95); }
+.sentence-blank .listen-btn.speaking { background: linear-gradient(135deg, #FFE566, #FFC107); color: #7a4000; }
+
+.ogrid { display: flex; flex-direction: column; gap: 8px; }
+.obtn {
+  background: #f8f5ff; border: 2.5px solid #e0d4ff; border-radius: 14px;
+  padding: 12px 16px; text-align: left; cursor: pointer; font-family: inherit;
+  font-size: .9rem; font-weight: 600; color: var(--ink);
+  transition: all .18s; user-select: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.obtn:hover:not(:disabled) { background: #ece4ff; border-color: #b39ddb; transform: scale(1.01); }
+.obtn .opt-label {
+  background: linear-gradient(135deg, #5BC8F5, #3AAFDF); color: #fff; border-radius: 50%;
+  width: 28px; height: 28px; min-width: 28px; text-align: center;
+  line-height: 28px; font-size: .8rem; font-weight: 900;
+}
+.obtn .opt-text { flex: 1; line-height: 1.5; }
+.obtn.sel { background: #e0d4ff; border-color: #9c27b0; font-weight: 800; }
+.obtn.ok {
+  background: #c8f5d5; border-color: var(--grass); color: #1a5c3a; font-weight: 800;
+}
+.obtn.no {
+  background: #ffd6d6; border-color: var(--coral); color: #8b1a1a; font-weight: 800;
+  opacity: .55; pointer-events: none;
+}
+.obtn:disabled { cursor: default; }
+
+.qfb {
+  display: none; margin-top: 10px; padding: 10px 14px;
+  border-radius: 12px; font-weight: 700; font-size: .88rem;
+}
+.fbok { background: #d4edda; color: #155724; }
+.fbno { background: #f8d7da; color: #721c24; }
+
+.qtxt { font-size: .95rem; font-weight: 700; line-height: 1.6; flex: 1; }
+.qtxt-hidden {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: #FF9800; font-style: italic;
+}
+.qspk {
+  background: none; border: none; cursor: pointer; font-size: 1.2rem;
+  padding: 2px 6px; border-radius: 8px; transition: transform .15s, background .2s;
+  line-height: 1; flex-shrink: 0;
+}
+.qspk:hover { background: #eee; transform: scale(1.15); }
+.qspk.speaking { background: #FFE566; }
+
+.r-ogrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+@media (max-width: 500px) { .r-ogrid { grid-template-columns: 1fr; } }
+.r-obtn {
+  background: #F4F0FF; border: 2px solid #D4C8FF; border-radius: 12px;
+  padding: 10px 14px; text-align: left; cursor: pointer; font-family: inherit;
+  font-size: .88rem; font-weight: 600; color: var(--ink);
+  transition: background .18s, border-color .18s, transform .12s; user-select: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.r-obtn:hover:not(:disabled) { background: #E4D8FF; border-color: #A78BE0; transform: scale(1.02); }
+.r-obtn.sel { background: #D4C8FF; border-color: #7C4DFF; font-weight: 800; }
+.r-obtn.ok { background: #C8F5D5; border-color: var(--grass); color: #1a5c3a; font-weight: 800; }
+.r-obtn.no { background: #FFD6D6; border-color: var(--coral); color: #8B1A1A; font-weight: 800; }
+.r-obtn:disabled { cursor: default; }
+.r-obtn .opt-speaker {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; cursor: pointer; padding: 2px; flex-shrink: 0;
+}
+
+.submit-row { text-align: center; margin: 16px 0 22px; }
+.bsub {
+  background: linear-gradient(135deg, var(--grass), #4CAF50); color: #fff;
+  font-size: 1.1rem; padding: 14px 40px; border-radius: 50px; border: none;
+  cursor: pointer; font-family: inherit; font-weight: 800;
+  box-shadow: 0 4px 18px rgba(107,203,119,.45); transition: transform .15s, opacity .2s;
+}
+.bsub:hover { transform: scale(1.04); }
+.bsub:disabled { opacity: .5; cursor: default; transform: none; }
+
+.locked-msg {
+  text-align: center; padding: 30px 20px;
+  background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+  border-radius: var(--r); margin: 0 auto 18px; max-width: 740px;
+  box-shadow: var(--shadow); font-size: 1rem; font-weight: 700; color: #888;
+}
+.locked-msg .lock-icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+.locked-msg.unlocked {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  color: #2e7d32; animation: pop-in .5s ease;
+}
+
+.scoreboard {
+  display: none; background: linear-gradient(135deg, var(--sun), var(--peach));
+  border-radius: var(--r); padding: 28px 22px; margin: 18px auto 0;
+  max-width: 740px; text-align: center; box-shadow: var(--shadow);
+}
+.scoreboard.show { display: block; animation: pop-in .4s ease; }
+.scoreboard h2 { font-size: 1.6rem; font-weight: 900; color: var(--ink); margin-bottom: 8px; }
+.score-big {
+  font-size: 3.8rem; font-weight: 900; color: var(--coral); line-height: 1;
+  text-shadow: 3px 3px 0 rgba(0,0,0,.08);
+}
+.score-msg { font-size: 1rem; font-weight: 700; color: #555; margin-top: 10px; }
+.bretry {
+  margin-top: 16px; background: linear-gradient(135deg, #5BC8F5, #3AAFDF); color: #fff;
+  font-size: 1rem; padding: 12px 28px; border-radius: 50px; border: none; cursor: pointer;
+  font-family: inherit; font-weight: 800; box-shadow: 0 4px 14px rgba(91,200,245,.4);
+  transition: transform .15s;
+}
+.bretry:hover { transform: scale(1.05); }
+
+.nav-links { text-align: center; margin: 18px 0; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 0 14px; }
+.nav-link {
+  display: inline-block; padding: 12px 24px; border-radius: 50px;
+  text-decoration: none; font-weight: 800; font-size: .92rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,.12); transition: transform .15s;
+}
+.nav-link:hover { transform: scale(1.05); }
+.nav-link-blue { background: linear-gradient(135deg, var(--sky), #3AAFDF); color: #fff; }
+.nav-link-purple { background: linear-gradient(135deg, #9B59D8, #6a3de8); color: #fff; }
+
+footer {
+  text-align: center; padding: 22px; color: #aaa; font-size: .76rem; margin-top: 8px;
+}
+footer span { color: var(--sky); }
+
+@keyframes pop-in {
+  0% { transform: scale(.7); opacity: 0; }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+@keyframes celebrate {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.1) rotate(-2deg); }
+  50% { transform: scale(1.15) rotate(2deg); }
+  75% { transform: scale(1.1) rotate(-1deg); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 480px) {
+  header { padding: 20px 14px 18px; }
+  .pcard, .qcard { padding: 14px 14px; }
+  .sentence-blank { flex-direction: column; gap: 6px; text-align: center; }
+  .para-en { font-size: .95rem; line-height: 2; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏙️ Lily的城市大冒險</h1>
+  <p>Lily's Big City Adventure ｜ 四年級英語聽力與閱讀測驗</p>
+  <p style="margin-top:8px;font-size:.78rem;opacity:.75;">📅 建立日期：2026-03-03</p>
+</header>
+
+<div class="ctrl-panel container">
+  <div class="ctrl-row">
+    <span class="ctrl-label">🗣️ 發音人員</span>
+    <select id="voice-select"><option value="">載入中…</option></select>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">🐢 發音速度</span>
+    <input type="range" id="speed-slider" min="0.5" max="1.2" step="0.05" value="0.8">
+    <span id="speed-val">0.80x</span>
+  </div>
+  <div class="ctrl-hint">先完成下方聽力測驗，讓故事空白處一一揭曉！點擊藍色單字可聽發音 🔊</div>
+</div>
+
+<details class="chip-banner container" id="vocab-details">
+  <summary><span class="arrow">▶</span> 📚 本課重點單字 — 點一下展開聽發音！</summary>
+  <div class="chips" id="chips"></div>
+</details>
+
+<h2 class="sec-title"><span>📖 故事：Lily的城市大冒險</span></h2>
+
+<div class="progress-wrap">
+  <div class="progress-bar-outer">
+    <div class="progress-bar-inner" id="prog-bar" style="width:8%">
+      <span class="progress-text" id="prog-text">0 / 10</span>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="story"></div>
+
+<button class="go-quiz" id="go-listen-btn">🎧 開始聽力測驗！Start Listening Quiz</button>
+
+<h2 class="sec-title" id="listen-anchor"><span>🎧 聽力測驗 Listening Quiz</span></h2>
+<div class="qsec">
+  <div class="qintro">
+    <span class="big-icon">👂</span>
+    <p>點擊 🔊 聽句子，從四個相似選項中選出你聽到的句子。</p>
+    <p>答對後，故事中對應的空白就會揭曉！每個選項只差一點點，要仔細聽喔！</p>
+  </div>
+  <div id="lcont"></div>
+</div>
+
+<button class="go-quiz btn-purple" id="go-reading-btn" style="display:none;">📝 開始閱讀測驗！Start Reading Quiz</button>
+
+<div id="reading-lock" class="locked-msg">
+  <span class="lock-icon">🔒</span>
+  請先完成聽力測驗，解鎖完整故事後再開始閱讀測驗！<br>
+  Complete the listening quiz to unlock the reading quiz!
+</div>
+
+<h2 class="sec-title" id="reading-anchor" style="display:none;"><span>📝 閱讀測驗 Reading Quiz</span></h2>
+<div class="qsec" id="reading-sec" style="display:none;">
+  <div class="qintro">
+    <p>📖 根據故事回答以下 10 題，選出最正確的答案。</p>
+    <p>部分題目或選項只有 🔊 圖示，請仔細聽！</p>
+  </div>
+  <div id="rcont"></div>
+  <div class="submit-row">
+    <button class="bsub" id="rsub-btn">🎯 提交答案 Submit</button>
+  </div>
+</div>
+
+<div class="scoreboard" id="scoreboard">
+  <h2>🏆 測驗結果 Quiz Result 🏆</h2>
+  <div class="score-big" id="score-big">0 / 10</div>
+  <div class="score-msg" id="score-msg"></div>
+  <button class="bretry" id="retry-btn">🔄 再來一次 Try Again</button>
+</div>
+
+<div class="nav-links">
+  <a class="nav-link nav-link-blue" href="index.html">🏠 回到故事首頁 Story Index</a>
+</div>
+
+<footer><p>✨ 專為努力學英語的小朋友設計 ✨ ｜ <span>Lily's Big City Adventure</span> © 2026</p></footer>
+
+<script>
+var VOCAB = [
+  ['bookstore','書店'],['restaurant','餐廳'],['hospital','醫院'],
+  ['bakery','麵包店'],['bank','銀行'],['post office','郵局'],
+  ['bike','腳踏車'],['scooter','機車'],['taxi','計程車'],
+  ['bus','公車'],['train','火車'],['car','汽車'],
+  ['MRT','捷運'],['plane','飛機'],['dress','洋裝'],
+  ['skirt','裙子'],['T-shirt','T恤'],['shorts','短褲'],
+  ['sneakers','運動鞋'],['pants','褲子'],['sweater','毛衣'],
+  ['jacket','夾克'],['smartphone','智慧型手機'],['phone','電話'],
+  ['smart','聰明的'],['umbrella','雨傘'],['water bottle','水壺'],
+  ['glasses','眼鏡'],['glass','玻璃杯'],['tired','累的'],
+  ['bored','無聊的'],['lightning bug','螢火蟲'],['old','年長的'],
+  ['young','年輕的'],['older sister','姊姊'],['older brother','哥哥'],
+  ['younger sister','妹妹'],['younger brother','弟弟'],['soft','柔軟的']
+];
+
+var EXTRA_CHIPS = [
+  ['post','郵政／郵件'],['office','辦公室']
+];
+
+var PARAS = [
+  {
+    en: "Last Saturday was a special day. Lily and her older sister Mia wanted to explore the city together. Lily put on a T-shirt, shorts, and sneakers. Mia wore a pretty dress and a jacket. {{0}} Mom handed them an umbrella and said, \"Be careful, it might rain!\"",
+    zh: "上個星期六是特別的一天。Lily和她的姊姊Mia想要一起探索城市。Lily穿上T恤、短褲和運動鞋。Mia穿了一件漂亮的洋裝和夾克。他們的哥哥Tom穿了褲子和毛衣。媽媽給他們一把雨傘，說：「小心，可能會下雨！」"
+  },
+  {
+    en: "Their younger sister Emma wore a cute skirt, and their younger brother Ben came along too. {{1}} They got on the bus and went to the MRT station. The MRT was fast and fun! Lily looked out the window and saw a plane in the sky. \"I want to fly on a plane someday!\" she said.",
+    zh: "他們的妹妹Emma穿了一條可愛的裙子，他們的弟弟Ben也一起來了。Lily拿起她的水壺，和媽媽說再見。他們搭上公車去捷運站。捷運又快又好玩！Lily從窗戶望出去，看到天空中有一架飛機。「我有一天想搭飛機！」她說。"
+  },
+  {
+    en: "They arrived at the bakery near the station. \"The bread here is so soft and yummy!\" said little Ben. {{2}} Then they walked to the restaurant next door for lunch. Tom was looking at his smartphone the whole time. \"This restaurant has great noodles!\" he said.",
+    zh: "他們到了車站附近的麵包店。「這裡的麵包又軟又好吃！」小Ben說。Lily喝了一杯冰牛奶。然後他們走到隔壁的餐廳吃午餐。Tom一直在看他的智慧型手機。「這家餐廳的麵很好吃！」他說。"
+  },
+  {
+    en: "After lunch, they walked to the bookstore. Lily found a book about lightning bugs. \"Lightning bugs are so smart! They can make their own light!\" she said. {{3}} But Tom was bored. \"I'm bored. Can we go somewhere else?\" he said.",
+    zh: "午餐後，他們走到書店。Lily找到一本關於螢火蟲的書。「螢火蟲好聰明！它們能自己發光！」她說。Mia戴上眼鏡安靜地讀書。但Tom很無聊。「我好無聊。我們能去別的地方嗎？」他說。"
+  },
+  {
+    en: "\"We need to go to the post office,\" said Mom. {{4}} The post office was next to a big bank and a tall office building. Emma mailed a card to Grandma. \"I love sending things by post!\" she said.",
+    zh: "「我們需要去郵局，」媽媽說。他們搭計程車去郵局。郵局在一家大銀行和一棟高高的辦公大樓旁邊。Emma寄了一張卡片給奶奶。「我喜歡用郵政寄東西！」她說。"
+  },
+  {
+    en: "After the post office, they walked to the hospital to visit Grandpa. Grandpa was old but still very strong. {{5}} He told them many stories about when he was young. \"When I was young, I rode a bike everywhere!\" Grandpa said.",
+    zh: "離開郵局後，他們走到醫院去探望爺爺。爺爺年長但仍然很強壯。他微笑著說他一點也不累。他告訴他們很多他年輕時候的故事。「我年輕的時候，到處騎腳踏車！」爺爺說。"
+  },
+  {
+    en: "On the way home, it started to rain. {{6}} They saw a scooter and a car on the wet road. \"Be careful! The road is wet!\" said Mom. {{7}} They took the train to go home.",
+    zh: "回家的路上，開始下雨了。大家打開了雨傘。他們看到一輛機車和一輛汽車在濕漉漉的路上。「小心！路是濕的！」媽媽說。Tom用電話打給爸爸說他們快到了。他們搭火車回家。"
+  },
+  {
+    en: "On the train, Emma put on a warm sweater because she was cold. {{8}} {{9}} \"What a fun day in the city!\" said Lily. Everyone was tired but happy. \"Let's go on another adventure next time!\" said Mia.",
+    zh: "在火車上，Emma穿上溫暖的毛衣因為她很冷。Lily說她下次想騎腳踏車去冒險。小Ben在柔軟的座位上睡著了。「在城市裡真是好玩的一天！」Lily說。大家都累了但很開心。「下次再去冒險吧！」Mia說。"
+  }
+];
+
+var LISTENING = [
+  {
+    correct: "Their older brother Tom wore pants and a sweater.",
+    opts: [
+      "Their older brother Tom wore pants and a sweater.",
+      "Their older sister Mia wore pants and a sweater.",
+      "Their older brother Tom wore shorts and a sweater.",
+      "Their older brother Tom wore pants and a jacket."
+    ],
+    ans: 0,
+    zh: "他們的哥哥Tom穿了褲子和毛衣。"
+  },
+  {
+    correct: "Lily picked up her water bottle and said goodbye to Mom.",
+    opts: [
+      "Lily picked up her umbrella and said goodbye to Mom.",
+      "Lily picked up her water bottle and said goodbye to Dad.",
+      "Lily picked up her water bottle and said goodbye to Mom.",
+      "Mia picked up her water bottle and said goodbye to Mom."
+    ],
+    ans: 2,
+    zh: "Lily拿起她的水壺，和媽媽說再見。"
+  },
+  {
+    correct: "Lily drank a glass of cold milk.",
+    opts: [
+      "Lily drank a glass of cold water.",
+      "Lily drank a glass of cold milk.",
+      "Mia drank a glass of cold milk.",
+      "Lily drank a cup of cold milk."
+    ],
+    ans: 1,
+    zh: "Lily喝了一杯冰牛奶。"
+  },
+  {
+    correct: "Mia put on her glasses and read quietly.",
+    opts: [
+      "Mia put on her glasses and read quietly.",
+      "Mia put on her glasses and slept quietly.",
+      "Lily put on her glasses and read quietly.",
+      "Mia took off her glasses and read quietly."
+    ],
+    ans: 0,
+    zh: "Mia戴上眼鏡安靜地讀書。"
+  },
+  {
+    correct: "They took a taxi to the post office.",
+    opts: [
+      "They took a bus to the post office.",
+      "They took a taxi to the bookstore.",
+      "They took a taxi to the bank.",
+      "They took a taxi to the post office."
+    ],
+    ans: 3,
+    zh: "他們搭計程車去郵局。"
+  },
+  {
+    correct: "He smiled and said he was not tired at all.",
+    opts: [
+      "He smiled and said he was not bored at all.",
+      "He smiled and said he was not tired at all.",
+      "He cried and said he was not tired at all.",
+      "He smiled and said he was very tired."
+    ],
+    ans: 1,
+    zh: "他微笑著說他一點也不累。"
+  },
+  {
+    correct: "Everyone opened their umbrellas.",
+    opts: [
+      "Everyone opened their umbrellas.",
+      "Everyone closed their umbrellas.",
+      "Everyone opened their jackets.",
+      "Everyone dropped their umbrellas."
+    ],
+    ans: 0,
+    zh: "大家打開了雨傘。"
+  },
+  {
+    correct: "Tom called Dad on his phone and said they were coming home.",
+    opts: [
+      "Tom called Mom on his phone and said they were coming home.",
+      "Tom called Dad on his phone and said they were going out.",
+      "Tom called Dad on his phone and said they were coming home.",
+      "Tom texted Dad on his phone and said they were coming home."
+    ],
+    ans: 2,
+    zh: "Tom用電話打給爸爸說他們快到了。"
+  },
+  {
+    correct: "Lily said she wanted to ride a bike for the next adventure.",
+    opts: [
+      "Lily said she wanted to ride a bike for the next adventure.",
+      "Lily said she wanted to ride a scooter for the next adventure.",
+      "Lily said she wanted to ride a bus for the next adventure.",
+      "Emma said she wanted to ride a bike for the next adventure."
+    ],
+    ans: 0,
+    zh: "Lily說她下次想騎腳踏車去冒險。"
+  },
+  {
+    correct: "Little Ben fell asleep on the soft seat.",
+    opts: [
+      "Little Ben fell asleep on the hard seat.",
+      "Little Tom fell asleep on the soft seat.",
+      "Little Ben fell asleep on the soft bed.",
+      "Little Ben fell asleep on the soft seat."
+    ],
+    ans: 3,
+    zh: "小Ben在柔軟的座位上睡著了。"
+  }
+];
+
+var READING = [
+  {
+    q: "What did Lily wear on Saturday?",
+    opts: ["A dress and sneakers", "A T-shirt, shorts, and sneakers", "Pants and a sweater", "A skirt and jacket"],
+    ans: 1
+  },
+  {
+    q: "How did they travel to the MRT station?",
+    opts: ["By taxi", "By car", "By bus", "By bike"],
+    ans: 2
+  },
+  {
+    q: "What did Lily see from the MRT window?",
+    opts: ["A train", "A scooter", "A plane", "A bird"],
+    ans: 2
+  },
+  {
+    q: "What did Ben say about the bread at the bakery?",
+    opts: ["It's hard", "It's old", "It's too big", "It's so soft"],
+    ans: 3
+  },
+  {
+    q: "What was Lily's book about at the bookstore?",
+    opts: ["Old castles", "Young heroes", "Lightning bugs", "Smart phones"],
+    ans: 2
+  },
+  {
+    q: "Where is the post office?",
+    opts: ["Near the restaurant", "Next to the bank and an office building", "Behind the hospital", "Inside the bookstore"],
+    ans: 1
+  },
+  {
+    q: "Who did they visit at the hospital?",
+    opts: ["Grandma", "A friend", "Grandpa", "A doctor"],
+    ans: 2
+  },
+  {
+    q: "What did Grandpa ride when he was young?",
+    opts: ["A scooter", "A bus", "A bike", "A car"],
+    ans: 2
+  },
+  {
+    q: "What happened on the way home?",
+    opts: ["It was sunny", "It started to rain", "It started to snow", "The bus broke down"],
+    ans: 1
+  },
+  {
+    q: "How did everyone feel at the end of the day?",
+    opts: ["Sad and bored", "Angry and tired", "Tired but happy", "Bored but okay"],
+    ans: 2
+  }
+];
+
+var speechRate = 0.8;
+var selectedVoice = null;
+var enVoices = [];
+var solvedBlanks = {};
+var totalBlanks = LISTENING.length;
+var readingAnswers = {};
+var readingSubmitted = false;
+var readingListenModes = {};
+
+function populateVoices() {
+  if (!window.speechSynthesis) return;
+  var all = speechSynthesis.getVoices();
+  enVoices = [];
+  for (var i = 0; i < all.length; i++) {
+    if (all[i].lang && all[i].lang.indexOf('en') === 0) enVoices.push(all[i]);
+  }
+  var sel = document.getElementById('voice-select');
+  var prev = sel.value;
+  sel.innerHTML = '';
+  if (enVoices.length === 0) {
+    var op = document.createElement('option');
+    op.value = ''; op.textContent = '（無可用英語語音）';
+    sel.appendChild(op);
+    return;
+  }
+  for (var i = 0; i < enVoices.length; i++) {
+    var v = enVoices[i];
+    var op = document.createElement('option');
+    op.value = i;
+    var label = v.name;
+    if (v.lang !== 'en-US') label += ' (' + v.lang + ')';
+    if (v.localService) label += ' ★';
+    op.textContent = label;
+    sel.appendChild(op);
+  }
+  if (prev && prev < enVoices.length) {
+    sel.value = prev;
+  } else {
+    sel.value = '0';
+  }
+  selectedVoice = enVoices[parseInt(sel.value)] || null;
+}
+
+function stopAll() {
+  try { speechSynthesis.cancel(); } catch(e) {}
+  var els = document.querySelectorAll('.speaking');
+  for (var i = 0; i < els.length; i++) els[i].classList.remove('speaking');
+  var hls = document.querySelectorAll('.highlight');
+  for (var i = 0; i < hls.length; i++) hls[i].classList.remove('highlight');
+  activeReadingBtn = null;
+}
+
+var activeReadingBtn = null;
+
+function speak(text, onEnd) {
+  if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = speechRate;
+  if (selectedVoice) u.voice = selectedVoice;
+  u.onend = function() { if (onEnd) onEnd(); };
+  u.onerror = function() { if (onEnd) onEnd(); };
+  speechSynthesis.speak(u);
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function isWordChar(ch) {
+  if (!ch) return false;
+  var c = ch.charCodeAt(0);
+  return (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || ch === '-' || ch === '\'';
+}
+
+function parseText(text) {
+  var allV = VOCAB.slice();
+  allV.sort(function(a, b) { return b[0].length - a[0].length; });
+  var parts = [];
+  var i = 0;
+  while (i < text.length) {
+    var matched = false;
+    for (var vi = 0; vi < allV.length; vi++) {
+      var vw = allV[vi][0];
+      var vlen = vw.length;
+      if (i + vlen > text.length) continue;
+      var seg = text.slice(i, i + vlen);
+      if (seg.toLowerCase() !== vw.toLowerCase()) continue;
+      var before = i > 0 ? text[i - 1] : '';
+      var after = (i + vlen < text.length) ? text[i + vlen] : '';
+      if (isWordChar(before) || isWordChar(after)) continue;
+      parts.push({ type: 'w', v: seg, word: vw, zh: allV[vi][1] });
+      i += vlen; matched = true; break;
+    }
+    if (!matched) {
+      if (parts.length && parts[parts.length - 1].type === 't') {
+        parts[parts.length - 1].v += text[i];
+      } else {
+        parts.push({ type: 't', v: text[i] });
+      }
+      i++;
+    }
+  }
+  return parts;
+}
+
+function updateProgress() {
+  var count = Object.keys(solvedBlanks).length;
+  var bar = document.getElementById('prog-bar');
+  var txt = document.getElementById('prog-text');
+  var pct = Math.round((count / totalBlanks) * 100);
+  bar.style.width = Math.max(pct, 8) + '%';
+  txt.textContent = count + ' / ' + totalBlanks;
+  if (count === totalBlanks) {
+    bar.parentElement.style.animation = 'celebrate .6s ease';
+    setTimeout(function() { bar.parentElement.style.animation = ''; }, 700);
+    unlockReadingQuiz();
+  }
+}
+
+function unlockReadingQuiz() {
+  var lock = document.getElementById('reading-lock');
+  lock.className = 'locked-msg unlocked';
+  lock.innerHTML = '<span class="lock-icon">🎉</span>太棒了！聽力測驗全部完成！故事已完整揭曉！<br>Great job! Now try the reading quiz below!';
+  document.getElementById('go-reading-btn').style.display = 'block';
+  document.getElementById('reading-anchor').style.display = '';
+  document.getElementById('reading-sec').style.display = '';
+}
+
+function revealStoryBlank(qi) {
+  var el = document.getElementById('sblank-' + qi);
+  if (!el) return;
+  var sentence = LISTENING[qi].correct;
+  var revealed = document.createElement('span');
+  revealed.className = 'story-revealed';
+  revealed.textContent = sentence;
+  revealed.title = LISTENING[qi].zh;
+  revealed.addEventListener('click', function(e) {
+    e.stopPropagation(); stopAll();
+    revealed.classList.add('speaking');
+    speak(sentence, function() { revealed.classList.remove('speaking'); });
+  });
+  el.parentNode.replaceChild(revealed, el);
+}
+
+function buildChips() {
+  var cont = document.getElementById('chips');
+  cont.innerHTML = '';
+  var allWords = VOCAB.concat(EXTRA_CHIPS);
+  for (var i = 0; i < allWords.length; i++) {
+    (function(en, zh) {
+      var chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = en + ' ' + zh;
+      chip.title = en + ' = ' + zh;
+      chip.addEventListener('click', function() {
+        stopAll();
+        chip.classList.add('speaking');
+        speak(en, function() { chip.classList.remove('speaking'); });
+      });
+      cont.appendChild(chip);
+    })(allWords[i][0], allWords[i][1]);
+  }
+}
+
+function buildStory() {
+  var cont = document.getElementById('story');
+  cont.innerHTML = '';
+
+  for (var pi = 0; pi < PARAS.length; pi++) {
+    var card = document.createElement('div');
+    card.className = 'pcard';
+    var enP = document.createElement('p');
+    enP.className = 'para-en';
+    enP.id = 'en' + pi;
+
+    var raw = PARAS[pi].en;
+    var segments = raw.split(/(\{\{\d+\}\})/);
+
+    for (var si = 0; si < segments.length; si++) {
+      var seg = segments[si];
+      var blankMatch = seg.match(/^\{\{(\d+)\}\}$/);
+
+      if (blankMatch) {
+        var qi = parseInt(blankMatch[1]);
+        if (solvedBlanks[qi]) {
+          var revealed = document.createElement('span');
+          revealed.className = 'story-revealed';
+          revealed.textContent = LISTENING[qi].correct;
+          revealed.title = LISTENING[qi].zh;
+          (function(sentence, el) {
+            el.addEventListener('click', function(e) {
+              e.stopPropagation(); stopAll();
+              el.classList.add('speaking');
+              speak(sentence, function() { el.classList.remove('speaking'); });
+            });
+          })(LISTENING[qi].correct, revealed);
+          enP.appendChild(revealed);
+        } else {
+          var blank = document.createElement('span');
+          blank.className = 'story-blank';
+          blank.id = 'sblank-' + qi;
+          blank.textContent = '🔒 聽力題 #' + (qi + 1);
+          blank.title = '完成聽力測驗第' + (qi + 1) + '題來揭曉！';
+          (function(idx) {
+            blank.addEventListener('click', function() {
+              var target = document.getElementById('lcard-' + idx);
+              if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+          })(qi);
+          enP.appendChild(blank);
+        }
+        enP.appendChild(document.createTextNode(' '));
+      } else if (seg) {
+        var sentences = [];
+        var re = /[^.!?"]*[.!?"]+['"]?\s*/g;
+        var m;
+        while ((m = re.exec(seg)) !== null) {
+          var s = m[0].trim();
+          if (s) sentences.push(s);
+        }
+        if (sentences.length === 0 && seg.trim()) sentences.push(seg.trim());
+
+        for (var ssi = 0; ssi < sentences.length; ssi++) {
+          var sspan = document.createElement('span');
+          sspan.className = 'ssen';
+          var parts = parseText(sentences[ssi]);
+          for (var k = 0; k < parts.length; k++) {
+            var pt = parts[k];
+            if (pt.type === 't') {
+              sspan.appendChild(document.createTextNode(pt.v));
+            } else {
+              var sp = document.createElement('span');
+              sp.className = 'vw';
+              sp.textContent = pt.v;
+              sp.title = pt.word + ' = ' + pt.zh;
+              (function(el, word) {
+                el.addEventListener('click', function(e) {
+                  e.stopPropagation(); stopAll();
+                  el.classList.add('speaking');
+                  speak(word, function() { el.classList.remove('speaking'); });
+                });
+              })(sp, pt.word);
+              sspan.appendChild(sp);
+            }
+          }
+          enP.appendChild(sspan);
+          if (ssi < sentences.length - 1) enP.appendChild(document.createTextNode(' '));
+        }
+      }
+    }
+    card.appendChild(enP);
+
+    var zhP = document.createElement('div');
+    zhP.className = 'para-zh';
+    zhP.textContent = PARAS[pi].zh;
+    card.appendChild(zhP);
+
+    var ctrl = document.createElement('div');
+    ctrl.className = 'pctrl';
+
+    (function(zhDiv) {
+      var bz = document.createElement('button');
+      bz.className = 'btn btn-zh';
+      bz.textContent = '🔤 中文翻譯';
+      bz.addEventListener('click', function() {
+        if (zhDiv.style.display === 'block') {
+          zhDiv.style.display = 'none'; bz.textContent = '🔤 中文翻譯';
+        } else {
+          zhDiv.style.display = 'block'; bz.textContent = '🔤 隱藏中文';
+        }
+      });
+      ctrl.appendChild(bz);
+    })(zhP);
+
+    (function(idx) {
+      var br = document.createElement('button');
+      br.className = 'btn btn-read';
+      br.textContent = '🔊 朗讀';
+      br._reading = false;
+      br._cancel = false;
+
+      br.addEventListener('click', function() {
+        if (br._reading) {
+          stopAll();
+          br.textContent = '🔊 朗讀';
+          br.className = 'btn btn-read';
+          br._reading = false;
+          br._cancel = true;
+          activeReadingBtn = null;
+          return;
+        }
+        stopAll();
+        br._reading = true;
+        br._cancel = false;
+        activeReadingBtn = br;
+        br.textContent = '⏹ 停止';
+        br.className = 'btn btn-stop';
+
+        var enP = document.getElementById('en' + idx);
+        var readables = [];
+        var children = enP.childNodes;
+        for (var c = 0; c < children.length; c++) {
+          var el = children[c];
+          if (el.nodeType === 1 && (el.classList.contains('ssen') || el.classList.contains('story-revealed'))) {
+            readables.push(el);
+          }
+        }
+
+        if (readables.length === 0) {
+          var fullText = PARAS[idx].en.replace(/\{\{(\d+)\}\}/g, function(_, n) {
+            return LISTENING[parseInt(n)].correct;
+          });
+          speak(fullText, function() {
+            br.textContent = '🔊 朗讀'; br.className = 'btn btn-read'; br._reading = false;
+            activeReadingBtn = null;
+          });
+          return;
+        }
+
+        var ri = 0;
+        function readNext() {
+          if (br._cancel || ri >= readables.length) {
+            for (var j = 0; j < readables.length; j++) readables[j].classList.remove('highlight');
+            br.textContent = '🔊 朗讀';
+            br.className = 'btn btn-read';
+            br._reading = false;
+            activeReadingBtn = null;
+            return;
+          }
+          var el = readables[ri];
+          el.classList.add('highlight');
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          speak(el.textContent.trim(), function() {
+            el.classList.remove('highlight');
+            ri++;
+            readNext();
+          });
+        }
+        readNext();
+      });
+      ctrl.appendChild(br);
+    })(pi);
+
+    card.appendChild(ctrl);
+    cont.appendChild(card);
+  }
+}
+
+function buildListeningQuiz() {
+  var cont = document.getElementById('lcont');
+  cont.innerHTML = '';
+
+  for (var qi = 0; qi < LISTENING.length; qi++) {
+    var q = LISTENING[qi];
+    var card = document.createElement('div');
+    card.className = 'qcard'; card.id = 'lcard-' + qi;
+    if (solvedBlanks[qi]) card.classList.add('solved');
+
+    var hdr = document.createElement('div');
+    hdr.className = 'qhdr';
+    var qnum = document.createElement('span');
+    qnum.className = 'qnum'; qnum.textContent = (qi + 1);
+    hdr.appendChild(qnum);
+
+    var blankArea = document.createElement('div');
+    blankArea.className = 'sentence-blank';
+    blankArea.id = 'lblank-' + qi;
+    if (solvedBlanks[qi]) blankArea.classList.add('solved');
+
+    var blankText = document.createElement('span');
+    blankText.className = 'blank-text';
+    blankText.id = 'lblanktxt-' + qi;
+    blankText.textContent = solvedBlanks[qi] ? q.correct : '＿＿＿＿＿＿＿＿＿＿＿＿＿＿';
+    blankArea.appendChild(blankText);
+
+    var listenBtn = document.createElement('button');
+    listenBtn.className = 'listen-btn';
+    listenBtn.textContent = '🔊 聽句子';
+    (function(sentence, btn) {
+      btn.addEventListener('click', function() {
+        stopAll();
+        btn.classList.add('speaking');
+        speak(sentence, function() { btn.classList.remove('speaking'); });
+      });
+    })(q.correct, listenBtn);
+    blankArea.appendChild(listenBtn);
+    hdr.appendChild(blankArea);
+    card.appendChild(hdr);
+
+    var grid = document.createElement('div');
+    grid.className = 'ogrid';
+    grid.id = 'lgrid-' + qi;
+    var labels = ['A', 'B', 'C', 'D'];
+
+    for (var oi = 0; oi < q.opts.length; oi++) {
+      (function(qIdx, optIdx, optText, myGrid) {
+        var ob = document.createElement('button');
+        ob.className = 'obtn'; ob.id = 'lobtn-' + qIdx + '-' + optIdx;
+
+        var label = document.createElement('span');
+        label.className = 'opt-label';
+        label.textContent = labels[optIdx];
+        ob.appendChild(label);
+
+        var textSpan = document.createElement('span');
+        textSpan.className = 'opt-text';
+        textSpan.textContent = optText;
+        ob.appendChild(textSpan);
+
+        if (solvedBlanks[qIdx]) {
+          ob.disabled = true;
+          if (optIdx === LISTENING[qIdx].ans) ob.classList.add('ok');
+        }
+
+        ob.addEventListener('click', function() {
+          if (solvedBlanks[qIdx]) return;
+          if (optIdx === LISTENING[qIdx].ans) {
+            solvedBlanks[qIdx] = true;
+            ob.classList.add('ok');
+            var card = document.getElementById('lcard-' + qIdx);
+            card.classList.add('solved');
+            var blankArea = document.getElementById('lblank-' + qIdx);
+            blankArea.classList.add('solved');
+            var blankTxt = document.getElementById('lblanktxt-' + qIdx);
+            blankTxt.textContent = LISTENING[qIdx].correct;
+
+            var fb = document.getElementById('lfb-' + qIdx);
+            fb.className = 'qfb fbok';
+            fb.innerHTML = '✅ 正確！' + LISTENING[qIdx].zh;
+            fb.style.display = 'block';
+
+            var sibs = myGrid.querySelectorAll('.obtn');
+            for (var s = 0; s < sibs.length; s++) sibs[s].disabled = true;
+
+            revealStoryBlank(qIdx);
+            updateProgress();
+            stopAll();
+            speak(LISTENING[qIdx].correct);
+          } else {
+            ob.classList.add('no');
+            ob.disabled = true;
+          }
+        });
+        myGrid.appendChild(ob);
+      })(qi, oi, q.opts[oi], grid);
+    }
+    card.appendChild(grid);
+
+    var fb = document.createElement('div');
+    fb.className = 'qfb'; fb.id = 'lfb-' + qi;
+    if (solvedBlanks[qi]) {
+      fb.className = 'qfb fbok';
+      fb.innerHTML = '✅ 正確！' + q.zh;
+      fb.style.display = 'block';
+    }
+    card.appendChild(fb);
+    cont.appendChild(card);
+  }
+}
+
+function buildReadingQuiz() {
+  var cont = document.getElementById('rcont');
+  cont.innerHTML = '';
+  readingAnswers = {};
+  readingSubmitted = false;
+  document.getElementById('rsub-btn').disabled = false;
+  document.getElementById('scoreboard').classList.remove('show');
+
+  var indices = [];
+  for (var i = 0; i < READING.length; i++) indices.push(i);
+  var shuffledIdx = shuffle(indices);
+  readingListenModes = {};
+  for (var i = 0; i < 4 && i < shuffledIdx.length; i++) {
+    readingListenModes[shuffledIdx[i]] = Math.random() < 0.5 ? 'stem' : 'options';
+  }
+
+  for (var qi = 0; qi < READING.length; qi++) {
+    var q = READING[qi];
+    var listenMode = readingListenModes[qi] || 'none';
+    var card = document.createElement('div');
+    card.className = 'qcard'; card.id = 'rcard-' + qi;
+
+    var hdr = document.createElement('div');
+    hdr.className = 'qhdr';
+    var qnum = document.createElement('span');
+    qnum.className = 'qnum'; qnum.textContent = (qi + 1);
+    qnum.style.background = 'linear-gradient(135deg, var(--lavender), #9B59D8)';
+    hdr.appendChild(qnum);
+
+    var qtxt = document.createElement('span');
+    qtxt.className = 'qtxt'; qtxt.id = 'rqtxt-' + qi;
+    if (listenMode === 'stem') {
+      var hl = document.createElement('span');
+      hl.className = 'qtxt-hidden';
+      hl.textContent = '👂 Click 🔊 to listen to the question';
+      qtxt.appendChild(hl);
+      qtxt.dataset.fullText = q.q;
+    } else {
+      qtxt.textContent = q.q;
+    }
+    hdr.appendChild(qtxt);
+
+    var spkBtn = document.createElement('button');
+    spkBtn.className = 'qspk'; spkBtn.textContent = '🔊'; spkBtn.title = '聽題目';
+    (function(text, btn) {
+      btn.addEventListener('click', function() {
+        stopAll();
+        btn.classList.add('speaking');
+        speak(text, function() { btn.classList.remove('speaking'); });
+      });
+    })(q.q, spkBtn);
+    hdr.appendChild(spkBtn);
+    card.appendChild(hdr);
+
+    var grid = document.createElement('div');
+    grid.className = 'r-ogrid';
+    for (var oi = 0; oi < q.opts.length; oi++) {
+      (function(qIdx, optIdx, optText, myGrid, mode) {
+        var ob = document.createElement('button');
+        ob.className = 'r-obtn'; ob.id = 'robtn-' + qIdx + '-' + optIdx;
+        if (mode === 'options') {
+          var os = document.createElement('span');
+          os.className = 'opt-speaker'; os.textContent = '🔊';
+          ob.appendChild(os);
+          ob.appendChild(document.createTextNode(' 聽選項 ' + String.fromCharCode(65 + optIdx)));
+          ob.dataset.fullText = optText;
+          ob.addEventListener('mouseenter', function() {
+            if (readingSubmitted) return; stopAll(); speak(optText);
+          });
+        } else {
+          ob.textContent = String.fromCharCode(65 + optIdx) + '. ' + optText;
+        }
+        ob.addEventListener('click', function() {
+          if (readingSubmitted) return;
+          var sibs = myGrid.querySelectorAll('.r-obtn');
+          for (var s = 0; s < sibs.length; s++) sibs[s].classList.remove('sel');
+          ob.classList.add('sel');
+          readingAnswers[qIdx] = optIdx;
+          if (mode === 'options') { stopAll(); speak(optText); }
+        });
+        myGrid.appendChild(ob);
+      })(qi, oi, q.opts[oi], grid, listenMode);
+    }
+    card.appendChild(grid);
+
+    var fb = document.createElement('div');
+    fb.className = 'qfb'; fb.id = 'rfb-' + qi;
+    card.appendChild(fb);
+    cont.appendChild(card);
+  }
+}
+
+function submitReadingQuiz() {
+  if (readingSubmitted) return;
+  var total = READING.length;
+  if (Object.keys(readingAnswers).length < total) {
+    alert('請先回答所有 ' + total + ' 題喔！\nPlease answer all ' + total + ' questions!');
+    return;
+  }
+  readingSubmitted = true;
+  document.getElementById('rsub-btn').disabled = true;
+  var score = 0;
+
+  for (var qi = 0; qi < READING.length; qi++) {
+    var q = READING[qi];
+    var card = document.getElementById('rcard-' + qi);
+    var fb = document.getElementById('rfb-' + qi);
+    var userAns = readingAnswers[qi];
+    var correctIdx = q.ans;
+    var isCorrect = (userAns === correctIdx);
+
+    var qtxt = document.getElementById('rqtxt-' + qi);
+    if (qtxt.dataset.fullText) qtxt.textContent = q.q;
+
+    if (isCorrect) {
+      score++;
+      card.classList.add('qok');
+      fb.className = 'qfb fbok';
+      fb.textContent = '✅ Correct! 正確！';
+    } else {
+      card.classList.add('qno');
+      fb.className = 'qfb fbno';
+      fb.textContent = '❌ Answer: ' + String.fromCharCode(65 + correctIdx) + '. ' + q.opts[correctIdx];
+    }
+    fb.style.display = 'block';
+
+    var btns = card.querySelectorAll('.r-obtn');
+    for (var bi = 0; bi < btns.length; bi++) {
+      btns[bi].disabled = true;
+      if (btns[bi].dataset.fullText) btns[bi].textContent = String.fromCharCode(65 + bi) + '. ' + q.opts[bi];
+      if (bi === correctIdx) btns[bi].classList.add('ok');
+      else if (bi === userAns && !isCorrect) btns[bi].classList.add('no');
+    }
+  }
+
+  var sb = document.getElementById('scoreboard');
+  document.getElementById('score-big').textContent = score + ' / ' + total;
+  var msg = '';
+  if (score === total) msg = '🎉 滿分！太厲害了！Perfect score!';
+  else if (score >= 8) msg = '👏 非常棒！Almost perfect!';
+  else if (score >= 6) msg = '😊 不錯喔！Good job!';
+  else if (score >= 4) msg = '💪 繼續加油！Keep trying!';
+  else msg = '📖 再仔細讀一次故事吧！Read the story again!';
+  document.getElementById('score-msg').textContent = msg;
+  sb.classList.add('show');
+  sb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  populateVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = populateVoices;
+  }
+
+  document.getElementById('voice-select').addEventListener('change', function() {
+    var idx = parseInt(this.value);
+    selectedVoice = (idx >= 0 && idx < enVoices.length) ? enVoices[idx] : null;
+    stopAll();
+    speak('Hello!');
+  });
+
+  var slider = document.getElementById('speed-slider');
+  var sval = document.getElementById('speed-val');
+  slider.addEventListener('input', function() {
+    speechRate = parseFloat(slider.value);
+    sval.textContent = speechRate.toFixed(2) + 'x';
+  });
+
+  document.getElementById('go-listen-btn').addEventListener('click', function() {
+    document.getElementById('listen-anchor').scrollIntoView({ behavior: 'smooth' });
+  });
+  document.getElementById('go-reading-btn').addEventListener('click', function() {
+    document.getElementById('reading-anchor').scrollIntoView({ behavior: 'smooth' });
+  });
+  document.getElementById('rsub-btn').addEventListener('click', submitReadingQuiz);
+  document.getElementById('retry-btn').addEventListener('click', function() {
+    buildReadingQuiz();
+    document.getElementById('reading-anchor').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  buildChips();
+  buildStory();
+  buildListeningQuiz();
+  buildReadingQuiz();
+  updateProgress();
+});
+</script>
+</body>
+</html>
