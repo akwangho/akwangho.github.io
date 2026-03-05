@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 英文預習小學堂：多吃蔬菜！ 🌟</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+            background-color: #f0fdf4; /* 淡淡的蔬菜綠色背景 */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #166534;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .subtitle {
+            color: #15803d;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 4px dashed #86efac;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 比例 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border: 5px solid #bbf7d0;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .section-title {
+            background-color: #fca5a5;
+            color: white;
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 1.5em;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        /* 單字卡和句子卡片的共同樣式 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* 調整最小寬度讓更多單字排版 */
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background-color: #fffbeb;
+            border: 2px solid #fde68a;
+            border-radius: 15px;
+            padding: 15px; /* 稍微縮小內距 */
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(253, 230, 138, 0.5);
+        }
+        .vocab-en {
+            font-size: 1.6em; /* 稍微縮小字體 */
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 3px;
+        }
+        .vocab-zh {
+            font-size: 1.1em; /* 稍微縮小字體 */
+            color: #78350f;
+            margin-bottom: 10px;
+        }
+        .sentence-card {
+            background-color: #f0f9ff;
+            border: 2px solid #bae6fd;
+            grid-column: 1 / -1; /* 讓句子卡片佔滿整行 */
+            padding: 20px;
+        }
+        .sentence-en {
+            font-size: 1.25em; /* 稍微縮小字體 */
+            font-weight: bold;
+            color: #0369a1;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .sentence-zh {
+            font-size: 1.05em; /* 稍微縮小字體 */
+            color: #0c4a6e;
+            margin-bottom: 12px;
+        }
+        .play-btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 18px; /* 稍微縮小按鈕 */
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .play-btn:hover {
+            background-color: #2563eb;
+        }
+        .play-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌟 英文預習小學堂 🌟</h1>
+    <div class="subtitle">【大家說英語】多吃蔬菜！Eat More Vegetables! 🥦🍅</div>
+
+    <div class="container">
+        <div class="video-container">
+            <div id="player"></div>
+        </div>
+
+        <div class="section-title">✨ 重點單字 ✨</div>
+        <div class="grid">
+            <div class="card">
+                <div class="vocab-en">🥬 Cabbage</div>
+                <div class="vocab-zh">高麗菜 / 包心菜</div>
+                <button class="play-btn" onclick="playVideoAt(928)">🎵 聽發音</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">🥗 Lettuce</div>
+                <div class="vocab-zh">生菜 / 萵苣</div>
+                <button class="play-btn" onclick="playVideoAt(947)">🎵 聽發音</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">🧅 Onion</div>
+                <div class="vocab-zh">洋蔥</div>
+                <button class="play-btn" onclick="playVideoAt(956)">🎵 聽發音</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">🌱 Green Bean</div>
+                <div class="vocab-zh">四季豆 / 敏豆</div>
+                <button class="play-btn" onclick="playVideoAt(964)">🎵 聽發音</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">🌽 Corn</div>
+                <div class="vocab-zh">玉米</div>
+                <button class="play-btn" onclick="playVideoAt(976)">🎵 聽發音</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">🥕 Carrot</div>
+                <div class="vocab-zh">紅蘿蔔</div>
+                <button class="play-btn" onclick="playVideoAt(983)">🎵 聽發音</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">🌶️ Pepper</div>
+                <div class="vocab-zh">甜椒 / 胡椒</div>
+                <button class="play-btn" onclick="playVideoAt(988)">🎵 聽發音</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">🥦 Broccoli</div>
+                <div class="vocab-zh">花椰菜</div>
+                <button class="play-btn" onclick="playVideoAt(998)">🎵 聽發音</button>
+            </div>
+        </div>
+
+        <div class="section-title">💬 關鍵句子 💬</div>
+        <div class="grid">
+            <div class="card sentence-card">
+                <div class="sentence-en">"Vegetables are good for you."</div>
+                <div class="sentence-zh">蔬菜對你有益處（吃蔬菜對身體好）。</div>
+                <button class="play-btn" onclick="playVideoAt(386)">🎵 聽發音</button>
+            </div>
+            <div class="card sentence-card">
+                <div class="sentence-en">"I don't eat enough of them."</div>
+                <div class="sentence-zh">我（蔬菜）吃得不夠多。</div>
+                <button class="play-btn" onclick="playVideoAt(347)">🎵 聽發音</button>
+            </div>
+            <div class="card sentence-card">
+                <div class="sentence-en">"Lettuce, tomatoes, and onions are great on sandwiches."</div>
+                <div class="sentence-zh">生菜、番茄和洋蔥加在三明治裡很棒。</div>
+                <button class="play-btn" onclick="playVideoAt(192)">🎵 聽發音</button>
+            </div>
+            <div class="card sentence-card">
+                <div class="sentence-en">"There are many kinds of vegetables."</div>
+                <div class="sentence-zh">有很多種蔬菜。</div>
+                <button class="play-btn" onclick="playVideoAt(920)">🎵 聽發音</button>
+            </div>
+            <div class="card sentence-card">
+                <div class="sentence-en">"What kinds of vegetables do you like?"</div>
+                <div class="sentence-zh">你喜歡哪種類型的蔬菜？</div>
+                <button class="play-btn" onclick="playVideoAt(115)">🎵 聽發音</button>
+            </div>
+            <div class="card sentence-card">
+                <div class="sentence-en">"I will eat more vegetables."</div>
+                <div class="sentence-zh">我會多吃蔬菜的。</div>
+                <button class="play-btn" onclick="playVideoAt(446)">🎵 聽發音</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+
+        // 當 YouTube API 準備好時，會自動呼叫此函數
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'dfgUcVVO-KI', // 影片的 ID
+                playerVars: {
+                    'playsinline': 1,
+                    'rel': 0, // 播放結束不顯示推薦影片
+                    'showinfo': 0
+                }
+            });
+        }
+
+        // 點擊按鈕時，跳轉到指定秒數並播放
+        function playVideoAt(seconds) {
+            if (player && player.seekTo) {
+                // 將畫面滾動到最上方讓小朋友看影片
+                window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                
+                player.seekTo(seconds, true);
+                player.playVideo();
+            } else {
+                alert("影片還在準備中，請稍等一下下喔！⏳");
+            }
+        }
+    </script>
+</body>
+</html>
