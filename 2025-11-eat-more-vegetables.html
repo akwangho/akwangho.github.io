@@ -65,7 +65,7 @@
         /* 單字卡和句子卡片的共同樣式 */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* 調整最小寬度讓更多單字排版 */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
         }
@@ -73,7 +73,7 @@
             background-color: #fffbeb;
             border: 2px solid #fde68a;
             border-radius: 15px;
-            padding: 15px; /* 稍微縮小內距 */
+            padding: 15px;
             transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
@@ -86,13 +86,13 @@
             box-shadow: 0 8px 15px rgba(253, 230, 138, 0.5);
         }
         .vocab-en {
-            font-size: 1.6em; /* 稍微縮小字體 */
+            font-size: 1.6em;
             font-weight: bold;
             color: #b45309;
             margin-bottom: 3px;
         }
         .vocab-zh {
-            font-size: 1.1em; /* 稍微縮小字體 */
+            font-size: 1.1em;
             color: #78350f;
             margin-bottom: 10px;
         }
@@ -103,34 +103,41 @@
             padding: 20px;
         }
         .sentence-en {
-            font-size: 1.25em; /* 稍微縮小字體 */
+            font-size: 1.25em;
             font-weight: bold;
             color: #0369a1;
             margin-bottom: 8px;
             line-height: 1.4;
         }
         .sentence-zh {
-            font-size: 1.05em; /* 稍微縮小字體 */
+            font-size: 1.05em;
             color: #0c4a6e;
             margin-bottom: 12px;
         }
-        .play-btn {
+        .play-btn, .replay-btn {
             background-color: #3b82f6;
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 8px 18px; /* 稍微縮小按鈕 */
+            padding: 8px 18px;
             font-size: 1em;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
             transition: background-color 0.2s, transform 0.1s;
+            margin: 5px; /* 增加按鈕間距 */
         }
-        .play-btn:hover {
+        .play-btn:hover, .replay-btn:hover {
             background-color: #2563eb;
         }
-        .play-btn:active {
+        .play-btn:active, .replay-btn:active {
             transform: scale(0.95);
+        }
+        .replay-btn {
+            background-color: #f97316; /* 橘色重播按鈕 */
+        }
+        .replay-btn:hover {
+            background-color: #ea580c;
         }
     </style>
 </head>
@@ -147,78 +154,116 @@
         <div class="section-title">✨ 重點單字 ✨</div>
         <div class="grid">
             <div class="card">
-                <div class="vocab-en">🥬 Cabbage</div>
+                <div class="vocab-en">Vegetables</div>
+                <div class="vocab-zh">蔬菜</div>
+                <button class="play-btn" onclick="playSegment(95, 102)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(95, 102)">🔄 重播片段</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">Cabbage</div>
                 <div class="vocab-zh">高麗菜 / 包心菜</div>
-                <button class="play-btn" onclick="playVideoAt(928)">🎵 聽發音</button>
+                <button class="play-btn" onclick="playSegment(338, 340)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(338, 340)">🔄 重播片段</button>
             </div>
             <div class="card">
-                <div class="vocab-en">🥗 Lettuce</div>
-                <div class="vocab-zh">生菜 / 萵苣</div>
-                <button class="play-btn" onclick="playVideoAt(947)">🎵 聽發音</button>
-            </div>
-            <div class="card">
-                <div class="vocab-en">🧅 Onion</div>
-                <div class="vocab-zh">洋蔥</div>
-                <button class="play-btn" onclick="playVideoAt(956)">🎵 聽發音</button>
-            </div>
-            <div class="card">
-                <div class="vocab-en">🌱 Green Bean</div>
-                <div class="vocab-zh">四季豆 / 敏豆</div>
-                <button class="play-btn" onclick="playVideoAt(964)">🎵 聽發音</button>
-            </div>
-            <div class="card">
-                <div class="vocab-en">🌽 Corn</div>
-                <div class="vocab-zh">玉米</div>
-                <button class="play-btn" onclick="playVideoAt(976)">🎵 聽發音</button>
-            </div>
-            <div class="card">
-                <div class="vocab-en">🥕 Carrot</div>
+                <div class="vocab-en">Carrots</div>
                 <div class="vocab-zh">紅蘿蔔</div>
-                <button class="play-btn" onclick="playVideoAt(983)">🎵 聽發音</button>
+                <button class="play-btn" onclick="playSegment(336, 338)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(336, 338)">🔄 重播片段</button>
             </div>
             <div class="card">
-                <div class="vocab-en">🌶️ Pepper</div>
-                <div class="vocab-zh">甜椒 / 胡椒</div>
-                <button class="play-btn" onclick="playVideoAt(988)">🎵 聽發音</button>
+                <div class="vocab-en">Lettuce</div>
+                <div class="vocab-zh">生菜 / 萵苣</div>
+                <button class="play-btn" onclick="playSegment(319, 321)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(319, 321)">🔄 重播片段</button>
             </div>
             <div class="card">
-                <div class="vocab-en">🥦 Broccoli</div>
-                <div class="vocab-zh">花椰菜</div>
-                <button class="play-btn" onclick="playVideoAt(998)">🎵 聽發音</button>
+                <div class="vocab-en">Tomatoes</div>
+                <div class="vocab-zh">番茄</div>
+                <button class="play-btn" onclick="playSegment(195, 197)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(195, 197)">🔄 重播片段</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">Onions</div>
+                <div class="vocab-zh">洋蔥</div>
+                <button class="play-btn" onclick="playSegment(321, 322)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(321, 322)">🔄 重播片段</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">Green beans</div>
+                <div class="vocab-zh">四季豆 / 敏豆</div>
+                <button class="play-btn" onclick="playSegment(355, 358)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(355, 358)">🔄 重播片段</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">Corn</div>
+                <div class="vocab-zh">玉米</div>
+                <button class="play-btn" onclick="playSegment(345, 347)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(345, 347)">🔄 重播片段</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">Raw</div>
+                <div class="vocab-zh">生的 (未煮熟的)</div>
+                <button class="play-btn" onclick="playSegment(905, 908)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(905, 908)">🔄 重播片段</button>
+            </div>
+            <div class="card">
+                <div class="vocab-en">Enough</div>
+                <div class="vocab-zh">足夠的</div>
+                <button class="play-btn" onclick="playSegment(547, 550)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(547, 550)">🔄 重播片段</button>
             </div>
         </div>
 
         <div class="section-title">💬 關鍵句子 💬</div>
         <div class="grid">
             <div class="card sentence-card">
+                <div class="sentence-en">"Eat more vegetables."</div>
+                <div class="sentence-zh">多吃蔬菜。</div>
+                <button class="play-btn" onclick="playSegment(43, 47)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(43, 47)">🔄 重播片段</button>
+            </div>
+            <div class="card sentence-card">
                 <div class="sentence-en">"Vegetables are good for you."</div>
                 <div class="sentence-zh">蔬菜對你有益處（吃蔬菜對身體好）。</div>
-                <button class="play-btn" onclick="playVideoAt(386)">🎵 聽發音</button>
+                <button class="play-btn" onclick="playSegment(177, 180)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(177, 180)">🔄 重播片段</button>
             </div>
             <div class="card sentence-card">
                 <div class="sentence-en">"I don't eat enough of them."</div>
                 <div class="sentence-zh">我（蔬菜）吃得不夠多。</div>
-                <button class="play-btn" onclick="playVideoAt(347)">🎵 聽發音</button>
+                <button class="play-btn" onclick="playSegment(408, 412)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(408, 412)">🔄 重播片段</button>
+            </div>
+            <div class="card sentence-card">
+                <div class="sentence-en">"What vegetables are great on sandwiches?"</div>
+                <div class="sentence-zh">哪些蔬菜加在三明治上很棒？</div>
+                <button class="play-btn" onclick="playSegment(246, 250)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(246, 250)">🔄 重播片段</button>
             </div>
             <div class="card sentence-card">
                 <div class="sentence-en">"Lettuce, tomatoes, and onions are great on sandwiches."</div>
                 <div class="sentence-zh">生菜、番茄和洋蔥加在三明治裡很棒。</div>
-                <button class="play-btn" onclick="playVideoAt(192)">🎵 聽發音</button>
+                <button class="play-btn" onclick="playSegment(312, 317)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(312, 317)">🔄 重播片段</button>
             </div>
             <div class="card sentence-card">
-                <div class="sentence-en">"There are many kinds of vegetables."</div>
-                <div class="sentence-zh">有很多種蔬菜。</div>
-                <button class="play-btn" onclick="playVideoAt(920)">🎵 聽發音</button>
+                <div class="sentence-en">"You can cook vegetables such as cabbage or carrots."</div>
+                <div class="sentence-zh">你可以烹煮像高麗菜或紅蘿蔔之類的蔬菜。</div>
+                <button class="play-btn" onclick="playSegment(333, 338)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(333, 338)">🔄 重播片段</button>
             </div>
             <div class="card sentence-card">
-                <div class="sentence-en">"What kinds of vegetables do you like?"</div>
-                <div class="sentence-zh">你喜歡哪種類型的蔬菜？</div>
-                <button class="play-btn" onclick="playVideoAt(115)">🎵 聽發音</button>
+                <div class="sentence-en">"Raw vegetables aren't too bad."</div>
+                <div class="sentence-zh">生吃蔬菜其實還不錯。</div>
+                <button class="play-btn" onclick="playSegment(1146, 1149)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(1146, 1149)">🔄 重播片段</button>
             </div>
             <div class="card sentence-card">
-                <div class="sentence-en">"I will eat more vegetables."</div>
-                <div class="sentence-zh">我會多吃蔬菜的。</div>
-                <button class="play-btn" onclick="playVideoAt(446)">🎵 聽發音</button>
+                <div class="sentence-en">"With good recipes, you can enjoy vegetables."</div>
+                <div class="sentence-zh">搭配好的食譜，你就能享受蔬菜的美味。</div>
+                <button class="play-btn" onclick="playSegment(1426, 1433)">🎵 聽發音</button>
+                <button class="replay-btn" onclick="playSegment(1426, 1433)">🔄 重播片段</button>
             </div>
         </div>
     </div>
@@ -226,30 +271,53 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         let player;
+        const videoId = 'dfgUcVVO-KI'; // 影片的 ID
 
         // 當 YouTube API 準備好時，會自動呼叫此函數
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                videoId: 'dfgUcVVO-KI', // 影片的 ID
+                videoId: videoId,
                 playerVars: {
                     'playsinline': 1,
                     'rel': 0, // 播放結束不顯示推薦影片
-                    'showinfo': 0
+                    'showinfo': 0,
+                    'controls': 1 // 確保播放器控制項顯示
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
                 }
             });
         }
 
-        // 點擊按鈕時，跳轉到指定秒數並播放
-        function playVideoAt(seconds) {
+        let currentEndTimeout; // 用來儲存 setTimeout 的 ID
+
+        // 播放特定片段的函數
+        function playSegment(startSeconds, endSeconds) {
             if (player && player.seekTo) {
+                // 清除之前的結束計時器，避免衝突
+                if (currentEndTimeout) {
+                    clearTimeout(currentEndTimeout);
+                }
+
                 // 將畫面滾動到最上方讓小朋友看影片
                 window.scrollTo({ top: 0, behavior: 'smooth' }); 
                 
-                player.seekTo(seconds, true);
+                player.seekTo(startSeconds, true);
                 player.playVideo();
+
+                // 設定計時器，在片段結束時停止播放
+                currentEndTimeout = setTimeout(() => {
+                    player.pauseVideo();
+                    player.seekTo(endSeconds, true); // 跳到結束時間，讓指針停在該處
+                }, (endSeconds - startSeconds) * 1000); // 轉換為毫秒
             } else {
                 alert("影片還在準備中，請稍等一下下喔！⏳");
             }
+        }
+
+        // 影片狀態改變時的處理 (例如，如果使用者手動播放到片段結束點)
+        function onPlayerStateChange(event) {
+            // 可以根據需要添加更多邏輯
         }
     </script>
 </body>
