@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語預習教材 | English Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdf2f8; }
+        ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f9a8d4; }
+    </style>
+</head>
+<body class="bg-amber-50 font-sans text-gray-800 min-h-screen">
+
+    <header class="bg-white/90 backdrop-blur-sm shadow-sm p-6 border-b-4 border-pink-200">
+        <h1 class="text-3xl font-bold text-sky-600 flex items-center gap-2">
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-emerald-500">英語預習教材</span>
+            <span class="text-gray-400 font-normal text-lg">English Preview</span>
+        </h1>
+        <p class="mt-2 text-gray-600">點選下方課程進入影片＋課文／單字／句型的互動教材。</p>
+    </header>
+
+    <main class="max-w-2xl mx-auto p-6 md:p-8">
+        <ul id="lesson-list" class="space-y-4">
+            <!-- 課程連結由下方 script 的 lessonList 資料渲染 -->
+        </ul>
+    </main>
+
+    <script>
+        // 課程列表：新增課程時在此加入一筆 { title, href, emoji, date } 即可
+        const lessonList = [
+            {
+                title: "Eat More Vegetables!",
+                href: "2025-11-eat-more-vegetables.html",
+                emoji: "🥦",
+                date: "2025-11"
+            }
+            // 未來新增範例：
+            // { title: "下一課標題", href: "2025-12-xxx.html", emoji: "📚", date: "2025-12" },
+        ];
+
+        const ul = document.getElementById('lesson-list');
+        lessonList.forEach((lesson) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <a href="${lesson.href}" 
+                   class="flex items-center gap-4 p-5 rounded-2xl bg-white border-2 border-sky-100 hover:border-sky-300 hover:shadow-lg transition-all duration-300 group">
+                    <span class="text-4xl drop-shadow-sm">${lesson.emoji}</span>
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xl font-bold text-sky-800 group-hover:text-sky-600">${lesson.title}</span>
+                        ${lesson.date ? `<span class="block text-sm text-gray-500 mt-0.5">${lesson.date}</span>` : ''}
+                    </div>
+                    <span class="text-sky-400 group-hover:text-sky-600 transition-colors">→</span>
+                </a>
+            `;
+            ul.appendChild(li);
+        });
+    </script>
+</body>
+</html>
