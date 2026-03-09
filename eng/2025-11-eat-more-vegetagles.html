@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語預習教材：Eat More Vegetables!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* 客製化滾動條，配合粉彩風格 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdf2f8; }
+        ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f9a8d4; }
+        
+        /* 播放中卡片的發光與放大效果 */
+        .glow {
+            box-shadow: 0 0 0 4px #facc15, 0 10px 25px -5px rgba(250, 204, 21, 0.4);
+            transform: scale(1.02);
+            border-color: #facc15 !important;
+            z-index: 10;
+        }
+
+        /* 標記勾選動畫 */
+        @keyframes pop {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-anim {
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="bg-amber-50 font-sans text-gray-800 overflow-hidden">
+
+    <header class="bg-white/90 backdrop-blur-sm shadow-sm p-4 flex flex-col md:flex-row justify-between items-center z-50 relative border-b-4 border-pink-200">
+        <h1 class="text-2xl font-bold text-sky-600 mb-3 md:mb-0 flex items-center gap-2">
+            🥦 <span class="bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-emerald-500">Eat More Vegetables!</span>
+        </h1>
+        <div class="flex space-x-3">
+            <button onclick="toggleChinese()" class="bg-pink-400 hover:bg-pink-500 text-white font-bold py-2 px-4 rounded-full shadow-md transition-transform hover:scale-105 active:scale-95 flex items-center gap-2">
+                <span>🇹🇼</span> 切換中文翻譯
+            </button>
+            <button onclick="exportSettings()" class="bg-sky-400 hover:bg-sky-500 text-white font-bold py-2 px-4 rounded-full shadow-md transition-transform hover:scale-105 active:scale-95 flex items-center gap-2">
+                <span>📋</span> 匯出時間設定
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-col md:flex-row h-[calc(100vh-80px)] relative">
+        
+        <div id="video-pane" class="w-full h-[30vh] md:h-full md:w-[50%] flex-shrink-0 bg-black relative z-40 flex items-center justify-center">
+            <div id="yt-player" class="w-full h-full pointer-events-none md:pointer-events-auto"></div>
+            <div class="absolute inset-0 z-10 hidden md:block" style="pointer-events: none;"></div>
+        </div>
+
+        <div id="drag-bar" class="hidden md:flex w-3 bg-white border-x border-gray-200 cursor-col-resize hover:bg-sky-100 items-center justify-center z-40 transition-colors">
+            <div class="w-1 h-12 bg-gray-300 rounded-full"></div>
+        </div>
+
+        <div id="content-pane" class="w-full md:w-[50%] flex-1 overflow-y-auto p-4 md:p-8 space-y-10 z-0 bg-gradient-to-b from-amber-50 to-orange-50 pb-32">
+            
+            <section>
+                <h2 class="text-2xl font-extrabold text-emerald-600 mb-4 flex items-center gap-2">
+                    <span class="bg-emerald-100 p-2 rounded-xl">A</span> 本日課文預習 (Lesson Text)
+                </h2>
+                <div class="space-y-4" id="section-a">
+                    </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-extrabold text-sky-600 mb-4 flex items-center gap-2 mt-10">
+                    <span class="bg-sky-100 p-2 rounded-xl">B</span> 關鍵單字 (Vocabulary)
+                </h2>
+                <div class="grid grid-cols-1 gap-4" id="section-b">
+                    </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-extrabold text-orange-500 mb-4 flex items-center gap-2 mt-10">
+                    <span class="bg-orange-100 p-2 rounded-xl">C</span> 關鍵句子 (Key Sentences)
+                </h2>
+                <div class="space-y-4" id="section-c">
+                    </div>
+            </section>
+
+            <section class="bg-pink-50 p-6 rounded-3xl shadow-inner border border-pink-200 mt-12">
+                <h2 class="text-2xl font-extrabold text-pink-600 mb-6 flex items-center gap-2">
+                    <span class="bg-pink-200 p-2 rounded-xl">D</span> 閱讀理解測驗 (Reading Quiz)
+                </h2>
+                <div class="space-y-6" id="section-d">
+                    </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        // ==========================================
+        // 資料庫設定 (Data Configuration)
+        // ==========================================
+        
+        // A. 課文預習資料 (取自影片字幕 04:05 - 04:36)
+        const lessonTexts = [
+            { id: 'a1', category: 'lessonText', eng: "Hi Sam, what are you shopping for?", cht: "嗨，山姆，你在買什麼？", start: "04:05", end: "04:08" },
+            { id: 'a2', category: 'lessonText', eng: "Vegetables. I don't eat enough of them, but I don't really like them.", cht: "蔬菜。我吃得不夠多，但我真的不太喜歡它們。", start: "04:08", end: "04:14" },
+            { id: 'a3', category: 'lessonText', eng: "Vegetables are good for you.", cht: "蔬菜對你有益處。", start: "04:14", end: "04:16" },
+            { id: 'a4', category: 'lessonText', eng: "I know I have to eat more vegetables. How can I do that?", cht: "我知道我必須吃更多蔬菜。我該怎麼做？", start: "04:16", end: "04:22" },
+            { id: 'a5', category: 'lessonText', eng: "Put vegetables on sandwiches. Lettuce, tomatoes, and onions are great on sandwiches.", cht: "把蔬菜加在三明治裡。生菜、番茄和洋蔥加在三明治裡很棒。", start: "04:22", end: "04:31" },
+            { id: 'a6', category: 'lessonText', eng: "That's true, and I do like raw carrots. Those are good.", cht: "那是真的，而且我確實喜歡生胡蘿蔔。那些很好吃。", start: "04:31", end: "04:36" }
+        ];
+
+        // B. 關鍵單字資料 (配合主持人解說片段)
+        const vocabularies = [
+            { id: 'b1', category: 'vocabulary', word: "vegetable", type: "n.", emoji: "🍎", cht: "蔬菜", eng: "We all need to eat more vegetables.", start: "00:51", end: "00:54" },
+            { id: 'b2', category: 'vocabulary', word: "supermarket", type: "n.", emoji: "🛒", cht: "超市", eng: "A supermarket is a really big store where you can buy all kinds of foods.", start: "04:46", end: "04:52" },
+            { id: 'b3', category: 'vocabulary', word: "enough", type: "adj.", emoji: "⚖️", cht: "足夠的", eng: "I don't eat enough of them.", start: "05:47", end: "05:51" },
+            { id: 'b4', category: 'vocabulary', word: "raw", type: "adj.", emoji: "🥗", cht: "生的", eng: "If you don't cook something, then it is raw.", start: "09:09", end: "09:14" },
+            { id: 'b5', category: 'vocabulary', word: "lettuce", type: "n.", emoji: "🥬", cht: "萵苣/生菜", eng: "Lettuce is a leafy vegetable that is often crispy.", start: "08:32", end: "08:37" },
+            { id: 'b6', category: 'vocabulary', word: "tomato", type: "n.", emoji: "🍅", cht: "番茄", eng: "Tomatoes are actually a fruit because they have seeds.", start: "08:04", end: "08:10" },
+            { id: 'b7', category: 'vocabulary', word: "onion", type: "n.", emoji: "🧅", cht: "洋蔥", eng: "Onions come in a few different colors.", start: "08:41", end: "08:45" },
+            { id: 'b8', category: 'vocabulary', word: "cabbage", type: "n.", emoji: "🥬", cht: "高麗菜", eng: "Cabbage looks a little bit like lettuce, but it's a lot harder.", start: "12:58", end: "13:04" },
+            { id: 'b9', category: 'vocabulary', word: "corn", type: "n.", emoji: "🌽", cht: "玉米", eng: "Corn is a very popular vegetable.", start: "13:13", end: "13:16" },
+            { id: 'b10', category: 'vocabulary', word: "green bean", type: "n.", emoji: "🌱", cht: "四季豆", eng: "Green beans just like it sounds, these are beans that are green.", start: "13:44", end: "13:51" }
+        ];
+
+        // C. 關鍵句子資料
+        const keySentences = [
+            { id: 'c1', category: 'keySentences', eng: "<mark class='bg-yellow-200 px-1 rounded'>Vegetables</mark> are healthy and delicious.", cht: "蔬菜健康又美味。", start: "01:40", end: "01:44" },
+            { id: 'c2', category: 'keySentences', eng: "You can cook vegetables such as <mark class='bg-yellow-200 px-1 rounded'>cabbage</mark> or carrots.", cht: "你可以烹煮像高麗菜或胡蘿蔔等蔬菜。", start: "01:45", end: "01:50" },
+            { id: 'c3', category: 'keySentences', eng: "You can cook <mark class='bg-yellow-200 px-1 rounded'>green beans</mark> and corn in many delicious ways.", cht: "你可以用許多美味的方式來烹調四季豆和玉米。", start: "02:07", end: "02:13" },
+            { id: 'c4', category: 'keySentences', eng: "What vegetables are great on <mark class='bg-yellow-200 px-1 rounded'>sandwiches</mark>?", cht: "什麼蔬菜加在三明治裡很棒？", start: "02:44", end: "02:49" },
+            { id: 'c5', category: 'keySentences', eng: "I don't know if we have <mark class='bg-yellow-200 px-1 rounded'>enough</mark>.", cht: "我不知道我們是否有足夠的量。", start: "05:55", end: "05:59" },
+            { id: 'c6', category: 'keySentences', eng: "We don't have <mark class='bg-yellow-200 px-1 rounded'>enough</mark> money.", cht: "我們沒有足夠的錢。", start: "06:03", end: "06:07" },
+            { id: 'c7', category: 'keySentences', eng: "<mark class='bg-yellow-200 px-1 rounded'>Vegetables</mark> are good for you.", cht: "蔬菜對你有益。", start: "06:31", end: "06:34" },
+            { id: 'c8', category: 'keySentences', eng: "I should eat <mark class='bg-yellow-200 px-1 rounded'>more</mark> of them.", cht: "我應該吃更多。", start: "06:42", end: "06:45" },
+            { id: 'c9', category: 'keySentences', eng: "<mark class='bg-yellow-200 px-1 rounded'>Raw</mark> vegetables aren't too bad.", cht: "生蔬菜其實還不錯。", start: "11:46", end: "11:50" },
+            { id: 'c10', category: 'keySentences', eng: "The movie was <mark class='bg-yellow-200 px-1 rounded'>okay</mark>.", cht: "這部電影還行。", start: "12:02", end: "12:05" }
+        ];
+
+        // D. 測驗資料
+        const quizData = [
+            { id: 'q1', q: "What is Sam shopping for?", options: [{v:'A', t:"Fruits"}, {v:'B', t:"Vegetables"}, {v:'C', t:"Meat"}, {v:'D', t:"Candy"}], ans: 'B', exp: "Sam is shopping for vegetables at the supermarket." },
+            { id: 'q2', q: "How does Sam feel about vegetables?", options: [{v:'A', t:"He loves them very much."}, {v:'B', t:"He grows them in his garden."}, {v:'C', t:"He doesn't really like them."}, {v:'D', t:"He only eats them for breakfast."}], ans: 'C', exp: "Sam says he doesn't really like them." },
+            { id: 'q3', q: "What does Sarah say are great on sandwiches?", options: [{v:'A', t:"Apples and bananas"}, {v:'B', t:"Carrots and potatoes"}, {v:'C', t:"Lettuce, tomatoes, and onions"}, {v:'D', t:"Cheese and ham"}], ans: 'C', exp: "Sarah suggests lettuce, tomatoes, and onions on sandwiches." },
+            { id: 'q4', q: "Does Sam like raw carrots?", options: [{v:'A', t:"Yes, he does."}, {v:'B', t:"No, he hates them."}, {v:'C', t:"Only when they are cooked."}, {v:'D', t:"He has never tried them."}], ans: 'A', exp: "Sam says 'I do like raw carrots. Those are good.'" },
+            { id: 'q5', q: "Why does Sarah tell Sam to eat vegetables?", options: [{v:'A', t:"Because they are expensive."}, {v:'B', t:"Because they are good for him."}, {v:'C', t:"Because he likes to cook."}, {v:'D', t:"Because they are sweet."}], ans: 'B', exp: "Sarah reminds him that vegetables are good for you." }
+        ];
+
+        // ==========================================
+        // 渲染畫面邏輯
+        // ==========================================
+
+        function renderCards() {
+            // Render A
+            const secA = document.getElementById('section-a');
+            lessonTexts.forEach(item => secA.innerHTML += createInteractiveCard(item, 'emerald'));
+
+            // Render B
+            const secB = document.getElementById('section-b');
+            vocabularies.forEach(item => {
+                let vocabHTML = `
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-4xl drop-shadow-sm">${item.emoji}</span>
+                        <div>
+                            <div class="english-text text-[1.5rem] font-bold text-sky-800 tracking-wide">${item.word} <span class="text-sm font-normal text-gray-500">(${item.type})</span></div>
+                            <div class="chinese-text hidden text-lg text-pink-600 font-bold drop-shadow-sm">${item.cht}</div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50/80 p-3 rounded-xl border-l-4 border-sky-400 mb-2">
+                        <div class="text-gray-700 italic font-serif text-lg leading-relaxed">"${item.eng}"</div>
+                    </div>
+                `;
+                secB.innerHTML += createInteractiveCard(item, 'sky', vocabHTML);
+            });
+
+            // Render C
+            const secC = document.getElementById('section-c');
+            keySentences.forEach(item => secC.innerHTML += createInteractiveCard(item, 'orange'));
+
+            // Render D (Quiz)
+            const secD = document.getElementById('section-d');
+            quizData.forEach((item, index) => {
+                let optionsHTML = item.options.map(opt => `
+                    <button class="w-full text-left p-4 rounded-xl border-2 border-gray-200 hover:bg-purple-50 hover:border-purple-300 font-medium text-lg transition-all" 
+                            data-val="${opt.v}" 
+                            onclick="speakText('${opt.t}'); checkAnswer(this, '${opt.v}', '${item.ans}', '${item.exp.replace(/'/g, "\\'")}')">
+                        ${opt.v}) ${opt.t}
+                    </button>
+                `).join('');
+
+                secD.innerHTML += `
+                    <div class="quiz-card bg-white rounded-3xl shadow-sm border border-purple-100 p-6 relative" data-qid="${item.id}">
+                        <div class="font-bold text-xl text-purple-800 mb-4 cursor-pointer hover:text-purple-600 inline-flex items-start gap-2 active:scale-95 transition-transform" 
+                             onclick="speakText('${item.q.replace(/'/g, "\\'")}')">
+                            <span class="mt-1">${index + 1}.</span> 
+                            <span>${item.q}</span> 
+                            <span class="text-2xl ml-2 hover:scale-110" title="Listen">🔊</span>
+                        </div>
+                        <div class="space-y-3 options-container">
+                            ${optionsHTML}
+                        </div>
+                        <div class="feedback hidden mt-4 p-4 rounded-xl text-lg font-bold transition-all duration-300"></div>
+                    </div>
+                `;
+            });
+        }
+
+        function createInteractiveCard(item, color, customHTML = null) {
+            let contentHTML = customHTML || `
+                <div class="english-text text-xl font-bold text-gray-800 leading-relaxed">${item.eng}</div>
+                <div class="chinese-text hidden text-lg text-${color}-600 font-medium mt-1">${item.cht}</div>
+            `;
+
+            return `
+                <div class="interactive-card bg-white rounded-2xl shadow-sm border-2 border-${color}-100 hover:shadow-lg p-5 relative transition-all duration-300 cursor-pointer group" 
+                     data-category="${item.category}" 
+                     onclick="playCard(this)">
+                    
+                    <div class="progress-badge hidden absolute top-3 right-3 text-2xl z-20">🌟</div>
+                    
+                    <div class="flex flex-col gap-2 relative z-10">
+                        ${contentHTML}
+                        
+                        <div class="time-adjuster flex flex-wrap items-center gap-4 bg-${color}-50/50 rounded-xl p-3 mt-3 opacity-80 group-hover:opacity-100 transition-opacity" 
+                             onclick="event.stopPropagation()">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-${color}-700">Start:</span>
+                                <button type="button" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow hover:bg-${color}-200 hover:scale-105 active:scale-95 transition-all text-sm font-bold text-gray-600" onclick="adjTime(this, 'start', -1)">-</button>
+                                <input type="text" class="start-time w-14 text-center text-sm font-mono font-bold bg-transparent border-b-2 border-${color}-300 focus:outline-none focus:border-${color}-500" value="${item.start}">
+                                <button type="button" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow hover:bg-${color}-200 hover:scale-105 active:scale-95 transition-all text-sm font-bold text-gray-600" onclick="adjTime(this, 'start', 1)">+</button>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-${color}-700">End:</span>
+                                <button type="button" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow hover:bg-${color}-200 hover:scale-105 active:scale-95 transition-all text-sm font-bold text-gray-600" onclick="adjTime(this, 'end', -1)">-</button>
+                                <input type="text" class="end-time w-14 text-center text-sm font-mono font-bold bg-transparent border-b-2 border-${color}-300 focus:outline-none focus:border-${color}-500" value="${item.end}">
+                                <button type="button" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow hover:bg-${color}-200 hover:scale-105 active:scale-95 transition-all text-sm font-bold text-gray-600" onclick="adjTime(this, 'end', 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // YouTube API & 播放邏輯
+        // ==========================================
+        let player;
+        let currentPlayingCard = null;
+        let stopTimer = null;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                videoId: 'dfgUcVVO-KI',
+                playerVars: { 
+                    'playsinline': 1, 
+                    'rel': 0,
+                    'controls': 1,
+                    'modestbranding': 1
+                }
+            });
+        }
+
+        function playCard(cardElement) {
+            if (!player || !player.seekTo) return;
+
+            // 解析使用者微調過的最新時間
+            const startStr = cardElement.querySelector('.start-time').value;
+            const endStr = cardElement.querySelector('.end-time').value;
+            const startSec = timeToSeconds(startStr);
+            const endSec = timeToSeconds(endStr);
+            const duration = (endSec - startSec) * 1000;
+
+            if(duration <= 0) return;
+
+            // 移除前一張卡片的狀態
+            if (currentPlayingCard && currentPlayingCard !== cardElement) {
+                currentPlayingCard.classList.remove('glow');
+            }
+
+            // 設定當前卡片發光與進度
+            currentPlayingCard = cardElement;
+            cardElement.classList.add('glow');
+            const badge = cardElement.querySelector('.progress-badge');
+            if (badge) {
+                badge.classList.remove('hidden');
+                badge.classList.add('pop-anim');
+            }
+
+            // 清除之前的暫停計時器
+            if (stopTimer) clearTimeout(stopTimer);
+
+            // 無痕播放
+            player.seekTo(startSec, true);
+            player.playVideo();
+
+            // 設定自動暫停
+            stopTimer = setTimeout(() => {
+                if(player.pauseVideo) player.pauseVideo();
+                cardElement.classList.remove('glow');
+            }, duration);
+        }
+
+        // ==========================================
+        // 時間處理與匯出邏輯
+        // ==========================================
+        function timeToSeconds(timeStr) {
+            let parts = timeStr.split(':');
+            if(parts.length !== 2) return 0;
+            return (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0);
+        }
+
+        function secondsToTime(seconds) {
+            if(seconds < 0) seconds = 0;
+            let m = Math.floor(seconds / 60);
+            let s = seconds % 60;
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        function adjTime(btn, type, delta) {
+            let input = btn.parentElement.querySelector('input');
+            let sec = timeToSeconds(input.value);
+            input.value = secondsToTime(sec + delta);
+        }
+
+        function exportSettings() {
+            let exportedData = { lessonText: [], vocabulary: [], keySentences: [] };
+            
+            document.querySelectorAll('.interactive-card').forEach(card => {
+                let cat = card.dataset.category;
+                if (!exportedData[cat]) return;
+                
+                // 去除 HTML 標籤抓取純文字
+                let engTextEl = card.querySelector('.english-text');
+                let eng = engTextEl.innerText.trim();
+                let start = card.querySelector('.start-time').value;
+                let end = card.querySelector('.end-time').value;
+                
+                exportedData[cat].push({ text: eng, start: start, end: end });
+            });
+            
+            navigator.clipboard.writeText(JSON.stringify(exportedData, null, 2))
+                .then(() => alert("✅ 最新時間設定已成功匯出至剪貼簿！\n(Settings formatted in JSON exported!)"))
+                .catch(err => console.error('匯出失敗: ', err));
+        }
+
+        // ==========================================
+        // 互動與 UI 輔助功能
+        // ==========================================
+        let isChineseVisible = false;
+        function toggleChinese() {
+            isChineseVisible = !isChineseVisible;
+            document.querySelectorAll('.chinese-text').forEach(el => {
+                if (isChineseVisible) {
+                    el.classList.remove('hidden');
+                    el.classList.add('animate-pulse'); // 簡單的出現動畫
+                    setTimeout(() => el.classList.remove('animate-pulse'), 500);
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                // 中斷之前的發音
+                window.speechSynthesis.cancel();
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; // 放慢語速適合國小生
+                utterance.pitch = 1.1; // 稍微提高音調更活潑
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // ==========================================
+        // 測驗與滿分彩蛋邏輯
+        // ==========================================
+        let correctCount = 0;
+        let answeredQuestions = new Set();
+
+        function checkAnswer(btn, answer, correctAnswer, explanation) {
+            let card = btn.closest('.quiz-card');
+            let qId = card.dataset.qid;
+            
+            if (answeredQuestions.has(qId)) return; 
+            answeredQuestions.add(qId);
+            
+            let feedback = card.querySelector('.feedback');
+            feedback.classList.remove('hidden');
+            
+            // 禁用所有選項
+            card.querySelectorAll('button').forEach(b => {
+                b.disabled = true;
+                b.classList.remove('hover:bg-purple-50', 'hover:border-purple-300');
+                b.classList.add('cursor-not-allowed', 'opacity-50');
+            });
+
+            if (answer === correctAnswer) {
+                // 答對
+                btn.classList.replace('border-gray-200', 'border-green-500');
+                btn.classList.add('bg-green-100', 'text-green-900', 'opacity-100');
+                feedback.innerHTML = `🟢 <b>Correct!</b> ${explanation}`;
+                feedback.classList.add('bg-green-100', 'text-green-800');
+                correctCount++;
+            } else {
+                // 答錯
+                btn.classList.replace('border-gray-200', 'border-red-500');
+                btn.classList.add('bg-red-100', 'text-red-900', 'opacity-100');
+                
+                // 標示正確答案
+                card.querySelectorAll('button').forEach(b => {
+                    if (b.dataset.val === correctAnswer) {
+                        b.classList.replace('border-gray-200', 'border-green-400');
+                        b.classList.add('bg-green-50', 'opacity-100');
+                    }
+                });
+                
+                feedback.innerHTML = `🔴 <b>Incorrect.</b> ${explanation}`;
+                feedback.classList.add('bg-red-100', 'text-red-800');
+            }
+            
+            // 滿分彩蛋
+            if (correctCount === 5) {
+                triggerConfetti();
+                setTimeout(() => {
+                    alert("🎉 恭喜你！\n英文小達人！🌟🌟🌟🌟🌟\nYou got a perfect score!");
+                }, 800);
+            }
+        }
+
+        function triggerConfetti() {
+            var duration = 4 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+                }));
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+                }));
+            }, 250);
+        }
+
+        // ==========================================
+        // 電腦版畫面分割拖曳邏輯
+        // ==========================================
+        let isDragging = false;
+        const dragBar = document.getElementById('drag-bar');
+        const videoPane = document.getElementById('video-pane');
+        const contentPane = document.getElementById('content-pane');
+
+        dragBar.addEventListener('mousedown', () => {
+            isDragging = true;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none'; // 防止拖曳時反白文字
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const containerWidth = document.body.clientWidth;
+            const newVideoWidth = (e.clientX / containerWidth) * 100;
+            
+            // 限制拖曳範圍 25% ~ 75%
+            if (newVideoWidth > 25 && newVideoWidth < 75) {
+                videoPane.style.width = newVideoWidth + '%';
+                contentPane.style.width = (100 - newVideoWidth) + '%';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                document.body.style.cursor = 'default';
+                document.body.style.userSelect = '';
+            }
+        });
+
+        // 初始化渲染
+        renderCards();
+
+    </script>
+</body>
+</html>
