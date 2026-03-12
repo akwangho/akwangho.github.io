@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍪 Cookies 互動英語學習站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* 自訂捲軸樣式 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        /* 避免拖曳時文字被選取 */
+        .no-select { user-select: none; }
+        /* 播放中發光效果 */
+        .playing-glow {
+            border-color: #fbbf24 !important;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-[#f8fafc] font-sans h-screen overflow-hidden flex flex-col md:flex-row">
+
+    <div id="video-pane" class="w-full md:w-[60%] h-[40vh] md:h-full flex flex-col bg-[#fffaf0] shrink-0 sticky top-0 z-50 shadow-md">
+        
+        <div class="p-3 bg-[#ffebb3] flex justify-between items-center shadow-sm z-20">
+            <h1 class="text-lg md:text-xl font-bold text-[#d97706]">🍪 Cookies 學習站</h1>
+            <button onclick="togglePanel()" class="bg-[#f59e0b] text-white px-4 py-1.5 rounded-full shadow-md hover:bg-[#d97706] transition text-sm font-bold">
+                ⚙️ 控制面板
+            </button>
+        </div>
+        
+        <div id="global-panel" class="hidden bg-[#fef3c7] p-3 text-sm shadow-inner z-10">
+            <div class="flex flex-wrap gap-2">
+                <button onclick="toggleZh()" class="bg-white border-2 border-[#fcd34d] px-3 py-1.5 rounded-full hover:bg-[#fef08a] transition font-bold text-gray-700">👁️ 顯示/隱藏中文</button>
+                <button onclick="toggleTuners()" class="bg-white border-2 border-[#fcd34d] px-3 py-1.5 rounded-full hover:bg-[#fef08a] transition font-bold text-gray-700">⏱️ 時間微調器</button>
+                <button onclick="adjustFontSize(2)" class="bg-white border-2 border-[#fcd34d] px-3 py-1.5 rounded-full hover:bg-[#fef08a] transition font-bold text-gray-700">A+ 放大</button>
+                <button onclick="adjustFontSize(-2)" class="bg-white border-2 border-[#fcd34d] px-3 py-1.5 rounded-full hover:bg-[#fef08a] transition font-bold text-gray-700">A- 縮小</button>
+                <button onclick="exportJSON()" class="bg-[#10b981] text-white px-3 py-1.5 rounded-full hover:bg-[#059669] transition font-bold shadow">💾 匯出時間設定</button>
+            </div>
+        </div>
+
+        <div class="flex-grow relative bg-black">
+            <div id="player" class="absolute inset-0 w-full h-full pointer-events-auto"></div>
+        </div>
+
+        <div class="bg-[#ffebb3] p-3 shadow-sm z-20">
+            <div class="flex justify-between text-sm font-bold text-[#b45309] mb-1">
+                <span>🏆 學習進度</span>
+                <span id="progress-text">0 / 0</span>
+            </div>
+            <div class="w-full bg-white rounded-full h-3.5 shadow-inner border border-[#fde68a]">
+                <div id="progress-bar" class="bg-[#34d399] h-full rounded-full transition-all duration-500 w-0"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="divider" class="hidden md:block w-2 bg-[#fcd34d] cursor-col-resize hover:bg-[#f59e0b] transition-colors z-30 shadow-md shrink-0 no-select"></div>
+
+    <div id="content-pane" class="w-full md:flex-1 h-[60vh] md:h-full overflow-y-auto bg-[#f8fafc] p-4 md:p-6 text-base space-y-10 scroll-smooth pb-32">
+        
+        <section>
+            <h2 class="text-2xl font-bold text-[#ec4899] mb-4 border-b-4 border-[#fbcfe8] inline-block pb-1">📖 A. 本日課文預習</h2>
+            <p class="text-sm text-gray-500 mb-3">點擊卡片即可播放對應片段</p>
+            <div id="lesson-container" class="space-y-3"></div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-[#8b5cf6] mb-4 border-b-4 border-[#ddd6fe] inline-block pb-1">🍎 B. 基礎關鍵單字</h2>
+            <div id="basic-vocab-container" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-[#f97316] mb-4 border-b-4 border-[#fed7aa] inline-block pb-1">🔥 C. 進階困難單字</h2>
+            <div id="adv-vocab-container" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-[#3b82f6] mb-4 border-b-4 border-[#bfdbfe] inline-block pb-1">💬 D. 實用關鍵句型</h2>
+            <div id="sentence-container" class="space-y-3"></div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-[#10b981] mb-4 border-b-4 border-[#a7f3d0] inline-block pb-1">📝 E. 閱讀理解測驗</h2>
+            <p class="text-sm text-gray-500 mb-3">點擊英文題目或選項可聆聽發音</p>
+            <div id="reading-container" class="space-y-6"></div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-[#6366f1] mb-4 border-b-4 border-[#c7d2fe] inline-block pb-1">🎧 F. 聽力練習測驗</h2>
+            <div id="listening-container" class="space-y-6"></div>
+        </section>
+    </div>
+
+    <script>
+        // === 1. 資料庫定義 (有註解方便維護) ===
+        const data = {
+            lessonTexts: [
+                { id: 'l1', en: "Hi James, try my famous chocolate chip cookies.", zh: "嗨，James，嚐嚐我著名的巧克力豆餅乾。", start: 241, end: 246 },
+                { id: 'l2', en: "They are for a party tonight.", zh: "它們是為了今晚的派對準備的。", start: 246, end: 248 },
+                { id: 'l3', en: "Okay, thanks. Mmm, do you like it?", zh: "好的，謝謝。嗯，你喜歡嗎？", start: 248, end: 255 },
+                { id: 'l4', en: "Yes, it's so soft and chewy. I love chewy cookies.", zh: "是的，它好軟又有嚼勁。我愛有嚼勁的餅乾。", start: 255, end: 260 },
+                { id: 'l5', en: "Have some more.", zh: "多吃一點吧。", start: 260, end: 262 },
+                { id: 'l6', en: "No thanks, you need them for the party.", zh: "不用了謝謝，你需要把它們留給派對。", start: 261, end: 265 },
+                { id: 'l7', en: "Don't worry, I have a lot for the party.", zh: "別擔心，我為了派對準備了很多。", start: 265, end: 268 },
+                { id: 'l8', en: "Do you bake cookies often?", zh: "你經常烤餅乾嗎？", start: 611, end: 614 },
+                { id: 'l9', en: "Yes I do, I often make crunchy sugar cookies.", zh: "是的，我經常做酥脆的糖餅乾。", start: 614, end: 619 },
+                { id: 'l10', en: "I make them in different shapes.", zh: "我把它們做成不同的形狀。", start: 619, end: 621 },
+                { id: 'l11', en: "That's fun! My grandma makes peanut butter cookies.", zh: "真有趣！我奶奶會做花生醬餅乾。", start: 621, end: 626 },
+                { id: 'l12', en: "She gives them away as gifts.", zh: "她把它們當作禮物送人。", start: 626, end: 628 },
+                { id: 'l13', en: "I do too. I give away boxes of different kinds of cookies.", zh: "我也是。我會送出一盒盒不同種類的餅乾。", start: 628, end: 633 },
+                { id: 'l14', en: "May I have a box? Sure! What kinds of cookies do you like?", zh: "我可以拿一盒嗎？當然！你喜歡哪種餅乾？", start: 633, end: 639 }
+            ],
+            basicVocab: [
+                { id: 'b1', en: "party", pos: "n.", zh: "派對", emoji: "🎈", start: 931, end: 937 },
+                { id: 'b2', en: "sugar", pos: "n.", zh: "糖", emoji: "🍬", start: 958, end: 965 },
+                { id: 'b3', en: "kind", pos: "n.", zh: "種類", emoji: "📦", start: 968, end: 974 },
+                { id: 'b4', en: "gift", pos: "n.", zh: "禮物", emoji: "🎁", start: 626, end: 628 },
+                { id: 'b5', en: "shape", pos: "n.", zh: "形狀", emoji: "⭐", start: 618, end: 621 },
+                { id: 'b6', en: "bake", pos: "v.", zh: "烘焙", emoji: "🧑‍🍳", start: 612, end: 614 },
+                { id: 'b7', en: "sweet", pos: "adj.", zh: "甜的", emoji: "🍭", start: 60, end: 64 },
+                { id: 'b8', en: "share", pos: "v.", zh: "分享", emoji: "🤝", start: 778, end: 785 }
+            ],
+            advVocab: [
+                { id: 'a1', en: "chocolate chip", pos: "n.", zh: "巧克力豆", emoji: "🍪", start: 938, end: 946 },
+                { id: 'a2', en: "peanut butter", pos: "n.", zh: "花生醬", emoji: "🥜", start: 948, end: 956 },
+                { id: 'a3', en: "chewy", pos: "adj.", zh: "有嚼勁的", emoji: "🦷", start: 442, end: 447 },
+                { id: 'a4', en: "crunchy", pos: "adj.", zh: "酥脆的", emoji: "🥨", start: 669, end: 677 },
+                { id: 'a5', en: "give away", pos: "phr.", zh: "贈送/分發", emoji: "👐", start: 801, end: 863 }
+            ],
+            keySentences: [
+                { id: 's1', en: "We are going to a <mark class='bg-yellow-200 px-1 rounded'>party</mark> tonight.", zh: "我們今晚要去參加派對。", start: 927, end: 935 },
+                { id: 's2', en: "Don't eat too much <mark class='bg-yellow-200 px-1 rounded'>sugar</mark>.", zh: "不要吃太多糖。", start: 962, end: 965 },
+                { id: 's3', en: "What <mark class='bg-yellow-200 px-1 rounded'>kind</mark> of pie do you like?", zh: "你喜歡哪種派？", start: 967, end: 974 },
+                { id: 's4', en: "She gave me a nice <mark class='bg-yellow-200 px-1 rounded'>gift</mark>.", zh: "她給了我一份很棒的禮物。", start: 625, end: 628 },
+                { id: 's5', en: "They make cookies in different <mark class='bg-yellow-200 px-1 rounded'>shapes</mark>.", zh: "他們製作不同形狀的餅乾。", start: 618, end: 622 },
+                { id: 's6', en: "Can you <mark class='bg-yellow-200 px-1 rounded'>bake</mark> a cake for me?", zh: "你可以幫我烤一個蛋糕嗎？", start: 611, end: 614 },
+                { id: 's7', en: "I like to <mark class='bg-yellow-200 px-1 rounded'>share</mark> my toys.", zh: "我喜歡分享我的玩具。", start: 778, end: 783 },
+                { id: 's8', en: "The kids love <mark class='bg-yellow-200 px-1 rounded'>chocolate chips</mark>.", zh: "孩子們喜愛巧克力豆。", start: 938, end: 947 },
+                { id: 's9', en: "I eat bread with <mark class='bg-yellow-200 px-1 rounded'>peanut butter</mark>.", zh: "我吃麵包配花生醬。", start: 948, end: 956 },
+                { id: 's10', en: "These candies are very <mark class='bg-yellow-200 px-1 rounded'>chewy</mark>.", zh: "這些糖果非常有嚼勁。", start: 442, end: 450 }
+            ],
+            readingQuiz: [
+                {
+                    id: 'rq1', q: "What kind of cookies did Sarah make for the party?", qZh: "Sarah 為派對做了什麼種類的餅乾？",
+                    options: [
+                        { id: 'rq1_1', text: "Chocolate chip cookies", zh: "巧克力豆餅乾", isCorrect: true },
+                        { id: 'rq1_2', text: "A birthday cake", zh: "一個生日蛋糕", isCorrect: false },
+                        { id: 'rq1_3', text: "Peanut butter candy", zh: "花生醬糖果", isCorrect: false },
+                        { id: 'rq1_4', text: "Some bread", zh: "一些麵包", isCorrect: false }
+                    ],
+                    explanation: "影片中 Sarah 提到要大家嚐嚐她的著名巧克力豆餅乾 (famous chocolate chip cookies)。", explanationZh: "對應課文內容。"
+                },
+                {
+                    id: 'rq2', q: "How do Sarah's cookies taste?", qZh: "Sarah 的餅乾嚐起來如何？",
+                    options: [
+                        { id: 'rq2_1', text: "Hard and crunchy", zh: "堅硬且酥脆", isCorrect: false },
+                        { id: 'rq2_2', text: "Soft and chewy", zh: "柔軟且有嚼勁", isCorrect: true },
+                        { id: 'rq2_3', text: "Very salty", zh: "非常鹹", isCorrect: false },
+                        { id: 'rq2_4', text: "Sour and sweet", zh: "酸酸甜甜", isCorrect: false }
+                    ],
+                    explanation: "James 說餅乾是 'soft and chewy'。", explanationZh: "柔軟且有嚼勁。"
+                },
+                {
+                    id: 'rq3', q: "Why doesn't James eat more cookies?", qZh: "為什麼 James 不吃更多餅乾？",
+                    options: [
+                        { id: 'rq3_1', text: "He doesn't like them.", zh: "他不喜歡。", isCorrect: false },
+                        { id: 'rq3_2', text: "He is too full.", zh: "他太飽了。", isCorrect: false },
+                        { id: 'rq3_3', text: "They are too hard.", zh: "餅乾太硬了。", isCorrect: false },
+                        { id: 'rq3_4', text: "Sarah needs them for the party.", zh: "Sarah 需要留給派對用。", isCorrect: true }
+                    ],
+                    explanation: "James 說 'you need them for the party'。", explanationZh: "因為要留給晚上的派對。"
+                },
+                {
+                    id: 'rq4', q: "What kind of cookies does Sarah often make?", qZh: "Sarah 經常做什麼種類的餅乾？",
+                    options: [
+                        { id: 'rq4_1', text: "Soft chocolate cookies.", zh: "柔軟的巧克力餅乾。", isCorrect: false },
+                        { id: 'rq4_2', text: "Crunchy sugar cookies.", zh: "酥脆的糖餅乾。", isCorrect: true },
+                        { id: 'rq4_3', text: "Big peanut butter cookies.", zh: "大的花生醬餅乾。", isCorrect: false },
+                        { id: 'rq4_4', text: "Small fruit cookies.", zh: "小的水果餅乾。", isCorrect: false }
+                    ],
+                    explanation: "Sarah 提到她經常做 'crunchy sugar cookies'。", explanationZh: "酥脆的糖餅乾。"
+                },
+                {
+                    id: 'rq5', q: "What does James' grandma do with her cookies?", qZh: "James 的奶奶如何處理她的餅乾？",
+                    options: [
+                        { id: 'rq5_1', text: "She gives them away as gifts.", zh: "她把餅乾當作禮物送人。", isCorrect: true },
+                        { id: 'rq5_2', text: "She eats them all.", zh: "她全部吃掉。", isCorrect: false },
+                        { id: 'rq5_3', text: "She sells them at a store.", zh: "她在商店賣掉。", isCorrect: false },
+                        { id: 'rq5_4', text: "She brings them to a party.", zh: "她帶去派對。", isCorrect: false }
+                    ],
+                    explanation: "James 說奶奶會 'gives them away as gifts'。", explanationZh: "當作禮物分送。"
+                }
+            ],
+            listeningQuiz: [
+                {
+                    id: 'lq1', start: 48, end: 52,
+                    options: [
+                        { id: 'lq1_1', text: "I love to eat cookies.", zh: "我喜歡吃餅乾。", isCorrect: true },
+                        { id: 'lq1_2', text: "I love to make cookies.", zh: "我喜歡做餅乾。", isCorrect: false },
+                        { id: 'lq1_3', text: "I want to eat cookies.", zh: "我想吃餅乾。", isCorrect: false },
+                        { id: 'lq1_4', text: "I like to eat candies.", zh: "我喜歡吃糖果。", isCorrect: false }
+                    ],
+                    explanation: "原音為: I love to eat cookies.", explanationZh: "我喜歡吃餅乾。"
+                },
+                {
+                    id: 'lq2', start: 75, end: 81,
+                    options: [
+                        { id: 'lq2_1', text: "We can bake cookies at home or we can buy them at a store.", zh: "我們可以在家烤餅乾，或者在商店買。", isCorrect: false },
+                        { id: 'lq2_2', text: "We can make cakes at home or we can buy them at a store.", zh: "我們可以在家做蛋糕，或者在商店買。", isCorrect: false },
+                        { id: 'lq2_3', text: "We can make cookies at home or we can buy them at a store.", zh: "我們可以在家做餅乾，或者在商店買。", isCorrect: true },
+                        { id: 'lq2_4', text: "We can make cookies at home or we can buy them at a shop.", zh: "我們可以在家做餅乾，或者在店鋪買。", isCorrect: false }
+                    ],
+                    explanation: "原音為: We can make cookies at home or we can buy them at a store.", explanationZh: "我們可以在家做餅乾，或者在商店買。"
+                },
+                {
+                    id: 'lq3', start: 329, end: 335,
+                    options: [
+                        { id: 'lq3_1', text: "It is a good idea to bring tasty things to a party.", zh: "帶美味的東西去派對是不錯的主意。", isCorrect: false },
+                        { id: 'lq3_2', text: "It's always a good idea to bring tasty things to a party.", zh: "帶美味的東西去派對總是不錯的主意。", isCorrect: true },
+                        { id: 'lq3_3', text: "It's always a good idea to buy tasty things for a party.", zh: "買美味的東西給派對總是不錯的主意。", isCorrect: false },
+                        { id: 'lq3_4', text: "It's always a great idea to bring sweet things to a party.", zh: "帶甜食去派對總是很棒的主意。", isCorrect: false }
+                    ],
+                    explanation: "原音為: It's always a good idea to bring tasty things to a party.", explanationZh: "帶美味的東西去派對總是不錯的主意。"
+                },
+                {
+                    id: 'lq4', start: 1183, end: 1188,
+                    options: [
+                        { id: 'lq4_1', text: "I remember making those when I was a child.", zh: "我記得我小時候做過那些。", isCorrect: false },
+                        { id: 'lq4_2', text: "I remember baking them when I was a kid.", zh: "我記得我小時候烤過它們。", isCorrect: false },
+                        { id: 'lq4_3', text: "I loved baking those when I was a kid.", zh: "我小時候熱愛烤那些。", isCorrect: false },
+                        { id: 'lq4_4', text: "I remember baking those when I was a kid.", zh: "我記得我小時候烤過那些。", isCorrect: true }
+                    ],
+                    explanation: "原音為: I remember baking those when I was a kid.", explanationZh: "我記得我小時候烤過那些。"
+                },
+                {
+                    id: 'lq5', start: 1205, end: 1210,
+                    options: [
+                        { id: 'lq5_1', text: "Hey, maybe we should bake cookies tonight when you get home.", zh: "嘿，也許我們今晚你回家後應該烤餅乾。", isCorrect: false },
+                        { id: 'lq5_2', text: "Hey, maybe you should bake cookies tonight when you get home.", zh: "嘿，也許你今晚回家後應該烤餅乾。", isCorrect: true },
+                        { id: 'lq5_3', text: "Hey, maybe you should make cookies tonight when you go home.", zh: "嘿，也許你今晚回家後應該做餅乾。", isCorrect: false },
+                        { id: 'lq5_4', text: "Hey, maybe you will bake cookies tonight when you get home.", zh: "嘿，也許你今晚回家後會烤餅乾。", isCorrect: false }
+                    ],
+                    explanation: "原音為: Hey, maybe you should bake cookies tonight when you get home.", explanationZh: "也許你今晚回家後應該烤餅乾。"
+                }
+            ]
+        };
+
+        // === 2. 狀態與全域變數 ===
+        let player;
+        let playInterval = null;
+        let currentEndTime = null;
+        let isDragging = false;
+        let showZh = false;
+        let showTuners = false;
+        let fontSize = 16;
+        
+        const clickedItems = new Set();
+        const totalItems = data.lessonTexts.length + data.basicVocab.length + data.advVocab.length + data.keySentences.length + data.listeningQuiz.length;
+
+        // === 3. YouTube IFrame API 初始化 ===
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'm1rpbQ4tSfU',
+                playerVars: { 'playsinline': 1, 'rel': 0, 'modestbranding': 1 },
+                events: { 'onReady': onPlayerReady }
+            });
+        }
+        function onPlayerReady(event) { console.log("YT Player Ready"); }
+
+        // === 4. 輔助功能 (時間格式化、發音) ===
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = Math.floor(sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function speakText(e, text) {
+            e.stopPropagation();
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // === 5. 核心播放與互動機制 ===
+        function playVideoSegment(start, end, itemId) {
+            if (!player || !player.seekTo) return;
+            player.seekTo(start, true);
+            player.playVideo();
+            currentEndTime = end;
+
+            // 紀錄進度與獎勵
+            if (!clickedItems.has(itemId)) {
+                clickedItems.add(itemId);
+                const stamp = document.getElementById(`stamp-${itemId}`);
+                if (stamp) {
+                    stamp.classList.remove('opacity-0');
+                    stamp.classList.add('opacity-100');
+                    // 卡片震動提示
+                    const card = document.getElementById(`card-${itemId}`) || document.getElementById(`lq-card-${itemId}`);
+                    if(card) {
+                        card.animate([{ transform: 'translate(1px, 1px) rotate(0deg)' }, { transform: 'translate(-1px, -2px) rotate(-1deg)' }, { transform: 'translate(-3px, 0px) rotate(1deg)' }, { transform: 'translate(3px, 2px) rotate(0deg)' }], { duration: 300 });
+                    }
+                }
+                updateProgressBar();
+            }
+
+            // 視覺狀態引導 (發光)
+            document.querySelectorAll('.playable-card').forEach(c => c.classList.remove('playing-glow'));
+            const card = document.getElementById(`card-${itemId}`) || document.getElementById(`lq-card-${itemId}`);
+            if (card) card.classList.add('playing-glow');
+
+            // 自動暫停機制
+            if (playInterval) clearInterval(playInterval);
+            playInterval = setInterval(() => {
+                if (player.getCurrentTime() >= currentEndTime) {
+                    player.pauseVideo();
+                    clearInterval(playInterval);
+                    if (card) card.classList.remove('playing-glow');
+                }
+            }, 200);
+        }
+
+        function playItem(type, itemId) {
+            const map = { 'lesson': data.lessonTexts, 'vocabB': data.basicVocab, 'vocabA': data.advVocab, 'sentence': data.keySentences, 'listen': data.listeningQuiz };
+            const item = map[type].find(i => i.id === itemId);
+            if (item) playVideoSegment(item.start, item.end, itemId);
+        }
+
+        function adjustTime(type, itemId, field, amount) {
+            const map = { 'lesson': data.lessonTexts, 'vocabB': data.basicVocab, 'vocabA': data.advVocab, 'sentence': data.keySentences, 'listen': data.listeningQuiz };
+            const item = map[type].find(i => i.id === itemId);
+            if (!item) return;
+            
+            item[field] += amount;
+            if (item[field] < 0) item[field] = 0;
+            
+            // 更新 UI
+            const span = document.getElementById(`${field}-time-${itemId}`);
+            if (span) span.innerText = `${field === 'start' ? 'Start' : 'End'}: ${formatTime(item[field])}`;
+
+            // 自動播放預覽
+            if (field === 'start') {
+                playVideoSegment(item.start, item.end, itemId);
+            } else {
+                let testStart = item.end - 3;
+                if (testStart < item.start) testStart = item.start;
+                playVideoSegment(testStart, item.end, itemId);
+            }
+        }
+
+        // === 6. 渲染與介面產生 ===
+        function createCardHTML(item, type) {
+            return `
+                <div id="card-${item.id}" class="playable-card relative bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer border-2 border-transparent hover:border-[#fcd34d]" onclick="playItem('${type}', '${item.id}')">
+                    <div id="stamp-${item.id}" class="absolute top-2 right-2 text-xl opacity-0 transition-opacity pointer-events-none drop-shadow-md">✅</div>
+                    <div class="flex items-center gap-3">
+                        ${item.emoji ? `<span class="text-4xl shrink-0">${item.emoji}</span>` : ''}
+                        <div class="w-full">
+                            <div class="text-lg font-bold text-gray-800 leading-snug">${item.en}</div>
+                            ${item.pos ? `<span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded mt-1 font-bold">${item.pos}</span>` : ''}
+                            <div class="zh-text hidden text-gray-500 mt-2 text-sm border-t pt-1 border-gray-100">${item.zh}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="time-tuners hidden mt-3 p-2 bg-gray-50 rounded-lg flex flex-wrap gap-2 text-xs justify-between items-center" onclick="event.stopPropagation()">
+                        <div class="flex items-center gap-1">
+                            <span id="start-time-${item.id}" class="text-gray-600 font-mono w-16">Start: ${formatTime(item.start)}</span>
+                            <button onclick="adjustTime('${type}', '${item.id}', 'start', -1)" class="bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 transition font-bold">-1s</button>
+                            <button onclick="adjustTime('${type}', '${item.id}', 'start', 1)" class="bg-green-100 text-green-600 px-2 py-1 rounded hover:bg-green-200 transition font-bold">+1s</button>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span id="end-time-${item.id}" class="text-gray-600 font-mono w-16">End: ${formatTime(item.end)}</span>
+                            <button onclick="adjustTime('${type}', '${item.id}', 'end', -1)" class="bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 transition font-bold">-1s</button>
+                            <button onclick="adjustTime('${type}', '${item.id}', 'end', 1)" class="bg-green-100 text-green-600 px-2 py-1 rounded hover:bg-green-200 transition font-bold">+1s</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAll() {
+            document.getElementById('lesson-container').innerHTML = data.lessonTexts.map(i => createCardHTML(i, 'lesson')).join('');
+            document.getElementById('basic-vocab-container').innerHTML = data.basicVocab.map(i => createCardHTML(i, 'vocabB')).join('');
+            document.getElementById('adv-vocab-container').innerHTML = data.advVocab.map(i => createCardHTML(i, 'vocabA')).join('');
+            document.getElementById('sentence-container').innerHTML = data.keySentences.map(i => createCardHTML(i, 'sentence')).join('');
+            renderReadingQuiz();
+            renderListeningQuiz();
+        }
+
+        function renderReadingQuiz() {
+            const html = data.readingQuiz.map((q, i) => {
+                let opts = q.options.map(o => `
+                    <button id="btn-${o.id}" class="block w-full text-left p-3 my-2 bg-white border-2 border-[#a7f3d0] rounded-xl hover:bg-[#ecfdf5] transition shadow-sm" onclick="speakText(event, '${o.text.replace(/'/g, "\\'")}'); checkReadingAnswer('${q.id}', '${o.id}')">
+                        <div class="font-bold text-gray-700">${o.text}</div>
+                        <div class="zh-text hidden text-sm text-gray-500 mt-1">${o.zh}</div>
+                    </button>
+                `).join('');
+
+                return `
+                    <div class="bg-[#f0fdf4] p-5 rounded-2xl shadow-sm border border-[#bbf7d0]">
+                        <div class="font-bold text-[#047857] text-lg mb-2 cursor-pointer hover:opacity-80 transition" onclick="speakText(event, '${q.q.replace(/'/g, "\\'")}')">
+                            Q${i+1}: ${q.q}
+                        </div>
+                        <div class="zh-text hidden text-sm text-gray-600 mb-4 pb-2 border-b border-[#a7f3d0]">${q.qZh}</div>
+                        ${opts}
+                        <div id="res-${q.id}" class="mt-3 text-sm font-bold hidden p-3 rounded-lg"></div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('reading-container').innerHTML = html;
+        }
+
+        function renderListeningQuiz() {
+            const html = data.listeningQuiz.map((q, i) => {
+                let opts = q.options.map(o => `
+                    <button id="btn-${o.id}" class="block w-full text-left p-3 my-2 bg-white border-2 border-[#c7d2fe] rounded-xl hover:bg-[#eef2ff] transition shadow-sm" onclick="checkListeningAnswer('${q.id}', '${o.id}')">
+                        <div class="font-bold text-gray-700">${o.text}</div>
+                        <div class="zh-text hidden text-sm text-gray-500 mt-1">${o.zh}</div>
+                    </button>
+                `).join('');
+
+                return `
+                    <div id="lq-card-${q.id}" class="playable-card bg-[#eef2ff] p-5 rounded-2xl shadow-sm border border-[#a5b4fc] transition-all">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="font-bold text-[#4338ca] text-lg flex items-center gap-2">
+                                Q${i+1} <span id="stamp-${q.id}" class="text-lg opacity-0 transition-opacity drop-shadow-md">✅</span>
+                            </span>
+                            <button onclick="playItem('listen', '${q.id}')" class="bg-[#6366f1] hover:bg-[#4f46e5] text-white px-5 py-2 rounded-full shadow-md flex items-center gap-2 transition font-bold">
+                                ▶️ 播放語音
+                            </button>
+                        </div>
+                        
+                        <div class="time-tuners hidden mb-4 p-3 bg-white rounded-lg flex flex-wrap gap-2 text-xs justify-between items-center border border-gray-200">
+                            <div class="flex items-center gap-1">
+                                <span id="start-time-${q.id}" class="text-gray-600 font-mono w-16">Start: ${formatTime(q.start)}</span>
+                                <button onclick="adjustTime('listen', '${q.id}', 'start', -1)" class="bg-red-100 text-red-600 px-2 py-1 rounded font-bold">-1s</button>
+                                <button onclick="adjustTime('listen', '${q.id}', 'start', 1)" class="bg-green-100 text-green-600 px-2 py-1 rounded font-bold">+1s</button>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span id="end-time-${q.id}" class="text-gray-600 font-mono w-16">End: ${formatTime(q.end)}</span>
+                                <button onclick="adjustTime('listen', '${q.id}', 'end', -1)" class="bg-red-100 text-red-600 px-2 py-1 rounded font-bold">-1s</button>
+                                <button onclick="adjustTime('listen', '${q.id}', 'end', 1)" class="bg-green-100 text-green-600 px-2 py-1 rounded font-bold">+1s</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            ${opts}
+                        </div>
+                        <div id="res-${q.id}" class="mt-3 text-sm font-bold hidden p-3 rounded-lg"></div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('listening-container').innerHTML = html;
+        }
+
+        // === 7. 測驗評分機制 ===
+        let readingScore = 0;
+        let listeningScore = 0;
+
+        function checkReadingAnswer(qId, optId) {
+            const q = data.readingQuiz.find(x => x.id === qId);
+            const opt = q.options.find(x => x.id === optId);
+            const resDiv = document.getElementById(`res-${qId}`);
+            
+            // 停用其他選項
+            q.options.forEach(o => {
+                const btn = document.getElementById(`btn-${o.id}`);
+                btn.onclick = null;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                if(o.id === optId) btn.classList.remove('opacity-50');
+            });
+
+            resDiv.classList.remove('hidden');
+            if(opt.isCorrect) {
+                resDiv.classList.add('bg-green-100', 'text-green-800');
+                resDiv.innerHTML = `🟢 答對了！<br><span class="text-gray-600 font-normal mt-1 block">${q.explanation}</span><span class="zh-text ${showZh ? '' : 'hidden'} text-gray-500 font-normal block">${q.explanationZh}</span>`;
+                readingScore++;
+                if(readingScore === 5) triggerConfetti("英文閱讀小達人！🌟🌟🌟🌟🌟");
+            } else {
+                resDiv.classList.add('bg-red-100', 'text-red-800');
+                resDiv.innerHTML = `🔴 答錯了。<br><span class="text-gray-600 font-normal mt-1 block">${q.explanation}</span><span class="zh-text ${showZh ? '' : 'hidden'} text-gray-500 font-normal block">${q.explanationZh}</span>`;
+            }
+        }
+
+        function checkListeningAnswer(qId, optId) {
+            const q = data.listeningQuiz.find(x => x.id === qId);
+            const opt = q.options.find(x => x.id === optId);
+            const resDiv = document.getElementById(`res-${qId}`);
+            
+            q.options.forEach(o => {
+                const btn = document.getElementById(`btn-${o.id}`);
+                btn.onclick = null;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                if(o.id === optId) btn.classList.remove('opacity-50');
+            });
+
+            resDiv.classList.remove('hidden');
+            if(opt.isCorrect) {
+                resDiv.classList.add('bg-green-100', 'text-green-800');
+                resDiv.innerHTML = `🟢 聽力滿分！<br><span class="text-gray-600 font-normal mt-1 block">${q.explanation}</span><span class="zh-text ${showZh ? '' : 'hidden'} text-gray-500 font-normal block">${q.explanationZh}</span>`;
+                listeningScore++;
+                if(listeningScore === 5) triggerConfetti("英文聽力小達人！🌟🌟🌟🌟🌟");
+            } else {
+                resDiv.classList.add('bg-red-100', 'text-red-800');
+                resDiv.innerHTML = `🔴 再接再厲。<br><span class="text-gray-600 font-normal mt-1 block">${q.explanation}</span><span class="zh-text ${showZh ? '' : 'hidden'} text-gray-500 font-normal block">${q.explanationZh}</span>`;
+            }
+        }
+
+        // === 8. 全局控制功能 ===
+        function togglePanel() {
+            const panel = document.getElementById('global-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function toggleZh() {
+            showZh = !showZh;
+            document.querySelectorAll('.zh-text').forEach(el => showZh ? el.classList.remove('hidden') : el.classList.add('hidden'));
+        }
+
+        function toggleTuners() {
+            showTuners = !showTuners;
+            document.querySelectorAll('.time-tuners').forEach(el => showTuners ? el.classList.remove('hidden') : el.classList.add('hidden'));
+        }
+
+        function adjustFontSize(amount) {
+            fontSize += amount;
+            if (fontSize < 12) fontSize = 12;
+            if (fontSize > 30) fontSize = 30;
+            const pane = document.getElementById('content-pane');
+            pane.style.fontSize = fontSize + 'px';
+            let style = document.getElementById('font-size-override');
+            if (!style) {
+                style = document.createElement('style');
+                style.id = 'font-size-override';
+                document.head.appendChild(style);
+            }
+            style.textContent = `
+                #content-pane { font-size: ${fontSize}px !important; }
+                #content-pane .text-2xl { font-size: ${Math.round(fontSize * 1.5)}px !important; }
+                #content-pane .text-lg { font-size: ${Math.round(fontSize * 1.125)}px !important; }
+                #content-pane .text-sm { font-size: ${Math.round(fontSize * 0.875)}px !important; }
+                #content-pane .text-xs { font-size: ${Math.round(fontSize * 0.75)}px !important; }
+                #content-pane .text-4xl { font-size: ${Math.round(fontSize * 2.25)}px !important; }
+                #content-pane .time-tuners, #content-pane .time-tuners * { font-size: 12px !important; }
+            `;
+        }
+
+        function exportJSON() {
+            const exportData = {
+                lessonTexts: data.lessonTexts.map(i => ({ en: i.en, start: i.start, end: i.end })),
+                basicVocab: data.basicVocab.map(i => ({ word: i.en, start: i.start, end: i.end })),
+                advVocab: data.advVocab.map(i => ({ word: i.en, start: i.start, end: i.end })),
+                keySentences: data.keySentences.map(i => ({ en: i.en, start: i.start, end: i.end })),
+                listeningQuiz: data.listeningQuiz.map(i => ({ start: i.start, end: i.end }))
+            };
+            navigator.clipboard.writeText(JSON.stringify(exportData, null, 2))
+                .then(() => alert("時間設定已成功複製到剪貼簿！(JSON格式)"))
+                .catch(err => console.error("複製失敗", err));
+        }
+
+        function updateProgressBar() {
+            const pct = (clickedItems.size / totalItems) * 100;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('progress-text').innerText = `${clickedItems.size} / ${totalItems}`;
+            if (clickedItems.size === totalItems) {
+                setTimeout(() => triggerConfetti("太棒了！你已完成所有影片學習！🎉"), 500);
+            }
+        }
+
+        function triggerConfetti(msg) {
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+            if (msg) setTimeout(() => alert(msg), 300);
+        }
+
+        // === 9. 拖曳分割線邏輯 ===
+        const divider = document.getElementById('divider');
+        const videoPane = document.getElementById('video-pane');
+
+        divider.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            document.body.style.cursor = 'col-resize';
+            const iframe = document.querySelector('#player');
+            if (iframe) iframe.style.pointerEvents = 'none'; // 防止 iframe 吞噬滑鼠事件
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const containerWidth = document.body.clientWidth;
+            const newPct = (e.clientX / containerWidth) * 100;
+            if (newPct > 20 && newPct < 80) { // 限制比例
+                videoPane.style.width = `${newPct}%`;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                document.body.style.cursor = 'default';
+                const iframe = document.querySelector('#player');
+                if (iframe) iframe.style.pointerEvents = 'auto'; // 恢復互動
+            }
+        });
+
+        // 初始化畫面
+        renderAll();
+        document.getElementById('progress-text').innerText = `0 / ${totalItems}`;
+    </script>
+</body>
+</html>
