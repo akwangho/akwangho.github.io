@@ -538,14 +538,14 @@
                     qTextWrap.innerHTML = `<p class="font-bold text-lg text-slate-800 cursor-pointer hover:text-blue-500 transition" onclick="speak('${q.q.replace(/'/g, "\\'")}')">${qIndex + 1}. ${q.q} <i class="fa-solid fa-volume-high text-sm text-slate-400 ml-1"></i></p>
                                            <p class="zh-text text-slate-500 text-sm mt-1">${q.q_zh}</p>`;
                 } else {
-                    // 聽力題：不顯示英文，點擊播放按鈕
+                    // 聽力題：顯示英文題目，點擊播放按鈕聽音檔
                     qTextWrap.innerHTML = `
                         <div class="flex items-center gap-3">
                             <button class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transform transition hover:scale-110" onclick="playSegment('${q.id}', ${q.s}, ${q.e})">
                                 <i class="fa-solid fa-play text-xl ml-1"></i>
                             </button>
                             <div>
-                                <p class="font-bold text-lg text-slate-800">題 ${qIndex + 1}：仔細聽影片說什麼！</p>
+                                <p class="font-bold text-lg text-slate-800 cursor-pointer hover:text-blue-500 transition" onclick="speak('${q.q.replace(/'/g, "\\'")}')">題 ${qIndex + 1}：${q.q} <i class="fa-solid fa-volume-high text-sm text-slate-400 ml-1"></i></p>
                                 <p class="zh-text text-slate-500 text-sm mt-1">${q.q_zh}</p>
                             </div>
                         </div>`;
