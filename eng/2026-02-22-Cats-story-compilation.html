@@ -69,9 +69,9 @@
         .zh-text { transition: opacity 0.3s ease; }
         .hide-zh .zh-text { opacity: 0; pointer-events: none; position: absolute; visibility: hidden; }
 
-        /* 時間微調器隱藏機制 */
-        .time-adjuster { display: none; }
-        .show-adjusters .time-adjuster { display: inline-flex; }
+        /* 時間微調器：預設隱藏，點擊上方「微調時間」按鈕才顯示 */
+        .time-adjuster { display: none !important; }
+        #main-container.show-adjusters .time-adjuster { display: inline-flex !important; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-800 text-base" id="app-body">
@@ -348,6 +348,12 @@
         }
 
         // --- 時間微調器邏輯 ---
+        function secondsToMMSS(sec) {
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
         function adjustTime(objArr, index, type, amount, event) {
             event.stopPropagation(); // 防止觸發卡片播放
             const item = objArr[index];
@@ -420,16 +426,16 @@
             const container = document.getElementById('content-container');
             container.innerHTML = '';
 
-            // 輔助函數：生成時間微調按鈕 HTML
+            // 輔助函數：生成時間微調按鈕 HTML（顯示為 MM:SS）
             const buildAdjusters = (arrName, index, s, e) => `
                 <div class="time-adjuster flex flex-col items-end gap-1 text-xs text-slate-400 absolute bottom-2 right-2 z-10">
                     <div class="flex items-center gap-1 bg-white p-1 rounded border shadow-sm">
-                        <span>起 ${s}s</span>
+                        <span>起 ${secondsToMMSS(s)}</span>
                         <button onclick="adjustTime(appData.${arrName}, ${index}, 'start', -1, event)" class="px-1.5 bg-slate-100 hover:bg-slate-200 rounded">-</button>
                         <button onclick="adjustTime(appData.${arrName}, ${index}, 'start', 1, event)" class="px-1.5 bg-slate-100 hover:bg-slate-200 rounded">+</button>
                     </div>
                     <div class="flex items-center gap-1 bg-white p-1 rounded border shadow-sm">
-                        <span>迄 ${e}s</span>
+                        <span>迄 ${secondsToMMSS(e)}</span>
                         <button onclick="adjustTime(appData.${arrName}, ${index}, 'end', -1, event)" class="px-1.5 bg-slate-100 hover:bg-slate-200 rounded">-</button>
                         <button onclick="adjustTime(appData.${arrName}, ${index}, 'end', 1, event)" class="px-1.5 bg-slate-100 hover:bg-slate-200 rounded">+</button>
                     </div>
@@ -619,17 +625,17 @@
                 qCard.appendChild(optGrid);
                 qCard.appendChild(feedbackDiv);
                 
-                // 聽力題的時間微調器 (使用輔助函數HTML然後塞進去)
+                // 聽力題的時間微調器 (MM:SS 顯示)
                 if(type === 'listen') {
                     const adjHTML = `
                         <div class="time-adjuster flex flex-col items-end gap-1 text-xs text-slate-400 absolute top-2 right-2 z-10">
                             <div class="flex items-center gap-1 bg-white p-1 rounded border shadow-sm">
-                                <span>起 ${q.s}s</span>
+                                <span>起 ${secondsToMMSS(q.s)}</span>
                                 <button onclick="adjustTime(appData.listenQuiz, ${qIndex}, 'start', -1, event)" class="px-1.5 bg-slate-100 hover:bg-slate-200 rounded">-</button>
                                 <button onclick="adjustTime(appData.listenQuiz, ${qIndex}, 'start', 1, event)" class="px-1.5 bg-slate-100 hover:bg-slate-200 rounded">+</button>
                             </div>
                             <div class="flex items-center gap-1 bg-white p-1 rounded border shadow-sm">
-                                <span>迄 ${q.e}s</span>
+                                <span>迄 ${secondsToMMSS(q.e)}</span>
                                 <button onclick="adjustTime(appData.listenQuiz, ${qIndex}, 'end', -1, event)" class="px-1.5 bg-slate-100 hover:bg-slate-200 rounded">-</button>
                                 <button onclick="adjustTime(appData.listenQuiz, ${qIndex}, 'end', 1, event)" class="px-1.5 bg-slate-100 hover:bg-slate-200 rounded">+</button>
                             </div>
