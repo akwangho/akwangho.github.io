@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小數運算練習題</title>
+    <title>小數運算進階練習題</title>
     <style>
         body {
             font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
@@ -11,163 +11,155 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f4f7f6;
+            background-color: #fdfaf6;
             color: #333;
         }
         h1 {
             text-align: center;
             color: #2c3e50;
-            border-bottom: 2px solid #3498db;
+            border-bottom: 2px solid #27ae60;
             padding-bottom: 10px;
         }
         h2 {
-            color: #2980b9;
+            color: #16a085;
             margin-top: 30px;
+            border-left: 5px solid #16a085;
+            padding-left: 10px;
         }
         .question-card {
             background-color: #ffffff;
             padding: 20px;
             margin-bottom: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+            border: 1px solid #eee;
         }
         .question-text {
             font-size: 1.1em;
             margin-bottom: 15px;
+            font-weight: 500;
         }
         details {
             margin-top: 10px;
         }
         summary {
             cursor: pointer;
-            color: #e67e22;
+            color: #d35400;
             font-weight: bold;
             outline: none;
             user-select: none;
-            padding: 5px 0;
-            transition: color 0.3s;
+            padding: 8px 12px;
+            background-color: #fbeee6;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            display: inline-block;
         }
         summary:hover {
-            color: #d35400;
+            background-color: #f5d7c4;
         }
         .answer-box {
-            margin-top: 10px;
+            margin-top: 15px;
             padding: 15px;
-            background-color: #ebf5fb;
-            border-left: 5px solid #3498db;
+            background-color: #eaeded;
+            border-left: 5px solid #bdc3c7;
             border-radius: 0 4px 4px 0;
-            font-size: 0.95em;
+            font-size: 1em;
+        }
+        .step {
+            margin-bottom: 5px;
+            color: #555;
         }
     </style>
 </head>
 <body>
 
-    <h1>📝 小數運算練習題</h1>
+    <h1>🚀 小數運算大挑戰</h1>
+    <p style="text-align: center; color: #7f8c8d;">仔細看題目，一步一步慢慢算喔！</p>
 
-    <h2>一、選擇題</h2>
+    <h2>一、觀念暖身題</h2>
 
     <div class="question-card">
-        <div class="question-text">1. (　　) 下面哪一個數最接近 5？<br>① 4.3　② 5.8　③ 4.8　④ 5.4</div>
+        <div class="question-text">1. (　　) 下面哪一個數最接近 8？<br>① 7.6　② 8.5　③ 7.9　④ 8.2</div>
         <details>
-            <summary>👉 點擊查看答案</summary>
+            <summary>👀 偷看答案與解析</summary>
             <div class="answer-box">
                 <strong>答案：③</strong><br>
-                解析：與 5 的相差值，4.8 差 0.2，差距最小。
+                解析：算算看誰跟 8 差最少。7.9 跟 8 只差了 0.1，是差距最小的。
             </div>
         </details>
     </div>
 
     <div class="question-card">
-        <div class="question-text">2. (　　) 下面哪一個數最接近 10？<br>① 9.6　② 10.5　③ 9.8　④ 10.3</div>
+        <div class="question-text">2. (　　) 請問「45 × 2.6」的答案，會跟下面哪一個算式一樣？<br>① 4.5 × 26　② 4.5 × 2.6　③ 450 × 26　④ 0.45 × 26</div>
         <details>
-            <summary>👉 點擊查看答案</summary>
-            <div class="answer-box">
-                <strong>答案：③</strong><br>
-                解析：與 10 的相差值，9.8 差 0.2，差距最小。
-            </div>
-        </details>
-    </div>
-
-    <div class="question-card">
-        <div class="question-text">3. (　　) 下面哪一個<strong>不可能</strong>是「一位小數」乘以「整數」的結果？<br>① 整數　② 一位小數　③ 二位小數　④ 以上都有可能</div>
-        <details>
-            <summary>👉 點擊查看答案</summary>
-            <div class="answer-box">
-                <strong>答案：③</strong><br>
-                解析：一位小數乘整數，小數位數最多只有一位，若遇到進位也可能變成整數，但絕不會憑空變成二位小數。
-            </div>
-        </details>
-    </div>
-
-    <div class="question-card">
-        <div class="question-text">4. (　　) 一個「三位小數」乘以 100，得到的結果會是幾位小數？<br>① 一位小數　② 二位小數　③ 三位小數　④ 整數</div>
-        <details>
-            <summary>👉 點擊查看答案</summary>
+            <summary>👀 偷看答案與解析</summary>
             <div class="answer-box">
                 <strong>答案：①</strong><br>
-                解析：乘以 100 代表小數點向右移兩位，三位小數會變成一位小數。
+                解析：原本的算式有一位小數。選項 ① 也是一位小數，且數字排列都是 4, 5, 2, 6，所以乘出來結果一樣。
+            </div>
+        </details>
+    </div>
+
+    <h2>二、應用與計算題（請寫出直式或橫式）</h2>
+
+    <div class="question-card">
+        <div class="question-text">1. 【消耗與剩餘】<br>家裡買了一包重 30.5 公斤的白米，全家人平均每天吃掉 0.8 公斤。請問吃了 3 個星期後，這包米還剩下幾公斤？</div>
+        <details>
+            <summary>✏️ 對答案囉</summary>
+            <div class="answer-box">
+                <strong>答案：13.7 公斤</strong><br>
+                <div class="step">第一步 (換算天數)：3 個星期 = 21 天</div>
+                <div class="step">第二步 (吃掉的量)：0.8 × 21 = 16.8 公斤</div>
+                <div class="step">第三步 (剩下的量)：30.5 - 16.8 = 13.7 公斤</div>
             </div>
         </details>
     </div>
 
     <div class="question-card">
-        <div class="question-text">5. (　　) 下列哪一個算式的答案與「7.2 × 14」相同？<br>① 72 × 1.4　② 0.72 × 14　③ 72 × 14　④ 720 × 1.4</div>
+        <div class="question-text">2. 【成本與利潤】<br>文具店老闆進貨了一批高級筆記本，每本的成本是 42.5 元，老闆以一本 65 元的價格賣出。今天總共賣出了 24 本，請問老闆今天一共賺了多少元？</div>
         <details>
-            <summary>👉 點擊查看答案</summary>
+            <summary>✏️ 對答案囉</summary>
             <div class="answer-box">
-                <strong>答案：①</strong><br>
-                解析：原本算式總共有一位小數。選項 ① 也是一位小數且數字組合相同。
-            </div>
-        </details>
-    </div>
-
-    <h2>二、應用題</h2>
-
-    <div class="question-card">
-        <div class="question-text">1. 一間手搖飲店有一桶 50 公升的果糖，平均每天用掉 1.25 公升，兩個星期後，這桶果糖還剩下多少公升？</div>
-        <details>
-            <summary>👉 點擊查看答案</summary>
-            <div class="answer-box">
-                <strong>答案：32.5 公升</strong><br>
-                算式：<br>
-                兩個星期 = 14 天<br>
-                50 - (1.25 × 14) <br>
-                = 50 - 17.5 <br>
-                = 32.5
+                <strong>答案：540 元</strong><br>
+                <div class="step">第一步 (賣一本賺多少)：65 - 42.5 = 22.5 元</div>
+                <div class="step">第二步 (賣 24 本賺多少)：22.5 × 24 = 540 元</div>
             </div>
         </details>
     </div>
 
     <div class="question-card">
-        <div class="question-text">2. 一杯鮮奶茶的成本是 28.5 元，飲料店以 45 元賣出，今天總共賣出了 50 杯，一共可以賺多少元？</div>
+        <div class="question-text">3. 【連鎖計算大挑戰】<br>已知甲數是 5.6。<br>(1) 乙數是甲數的 3 倍多 1.2，乙數是多少？<br>(2) 丙數是乙數的 5 倍少 4.5，丙數是多少？</div>
         <details>
-            <summary>👉 點擊查看答案</summary>
+            <summary>✏️ 對答案囉</summary>
             <div class="answer-box">
-                <strong>答案：825 元</strong><br>
-                算式：<br>
-                (45 - 28.5) × 50 <br>
-                = 16.5 × 50 <br>
-                = 825
+                <strong>答案：(1) 乙數是 18；(2) 丙數是 85.5</strong><br>
+                <div class="step">算式 (1)：5.6 × 3 + 1.2 = 16.8 + 1.2 = 18</div>
+                <div class="step">算式 (2)：18 × 5 - 4.5 = 90 - 4.5 = 85.5</div>
             </div>
         </details>
     </div>
 
     <div class="question-card">
-        <div class="question-text">
-            3. <br>
-            (1) 甲數是 3.45，乙數是甲數的 4 倍少 2.15，乙數是多少？<br>
-            (2) 承上題，丙數是乙數的 12 倍再多 5.8，丙數是多少？
-        </div>
+        <div class="question-text">4. 【面積與乘法】<br>學校有一個長方形的花圃，長是 12.5 公尺，寬是 8 公尺。<br>(1) 這個花圃的面積是多少平方公尺？<br>(2) 如果每 1 平方公尺需要買 1.5 包的肥料來施肥，總共需要買幾包肥料？</div>
         <details>
-            <summary>👉 點擊查看答案</summary>
+            <summary>✏️ 對答案囉</summary>
             <div class="answer-box">
-                <strong>答案：(1) 11.65；(2) 145.6</strong><br>
-                算式 (1)：<br>
-                3.45 × 4 - 2.15 <br>
-                = 13.8 - 2.15 = 11.65<br><br>
-                算式 (2)：<br>
-                11.65 × 12 + 5.8 <br>
-                = 139.8 + 5.8 = 145.6
+                <strong>答案：(1) 100 平方公尺；(2) 150 包</strong><br>
+                <div class="step">算式 (1) 算面積：長 × 寬 = 12.5 × 8 = 100 (平方公尺)</div>
+                <div class="step">算式 (2) 算肥料：100 × 1.5 = 150 (包)</div>
+            </div>
+        </details>
+    </div>
+
+    <div class="question-card">
+        <div class="question-text">5. 【距離與加減乘混合】<br>哥哥每天早上都會去慢跑，平均每天跑 4.2 公里。4 月份剛好有 30 天，哥哥設定的目標是這個月要跑 150 公里。<br>請問哥哥 4 月份跑完後，有沒有達到目標？如果沒有，還差幾公里才達標？</div>
+        <details>
+            <summary>✏️ 對答案囉</summary>
+            <div class="answer-box">
+                <strong>答案：沒有達到目標，還差 24 公里。</strong><br>
+                <div class="step">第一步 (跑的總距離)：4.2 × 30 = 126 公里</div>
+                <div class="step">第二步 (比較與相減)：126 小於 150，所以沒達標。</div>
+                <div class="step">第三步 (差多少)：150 - 126 = 24 公里</div>
             </div>
         </details>
     </div>
