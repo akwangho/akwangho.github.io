@@ -3,250 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小數乘法與混合計算加強練習</title>
+    <title>小數兩位數計算題練習 (20題)</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            line-height: 1.6;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #f0f4f8;
             padding: 20px;
+            color: #333;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         h1 {
             text-align: center;
             color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
         }
-        .section-title {
-            font-size: 1.2em;
-            color: #e67e22;
+        .practice-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             margin-top: 30px;
-            border-left: 5px solid #e67e22;
-            padding-left: 10px;
         }
-        .question-card {
-            background-color: #fafafa;
-            border: 1px solid #e0e0e0;
+        .q-box {
+            font-size: 1.2em;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #ddd;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
         }
-        .question-text {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
+        .q-num {
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-size: 0.8em;
         }
-        .options {
-            margin-bottom: 15px;
-            padding-left: 15px;
+        .btn-container {
+            text-align: center;
+            margin: 40px 0;
         }
-        .btn-show {
-            background-color: #3498db;
+        #show-ans-btn {
+            background-color: #27ae60;
             color: white;
             border: none;
-            padding: 10px 18px;
-            font-size: 1em;
-            border-radius: 6px;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .btn-show:hover {
-            background-color: #2980b9;
+        #show-ans-btn:hover {
+            background-color: #219150;
+            transform: translateY(-2px);
         }
-        .answer-box {
+        #answer-section {
             display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #e8f8f5;
-            border-left: 4px solid #1abc9c;
-            border-radius: 4px;
-            color: #0e6251;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 2px dashed #27ae60;
+            border-radius: 10px;
         }
-        .math-steps {
-            font-family: 'Courier New', Courier, monospace;
-            background: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            border: 1px dashed #1abc9c;
+        .ans-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .ans-val {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        @media (max-width: 600px) {
+            .practice-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>📝 四年級數學：小數計算與應用加強練習</h1>
-    <p>請先在計算紙上完成計算，確認答案後，再點擊「顯示解答與算式」來對答案喔！</p>
+    <h1>🔢 小數兩位數計算強化練習</h1>
+    <p style="text-align: center; color: #7f8c8d;">請在計算紙上完成直式計算後，再點擊下方按鈕對答案。</p>
 
-    <div class="section-title">一、 觀念與選擇題（尋找最接近的數）</div>
-    
-    <div class="question-card">
-        <div class="question-text">1. 下面哪一個數最接近 4？</div>
-        <div class="options">
-            (1) 3.8 &nbsp;&nbsp; (2) 4.3 &nbsp;&nbsp; (3) 3.92 &nbsp;&nbsp; (4) 4.15
-        </div>
-        <button class="btn-show" onclick="toggleAnswer('ans1')">👁️ 顯示解答與算式</button>
-        <div id="ans1" class="answer-box">
-            <strong>正確答案：(3)</strong>
-            <div class="math-steps">
-                解析：將每個選項與 4 相減找距離差：<br>
-                (1) 4 - 3.8 = 0.2<br>
-                (2) 4.3 - 4 = 0.3<br>
-                (3) 4 - 3.92 = 0.08<br>
-                (4) 4.15 - 4 = 0.15<br>
-                因為 0.08 最小，所以 3.92 最接近 4。
-            </div>
-        </div>
+    <div class="practice-grid">
+        <div class="q-box"><div class="q-num">1</div> 4.56 + 3.28 = ?</div>
+        <div class="q-box"><div class="q-num">2</div> 12.05 - 8.47 = ?</div>
+        <div class="q-box"><div class="q-num">3</div> 0.74 × 15 = ?</div>
+        <div class="q-box"><div class="q-num">4</div> 6.8 + 4.25 = ?</div>
+        <div class="q-box"><div class="q-num">5</div> 20 - 9.36 = ?</div>
+        <div class="q-box"><div class="q-num">6</div> 3.14 × 12 = ?</div>
+        <div class="q-box"><div class="q-num">7</div> 1.09 × 25 = ?</div>
+        <div class="q-box"><div class="q-num">8</div> 5.82 + 14.18 = ?</div>
+        <div class="q-box"><div class="q-num">9</div> 0.05 × 48 = ?</div>
+        <div class="q-box"><div class="q-num">10</div> 7.3 - 2.85 = ?</div>
+        
+        <div class="q-box"><div class="q-num">11</div> 2.45 × 36 = ?</div>
+        <div class="q-box"><div class="q-num">12</div> 0.88 × 50 = ?</div>
+        <div class="q-box"><div class="q-num">13</div> (3.5 + 1.25) × 4 = ?</div>
+        <div class="q-box"><div class="q-num">14</div> 15 - (2.15 × 6) = ?</div>
+        <div class="q-box"><div class="q-num">15</div> 4.36 × 18 = ?</div>
+        <div class="q-box"><div class="q-num">16</div> 0.65 × 24 + 5.4 = ?</div>
+        <div class="q-box"><div class="q-num">17</div> 100 - 45.75 = ?</div>
+        <div class="q-box"><div class="q-num">18</div> (8.4 - 3.12) × 5 = ?</div>
+        <div class="q-box"><div class="q-num">19</div> 1.25 × 32 = ?</div>
+        <div class="q-box"><div class="q-num">20</div> 2.08 × 15 - 12.5 = ?</div>
     </div>
 
-    <div class="question-card">
-        <div class="question-text">2. 下面哪一個數最接近 10？</div>
-        <div class="options">
-            (1) 10.12 &nbsp;&nbsp; (2) 9.8 &nbsp;&nbsp; (3) 10.25 &nbsp;&nbsp; (4) 9.91
-        </div>
-        <button class="btn-show" onclick="toggleAnswer('ans2')">👁️ 顯示解答與算式</button>
-        <div id="ans2" class="answer-box">
-            <strong>正確答案：(4)</strong>
-            <div class="math-steps">
-                解析：將每個選項與 10 相減找距離差：<br>
-                (1) 10.12 - 10 = 0.12<br>
-                (2) 10 - 9.8 = 0.2<br>
-                (3) 10.25 - 10 = 0.25<br>
-                (4) 10 - 9.91 = 0.09<br>
-                因為 0.09 最小，所以 9.91 最接近 10。
-            </div>
-        </div>
+    <div class="btn-container">
+        <button id="show-ans-btn" onclick="showAnswers()">✅ 點擊顯示全部答案</button>
     </div>
 
-    <div class="section-title">二、 直式計算題（請注意小數點的位置）</div>
-
-    <div class="question-card">
-        <div class="question-text">3. 計算： 15.4 × 26 = ？</div>
-        <button class="btn-show" onclick="toggleAnswer('ans3')">👁️ 顯示解答與算式</button>
-        <div id="ans3" class="answer-box">
-            <strong>答案： 400.4</strong>
-            <div class="math-steps">
-                算式：<br>
-                &nbsp;&nbsp; 15.4<br>
-                × &nbsp;&nbsp;26<br>
-                -------<br>
-                &nbsp;&nbsp; 924<br>
-                &nbsp; 308<br>
-                -------<br>
-                &nbsp; 400.4
-            </div>
+    <div id="answer-section">
+        <h3 style="color: #27ae60;">📝 參考答案：</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="ans-item">1. 答案：<span class="ans-val">7.84</span></div>
+            <div class="ans-item">2. 答案：<span class="ans-val">3.58</span></div>
+            <div class="ans-item">3. 答案：<span class="ans-val">11.1</span></div>
+            <div class="ans-item">4. 答案：<span class="ans-val">11.05</span></div>
+            <div class="ans-item">5. 答案：<span class="ans-val">10.64</span></div>
+            <div class="ans-item">6. 答案：<span class="ans-val">37.68</span></div>
+            <div class="ans-item">7. 答案：<span class="ans-val">27.25</span></div>
+            <div class="ans-item">8. 答案：<span class="ans-val">20</span></div>
+            <div class="ans-item">9. 答案：<span class="ans-val">2.4</span></div>
+            <div class="ans-item">10. 答案：<span class="ans-val">4.45</span></div>
+            <div class="ans-item">11. 答案：<span class="ans-val">88.2</span></div>
+            <div class="ans-item">12. 答案：<span class="ans-val">44</span></div>
+            <div class="ans-item">13. 答案：<span class="ans-val">19</span> (4.75 × 4)</div>
+            <div class="ans-item">14. 答案：<span class="ans-val">2.1</span> (15 - 12.9)</div>
+            <div class="ans-item">15. 答案：<span class="ans-val">78.48</span></div>
+            <div class="ans-item">16. 答案：<span class="ans-val">21</span> (15.6 + 5.4)</div>
+            <div class="ans-item">17. 答案：<span class="ans-val">54.25</span></div>
+            <div class="ans-item">18. 答案：<span class="ans-val">26.4</span> (5.28 × 5)</div>
+            <div class="ans-item">19. 答案：<span class="ans-val">40</span></div>
+            <div class="ans-item">20. 答案：<span class="ans-val">18.7</span> (31.2 - 12.5)</div>
         </div>
     </div>
-
-    <div class="question-card">
-        <div class="question-text">4. 計算： 3.75 × 18 = ？</div>
-        <button class="btn-show" onclick="toggleAnswer('ans4')">👁️ 顯示解答與算式</button>
-        <div id="ans4" class="answer-box">
-            <strong>答案： 67.5</strong>
-            <div class="math-steps">
-                算式：<br>
-                &nbsp;&nbsp; 3.75<br>
-                × &nbsp;&nbsp;18<br>
-                -------<br>
-                &nbsp; 3000<br>
-                &nbsp; 375<br>
-                -------<br>
-                &nbsp; 67.50 (最後的0可省略，記作 67.5)
-            </div>
-        </div>
-    </div>
-
-    <div class="question-card">
-        <div class="question-text">5. 計算： 0.84 × 35 = ？</div>
-        <button class="btn-show" onclick="toggleAnswer('ans5')">👁️ 顯示解答與算式</button>
-        <div id="ans5" class="answer-box">
-            <strong>答案： 29.4</strong>
-            <div class="math-steps">
-                算式：<br>
-                &nbsp;&nbsp; 0.84<br>
-                × &nbsp;&nbsp;35<br>
-                -------<br>
-                &nbsp;&nbsp; 420<br>
-                &nbsp; 252<br>
-                -------<br>
-                &nbsp; 29.40 (記作 29.4)
-            </div>
-        </div>
-    </div>
-
-    <div class="section-title">三、 多步驟應用題（小心抄寫與對齊喔！）</div>
-
-    <div class="question-card">
-        <div class="question-text">6. 甲數是 4.15，乙數是甲數的 5 倍少 2.38，乙數是多少？</div>
-        <button class="btn-show" onclick="toggleAnswer('ans6')">👁️ 顯示解答與算式</button>
-        <div id="ans6" class="answer-box">
-            <strong>答案： 18.37</strong>
-            <div class="math-steps">
-                步驟 1：先算甲數的 5 倍<br>
-                4.15 × 5 = 20.75<br><br>
-                步驟 2：再減去 2.38<br>
-                20.75 - 2.38 = 18.37<br>
-                (提醒：小數減法時，小數點要上下對齊喔！)
-            </div>
-        </div>
-    </div>
-
-    <div class="question-card">
-        <div class="question-text">7. 承第(6)題，丙數是乙數的 14 倍再多 5.6，丙數是多少？</div>
-        <button class="btn-show" onclick="toggleAnswer('ans7')">👁️ 顯示解答與算式</button>
-        <div id="ans7" class="answer-box">
-            <strong>答案： 262.78</strong>
-            <div class="math-steps">
-                步驟 1：先算乙數(18.37)的 14 倍<br>
-                18.37 × 14 = 257.18<br><br>
-                步驟 2：再加上 5.6<br>
-                257.18 + 5.6 = 262.78<br>
-                (提醒：加法時 5.6 可以補0想成 5.60，確保對齊)
-            </div>
-        </div>
-    </div>
-
-    <div class="question-card">
-        <div class="question-text">8. 一桶無糖綠茶有 15.5 公升，平均每天喝掉 0.65 公升，兩個星期（14天）後，這桶綠茶還剩下多少公升？</div>
-        <button class="btn-show" onclick="toggleAnswer('ans8')">👁️ 顯示解答與算式</button>
-        <div id="ans8" class="answer-box">
-            <strong>答案： 6.4 公升</strong>
-            <div class="math-steps">
-                步驟 1：先算出 14 天總共喝掉多少<br>
-                0.65 × 14 = 9.1<br><br>
-                步驟 2：用原來的量減掉喝掉的量<br>
-                15.5 - 9.1 = 6.4
-            </div>
-        </div>
-    </div>
-
 </div>
 
 <script>
-    function toggleAnswer(elementId) {
-        var answerBox = document.getElementById(elementId);
-        var button = answerBox.previousElementSibling;
-        
-        if (answerBox.style.display === "block") {
-            answerBox.style.display = "none";
-            button.innerHTML = "👁️ 顯示解答與算式";
-            button.style.backgroundColor = "#3498db";
-        } else {
-            answerBox.style.display = "block";
-            button.innerHTML = "🙈 隱藏解答與算式";
-            button.style.backgroundColor = "#7f8c8d";
-        }
+    function showAnswers() {
+        var ansSection = document.getElementById('answer-section');
+        var btn = document.getElementById('show-ans-btn');
+        ansSection.style.display = 'block';
+        btn.style.display = 'none';
+        window.scrollTo({ top: ansSection.offsetTop, behavior: 'smooth' });
     }
 </script>
 
