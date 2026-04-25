@@ -2,170 +2,243 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>火眼金睛挑戰：是周長還是面積？</title>
     <style>
-        @page {
-            size: A4;
-            margin: 15mm;
-            background-color: #f7f9f2; /* 淡淡的草地綠 */
-        }
         body {
-            font-family: "Microsoft JhengHei", sans-serif;
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background-color: #f4f9f4;
             color: #333;
+            padding: 20px;
             line-height: 1.6;
-            margin: 0;
-            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
         .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
             background-color: #4CAF50;
             color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .header h1 {
+            margin: 0 0 10px 0;
+        }
+        .header p {
             margin: 0;
-            font-size: 24pt;
+            font-size: 1.1em;
+            opacity: 0.9;
         }
-        .section {
-            background-color: white;
-            padding: 20px;
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 6px solid #ff9800;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .question {
+            font-size: 1.25em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .keyword {
+            color: #d32f2f;
+            text-decoration: underline;
+        }
+        .btn {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: bold;
             border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-left: 6px solid #8bc34a;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .section h2 {
-            color: #2e7d32;
-            margin-top: 0;
-            border-bottom: 2px dashed #8bc34a;
-            padding-bottom: 5px;
-            font-size: 16pt;
+        .btn:hover {
+            background-color: #007399;
         }
-        .method-box {
-            background-color: #fff9c4;
-            border: 2px solid #fbc02d;
-            padding: 15px;
+        .btn-hide {
+            background-color: #f44336;
+        }
+        .btn-hide:hover {
+            background-color: #da190b;
+        }
+        .answer-box {
+            display: none;
+            margin-top: 20px;
+            padding: 15px 20px;
+            background-color: #fff9e6;
             border-radius: 8px;
-            margin: 10px 0;
+            border: 2px dashed #ffc107;
+            animation: fadeIn 0.5s ease-in-out;
         }
-        .method-step {
+        .correct-ans {
+            font-size: 1.2em;
             font-weight: bold;
             color: #d32f2f;
-        }
-        .problem {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            page-break-inside: avoid;
-        }
-        .problem-title {
-            font-weight: bold;
-            font-size: 13pt;
             margin-bottom: 10px;
-            display: block;
         }
-        .diagram-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            margin: 15px 0;
+        .rationale {
+            color: #424242;
+            font-size: 1.05em;
         }
-        .shape {
-            border: 2px solid #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            background-color: #e8f5e9;
+        .rationale strong {
+            color: #2e7d32;
         }
-        .rect { width: 120px; height: 60px; }
-        .square { width: 80px; height: 80px; }
-        
-        .label-top { position: absolute; top: -25px; width: 100%; text-align: center; }
-        .label-left { position: absolute; left: -40px; top: 0; height: 100%; display: flex; align-items: center; }
-        
-        .ans-space {
-            border-bottom: 1px solid #999;
-            display: inline-block;
-            width: 150px;
-            margin-top: 10px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .footer {
             text-align: center;
-            font-size: 9pt;
+            margin-top: 40px;
             color: #777;
-            margin-top: 20px;
+            font-size: 0.9em;
         }
     </style>
+    <script>
+        function toggleAnswer(id) {
+            var answerBox = document.getElementById('ans-' + id);
+            var btn = document.getElementById('btn-' + id);
+            
+            if (answerBox.style.display === "none" || answerBox.style.display === "") {
+                answerBox.style.display = "block";
+                btn.innerHTML = "👀 隱藏解答";
+                btn.classList.add('btn-hide');
+            } else {
+                answerBox.style.display = "none";
+                btn.innerHTML = "💡 顯示解答";
+                btn.classList.remove('btn-hide');
+            }
+        }
+    </script>
 </head>
 <body>
+
+<div class="container">
     <div class="header">
-        <h1>小農夫數學挑戰：面積與邊長的秘密</h1>
+        <h1>👀 火眼金睛挑戰：是周長還是面積？</h1>
+        <p>算數學就像當偵探，題目裡的每一個字都是線索！<br>想好答案後，再點擊按鈕看看你答對了沒！</p>
     </div>
 
-    <div class="section">
-        <h2>💡 學習秘訣：不用開根號，也能算邊長！</h2>
-        <p>當我們知道正方形的面積是 <b>225</b>，想要找邊長（□ × □ = 225）時，可以用以下三步驟：</p>
-        <div class="method-box">
-            <p><span class="method-step">步驟 1：抓大範圍 (夾擠法)</span><br>
-            10 × 10 = 100，20 × 20 = 400。因為 225 介於 100 到 400 之間，所以邊長一定是 <b>10 幾</b>。</p>
-            
-            <p><span class="method-step">步驟 2：看個位數</span><br>
-            誰乘上自己，尾數會是 5？只有 <b>5 × 5 = 25</b>。所以答案可能是 15。</p>
-            
-            <p><span class="method-step">步驟 3：驗證一下</span><br>
-            動手算算看 15 × 15 是否等於 225。如果是，就找到了！</p>
+    <!-- 題目 1 -->
+    <div class="card">
+        <div class="question">1. 有一條正方形的手帕，它的邊長是 6 公分。請問這條手帕的「<span class="keyword">面積</span>」是多少平方公分？</div>
+        <button id="btn-1" class="btn" onclick="toggleAnswer(1)">💡 顯示解答</button>
+        <div id="ans-1" class="answer-box">
+            <div class="correct-ans">解答：36 平方公分</div>
+            <div class="rationale"><strong>解說：</strong>題目問的是「面積」。<br>正方形面積 ＝ 邊長 × 邊長，所以是 6 × 6 = 36。</div>
         </div>
     </div>
 
-    <div class="section">
-        <h2>🚜 實戰練習題</h2>
-
-        <div class="problem">
-            <span class="problem-title">1. 農場裡有一塊長 16 公尺、寬 4 公尺的長方形菜地，和一塊面積相同的正方形花圃。</span>
-            <div class="diagram-container">
-                <div class="shape rect">
-                    <div class="label-top">16m</div>
-                    <div class="label-left">4m</div>
-                    甲
-                </div>
-                <div style="font-size: 24pt;">=</div>
-                <div class="shape square">
-                    <div class="label-top">? m</div>
-                    乙
-                </div>
-            </div>
-            (1) 甲菜地的面積是多少平方公尺？ <span class="ans-space"></span><br>
-            (2) 乙花圃的邊長是多少公尺？ <span class="ans-space"></span><br>
-            (3) 乙花圃的周長是多少公尺？ <span class="ans-space"></span>
-        </div>
-
-        <div class="problem">
-            <span class="problem-title">2. 爺爺想把一塊長 20 公尺、寬 5 公尺的長方形果園，改成一塊面積一樣大的正方形果園。</span>
-            <p>請算出新的正方形果園邊長是多少？（利用 10×10, 20×20 估算法）</p>
-            <div style="height: 100px; border: 1px dashed #ccc; margin: 10px 0; border-radius: 5px; padding: 10px; color: #999;">計算區：</div>
-            答：邊長是 <span class="ans-space"></span> 公尺。
-        </div>
-
-        <div class="problem">
-            <span class="problem-title">3. 進階題：一個正方形魚池的面積是 625 平方公尺。</span>
-            <p>提示：20 × 20 = 400，30 × 30 = 900。想一想，尾數是 5，邊長應該是多少？</p>
-            <div style="height: 100px; border: 1px dashed #ccc; margin: 10px 0; border-radius: 5px; padding: 10px; color: #999;">計算區：</div>
-            答：邊長是 <span class="ans-space"></span> 公尺，周長是 <span class="ans-space"></span> 公尺。
-        </div>
-        
-        <div class="problem">
-            <span class="problem-title">4. 應用題：有一塊正方形草地面積為 144 平方公尺，請問它的周長是多少？</span>
-            <p>提示：10x10=100, 20x20=400。尾數是 4，可能是 2x2 或 8x8，試試看 12 還是 18？</p>
-            <div style="height: 100px; border: 1px dashed #ccc; margin: 10px 0; border-radius: 5px; padding: 10px; color: #999;">計算區：</div>
-            答：周長是 <span class="ans-space"></span> 公尺。
+    <!-- 題目 2 -->
+    <div class="card">
+        <div class="question">2. （請看清楚喔！）有一條正方形的手帕，它的邊長是 6 公分。請問這條手帕的「<span class="keyword">周長</span>」是多少公分？</div>
+        <button id="btn-2" class="btn" onclick="toggleAnswer(2)">💡 顯示解答</button>
+        <div id="ans-2" class="answer-box">
+            <div class="correct-ans">解答：24 公分</div>
+            <div class="rationale"><strong>解說：</strong>題目問的是「周長」，也就是四個邊加起來的總和。<br>正方形周長 ＝ 邊長 × 4，所以是 6 × 4 = 24。</div>
         </div>
     </div>
 
+    <!-- 題目 3 -->
+    <div class="card">
+        <div class="question">3. 長方形書桌的長是 10 公分，寬是 5 公分。請問書桌表面的「<span class="keyword">面積</span>」是多少平方公分？</div>
+        <button id="btn-3" class="btn" onclick="toggleAnswer(3)">💡 顯示解答</button>
+        <div id="ans-3" class="answer-box">
+            <div class="correct-ans">解答：50 平方公分</div>
+            <div class="rationale"><strong>解說：</strong>算「面積」就是算裡面有多大。<br>長方形面積 ＝ 長 × 寬，所以是 10 × 5 = 50。</div>
+        </div>
+    </div>
+
+    <!-- 題目 4 -->
+    <div class="card">
+        <div class="question">4. 爸爸要在長 10 公尺、寬 5 公尺的長方形花圃「<span class="keyword">周圍圍上柵欄</span>」。請問柵欄的總長度是多少公尺？</div>
+        <button id="btn-4" class="btn" onclick="toggleAnswer(4)">💡 顯示解答</button>
+        <div id="ans-4" class="answer-box">
+            <div class="correct-ans">解答：30 公尺</div>
+            <div class="rationale"><strong>解說：</strong>「周圍圍上柵欄」代表要求的是外圍一圈的「周長」。<br>長方形周長 ＝ (長 + 寬) × 2，所以是 (10 + 5) × 2 = 30。</div>
+        </div>
+    </div>
+
+    <!-- 題目 5 -->
+    <div class="card">
+        <div class="question">5. 有一塊正方形的積木，它的「<span class="keyword">面積</span>」是 64 平方公分。請問它的「邊長」是多少公分？</div>
+        <button id="btn-5" class="btn" onclick="toggleAnswer(5)">💡 顯示解答</button>
+        <div id="ans-5" class="answer-box">
+            <div class="correct-ans">解答：8 公分</div>
+            <div class="rationale"><strong>解說：</strong>面積是由兩個一樣的數字相乘得到的。<br>想一想九九乘法表，哪兩個一樣的數字相乘是 64？答案是 8 × 8 = 64。所以邊長是 8。</div>
+        </div>
+    </div>
+
+    <!-- 題目 6 -->
+    <div class="card">
+        <div class="question">6. 有一個正方形的相框，它的「<span class="keyword">周長</span>」是 36 公分。請問它的「邊長」是多少公分？</div>
+        <button id="btn-6" class="btn" onclick="toggleAnswer(6)">💡 顯示解答</button>
+        <div id="ans-6" class="answer-box">
+            <div class="correct-ans">解答：9 公分</div>
+            <div class="rationale"><strong>解說：</strong>注意！這次給的是周圍四個邊加起來的長度。<br>要求一個邊，就要把總長度平分成 4 份：36 ÷ 4 = 9。</div>
+        </div>
+    </div>
+
+    <!-- 題目 7 -->
+    <div class="card">
+        <div class="question">7. 學校的籃球場是一個長方形，長 30 公尺、寬 15 公尺。小明「<span class="keyword">繞著籃球場邊線跑了一圈</span>」，請問他跑了多少公尺？</div>
+        <button id="btn-7" class="btn" onclick="toggleAnswer(7)">💡 顯示解答</button>
+        <div id="ans-7" class="answer-box">
+            <div class="correct-ans">解答：90 公尺</div>
+            <div class="rationale"><strong>解說：</strong>「繞著邊線跑一圈」就是在算「周長」。<br>算法是 (30 + 15) × 2 = 90。</div>
+        </div>
+    </div>
+
+    <!-- 題目 8 -->
+    <div class="card">
+        <div class="question">8. 農夫要在一塊長 8 公尺、寬 5 公尺的長方形土地上「<span class="keyword">鋪滿草皮</span>」。請問農夫需要買多少面積的草皮？</div>
+        <button id="btn-8" class="btn" onclick="toggleAnswer(8)">💡 顯示解答</button>
+        <div id="ans-8" class="answer-box">
+            <div class="correct-ans">解答：40 平方公尺</div>
+            <div class="rationale"><strong>解說：</strong>「鋪滿表面」就是在算「面積」。<br>長方形面積 ＝ 長 × 寬，所以是 8 × 5 = 40。</div>
+        </div>
+    </div>
+
+    <!-- 題目 9 -->
+    <div class="card">
+        <div class="question" style="color: #673ab7;">👿 9. 【魔王綜合題】有一個正方形的菜園，知道它的「周長是 40 公尺」，請問這個菜園的「<span class="keyword">面積</span>」是多少平方公尺？</div>
+        <button id="btn-9" class="btn" onclick="toggleAnswer(9)">💡 顯示解答</button>
+        <div id="ans-9" class="answer-box">
+            <div class="correct-ans">解答：100 平方公尺</div>
+            <div class="rationale"><strong>解說：</strong>這題要分兩步算！<br>第一步：先用周長找出邊長 👉 40 ÷ 4 = 10（邊長）。<br>第二步：用邊長算面積 👉 10 × 10 = 100。</div>
+        </div>
+    </div>
+
+    <!-- 題目 10 -->
+    <div class="card">
+        <div class="question" style="color: #673ab7;">👿 10. 【魔王綜合題】小華有一張「面積是 81 平方公分」的正方形色紙，他想在色紙的「<span class="keyword">四個邊緣貼上紙膠帶</span>」，請問他需要多長的紙膠帶？</div>
+        <button id="btn-10" class="btn" onclick="toggleAnswer(10)">💡 顯示解答</button>
+        <div id="ans-10" class="answer-box">
+            <div class="correct-ans">解答：36 公分</div>
+            <div class="rationale"><strong>解說：</strong>一樣要分兩步算！<br>第一步：先用面積找邊長 👉 9 × 9 = 81，所以邊長是 9。<br>第二步：「四個邊緣」代表求周長 👉 9 × 4 = 36。</div>
+        </div>
+    </div>
+    
     <div class="footer">
-        © 2024 小小數學家農場版 | 練習重點：觀察力、估算力、驗證力
+        © 小小數學家挑戰測驗 | 訓練讀題專注力
     </div>
+
+</div>
+
 </body>
 </html>
