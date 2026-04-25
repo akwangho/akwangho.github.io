@@ -2,167 +2,170 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小數兩位數計算題練習 - 第三回合 (20題)</title>
     <style>
+        @page {
+            size: A4;
+            margin: 15mm;
+            background-color: #f7f9f2; /* 淡淡的草地綠 */
+        }
         body {
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background-color: #f0f4f8;
-            padding: 20px;
+            font-family: "Microsoft JhengHei", sans-serif;
             color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            border-bottom: 3px solid #e67e22;
-            padding-bottom: 15px;
-        }
-        .practice-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .q-box {
-            font-size: 1.2em;
-            padding: 15px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-        }
-        .q-num {
-            background: #e67e22;
+        .header {
+            background-color: #4CAF50;
             color: white;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            margin-right: 15px;
-            font-size: 0.8em;
-        }
-        .btn-container {
-            text-align: center;
-            margin: 40px 0;
-        }
-        #show-ans-btn {
-            background-color: #d35400;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        #show-ans-btn:hover {
-            background-color: #e67e22;
-            transform: translateY(-2px);
-        }
-        #answer-section {
-            display: none;
-            margin-top: 30px;
             padding: 20px;
-            background-color: #fdf5e6;
-            border: 2px dashed #d35400;
+            text-align: center;
             border-radius: 10px;
+            margin-bottom: 20px;
         }
-        .ans-item {
-            margin-bottom: 10px;
-            padding: 8px;
-            border-bottom: 1px solid #eccb9e;
+        .header h1 {
+            margin: 0;
+            font-size: 24pt;
         }
-        .ans-val {
-            color: #c0392b;
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 6px solid #8bc34a;
+        }
+        .section h2 {
+            color: #2e7d32;
+            margin-top: 0;
+            border-bottom: 2px dashed #8bc34a;
+            padding-bottom: 5px;
+            font-size: 16pt;
+        }
+        .method-box {
+            background-color: #fff9c4;
+            border: 2px solid #fbc02d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .method-step {
             font-weight: bold;
+            color: #d32f2f;
         }
-        @media (max-width: 600px) {
-            .practice-grid { grid-template-columns: 1fr; }
+        .problem {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            page-break-inside: avoid;
+        }
+        .problem-title {
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .diagram-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .shape {
+            border: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background-color: #e8f5e9;
+        }
+        .rect { width: 120px; height: 60px; }
+        .square { width: 80px; height: 80px; }
+        
+        .label-top { position: absolute; top: -25px; width: 100%; text-align: center; }
+        .label-left { position: absolute; left: -40px; top: 0; height: 100%; display: flex; align-items: center; }
+        
+        .ans-space {
+            border-bottom: 1px solid #999;
+            display: inline-block;
+            width: 150px;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 9pt;
+            color: #777;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>💪 小數兩位數計算強化練習 (第三回合)</h1>
-    <p style="text-align: center; color: #7f8c8d;">請準備好計算紙，算完後再點擊按鈕對答案，加油！</p>
-
-    <div class="practice-grid">
-        <div class="q-box"><div class="q-num">1</div> 5.72 + 2.49 = ?</div>
-        <div class="q-box"><div class="q-num">2</div> 14.08 - 6.55 = ?</div>
-        <div class="q-box"><div class="q-num">3</div> 3.25 × 14 = ?</div>
-        <div class="q-box"><div class="q-num">4</div> 8.9 + 3.14 = ?</div>
-        <div class="q-box"><div class="q-num">5</div> 25 - 12.48 = ?</div>
-        <div class="q-box"><div class="q-num">6</div> 0.68 × 25 = ?</div>
-        <div class="q-box"><div class="q-num">7</div> 4.05 × 16 = ?</div>
-        <div class="q-box"><div class="q-num">8</div> 0.95 + 1.25 = ?</div>
-        <div class="q-box"><div class="q-num">9</div> 1.75 × 40 = ?</div>
-        <div class="q-box"><div class="q-num">10</div> 7.42 - 3.8 = ?</div>
-        
-        <div class="q-box"><div class="q-num">11</div> 5.12 × 8 = ?</div>
-        <div class="q-box"><div class="q-num">12</div> 0.94 × 35 = ?</div>
-        <div class="q-box"><div class="q-num">13</div> 16.55 + 4.45 = ?</div>
-        <div class="q-box"><div class="q-num">14</div> 10.1 - 4.85 = ?</div>
-        <div class="q-box"><div class="q-num">15</div> 2.15 × 12 + 4.2 = ?</div>
-        <div class="q-box"><div class="q-num">16</div> 50 - (3.45 × 8) = ?</div>
-        <div class="q-box"><div class="q-num">17</div> (6.2 - 2.85) × 4 = ?</div>
-        <div class="q-box"><div class="q-num">18</div> 1.48 × 25 - 15 = ?</div>
-        <div class="q-box"><div class="q-num">19</div> (1.25 + 0.85) × 15 = ?</div>
-        <div class="q-box"><div class="q-num">20</div> 100 - 4.25 × 16 = ?</div>
+    <div class="header">
+        <h1>小農夫數學挑戰：面積與邊長的秘密</h1>
     </div>
 
-    <div class="btn-container">
-        <button id="show-ans-btn" onclick="showAnswers()">✅ 點擊顯示全部答案</button>
-    </div>
-
-    <div id="answer-section">
-        <h3 style="color: #d35400;">📝 參考答案：</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="ans-item">1. 答案：<span class="ans-val">8.21</span></div>
-            <div class="ans-item">2. 答案：<span class="ans-val">7.53</span></div>
-            <div class="ans-item">3. 答案：<span class="ans-val">45.5</span></div>
-            <div class="ans-item">4. 答案：<span class="ans-val">12.04</span></div>
-            <div class="ans-item">5. 答案：<span class="ans-val">12.52</span></div>
-            <div class="ans-item">6. 答案：<span class="ans-val">17</span></div>
-            <div class="ans-item">7. 答案：<span class="ans-val">64.8</span></div>
-            <div class="ans-item">8. 答案：<span class="ans-val">2.2</span></div>
-            <div class="ans-item">9. 答案：<span class="ans-val">70</span></div>
-            <div class="ans-item">10. 答案：<span class="ans-val">3.62</span></div>
-            <div class="ans-item">11. 答案：<span class="ans-val">40.96</span></div>
-            <div class="ans-item">12. 答案：<span class="ans-val">32.9</span></div>
-            <div class="ans-item">13. 答案：<span class="ans-val">21</span></div>
-            <div class="ans-item">14. 答案：<span class="ans-val">5.25</span></div>
-            <div class="ans-item">15. 答案：<span class="ans-val">30</span> (25.8 + 4.2)</div>
-            <div class="ans-item">16. 答案：<span class="ans-val">22.4</span> (50 - 27.6)</div>
-            <div class="ans-item">17. 答案：<span class="ans-val">13.4</span> (3.35 × 4)</div>
-            <div class="ans-item">18. 答案：<span class="ans-val">22</span> (37 - 15)</div>
-            <div class="ans-item">19. 答案：<span class="ans-val">31.5</span> (2.1 × 15)</div>
-            <div class="ans-item">20. 答案：<span class="ans-val">32</span> (100 - 68)</div>
+    <div class="section">
+        <h2>💡 學習秘訣：不用開根號，也能算邊長！</h2>
+        <p>當我們知道正方形的面積是 <b>225</b>，想要找邊長（□ × □ = 225）時，可以用以下三步驟：</p>
+        <div class="method-box">
+            <p><span class="method-step">步驟 1：抓大範圍 (夾擠法)</span><br>
+            10 × 10 = 100，20 × 20 = 400。因為 225 介於 100 到 400 之間，所以邊長一定是 <b>10 幾</b>。</p>
+            
+            <p><span class="method-step">步驟 2：看個位數</span><br>
+            誰乘上自己，尾數會是 5？只有 <b>5 × 5 = 25</b>。所以答案可能是 15。</p>
+            
+            <p><span class="method-step">步驟 3：驗證一下</span><br>
+            動手算算看 15 × 15 是否等於 225。如果是，就找到了！</p>
         </div>
     </div>
-</div>
 
-<script>
-    function showAnswers() {
-        var ansSection = document.getElementById('answer-section');
-        var btn = document.getElementById('show-ans-btn');
-        ansSection.style.display = 'block';
-        btn.style.display = 'none';
-        window.scrollTo({ top: ansSection.offsetTop, behavior: 'smooth' });
-    }
-</script>
+    <div class="section">
+        <h2>🚜 實戰練習題</h2>
 
+        <div class="problem">
+            <span class="problem-title">1. 農場裡有一塊長 16 公尺、寬 4 公尺的長方形菜地，和一塊面積相同的正方形花圃。</span>
+            <div class="diagram-container">
+                <div class="shape rect">
+                    <div class="label-top">16m</div>
+                    <div class="label-left">4m</div>
+                    甲
+                </div>
+                <div style="font-size: 24pt;">=</div>
+                <div class="shape square">
+                    <div class="label-top">? m</div>
+                    乙
+                </div>
+            </div>
+            (1) 甲菜地的面積是多少平方公尺？ <span class="ans-space"></span><br>
+            (2) 乙花圃的邊長是多少公尺？ <span class="ans-space"></span><br>
+            (3) 乙花圃的周長是多少公尺？ <span class="ans-space"></span>
+        </div>
+
+        <div class="problem">
+            <span class="problem-title">2. 爺爺想把一塊長 20 公尺、寬 5 公尺的長方形果園，改成一塊面積一樣大的正方形果園。</span>
+            <p>請算出新的正方形果園邊長是多少？（利用 10×10, 20×20 估算法）</p>
+            <div style="height: 100px; border: 1px dashed #ccc; margin: 10px 0; border-radius: 5px; padding: 10px; color: #999;">計算區：</div>
+            答：邊長是 <span class="ans-space"></span> 公尺。
+        </div>
+
+        <div class="problem">
+            <span class="problem-title">3. 進階題：一個正方形魚池的面積是 625 平方公尺。</span>
+            <p>提示：20 × 20 = 400，30 × 30 = 900。想一想，尾數是 5，邊長應該是多少？</p>
+            <div style="height: 100px; border: 1px dashed #ccc; margin: 10px 0; border-radius: 5px; padding: 10px; color: #999;">計算區：</div>
+            答：邊長是 <span class="ans-space"></span> 公尺，周長是 <span class="ans-space"></span> 公尺。
+        </div>
+        
+        <div class="problem">
+            <span class="problem-title">4. 應用題：有一塊正方形草地面積為 144 平方公尺，請問它的周長是多少？</span>
+            <p>提示：10x10=100, 20x20=400。尾數是 4，可能是 2x2 或 8x8，試試看 12 還是 18？</p>
+            <div style="height: 100px; border: 1px dashed #ccc; margin: 10px 0; border-radius: 5px; padding: 10px; color: #999;">計算區：</div>
+            答：周長是 <span class="ans-space"></span> 公尺。
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2024 小小數學家農場版 | 練習重點：觀察力、估算力、驗證力
+    </div>
 </body>
 </html>
