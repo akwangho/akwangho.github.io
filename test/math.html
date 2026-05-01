@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小數兩位數四則運算練習 - 第三回合 (20題)</title>
+    <title>小數兩位數計算練習 - 第四回合 (不含除法)</title>
     <style>
         body {
             font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background-color: #f4f0fa;
+            background-color: #e8f8f5;
             padding: 20px;
             color: #333;
         }
@@ -21,8 +21,8 @@
         }
         h1 {
             text-align: center;
-            color: #4a235a;
-            border-bottom: 3px solid #8e44ad;
+            color: #16a085;
+            border-bottom: 3px solid #1abc9c;
             padding-bottom: 15px;
         }
         .practice-grid {
@@ -41,7 +41,7 @@
             align-items: center;
         }
         .q-num {
-            background: #8e44ad;
+            background: #1abc9c;
             color: white;
             width: 30px;
             height: 30px;
@@ -57,7 +57,7 @@
             margin: 40px 0;
         }
         #show-ans-btn {
-            background-color: #9b59b6;
+            background-color: #16a085;
             color: white;
             border: none;
             padding: 15px 40px;
@@ -68,24 +68,24 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         #show-ans-btn:hover {
-            background-color: #8e44ad;
+            background-color: #117864;
             transform: translateY(-2px);
         }
         #answer-section {
             display: none;
             margin-top: 30px;
             padding: 20px;
-            background-color: #fbf7ff;
-            border: 2px dashed #8e44ad;
+            background-color: #ebf5fb;
+            border: 2px dashed #16a085;
             border-radius: 10px;
         }
         .ans-item {
             margin-bottom: 10px;
             padding: 8px;
-            border-bottom: 1px solid #e0d4eb;
+            border-bottom: 1px solid #d4e6f1;
         }
         .ans-val {
-            color: #d35400;
+            color: #e74c3c;
             font-weight: bold;
         }
         @media (max-width: 600px) {
@@ -96,31 +96,31 @@
 <body>
 
 <div class="container">
-    <h1>🚀 小數兩位數四則運算綜合練習</h1>
-    <p style="text-align: center; color: #7f8c8d;">這次加入了除法與混合題型，請在計算紙上仔細列出直式，完成後再對答案喔！</p>
+    <h1>🎯 小數兩位數計算強化 (不含除法)</h1>
+    <p style="text-align: center; color: #7f8c8d;">本次練習專注於加、減、乘法與括號的混合計算。請在計算紙上完成後再對答案！</p>
 
     <div class="practice-grid">
-        <div class="q-box"><div class="q-num">1</div> 15.36 + 4.85 = ?</div>
-        <div class="q-box"><div class="q-num">2</div> 20 - 8.42 = ?</div>
-        <div class="q-box"><div class="q-num">3</div> 3.15 × 12 = ?</div>
-        <div class="q-box"><div class="q-num">4</div> 14.25 ÷ 5 = ?</div>
-        <div class="q-box"><div class="q-num">5</div> 7.55 + 2.45 = ?</div>
-        <div class="q-box"><div class="q-num">6</div> 32.14 - 15.8 = ?</div>
-        <div class="q-box"><div class="q-num">7</div> 0.85 × 24 = ?</div>
-        <div class="q-box"><div class="q-num">8</div> 25.48 ÷ 4 = ?</div>
-        <div class="q-box"><div class="q-num">9</div> 1.25 × 16 = ?</div>
-        <div class="q-box"><div class="q-num">10</div> 10.5 - 3.75 = ?</div>
+        <div class="q-box"><div class="q-num">1</div> 14.85 + 6.32 = ?</div>
+        <div class="q-box"><div class="q-num">2</div> 0.95 + 1.15 = ?</div>
+        <div class="q-box"><div class="q-num">3</div> 27.08 + 15.92 = ?</div>
+        <div class="q-box"><div class="q-num">4</div> 8.64 + 5.7 = ?</div>
+        <div class="q-box"><div class="q-num">5</div> 15.42 - 8.65 = ?</div>
+        <div class="q-box"><div class="q-num">6</div> 30 - 12.58 = ?</div>
+        <div class="q-box"><div class="q-num">7</div> 9.15 - 4.8 = ?</div>
+        <div class="q-box"><div class="q-num">8</div> 10.05 - 6.99 = ?</div>
+        <div class="q-box"><div class="q-num">9</div> 2.35 × 14 = ?</div>
+        <div class="q-box"><div class="q-num">10</div> 0.78 × 25 = ?</div>
+        <div class="q-box"><div class="q-num">11</div> 4.05 × 18 = ?</div>
+        <div class="q-box"><div class="q-num">12</div> 1.25 × 36 = ?</div>
         
-        <div class="q-box"><div class="q-num">11</div> (4.25 + 1.75) × 8 = ?</div>
-        <div class="q-box"><div class="q-num">12</div> 30 - (2.45 × 6) = ?</div>
-        <div class="q-box"><div class="q-num">13</div> 5.12 × 15 = ?</div>
-        <div class="q-box"><div class="q-num">14</div> 36.45 ÷ 9 = ?</div>
-        <div class="q-box"><div class="q-num">15</div> 1.05 × 20 = ?</div>
-        <div class="q-box"><div class="q-num">16</div> 8.42 + 5.58 - 3.2 = ?</div>
-        <div class="q-box"><div class="q-num">17</div> (12.48 ÷ 6) + 1.5 = ?</div>
-        <div class="q-box"><div class="q-num">18</div> 0.75 × 36 = ?</div>
-        <div class="q-box"><div class="q-num">19</div> 100 - (8.25 × 4) = ?</div>
-        <div class="q-box"><div class="q-num">20</div> (12.35 - 7.15) × 15 = ?</div>
+        <div class="q-box"><div class="q-num">13</div> 4.5 × 12 + 8.4 = ?</div>
+        <div class="q-box"><div class="q-num">14</div> 50 - 3.25 × 8 = ?</div>
+        <div class="q-box"><div class="q-num">15</div> (8.45 + 1.55) × 15 = ?</div>
+        <div class="q-box"><div class="q-num">16</div> 24.6 - (5.8 + 7.45) = ?</div>
+        <div class="q-box"><div class="q-num">17</div> 1.08 × 25 - 12.5 = ?</div>
+        <div class="q-box"><div class="q-num">18</div> (15.2 - 6.85) × 4 = ?</div>
+        <div class="q-box"><div class="q-num">19</div> 0.65 × 40 + 15.8 = ?</div>
+        <div class="q-box"><div class="q-num">20</div> 100 - (12.5 + 3.75) × 2 = ?</div>
     </div>
 
     <div class="btn-container">
@@ -128,28 +128,28 @@
     </div>
 
     <div id="answer-section">
-        <h3 style="color: #8e44ad;">📝 參考答案與提示：</h3>
+        <h3 style="color: #16a085;">📝 參考答案與提示：</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="ans-item">1. 答案：<span class="ans-val">20.21</span></div>
-            <div class="ans-item">2. 答案：<span class="ans-val">11.58</span></div>
-            <div class="ans-item">3. 答案：<span class="ans-val">37.8</span></div>
-            <div class="ans-item">4. 答案：<span class="ans-val">2.85</span></div>
-            <div class="ans-item">5. 答案：<span class="ans-val">10</span></div>
-            <div class="ans-item">6. 答案：<span class="ans-val">16.34</span> (記得對齊小數點)</div>
-            <div class="ans-item">7. 答案：<span class="ans-val">20.4</span></div>
-            <div class="ans-item">8. 答案：<span class="ans-val">6.37</span></div>
-            <div class="ans-item">9. 答案：<span class="ans-val">20</span></div>
-            <div class="ans-item">10. 答案：<span class="ans-val">6.75</span></div>
-            <div class="ans-item">11. 答案：<span class="ans-val">48</span> (6 × 8)</div>
-            <div class="ans-item">12. 答案：<span class="ans-val">15.3</span> (30 - 14.7)</div>
-            <div class="ans-item">13. 答案：<span class="ans-val">76.8</span></div>
-            <div class="ans-item">14. 答案：<span class="ans-val">4.05</span></div>
-            <div class="ans-item">15. 答案：<span class="ans-val">21</span></div>
-            <div class="ans-item">16. 答案：<span class="ans-val">10.8</span> (14 - 3.2)</div>
-            <div class="ans-item">17. 答案：<span class="ans-val">3.58</span> (2.08 + 1.5)</div>
-            <div class="ans-item">18. 答案：<span class="ans-val">27</span></div>
-            <div class="ans-item">19. 答案：<span class="ans-val">67</span> (100 - 33)</div>
-            <div class="ans-item">20. 答案：<span class="ans-val">78</span> (5.2 × 15)</div>
+            <div class="ans-item">1. 答案：<span class="ans-val">21.17</span></div>
+            <div class="ans-item">2. 答案：<span class="ans-val">2.1</span> (原為 2.10)</div>
+            <div class="ans-item">3. 答案：<span class="ans-val">43</span> (原為 43.00)</div>
+            <div class="ans-item">4. 答案：<span class="ans-val">14.34</span> (對齊小數點，5.7想成5.70)</div>
+            <div class="ans-item">5. 答案：<span class="ans-val">6.77</span></div>
+            <div class="ans-item">6. 答案：<span class="ans-val">17.42</span></div>
+            <div class="ans-item">7. 答案：<span class="ans-val">4.35</span></div>
+            <div class="ans-item">8. 答案：<span class="ans-val">3.06</span></div>
+            <div class="ans-item">9. 答案：<span class="ans-val">32.9</span></div>
+            <div class="ans-item">10. 答案：<span class="ans-val">19.5</span></div>
+            <div class="ans-item">11. 答案：<span class="ans-val">72.9</span></div>
+            <div class="ans-item">12. 答案：<span class="ans-val">45</span></div>
+            <div class="ans-item">13. 答案：<span class="ans-val">62.4</span> (先乘後加：54 + 8.4)</div>
+            <div class="ans-item">14. 答案：<span class="ans-val">24</span> (先乘後減：50 - 26)</div>
+            <div class="ans-item">15. 答案：<span class="ans-val">150</span> (括號先算：10 × 15)</div>
+            <div class="ans-item">16. 答案：<span class="ans-val">11.35</span> (24.6 - 13.25)</div>
+            <div class="ans-item">17. 答案：<span class="ans-val">14.5</span> (27 - 12.5)</div>
+            <div class="ans-item">18. 答案：<span class="ans-val">33.4</span> (8.35 × 4)</div>
+            <div class="ans-item">19. 答案：<span class="ans-val">41.8</span> (26 + 15.8)</div>
+            <div class="ans-item">20. 答案：<span class="ans-val">67.5</span> (100 - 16.25 × 2 = 100 - 32.5)</div>
         </div>
     </div>
 </div>
@@ -163,181 +163,6 @@
         window.scrollTo({ top: ansSection.offsetTop, behavior: 'smooth' });
     }
 </script>
-
-</body>
-</html>
-        .btn:hover {
-            background-color: #007399;
-        }
-        .btn-hide {
-            background-color: #f44336;
-        }
-        .btn-hide:hover {
-            background-color: #da190b;
-        }
-        .answer-box {
-            display: none;
-            margin-top: 20px;
-            padding: 15px 20px;
-            background-color: #fff9e6;
-            border-radius: 8px;
-            border: 2px dashed #ffc107;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        .correct-ans {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #d32f2f;
-            margin-bottom: 10px;
-        }
-        .rationale {
-            color: #424242;
-            font-size: 1.05em;
-        }
-        .rationale strong {
-            color: #2e7d32;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #777;
-            font-size: 0.9em;
-        }
-    </style>
-    <script>
-        function toggleAnswer(id) {
-            var answerBox = document.getElementById('ans-' + id);
-            var btn = document.getElementById('btn-' + id);
-            
-            if (answerBox.style.display === "none" || answerBox.style.display === "") {
-                answerBox.style.display = "block";
-                btn.innerHTML = "👀 隱藏解答";
-                btn.classList.add('btn-hide');
-            } else {
-                answerBox.style.display = "none";
-                btn.innerHTML = "💡 顯示解答";
-                btn.classList.remove('btn-hide');
-            }
-        }
-    </script>
-</head>
-<body>
-
-<div class="container">
-    <div class="header">
-        <h1>👀 火眼金睛挑戰：是周長還是面積？</h1>
-        <p>算數學就像當偵探，題目裡的每一個字都是線索！<br>想好答案後，再點擊按鈕看看你答對了沒！</p>
-    </div>
-
-    <!-- 題目 1 -->
-    <div class="card">
-        <div class="question">1. 有一條正方形的手帕，它的邊長是 6 公分。請問這條手帕的「<span class="keyword">面積</span>」是多少平方公分？</div>
-        <button id="btn-1" class="btn" onclick="toggleAnswer(1)">💡 顯示解答</button>
-        <div id="ans-1" class="answer-box">
-            <div class="correct-ans">解答：36 平方公分</div>
-            <div class="rationale"><strong>解說：</strong>題目問的是「面積」。<br>正方形面積 ＝ 邊長 × 邊長，所以是 6 × 6 = 36。</div>
-        </div>
-    </div>
-
-    <!-- 題目 2 -->
-    <div class="card">
-        <div class="question">2. （請看清楚喔！）有一條正方形的手帕，它的邊長是 6 公分。請問這條手帕的「<span class="keyword">周長</span>」是多少公分？</div>
-        <button id="btn-2" class="btn" onclick="toggleAnswer(2)">💡 顯示解答</button>
-        <div id="ans-2" class="answer-box">
-            <div class="correct-ans">解答：24 公分</div>
-            <div class="rationale"><strong>解說：</strong>題目問的是「周長」，也就是四個邊加起來的總和。<br>正方形周長 ＝ 邊長 × 4，所以是 6 × 4 = 24。</div>
-        </div>
-    </div>
-
-    <!-- 題目 3 -->
-    <div class="card">
-        <div class="question">3. 長方形書桌的長是 10 公分，寬是 5 公分。請問書桌表面的「<span class="keyword">面積</span>」是多少平方公分？</div>
-        <button id="btn-3" class="btn" onclick="toggleAnswer(3)">💡 顯示解答</button>
-        <div id="ans-3" class="answer-box">
-            <div class="correct-ans">解答：50 平方公分</div>
-            <div class="rationale"><strong>解說：</strong>算「面積」就是算裡面有多大。<br>長方形面積 ＝ 長 × 寬，所以是 10 × 5 = 50。</div>
-        </div>
-    </div>
-
-    <!-- 題目 4 -->
-    <div class="card">
-        <div class="question">4. 爸爸要在長 10 公尺、寬 5 公尺的長方形花圃「<span class="keyword">周圍圍上柵欄</span>」。請問柵欄的總長度是多少公尺？</div>
-        <button id="btn-4" class="btn" onclick="toggleAnswer(4)">💡 顯示解答</button>
-        <div id="ans-4" class="answer-box">
-            <div class="correct-ans">解答：30 公尺</div>
-            <div class="rationale"><strong>解說：</strong>「周圍圍上柵欄」代表要求的是外圍一圈的「周長」。<br>長方形周長 ＝ (長 + 寬) × 2，所以是 (10 + 5) × 2 = 30。</div>
-        </div>
-    </div>
-
-    <!-- 題目 5 -->
-    <div class="card">
-        <div class="question">5. 有一塊正方形的積木，它的「<span class="keyword">面積</span>」是 64 平方公分。請問它的「邊長」是多少公分？</div>
-        <button id="btn-5" class="btn" onclick="toggleAnswer(5)">💡 顯示解答</button>
-        <div id="ans-5" class="answer-box">
-            <div class="correct-ans">解答：8 公分</div>
-            <div class="rationale"><strong>解說：</strong>面積是由兩個一樣的數字相乘得到的。<br>想一想九九乘法表，哪兩個一樣的數字相乘是 64？答案是 8 × 8 = 64。所以邊長是 8。</div>
-        </div>
-    </div>
-
-    <!-- 題目 6 -->
-    <div class="card">
-        <div class="question">6. 有一個正方形的相框，它的「<span class="keyword">周長</span>」是 36 公分。請問它的「邊長」是多少公分？</div>
-        <button id="btn-6" class="btn" onclick="toggleAnswer(6)">💡 顯示解答</button>
-        <div id="ans-6" class="answer-box">
-            <div class="correct-ans">解答：9 公分</div>
-            <div class="rationale"><strong>解說：</strong>注意！這次給的是周圍四個邊加起來的長度。<br>要求一個邊，就要把總長度平分成 4 份：36 ÷ 4 = 9。</div>
-        </div>
-    </div>
-
-    <!-- 題目 7 -->
-    <div class="card">
-        <div class="question">7. 學校的籃球場是一個長方形，長 30 公尺、寬 15 公尺。小明「<span class="keyword">繞著籃球場邊線跑了一圈</span>」，請問他跑了多少公尺？</div>
-        <button id="btn-7" class="btn" onclick="toggleAnswer(7)">💡 顯示解答</button>
-        <div id="ans-7" class="answer-box">
-            <div class="correct-ans">解答：90 公尺</div>
-            <div class="rationale"><strong>解說：</strong>「繞著邊線跑一圈」就是在算「周長」。<br>算法是 (30 + 15) × 2 = 90。</div>
-        </div>
-    </div>
-
-    <!-- 題目 8 -->
-    <div class="card">
-        <div class="question">8. 農夫要在一塊長 8 公尺、寬 5 公尺的長方形土地上「<span class="keyword">鋪滿草皮</span>」。請問農夫需要買多少面積的草皮？</div>
-        <button id="btn-8" class="btn" onclick="toggleAnswer(8)">💡 顯示解答</button>
-        <div id="ans-8" class="answer-box">
-            <div class="correct-ans">解答：40 平方公尺</div>
-            <div class="rationale"><strong>解說：</strong>「鋪滿表面」就是在算「面積」。<br>長方形面積 ＝ 長 × 寬，所以是 8 × 5 = 40。</div>
-        </div>
-    </div>
-
-    <!-- 題目 9 -->
-    <div class="card">
-        <div class="question" style="color: #673ab7;">👿 9. 【魔王綜合題】有一個正方形的菜園，知道它的「周長是 40 公尺」，請問這個菜園的「<span class="keyword">面積</span>」是多少平方公尺？</div>
-        <button id="btn-9" class="btn" onclick="toggleAnswer(9)">💡 顯示解答</button>
-        <div id="ans-9" class="answer-box">
-            <div class="correct-ans">解答：100 平方公尺</div>
-            <div class="rationale"><strong>解說：</strong>這題要分兩步算！<br>第一步：先用周長找出邊長 👉 40 ÷ 4 = 10（邊長）。<br>第二步：用邊長算面積 👉 10 × 10 = 100。</div>
-        </div>
-    </div>
-
-    <!-- 題目 10 -->
-    <div class="card">
-        <div class="question" style="color: #673ab7;">👿 10. 【魔王綜合題】小華有一張「面積是 81 平方公分」的正方形色紙，他想在色紙的「<span class="keyword">四個邊緣貼上紙膠帶</span>」，請問他需要多長的紙膠帶？</div>
-        <button id="btn-10" class="btn" onclick="toggleAnswer(10)">💡 顯示解答</button>
-        <div id="ans-10" class="answer-box">
-            <div class="correct-ans">解答：36 公分</div>
-            <div class="rationale"><strong>解說：</strong>一樣要分兩步算！<br>第一步：先用面積找邊長 👉 9 × 9 = 81，所以邊長是 9。<br>第二步：「四個邊緣」代表求周長 👉 9 × 4 = 36。</div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        © 小小數學家挑戰測驗 | 訓練讀題專注力
-    </div>
-
-</div>
 
 </body>
 </html>
