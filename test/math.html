@@ -3,70 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>火眼金睛挑戰：是周長還是面積？</title>
+    <title>小數兩位數四則運算練習 - 第三回合 (20題)</title>
     <style>
         body {
-            font-family: 'Microsoft JhengHei', sans-serif;
-            background-color: #f4f9f4;
-            color: #333;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #f4f0fa;
             padding: 20px;
-            line-height: 1.6;
+            color: #333;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .header {
+        h1 {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: #4a235a;
+            border-bottom: 3px solid #8e44ad;
+            padding-bottom: 15px;
         }
-        .header h1 {
-            margin: 0 0 10px 0;
+        .practice-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
         }
-        .header p {
-            margin: 0;
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-        .card {
+        .q-box {
+            font-size: 1.2em;
+            padding: 15px;
             background: #fff;
-            border-radius: 10px;
-            padding: 20px 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 6px solid #ff9800;
-            transition: transform 0.2s;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
         }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        .q-num {
+            background: #8e44ad;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-size: 0.8em;
         }
-        .question {
-            font-size: 1.25em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
+        .btn-container {
+            text-align: center;
+            margin: 40px 0;
         }
-        .keyword {
-            color: #d32f2f;
-            text-decoration: underline;
-        }
-        .btn {
-            background-color: #008CBA;
+        #show-ans-btn {
+            background-color: #9b59b6;
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 1em;
-            font-weight: bold;
-            border-radius: 8px;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
+        #show-ans-btn:hover {
+            background-color: #8e44ad;
+            transform: translateY(-2px);
+        }
+        #answer-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fbf7ff;
+            border: 2px dashed #8e44ad;
+            border-radius: 10px;
+        }
+        .ans-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #e0d4eb;
+        }
+        .ans-val {
+            color: #d35400;
+            font-weight: bold;
+        }
+        @media (max-width: 600px) {
+            .practice-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚀 小數兩位數四則運算綜合練習</h1>
+    <p style="text-align: center; color: #7f8c8d;">這次加入了除法與混合題型，請在計算紙上仔細列出直式，完成後再對答案喔！</p>
+
+    <div class="practice-grid">
+        <div class="q-box"><div class="q-num">1</div> 15.36 + 4.85 = ?</div>
+        <div class="q-box"><div class="q-num">2</div> 20 - 8.42 = ?</div>
+        <div class="q-box"><div class="q-num">3</div> 3.15 × 12 = ?</div>
+        <div class="q-box"><div class="q-num">4</div> 14.25 ÷ 5 = ?</div>
+        <div class="q-box"><div class="q-num">5</div> 7.55 + 2.45 = ?</div>
+        <div class="q-box"><div class="q-num">6</div> 32.14 - 15.8 = ?</div>
+        <div class="q-box"><div class="q-num">7</div> 0.85 × 24 = ?</div>
+        <div class="q-box"><div class="q-num">8</div> 25.48 ÷ 4 = ?</div>
+        <div class="q-box"><div class="q-num">9</div> 1.25 × 16 = ?</div>
+        <div class="q-box"><div class="q-num">10</div> 10.5 - 3.75 = ?</div>
+        
+        <div class="q-box"><div class="q-num">11</div> (4.25 + 1.75) × 8 = ?</div>
+        <div class="q-box"><div class="q-num">12</div> 30 - (2.45 × 6) = ?</div>
+        <div class="q-box"><div class="q-num">13</div> 5.12 × 15 = ?</div>
+        <div class="q-box"><div class="q-num">14</div> 36.45 ÷ 9 = ?</div>
+        <div class="q-box"><div class="q-num">15</div> 1.05 × 20 = ?</div>
+        <div class="q-box"><div class="q-num">16</div> 8.42 + 5.58 - 3.2 = ?</div>
+        <div class="q-box"><div class="q-num">17</div> (12.48 ÷ 6) + 1.5 = ?</div>
+        <div class="q-box"><div class="q-num">18</div> 0.75 × 36 = ?</div>
+        <div class="q-box"><div class="q-num">19</div> 100 - (8.25 × 4) = ?</div>
+        <div class="q-box"><div class="q-num">20</div> (12.35 - 7.15) × 15 = ?</div>
+    </div>
+
+    <div class="btn-container">
+        <button id="show-ans-btn" onclick="showAnswers()">✅ 點擊顯示全部答案</button>
+    </div>
+
+    <div id="answer-section">
+        <h3 style="color: #8e44ad;">📝 參考答案與提示：</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="ans-item">1. 答案：<span class="ans-val">20.21</span></div>
+            <div class="ans-item">2. 答案：<span class="ans-val">11.58</span></div>
+            <div class="ans-item">3. 答案：<span class="ans-val">37.8</span></div>
+            <div class="ans-item">4. 答案：<span class="ans-val">2.85</span></div>
+            <div class="ans-item">5. 答案：<span class="ans-val">10</span></div>
+            <div class="ans-item">6. 答案：<span class="ans-val">16.34</span> (記得對齊小數點)</div>
+            <div class="ans-item">7. 答案：<span class="ans-val">20.4</span></div>
+            <div class="ans-item">8. 答案：<span class="ans-val">6.37</span></div>
+            <div class="ans-item">9. 答案：<span class="ans-val">20</span></div>
+            <div class="ans-item">10. 答案：<span class="ans-val">6.75</span></div>
+            <div class="ans-item">11. 答案：<span class="ans-val">48</span> (6 × 8)</div>
+            <div class="ans-item">12. 答案：<span class="ans-val">15.3</span> (30 - 14.7)</div>
+            <div class="ans-item">13. 答案：<span class="ans-val">76.8</span></div>
+            <div class="ans-item">14. 答案：<span class="ans-val">4.05</span></div>
+            <div class="ans-item">15. 答案：<span class="ans-val">21</span></div>
+            <div class="ans-item">16. 答案：<span class="ans-val">10.8</span> (14 - 3.2)</div>
+            <div class="ans-item">17. 答案：<span class="ans-val">3.58</span> (2.08 + 1.5)</div>
+            <div class="ans-item">18. 答案：<span class="ans-val">27</span></div>
+            <div class="ans-item">19. 答案：<span class="ans-val">67</span> (100 - 33)</div>
+            <div class="ans-item">20. 答案：<span class="ans-val">78</span> (5.2 × 15)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showAnswers() {
+        var ansSection = document.getElementById('answer-section');
+        var btn = document.getElementById('show-ans-btn');
+        ansSection.style.display = 'block';
+        btn.style.display = 'none';
+        window.scrollTo({ top: ansSection.offsetTop, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
         .btn:hover {
             background-color: #007399;
         }
