@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小數兩位數計算練習 - 小猴子陪伴版</title>
+    <title>小數兩位數計算練習 - 小猴子特訓篇</title>
     <style>
         body {
             font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background-color: #fdf6e3;
+            background-color: #f4fae3; /* 換個清新的草地綠色調 */
             padding: 20px;
             color: #4a4a4a;
         }
@@ -17,8 +17,8 @@
             background: white;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(139, 69, 19, 0.1);
-            border: 3px solid #e2c09c;
+            box-shadow: 0 8px 16px rgba(46, 139, 87, 0.15);
+            border: 3px solid #82b582;
         }
         .header-section {
             text-align: center;
@@ -28,13 +28,13 @@
             width: 150px;
             height: auto;
             border-radius: 50%;
-            border: 4px dashed #d35400;
+            border: 4px dashed #2e8b57;
             padding: 5px;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         h1 {
-            color: #8b4513;
+            color: #2e8b57;
             margin-top: 15px;
             padding-bottom: 10px;
         }
@@ -47,8 +47,8 @@
         .q-box {
             font-size: 1.2em;
             padding: 15px;
-            background: #faf4e8;
-            border: 2px solid #e2c09c;
+            background: #f8fdf8;
+            border: 2px solid #a8d5a8;
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -56,10 +56,10 @@
         }
         .q-box:hover {
             transform: scale(1.02);
-            background: #fdf0d5;
+            background: #eaf6ea;
         }
         .q-num {
-            background: #d35400;
+            background: #2e8b57;
             color: white;
             width: 32px;
             height: 32px;
@@ -77,7 +77,7 @@
             margin: 40px 0;
         }
         #show-ans-btn {
-            background-color: #d35400;
+            background-color: #2e8b57;
             color: white;
             border: none;
             padding: 15px 40px;
@@ -86,29 +86,29 @@
             border-radius: 50px;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 4px 6px rgba(211, 84, 0, 0.3);
+            box-shadow: 0 4px 6px rgba(46, 139, 87, 0.3);
         }
         #show-ans-btn:hover {
-            background-color: #a04000;
+            background-color: #1f6b40;
             transform: translateY(-3px);
-            box-shadow: 0 6px 10px rgba(211, 84, 0, 0.4);
+            box-shadow: 0 6px 10px rgba(46, 139, 87, 0.4);
         }
         #answer-section {
             display: none;
             margin-top: 30px;
             padding: 25px;
-            background-color: #fff9f0;
-            border: 3px dashed #d35400;
+            background-color: #f2f9f2;
+            border: 3px dashed #2e8b57;
             border-radius: 15px;
         }
         .ans-item {
             margin-bottom: 12px;
             padding: 8px;
-            border-bottom: 1px dashed #e2c09c;
+            border-bottom: 1px dashed #a8d5a8;
             font-size: 1.1em;
         }
         .ans-val {
-            color: #c0392b;
+            color: #d35400;
             font-weight: bold;
             font-size: 1.15em;
         }
@@ -121,62 +121,62 @@
 
 <div class="container">
     <div class="header-section">
-        <img src="monkey_head.png" alt="小猴子" class="monkey-img">
-        <h1>🐒 小猴子陪你練：小數計算 (不含除法)</h1>
-        <p style="color: #8b4513;">跟著小猴子一起把計算練得又快又準！算完記得點擊下方按鈕對答案喔。</p>
+        <img src="monkey_head.jpg" alt="小猴子" class="monkey-img">
+        <h1>🐵 小猴子的森林特訓：小數運算 (無除法)</h1>
+        <p style="color: #4a4a4a;">準備好計算紙了嗎？我們繼續挑戰小數點！算完後點擊按鈕，小猴子會把香蕉跟解答一起給你喔！</p>
     </div>
 
     <div class="practice-grid">
-        <div class="q-box"><div class="q-num">1</div> 12.45 + 3.18 = ?</div>
-        <div class="q-box"><div class="q-num">2</div> 8.72 + 5.28 = ?</div>
-        <div class="q-box"><div class="q-num">3</div> 15.05 - 6.42 = ?</div>
-        <div class="q-box"><div class="q-num">4</div> 20 - 4.75 = ?</div>
-        <div class="q-box"><div class="q-num">5</div> 3.14 × 15 = ?</div>
-        <div class="q-box"><div class="q-num">6</div> 0.85 × 24 = ?</div>
-        <div class="q-box"><div class="q-num">7</div> 6.38 + 12.05 = ?</div>
-        <div class="q-box"><div class="q-num">8</div> 9.1 - 2.85 = ?</div>
-        <div class="q-box"><div class="q-num">9</div> 4.25 × 16 = ?</div>
-        <div class="q-box"><div class="q-num">10</div> 1.05 × 32 = ?</div>
+        <div class="q-box"><div class="q-num">1</div> 15.68 + 4.22 = ?</div>
+        <div class="q-box"><div class="q-num">2</div> 21.05 - 9.47 = ?</div>
+        <div class="q-box"><div class="q-num">3</div> 8.95 + 13.15 = ?</div>
+        <div class="q-box"><div class="q-num">4</div> 30 - 14.28 = ?</div>
+        <div class="q-box"><div class="q-num">5</div> 5.46 + 2.75 = ?</div>
+        <div class="q-box"><div class="q-num">6</div> 1.25 × 24 = ?</div>
+        <div class="q-box"><div class="q-num">7</div> 0.75 × 16 = ?</div>
+        <div class="q-box"><div class="q-num">8</div> 3.42 × 15 = ?</div>
+        <div class="q-box"><div class="q-num">9</div> 0.98 × 50 = ?</div>
+        <div class="q-box"><div class="q-num">10</div> 2.05 × 18 = ?</div>
         
-        <div class="q-box"><div class="q-num">11</div> 18.52 - 9.6 = ?</div>
-        <div class="q-box"><div class="q-num">12</div> 7.45 + 8.55 = ?</div>
-        <div class="q-box"><div class="q-num">13</div> 2.25 × 14 + 3.6 = ?</div>
-        <div class="q-box"><div class="q-num">14</div> (5.25 + 3.75) × 12 = ?</div>
-        <div class="q-box"><div class="q-num">15</div> 40 - 2.15 × 8 = ?</div>
-        <div class="q-box"><div class="q-num">16</div> 0.95 × 20 - 5.5 = ?</div>
-        <div class="q-box"><div class="q-num">17</div> 16.48 + (7.2 - 3.45) = ?</div>
-        <div class="q-box"><div class="q-num">18</div> (10 - 2.85) × 4 = ?</div>
-        <div class="q-box"><div class="q-num">19</div> 3.25 × 8 + 4.5 = ?</div>
-        <div class="q-box"><div class="q-num">20</div> 50 - (6.45 + 3.55) × 3 = ?</div>
+        <div class="q-box"><div class="q-num">11</div> 12.55 + 3.25 × 4 = ?</div>
+        <div class="q-box"><div class="q-num">12</div> (8.45 - 2.15) × 6 = ?</div>
+        <div class="q-box"><div class="q-num">13</div> 50 - 4.15 × 8 = ?</div>
+        <div class="q-box"><div class="q-num">14</div> 1.55 × 20 - 14.8 = ?</div>
+        <div class="q-box"><div class="q-num">15</div> (15.25 + 4.75) × 14 = ?</div>
+        <div class="q-box"><div class="q-num">16</div> 35.8 - (6.45 + 12.55) = ?</div>
+        <div class="q-box"><div class="q-num">17</div> 2.48 × 25 = ?</div>
+        <div class="q-box"><div class="q-num">18</div> 0.64 × 35 + 8.6 = ?</div>
+        <div class="q-box"><div class="q-num">19</div> 100 - (1.25 + 3.75) × 12 = ?</div>
+        <div class="q-box"><div class="q-num">20</div> (20.5 - 8.35) × 5 = ?</div>
     </div>
 
     <div class="btn-container">
-        <button id="show-ans-btn" onclick="showAnswers()">🍌 點擊顯示全部答案</button>
+        <button id="show-ans-btn" onclick="showAnswers()">🍌 點擊領取香蕉與解答</button>
     </div>
 
     <div id="answer-section">
-        <h3 style="color: #d35400;">📝 小猴子提供的解答：</h3>
+        <h3 style="color: #1f6b40;">📝 小猴子幫你改考卷：</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="ans-item">1. 答案：<span class="ans-val">15.63</span></div>
-            <div class="ans-item">2. 答案：<span class="ans-val">14</span> (14.00)</div>
-            <div class="ans-item">3. 答案：<span class="ans-val">8.63</span></div>
-            <div class="ans-item">4. 答案：<span class="ans-val">15.25</span> (20.00 - 4.75)</div>
-            <div class="ans-item">5. 答案：<span class="ans-val">47.1</span></div>
-            <div class="ans-item">6. 答案：<span class="ans-val">20.4</span></div>
-            <div class="ans-item">7. 答案：<span class="ans-val">18.43</span></div>
-            <div class="ans-item">8. 答案：<span class="ans-val">6.25</span> (9.10 - 2.85)</div>
-            <div class="ans-item">9. 答案：<span class="ans-val">68</span></div>
-            <div class="ans-item">10. 答案：<span class="ans-val">33.6</span></div>
-            <div class="ans-item">11. 答案：<span class="ans-val">8.92</span> (18.52 - 9.60)</div>
-            <div class="ans-item">12. 答案：<span class="ans-val">16</span> (16.00)</div>
-            <div class="ans-item">13. 答案：<span class="ans-val">35.1</span> (先乘後加：31.5 + 3.6)</div>
-            <div class="ans-item">14. 答案：<span class="ans-val">108</span> (括號先算：9 × 12)</div>
-            <div class="ans-item">15. 答案：<span class="ans-val">22.8</span> (40 - 17.2)</div>
-            <div class="ans-item">16. 答案：<span class="ans-val">13.5</span> (19 - 5.5)</div>
-            <div class="ans-item">17. 答案：<span class="ans-val">20.23</span> (16.48 + 3.75)</div>
-            <div class="ans-item">18. 答案：<span class="ans-val">28.6</span> (7.15 × 4)</div>
-            <div class="ans-item">19. 答案：<span class="ans-val">30.5</span> (26 + 4.5)</div>
-            <div class="ans-item">20. 答案：<span class="ans-val">20</span> (50 - 10 × 3 = 50 - 30)</div>
+            <div class="ans-item">1. 答案：<span class="ans-val">19.9</span> (19.90)</div>
+            <div class="ans-item">2. 答案：<span class="ans-val">11.58</span></div>
+            <div class="ans-item">3. 答案：<span class="ans-val">22.1</span> (22.10)</div>
+            <div class="ans-item">4. 答案：<span class="ans-val">15.72</span></div>
+            <div class="ans-item">5. 答案：<span class="ans-val">8.21</span></div>
+            <div class="ans-item">6. 答案：<span class="ans-val">30</span> (30.00)</div>
+            <div class="ans-item">7. 答案：<span class="ans-val">12</span> (12.00)</div>
+            <div class="ans-item">8. 答案：<span class="ans-val">51.3</span> (51.30)</div>
+            <div class="ans-item">9. 答案：<span class="ans-val">49</span> (49.00)</div>
+            <div class="ans-item">10. 答案：<span class="ans-val">36.9</span> (36.90)</div>
+            <div class="ans-item">11. 答案：<span class="ans-val">25.55</span> (先乘後加：12.55 + 13)</div>
+            <div class="ans-item">12. 答案：<span class="ans-val">37.8</span> (括號先算：6.3 × 6)</div>
+            <div class="ans-item">13. 答案：<span class="ans-val">16.8</span> (50 - 33.2)</div>
+            <div class="ans-item">14. 答案：<span class="ans-val">16.2</span> (31 - 14.8)</div>
+            <div class="ans-item">15. 答案：<span class="ans-val">280</span> (20 × 14)</div>
+            <div class="ans-item">16. 答案：<span class="ans-val">16.8</span> (35.8 - 19)</div>
+            <div class="ans-item">17. 答案：<span class="ans-val">62</span> (62.00)</div>
+            <div class="ans-item">18. 答案：<span class="ans-val">31</span> (先乘後加：22.4 + 8.6)</div>
+            <div class="ans-item">19. 答案：<span class="ans-val">40</span> (100 - 5 × 12 = 100 - 60)</div>
+            <div class="ans-item">20. 答案：<span class="ans-val">60.75</span> (12.15 × 5)</div>
         </div>
     </div>
 </div>
