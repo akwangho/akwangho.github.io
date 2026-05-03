@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小數兩位數計算練習 - 小猴子毒舌特訓版</title>
+    <title>小數兩位數計算練習 - 小猴子苦苦哀求版</title>
     <style>
         body {
             font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background-color: #fdf5e6;
+            background-color: #f0f8ff; /* 溫柔的愛麗絲藍 */
             padding: 20px;
-            color: #3e2723;
+            color: #333;
         }
         .container {
             max-width: 800px;
@@ -17,8 +17,8 @@
             background: white;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(121, 85, 72, 0.15);
-            border: 4px solid #8d6e63;
+            box-shadow: 0 8px 16px rgba(70, 130, 180, 0.15);
+            border: 4px solid #87ceeb;
         }
         .header-section {
             text-align: center;
@@ -28,32 +28,28 @@
             width: 150px;
             height: auto;
             border-radius: 50%;
-            border: 4px dashed #6d4c41;
+            border: 4px dashed #5f9ea0;
             padding: 5px;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            transition: transform 0.3s;
-        }
-        .monkey-img:hover {
-            transform: rotate(-10deg) scale(1.1);
         }
         h1 {
-            color: #5d4037;
+            color: #4682b4;
             margin-top: 15px;
             padding-bottom: 10px;
         }
         
-        /* 小猴子的毒舌叮嚀區塊設計 */
+        /* 小猴子的懇求叮嚀區塊設計 */
         .tips-box {
-            background-color: #ffebee;
-            border-left: 8px solid #c62828;
+            background-color: #e0ffff;
+            border-left: 8px solid #4682b4;
             padding: 20px;
             margin: 20px 0 30px 0;
             border-radius: 0 15px 15px 0;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
         .tips-title {
-            color: #b71c1c;
+            color: #005f6b;
             font-size: 1.3em;
             font-weight: bold;
             margin-bottom: 15px;
@@ -69,22 +65,22 @@
             font-size: 1.15em;
             line-height: 1.6;
             position: relative;
-            padding-left: 35px;
-            color: #37474f;
+            padding-left: 40px;
+            color: #2f4f4f;
         }
         .tips-list li::before {
-            content: '🔥';
+            content: '🥺';
             position: absolute;
             left: 0;
-            top: 2px;
-            font-size: 1.2em;
+            top: 0;
+            font-size: 1.3em;
         }
         .highlight {
-            background-color: #ffcdd2;
+            background-color: #b0e0e6;
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: bold;
-            color: #b71c1c;
+            color: #005f6b;
         }
 
         .practice-grid {
@@ -95,8 +91,8 @@
         .q-box {
             font-size: 1.2em;
             padding: 15px;
-            background: #fafafa;
-            border: 2px solid #bcaaa4;
+            background: #fdfdfd;
+            border: 2px solid #add8e6;
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -104,10 +100,10 @@
         }
         .q-box:hover {
             transform: scale(1.02);
-            background: #efebe9;
+            background: #f0f8ff;
         }
         .q-num {
-            background: #795548;
+            background: #5f9ea0;
             color: white;
             width: 35px;
             height: 35px;
@@ -125,7 +121,7 @@
             margin: 40px 0;
         }
         #show-ans-btn {
-            background-color: #c62828;
+            background-color: #4682b4;
             color: white;
             border: none;
             padding: 15px 40px;
@@ -134,34 +130,34 @@
             border-radius: 50px;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 4px 6px rgba(198, 40, 40, 0.3);
+            box-shadow: 0 4px 6px rgba(70, 130, 180, 0.3);
         }
         #show-ans-btn:hover {
-            background-color: #b71c1c;
+            background-color: #4169e1;
             transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 6px 12px rgba(198, 40, 40, 0.4);
+            box-shadow: 0 6px 12px rgba(70, 130, 180, 0.4);
         }
         #answer-section {
             display: none;
             margin-top: 30px;
             padding: 25px;
-            background-color: #efebe9;
-            border: 3px dashed #8d6e63;
+            background-color: #f0f8ff;
+            border: 3px dashed #4682b4;
             border-radius: 15px;
         }
         .ans-item {
             margin-bottom: 12px;
             padding: 10px;
-            border-bottom: 1px dashed #bcaaa4;
+            border-bottom: 1px dashed #add8e6;
             font-size: 1.1em;
         }
         .ans-val {
-            color: #d32f2f;
+            color: #d35400;
             font-weight: bold;
             font-size: 1.2em;
         }
-        .snarky-comment {
-            color: #6d4c41;
+        .soft-comment {
+            color: #5f9ea0;
             font-size: 0.9em;
             margin-left: 8px;
             font-style: italic;
@@ -175,70 +171,70 @@
 
 <div class="container">
     <div class="header-section">
-        <img src="monkey_head.png" alt="小猴子" class="monkey-img">
-        <h1>🐒 毒舌小猴子的地獄特訓卷</h1>
+        <img src="monkey_pretty_please.png" alt="小猴子" class="monkey-img">
+        <h1>🐒 小猴子拜託你：小數計算練習</h1>
     </div>
 
     <div class="tips-box">
-        <div class="tips-title">📢 寫考卷前，聽聽本猴的「3個靈魂拷問」：</div>
+        <div class="tips-title">📢 寫考卷前，小猴子眼淚汪汪地求求你：</div>
         <ul class="tips-list">
-            <li><span class="highlight">你的腦袋是保險箱嗎？</span> 借位和進位的時候，請乖乖把原本的數字「劃掉」寫上新數字！別老是妄想自己會心電感應，每次都差那個 1，分數就是這樣憑空蒸發的啦！</li>
-            <li><span class="highlight">你的數字是剛學走路嗎？</span> 東倒西歪還擠在一起取暖！寫字不是在畫符咒，請寫得連你自己都看得懂，要是因為看錯自己寫的「鬼畫符」而算錯，本猴看了都要笑到從樹上掉下來！</li>
-            <li><span class="highlight">請收起你那盲目的自信！</span> 別以為題目看起來簡單就開始大展「心算神功」。乖乖在旁邊給我列出「直式」！你又不是人體計算機，腳踏實地列直式才是王道啊！</li>
+            <li><span class="highlight">拜託拜託，借位跟進位的時候，老老實實把數字劃掉好不好...</span> 算我怕你了，不要再把進位放在心裡了啦，每次都差那個 1 就全錯了，小猴子看了心好痛啊！</li>
+            <li><span class="highlight">求求你字寫漂亮一點、分開一點好嗎...</span> 你寫的數字常常黏在一起，結果自己看錯自己寫的數字被扣分，這真的太可惜了啦，給點面子寫整齊一點嘛！</li>
+            <li><span class="highlight">小猴子給你跪了，請一定要乖乖寫直式...</span> 就算你覺得題目看起來超級簡單，也請你在旁邊把直式列出來好不好？不要太相信心算，穩穩地把分數拿下來才是最棒的啊！</li>
         </ul>
     </div>
 
     <div class="practice-grid">
-        <div class="q-box"><div class="q-num">1</div> 35.48 + 17.65 = ?</div>
-        <div class="q-box"><div class="q-num">2</div> 50.02 - 18.37 = ?</div>
-        <div class="q-box"><div class="q-num">3</div> 8.9 + 4.25 = ?</div>
-        <div class="q-box"><div class="q-num">4</div> 21.3 - 6.85 = ?</div>
-        <div class="q-box"><div class="q-num">5</div> 14.05 - 7.6 = ?</div>
-        <div class="q-box"><div class="q-num">6</div> 9.99 + 0.05 = ?</div>
-        <div class="q-box"><div class="q-num">7</div> 2.45 × 16 = ?</div>
-        <div class="q-box"><div class="q-num">8</div> 0.85 × 35 = ?</div>
-        <div class="q-box"><div class="q-num">9</div> 6.08 × 15 = ?</div>
-        <div class="q-box"><div class="q-num">10</div> 1.75 × 24 = ?</div>
+        <div class="q-box"><div class="q-num">1</div> 14.5 + 8.75 = ?</div>
+        <div class="q-box"><div class="q-num">2</div> 20 - 5.38 = ?</div>
+        <div class="q-box"><div class="q-num">3</div> 3.4 × 15 = ?</div>
+        <div class="q-box"><div class="q-num">4</div> 12.05 - 6.8 = ?</div>
+        <div class="q-box"><div class="q-num">5</div> 9.9 + 1.15 = ?</div>
+        <div class="q-box"><div class="q-num">6</div> 100 - 8.42 = ?</div>
+        <div class="q-box"><div class="q-num">7</div> 0.75 × 24 = ?</div>
+        <div class="q-box"><div class="q-num">8</div> 4.68 + 15.32 = ?</div>
+        <div class="q-box"><div class="q-num">9</div> 1.25 × 36 = ?</div>
+        <div class="q-box"><div class="q-num">10</div> 15.4 - 9.85 = ?</div>
         
-        <div class="q-box"><div class="q-num">11</div> 15.6 + 3.5 × 12 = ?</div>
-        <div class="q-box"><div class="q-num">12</div> 60 - 2.85 × 14 = ?</div>
-        <div class="q-box"><div class="q-num">13</div> (10.5 - 3.75) × 8 = ?</div>
-        <div class="q-box"><div class="q-num">14</div> 4.25 × 18 - 25.5 = ?</div>
-        <div class="q-box"><div class="q-num">15</div> (8.6 + 4.8) × 15 = ?</div>
-        <div class="q-box"><div class="q-num">16</div> 100 - (12.45 + 3.55) × 4 = ?</div>
-        <div class="q-box"><div class="q-num">17</div> 1.05 × 36 + 12.8 = ?</div>
-        <div class="q-box"><div class="q-num">18</div> 85.4 - (24.6 + 18.85) = ?</div>
-        <div class="q-box"><div class="q-num">19</div> (30 - 14.25) × 6 = ?</div>
-        <div class="q-box"><div class="q-num">20</div> 2.5 × 24 + 3.75 × 8 = ?</div>
+        <div class="q-box"><div class="q-num">11</div> 18.5 + 2.5 × 6 = ?</div>
+        <div class="q-box"><div class="q-num">12</div> (14.2 - 5.8) × 5 = ?</div>
+        <div class="q-box"><div class="q-num">13</div> 50 - 4.5 × 8 = ?</div>
+        <div class="q-box"><div class="q-num">14</div> 3.15 × 12 + 6.2 = ?</div>
+        <div class="q-box"><div class="q-num">15</div> 100 - (15.5 + 4.5) × 3 = ?</div>
+        <div class="q-box"><div class="q-num">16</div> 0.8 × 45 - 12.6 = ?</div>
+        <div class="q-box"><div class="q-num">17</div> (8.25 + 3.75) × 14 = ?</div>
+        <div class="q-box"><div class="q-num">18</div> 42.8 - (16.4 + 8.65) = ?</div>
+        <div class="q-box"><div class="q-num">19</div> 2.4 × 15 + 18.5 = ?</div>
+        <div class="q-box"><div class="q-num">20</div> (30 - 12.5) × 4 = ?</div>
     </div>
 
     <div class="btn-container">
-        <button id="show-ans-btn" onclick="showAnswers()">🔥 膽子夠大就點我對答案，別怕被猴子笑！</button>
+        <button id="show-ans-btn" onclick="showAnswers()">🥺 我都有乖乖聽話，點我對答案！</button>
     </div>
 
     <div id="answer-section">
-        <h3 style="color: #b71c1c;">📝 來看看你是不是又「自信過頭」翻車了：</h3>
+        <h3 style="color: #005f6b;">📝 小猴子期待的對答案時間：</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="ans-item">1. 答案：<span class="ans-val">53.13</span> <span class="snarky-comment">(進位有乖乖寫上去嗎？)</span></div>
-            <div class="ans-item">2. 答案：<span class="ans-val">31.65</span> <span class="snarky-comment">(大魔王連環借位題，沒劃掉數字的一定錯！)</span></div>
-            <div class="ans-item">3. 答案：<span class="ans-val">13.15</span> <span class="snarky-comment">(8.9 是 8.90，對齊沒？)</span></div>
-            <div class="ans-item">4. 答案：<span class="ans-val">14.45</span> <span class="snarky-comment">(21.30 減 6.85，別跟我說你心算！)</span></div>
-            <div class="ans-item">5. 答案：<span class="ans-val">6.45</span> <span class="snarky-comment">(7.60 喔，別看走眼了。)</span></div>
-            <div class="ans-item">6. 答案：<span class="ans-val">10.04</span> <span class="snarky-comment">(連環進位，是不是又漏寫了 1？)</span></div>
-            <div class="ans-item">7. 答案：<span class="ans-val">39.2</span> <span class="snarky-comment">(算出來 39.20，最後的 0 可以省啦)</span></div>
-            <div class="ans-item">8. 答案：<span class="ans-val">29.75</span></div>
-            <div class="ans-item">9. 答案：<span class="ans-val">91.2</span> <span class="snarky-comment">(字有沒有寫黏在一起？)</span></div>
-            <div class="ans-item">10. 答案：<span class="ans-val">42</span> <span class="snarky-comment">(整數 42，清爽！)</span></div>
-            <div class="ans-item">11. 答案：<span class="ans-val">57.6</span> <span class="snarky-comment">(先乘後加：15.6 + 42)</span></div>
-            <div class="ans-item">12. 答案：<span class="ans-val">20.1</span> <span class="snarky-comment">(60 - 39.9，借位又來囉)</span></div>
-            <div class="ans-item">13. 答案：<span class="ans-val">54</span> <span class="snarky-comment">(括號先算 6.75)</span></div>
-            <div class="ans-item">14. 答案：<span class="ans-val">51</span> <span class="snarky-comment">(76.5 - 25.5)</span></div>
-            <div class="ans-item">15. 答案：<span class="ans-val">201</span> <span class="snarky-comment">(13.4 × 15)</span></div>
-            <div class="ans-item">16. 答案：<span class="ans-val">36</span> <span class="snarky-comment">(100 - 64，這題再錯打屁股)</span></div>
-            <div class="ans-item">17. 答案：<span class="ans-val">50.6</span> <span class="snarky-comment">(37.8 + 12.8)</span></div>
-            <div class="ans-item">18. 答案：<span class="ans-val">41.95</span> <span class="snarky-comment">(85.40 - 43.45)</span></div>
-            <div class="ans-item">19. 答案：<span class="ans-val">94.5</span> <span class="snarky-comment">(15.75 × 6)</span></div>
-            <div class="ans-item">20. 答案：<span class="ans-val">90</span> <span class="snarky-comment">(兩邊先乘，60 + 30)</span></div>
+            <div class="ans-item">1. 答案：<span class="ans-val">23.25</span> <span class="soft-comment">(進位有乖乖寫上去對吧？)</span></div>
+            <div class="ans-item">2. 答案：<span class="ans-val">14.62</span> <span class="soft-comment">(20.00 借位，謝謝你有劃掉數字喔！)</span></div>
+            <div class="ans-item">3. 答案：<span class="ans-val">51</span></div>
+            <div class="ans-item">4. 答案：<span class="ans-val">5.25</span> <span class="soft-comment">(6.80 有對齊小數點，太棒了)</span></div>
+            <div class="ans-item">5. 答案：<span class="ans-val">11.05</span> <span class="soft-comment">(9.90 + 1.15)</span></div>
+            <div class="ans-item">6. 答案：<span class="ans-val">91.58</span> <span class="soft-comment">(最容易錯的連續借位，你寫對了嗎？)</span></div>
+            <div class="ans-item">7. 答案：<span class="ans-val">18</span> <span class="soft-comment">(18.00)</span></div>
+            <div class="ans-item">8. 答案：<span class="ans-val">20</span> <span class="soft-comment">(20.00，剛好進位成整數！)</span></div>
+            <div class="ans-item">9. 答案：<span class="ans-val">45</span> <span class="soft-comment">(45.00)</span></div>
+            <div class="ans-item">10. 答案：<span class="ans-val">5.55</span> <span class="soft-comment">(15.40 減 9.85)</span></div>
+            <div class="ans-item">11. 答案：<span class="ans-val">33.5</span> <span class="soft-comment">(先乘後加：18.5 + 15)</span></div>
+            <div class="ans-item">12. 答案：<span class="ans-val">42</span> <span class="soft-comment">(括號先：8.4 × 5)</span></div>
+            <div class="ans-item">13. 答案：<span class="ans-val">14</span> <span class="soft-comment">(先乘：50 - 36)</span></div>
+            <div class="ans-item">14. 答案：<span class="ans-val">44</span> <span class="soft-comment">(37.8 + 6.2)</span></div>
+            <div class="ans-item">15. 答案：<span class="ans-val">40</span> <span class="soft-comment">(100 - 20 × 3 = 100 - 60)</span></div>
+            <div class="ans-item">16. 答案：<span class="ans-val">23.4</span> <span class="soft-comment">(36 - 12.6)</span></div>
+            <div class="ans-item">17. 答案：<span class="ans-val">168</span> <span class="soft-comment">(12 × 14)</span></div>
+            <div class="ans-item">18. 答案：<span class="ans-val">17.75</span> <span class="soft-comment">(42.80 - 25.05)</span></div>
+            <div class="ans-item">19. 答案：<span class="ans-val">54.5</span> <span class="soft-comment">(36 + 18.5)</span></div>
+            <div class="ans-item">20. 答案：<span class="ans-val">70</span> <span class="soft-comment">(17.5 × 4)</span></div>
         </div>
     </div>
 </div>
