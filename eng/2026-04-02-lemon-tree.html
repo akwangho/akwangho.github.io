@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lemon Tree 🍋 聽歌學英文</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=Noto+Sans+TC:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+            background-color: #FEF9C3; /* Pastel Yellow */
+            overflow: hidden; /* 防止整個頁面捲動，控制在內部容器 */
+        }
+
+        /* 自定義捲軸 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #FDE047; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FACC15; }
+
+        /* 卡片發光與動態效果 */
+        .card-active {
+            border-color: #FACC15 !important;
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.6);
+            transform: scale(1.02);
+            background-color: #FEFEF0;
+        }
+
+        /* 卡片震動小動畫 (點擊獎勵) */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(2deg); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop {
+            animation: pop 0.4s ease-out;
+        }
+
+        /* 拖曳分割線 */
+        #resizer {
+            transition: background-color 0.2s;
+        }
+        #resizer:hover, #resizer.active {
+            background-color: #FACC15;
+        }
+
+        /* 隱藏元素用 */
+        .hide { display: none !important; }
+        
+        /* 避免 iframe 在拖曳時吞噬滑鼠事件 */
+        .pointer-events-none { pointer-events: none; }
+    </style>
+</head>
+<body class="flex flex-col h-screen text-gray-800">
+
+    <header class="bg-white/90 backdrop-blur-md shadow-sm z-50 flex-none rounded-b-3xl">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="text-2xl">🍋</div>
+                    <div class="flex-1 bg-yellow-100 rounded-full h-5 relative overflow-hidden shadow-inner">
+                        <div id="progress-bar" class="bg-yellow-400 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
+                    </div>
+                    <div class="font-bold text-yellow-600 text-lg w-20 text-right">
+                        <span id="progress-text">0/0</span>
+                    </div>
+                </div>
+                <button onclick="toggleControlPanel()" class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full font-bold hover:bg-yellow-200 transition">
+                    <i class="fa-solid fa-gear mr-1"></i> 設定與工具
+                </button>
+            </div>
+
+            <div id="control-panel" class="hidden mt-4 pt-4 border-t border-yellow-200 flex flex-wrap gap-3">
+                <button onclick="toggleChinese()" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl font-bold hover:bg-blue-200 transition">
+                    <i class="fa-solid fa-language mr-1"></i> 切換中文翻譯
+                </button>
+                <button onclick="toggleControls()" class="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl font-bold hover:bg-purple-200 transition">
+                    <i class="fa-solid fa-clock mr-1"></i> 顯示時間微調器
+                </button>
+                <div class="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-font"></i> 字體大小
+                    <button onclick="changeFontSize(-0.1)" class="w-8 h-8 bg-white rounded-full shadow hover:bg-green-50">-</button>
+                    <button onclick="changeFontSize(0.1)" class="w-8 h-8 bg-white rounded-full shadow hover:bg-green-50">+</button>
+                </div>
+                <button onclick="exportData()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition ml-auto">
+                    <i class="fa-solid fa-copy mr-1"></i> 匯出時間設定
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative p-2 gap-2" id="main-container">
+        
+        <div id="video-section" class="w-full md:w-2/3 h-64 md:h-full bg-black rounded-3xl overflow-hidden shadow-lg sticky top-0 z-40 flex-none md:flex-auto flex flex-col">
+            <div id="player" class="w-full h-full"></div>
+        </div>
+
+        <div id="resizer" class="hidden md:block w-2 bg-yellow-200 rounded-full cursor-col-resize flex-none opacity-50 hover:opacity-100"></div>
+
+        <div id="content-section" class="flex-1 h-full overflow-y-auto bg-white rounded-3xl shadow-lg p-4 pb-20 relative">
+            
+            <div class="flex gap-2 mb-4 sticky top-0 bg-white/90 backdrop-blur pb-2 z-10 border-b border-gray-100">
+                <button onclick="switchTab('lyrics')" id="tab-lyrics" class="flex-1 py-2 rounded-xl font-bold bg-yellow-400 text-white shadow-md transition">🎵 歌曲歌詞</button>
+                <button onclick="switchTab('vocab')" id="tab-vocab" class="flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition">📖 單字學習</button>
+            </div>
+
+            <div id="content-area" class="space-y-4">
+                </div>
+        </div>
+    </main>
+
+    <script>
+        // === 原始資料定義 ===
+        // 為簡化並貼近小朋友，這裡擷取重點歌詞並配上基礎翻譯，時間戳預設約略值，供後續微調
+        const sourceLyrics = [
+            { id: "l1", start: 14, end: 18, en: "I'm sitting here in the boring room.", zh: "我坐在這個無聊的房間裡" },
+            { id: "l2", start: 17, end: 21, en: "It's just another rainy Sunday afternoon.", zh: "這只是另一個下雨的星期天下午" },
+            { id: "l3", start: 21, end: 24, en: "I'm wasting my time, I got nothing to do.", zh: "我在浪費時間，無事可做" },
+            { id: "l4", start: 24, end: 28, en: "I'm hanging around, I'm waiting for you.", zh: "我到處閒晃，我在等著你" },
+            { id: "l5", start: 28, end: 34, en: "But nothing ever happens and I wonder.", zh: "但什麼事都沒發生，我很好奇" },
+            { id: "l6", start: 34, end: 38, en: "I'm driving around in my car.", zh: "我開著我的車四處兜風" },
+            { id: "l7", start: 37, end: 41, en: "I'm driving too fast, I'm driving too far.", zh: "我開得太快，開得太遠" },
+            { id: "l8", start: 41, end: 45, en: "I'd like to change my point of view.", zh: "我想要改變一下觀點" },
+            { id: "l9", start: 44, end: 48, en: "I feel so lonely, I'm waiting for you.", zh: "我感覺好寂寞，我在等著你" },
+            { id: "l10", start: 47, end: 54, en: "But nothing ever happens and I wonder.", zh: "但什麼事都沒發生，我很好奇" },
+            { id: "l11", start: 54, end: 58, en: "I wonder how, I wonder why.", zh: "我想知道如何，我想知道為什麼" },
+            { id: "l12", start: 58, end: 62, en: "Yesterday you told me about the blue blue sky.", zh: "昨天你告訴我關於那蔚藍的天空" },
+            { id: "l13", start: 62, end: 67, en: "And all that I can see is just a yellow lemon tree.", zh: "而我所能看見的，只有一棵黃色的檸檬樹" },
+            { id: "l14", start: 67, end: 71, en: "I'm turning my head up and down.", zh: "我上下轉動我的頭" },
+            { id: "l15", start: 71, end: 75, en: "I'm turning turning turning turning turning around.", zh: "我轉呀轉呀轉呀轉呀轉了一圈" },
+            { id: "l16", start: 75, end: 80, en: "And all that I can see is just another lemon tree.", zh: "而我所能看見的，只是另一棵檸檬樹" },
+            { id: "l17", start: 94, end: 98, en: "I'm sitting here, I miss the power.", zh: "我坐在這裡，我失去了動力" },
+            { id: "l18", start: 98, end: 102, en: "I'd like to go out taking a shower.", zh: "我想要出去沖個澡" },
+            { id: "l19", start: 101, end: 105, en: "But there's a heavy cloud inside my head.", zh: "但我的腦海裡有一片沉重的烏雲" },
+            { id: "l20", start: 104, end: 108, en: "I feel so tired, put myself into bed.", zh: "我感覺好累，把自己扔到床上" },
+            { id: "l21", start: 107, end: 114, en: "Well, nothing ever happens and I wonder.", zh: "嗯，什麼事都沒發生，我很好奇" },
+            { id: "l22", start: 115, end: 121, en: "Isolation is not good for me.", zh: "孤單對我來說不是件好事" },
+            { id: "l23", start: 121, end: 129, en: "Isolation, I don't want to sit on the lemon tree.", zh: "孤單，我不想坐在檸檬樹上" },
+            { id: "l24", start: 128, end: 132, en: "I'm stepping around in the desert of joy.", zh: "我在歡樂的沙漠裡踱步" },
+            { id: "l25", start: 131, end: 135, en: "Maybe anyhow I'll get another toy.", zh: "也許無論如何我會得到另一個玩具" },
+            { id: "l26", start: 134, end: 140, en: "And everything will happen and you wonder.", zh: "然後一切都會發生，而你很好奇" },
+            { id: "l28", start: 145, end: 148, en: "Yesterday you told me about the blue blue sky.", zh: "昨天你告訴我關於那蔚藍的天空" },
+            { id: "l27", start: 140, end: 145, en: "I wonder how, I wonder why.", zh: "我想知道如何，我想知道為什麼" },
+            { id: "l29", start: 148, end: 154, en: "And all that I can see is just another lemon tree.", zh: "而我所能看見的，只是另一棵檸檬樹" },
+            { id: "l30", start: 153, end: 158, en: "I'm turning my head up and down.", zh: "我上下轉動我的頭" },
+            { id: "l31", start: 158, end: 162, en: "I'm turning turning turning turning turning around.", zh: "我轉呀轉呀轉呀轉呀轉了一圈" },
+            { id: "l32", start: 161, end: 167, en: "And all that I can see is just a yellow lemon tree.", zh: "而我所能看見的，只有一棵黃色的檸檬樹" }
+        ];
+
+        const sourceVocab = [
+            { id: "v1", start: 14, end: 18, word: "Boring", emoji: "🥱", pos: "Adj.", zh: "無聊的", en: "I'm sitting here in the boring room." },
+            { id: "v2", start: 14, end: 18, word: "Room", emoji: "🏠", pos: "N.", zh: "房間", en: "I'm sitting here in the boring room." },
+            { id: "v3", start: 17, end: 21, word: "Rainy", emoji: "🌧️", pos: "Adj.", zh: "下雨的", en: "It's just another rainy Sunday afternoon." },
+            { id: "v4", start: 17, end: 21, word: "Afternoon", emoji: "🌇", pos: "N.", zh: "下午", en: "It's just another rainy Sunday afternoon." },
+            { id: "v5", start: 25, end: 28, word: "Wait", emoji: "⏳", pos: "V.", zh: "等待", en: "I'm hanging around I'm waiting for you." },
+            { id: "v6", start: 28, end: 34, word: "Happen", emoji: "💥", pos: "V.", zh: "發生", en: "But nothing ever happens." },
+            { id: "v7", start: 28, end: 34, word: "Wonder", emoji: "🤔", pos: "V.", zh: "想知道/好奇", en: "And I wonder." },
+            { id: "v8", start: 37, end: 40, word: "Fast", emoji: "🏎️", pos: "Adj.", zh: "快的", en: "I'm driving too fast." },
+            { id: "v9", start: 39, end: 41, word: "Far", emoji: "🔭", pos: "Adj/Adv.", zh: "遠的", en: "I'm driving too far." },
+            { id: "v10", start: 44, end: 48, word: "Lonely", emoji: "🥺", pos: "Adj.", zh: "寂寞的", en: "I feel so lonely." },
+            { id: "v11", start: 58, end: 62, word: "Sky", emoji: "☁️", pos: "N.", zh: "天空", en: "Yesterday you told me 'bout the blue blue sky." },
+            { id: "v12", start: 63, end: 66, word: "Yellow", emoji: "🟨", pos: "Adj.", zh: "黃色的", en: "Is just a yellow lemon tree." },
+            { id: "v13", start: 63, end: 66, word: "Tree", emoji: "🌳", pos: "N.", zh: "樹", en: "Is just a yellow lemon tree." },
+            { id: "v14", start: 94, end: 98, word: "Power", emoji: "🔋", pos: "N.", zh: "力量/動力", en: "I'm sitting here, I miss the power." },
+            { id: "v15", start: 98, end: 101, word: "Shower", emoji: "🚿", pos: "N.", zh: "淋浴", en: "I'd like to go out taking a shower." },
+            { id: "v16", start: 101, end: 105, word: "Heavy", emoji: "🏋️", pos: "Adj.", zh: "沉重的", en: "But there's a heavy cloud inside my head." },
+            { id: "v17", start: 101, end: 105, word: "Cloud", emoji: "☁️", pos: "N.", zh: "雲", en: "But there's a heavy cloud inside my head." },
+            { id: "v18", start: 104, end: 108, word: "Tired", emoji: "😫", pos: "Adj.", zh: "疲倦的", en: "I feel so tired, put myself into bed." },
+            { id: "v19", start: 104, end: 108, word: "Bed", emoji: "🛏️", pos: "N.", zh: "床", en: "I feel so tired, put myself into bed." },
+            { id: "v20", start: 115, end: 121, word: "Isolation", emoji: "🏝️", pos: "N.", zh: "孤單/孤立", en: "Isolation is not good for me." },
+            { id: "v21", start: 128, end: 132, word: "Joy", emoji: "🎉", pos: "N.", zh: "歡樂", en: "I'm stepping around in the desert of joy." },
+            { id: "v22", start: 131, end: 135, word: "Toy", emoji: "🧸", pos: "N.", zh: "玩具", en: "Maybe anyhow I'll get another toy." },
+            { id: "v23", start: 134, end: 141, word: "Everything", emoji: "🌍", pos: "Pron.", zh: "一切/每件事", en: "And everything will happen and you wonder." }
+        ];
+
+        // === 系統狀態管理 ===
+        let data = { lyrics: sourceLyrics, vocab: sourceVocab };
+        let currentTab = 'lyrics';
+        let showChinese = false;
+        let showTimingControls = false;
+        let baseFontSize = 1.25; // rem
+        let learnedCards = new Set();
+        let totalCards = sourceLyrics.length + sourceVocab.length;
+        
+        let player;
+        let currentlyPlayingId = null;
+        let checkInterval = null;
+
+        // === 初始化 YouTube API ===
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'wCQfkEkePx8', // Lemon tree
+                playerVars: { 'playsinline': 1, 'rel': 0 },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            renderCards();
+            updateProgress();
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                if(!checkInterval) checkInterval = setInterval(checkVideoTime, 100);
+            } else {
+                clearInterval(checkInterval);
+                checkInterval = null;
+                removeGlow();
+            }
+        }
+
+        // === 播放與檢查時間邏輯 ===
+        function checkVideoTime() {
+            if(!player || !player.getCurrentTime) return;
+            const time = player.getCurrentTime();
+            const currentItems = data[currentTab];
+            
+            // 如果我們知道現在是被某個卡片觸發的，到了 endTime 就暫停
+            if (currentlyPlayingId) {
+                const item = currentItems.find(i => i.id === currentlyPlayingId);
+                if (item && time >= item.end) {
+                    player.pauseVideo();
+                    currentlyPlayingId = null;
+                    removeGlow();
+                    return;
+                }
+            }
+
+            // 處理發光狀態
+            removeGlow();
+            for (let item of currentItems) {
+                if (time >= item.start && time < item.end) {
+                    document.getElementById(`card-${item.id}`)?.classList.add('card-active');
+                }
+            }
+        }
+
+        function removeGlow() {
+            document.querySelectorAll('.card-active').forEach(el => el.classList.remove('card-active'));
+        }
+
+        // 點擊卡片播放
+        window.playItem = function(id, event) {
+            // 如果點擊的是按鈕或輸入框，不觸發整張卡片播放
+            if(event && (event.target.tagName === 'BUTTON' || event.target.tagName === 'I')) return;
+
+            const item = data[currentTab].find(i => i.id === id);
+            if (!item) return;
+
+            currentlyPlayingId = id;
+            player.seekTo(item.start, true);
+            player.playVideo();
+
+            handleReward(id);
+        };
+
+        // === 獎勵與進度機制 ===
+        function handleReward(id) {
+            if (!learnedCards.has(id)) {
+                learnedCards.add(id);
+                updateProgress();
+                
+                const card = document.getElementById(`card-${id}`);
+                card.classList.add('animate-pop');
+                setTimeout(() => card.classList.remove('animate-pop'), 400);
+
+                const marker = document.getElementById(`marker-${id}`);
+                marker.classList.remove('hidden');
+
+                if (learnedCards.size === totalCards) {
+                    triggerConfetti();
+                }
+            }
+        }
+
+        function updateProgress() {
+            const percentage = (learnedCards.size / totalCards) * 100;
+            document.getElementById('progress-bar').style.width = percentage + '%';
+            document.getElementById('progress-text').innerText = `${learnedCards.size}/${totalCards}`;
+        }
+
+        function triggerConfetti() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        // === UI 渲染邏輯 ===
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function renderCards() {
+            const container = document.getElementById('content-area');
+            container.innerHTML = '';
+            const items = data[currentTab];
+
+            items.forEach(item => {
+                const isLearned = learnedCards.has(item.id);
+                const html = `
+                    <div id="card-${item.id}" class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer border-2 border-transparent p-5 relative overflow-hidden" onclick="playItem('${item.id}', event)">
+                        
+                        <div id="marker-${item.id}" class="absolute top-2 right-3 text-2xl ${isLearned ? '' : 'hidden'}">🌟</div>
+
+                        ${currentTab === 'lyrics' ? `
+                            <div class="content-text font-bold text-gray-800" style="font-size: ${baseFontSize}rem;">${item.en}</div>
+                            <div class="zh-text text-gray-500 mt-2 font-medium ${showChinese ? '' : 'hidden'}" style="font-size: ${baseFontSize * 0.8}rem;">${item.zh}</div>
+                        ` : `
+                            <div class="flex items-end gap-3 mb-2">
+                                <div class="text-4xl">${item.emoji}</div>
+                                <div class="font-extrabold text-blue-600 content-text" style="font-size: ${Math.max(1.5, baseFontSize)}rem;">${item.word}</div>
+                                <div class="text-gray-400 font-bold mb-1">${item.pos}</div>
+                            </div>
+                            <div class="zh-text text-gray-600 font-bold ${showChinese ? '' : 'hidden'}" style="font-size: ${baseFontSize * 0.9}rem;">${item.zh}</div>
+                            <div class="mt-3 text-gray-500 italic bg-yellow-50 p-3 rounded-xl border border-yellow-100" style="font-size: ${baseFontSize * 0.75}rem;">"${item.en}"</div>
+                        `}
+
+                        <div class="timing-controls flex gap-4 mt-4 pt-3 border-t border-gray-100 ${showTimingControls ? '' : 'hidden'}">
+                            <div class="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
+                                <span class="text-xs font-bold text-gray-400">START</span>
+                                <button onclick="adjustTime('${item.id}', -1, true)" class="w-7 h-7 bg-white rounded shadow text-sm hover:bg-yellow-100">-</button>
+                                <span class="font-mono text-sm w-12 text-center" id="start-time-${item.id}">${formatTime(item.start)}</span>
+                                <button onclick="adjustTime('${item.id}', 1, true)" class="w-7 h-7 bg-white rounded shadow text-sm hover:bg-yellow-100">+</button>
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
+                                <span class="text-xs font-bold text-gray-400">END</span>
+                                <button onclick="adjustTime('${item.id}', -1, false)" class="w-7 h-7 bg-white rounded shadow text-sm hover:bg-yellow-100">-</button>
+                                <span class="font-mono text-sm w-12 text-center" id="end-time-${item.id}">${formatTime(item.end)}</span>
+                                <button onclick="adjustTime('${item.id}', 1, false)" class="w-7 h-7 bg-white rounded shadow text-sm hover:bg-yellow-100">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        // === 全局控制與設定 ===
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            document.getElementById('tab-lyrics').className = tab === 'lyrics' 
+                ? "flex-1 py-2 rounded-xl font-bold bg-yellow-400 text-white shadow-md transition" 
+                : "flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition";
+            document.getElementById('tab-vocab').className = tab === 'vocab' 
+                ? "flex-1 py-2 rounded-xl font-bold bg-yellow-400 text-white shadow-md transition" 
+                : "flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition";
+            renderCards();
+        };
+
+        window.toggleControlPanel = function() {
+            const panel = document.getElementById('control-panel');
+            panel.classList.toggle('hidden');
+        };
+
+        window.toggleChinese = function() {
+            showChinese = !showChinese;
+            const zhElements = document.querySelectorAll('.zh-text');
+            zhElements.forEach(el => showChinese ? el.classList.remove('hidden') : el.classList.add('hidden'));
+        };
+
+        window.toggleControls = function() {
+            showTimingControls = !showTimingControls;
+            const controls = document.querySelectorAll('.timing-controls');
+            controls.forEach(el => showTimingControls ? el.classList.remove('hidden') : el.classList.add('hidden'));
+        };
+
+        window.changeFontSize = function(delta) {
+            baseFontSize = Math.max(0.8, Math.min(3, baseFontSize + delta));
+            renderCards();
+        };
+
+        // 微調時間邏輯
+        window.adjustTime = function(id, seconds, isStart) {
+            const item = data[currentTab].find(i => i.id === id);
+            if (!item) return;
+
+            if (isStart) {
+                item.start = Math.max(0, item.start + seconds);
+                document.getElementById(`start-time-${id}`).innerText = formatTime(item.start);
+                // 自動預覽最新 Start Time
+                currentlyPlayingId = id;
+                player.seekTo(item.start, true);
+                player.playVideo();
+            } else {
+                item.end = Math.max(item.start + 1, item.end + seconds);
+                document.getElementById(`end-time-${id}`).innerText = formatTime(item.end);
+                // 自動預覽最新 End Time (從結束前 3 秒開始播)
+                currentlyPlayingId = id;
+                const previewStart = Math.max(item.start, item.end - 3);
+                player.seekTo(previewStart, true);
+                player.playVideo();
+            }
+        };
+
+        // 匯出功能
+        window.exportData = function() {
+            const exportObj = {
+                lyrics: data.lyrics.map(l => ({ en: l.en, start: l.start, end: l.end })),
+                vocab: data.vocab.map(v => ({ word: v.word, start: v.start, end: v.end }))
+            };
+            const jsonStr = JSON.stringify(exportObj, null, 2);
+            navigator.clipboard.writeText(jsonStr).then(() => {
+                alert('✅ 時間設定 JSON 已成功複製到剪貼簿！');
+            });
+        };
+
+        // === 拖曳分割視窗邏輯 (Split Screen) ===
+        const resizer = document.getElementById('resizer');
+        const videoSection = document.getElementById('video-section');
+        const mainContainer = document.getElementById('main-container');
+        let isResizing = false;
+
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            resizer.classList.add('active');
+            // 【重要防呆】：避免滑鼠進入 iframe 吞噬拖曳事件
+            videoSection.classList.add('pointer-events-none');
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const containerRect = mainContainer.getBoundingClientRect();
+            // 計算滑鼠在容器內的相對寬度百分比
+            let newWidthPercent = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+            
+            // 限制最小最大寬度 (20% ~ 80%)
+            if (newWidthPercent < 20) newWidthPercent = 20;
+            if (newWidthPercent > 80) newWidthPercent = 80;
+
+            videoSection.style.width = `${newWidthPercent}%`;
+            videoSection.style.flex = "none";
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                resizer.classList.remove('active');
+                videoSection.classList.remove('pointer-events-none');
+            }
+        });
+
+    </script>
+</body>
+</html>
