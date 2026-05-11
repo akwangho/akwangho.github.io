@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brave Dog's Story - 互動英語預習教材</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* 自訂滾動條與特效 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdfbf7; }
+        ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f9a8d4; }
+        
+        .glowing-border {
+            box-shadow: 0 0 15px 5px rgba(96, 165, 250, 0.5);
+            border-color: #60a5fa !important;
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        
+        .animate-bounce-short {
+            animation: bounce-short 0.5s ease-in-out;
+        }
+
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* 防止選取文字影響拖曳 */
+        .no-select {
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-yellow-50 text-gray-800 font-sans overflow-hidden text-base" id="app-body">
+
+    <div class="flex flex-col md:flex-row h-screen w-full">
+        <div id="left-panel" class="w-full md:w-[60%] h-[45vh] md:h-full flex flex-col relative bg-blue-50 z-20 shadow-lg shrink-0">
+            
+            <div class="bg-white rounded-b-2xl shadow-sm border-b border-blue-100 shrink-0">
+                <button id="toggle-panel-btn" class="w-full py-2 text-blue-500 font-bold hover:bg-blue-50 rounded-b-2xl transition flex justify-center items-center gap-2">
+                    <span>⚙️ 展開/收合控制面板</span>
+                    <svg id="panel-icon" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="control-panel" class="hidden p-4 grid grid-cols-2 gap-3 text-sm">
+                    <button onclick="toggleChinese()" class="bg-pink-100 hover:bg-pink-200 text-pink-700 py-2 rounded-xl font-bold transition">👀 顯示/隱藏中文</button>
+                    <button onclick="toggleAdjusters()" class="bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 rounded-xl font-bold transition">⏱️ 顯示/隱藏時間微調</button>
+                    <div class="flex gap-2 bg-green-50 p-1 rounded-xl items-center justify-center border border-green-200">
+                        <span class="text-green-700 font-bold mr-1">字型:</span>
+                        <button onclick="changeFontSize(1)" class="bg-green-200 hover:bg-green-300 w-8 h-8 rounded-lg font-bold text-lg">+</button>
+                        <button onclick="changeFontSize(-1)" class="bg-green-200 hover:bg-green-300 w-8 h-8 rounded-lg font-bold text-lg">-</button>
+                    </div>
+                    <button onclick="exportData()" class="bg-orange-100 hover:bg-orange-200 text-orange-700 py-2 rounded-xl font-bold transition">💾 匯出時間設定</button>
+                </div>
+            </div>
+
+            <div class="relative flex-1 bg-black w-full my-2 md:rounded-r-xl overflow-hidden shrink-0 min-h-[200px]">
+                <div id="youtube-player" class="absolute inset-0 w-full h-full pointer-events-auto"></div>
+                <div id="iframe-cover" class="absolute inset-0 z-50 hidden bg-transparent"></div>
+            </div>
+
+            <div class="p-4 bg-white shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] md:rounded-tr-2xl">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-bold text-blue-600">🏆 學習進度</span>
+                    <span id="progress-text" class="text-sm font-bold text-gray-500">0 / 0</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                    <div id="progress-bar" class="bg-gradient-to-r from-pink-400 to-yellow-400 h-4 rounded-full transition-all duration-500 shadow-inner" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resizer" class="hidden md:flex w-3 bg-gray-200 hover:bg-blue-300 cursor-col-resize z-30 flex-col justify-center items-center shrink-0 transition-colors">
+            <div class="w-1 h-8 bg-gray-400 rounded-full"></div>
+        </div>
+
+        <div id="right-panel" class="w-full md:w-[40%] h-[55vh] md:h-full overflow-y-auto p-4 md:p-6 bg-[#fdfbf7] flex-1 pb-24 space-y-8 scroll-smooth relative">
+            
+            <section id="section-lesson">
+                <h2 class="text-2xl font-black text-pink-500 mb-4 flex items-center gap-2"><span class="text-3xl">📖</span> A. 本日課文預習</h2>
+                <div id="container-lesson" class="space-y-4"></div>
+            </section>
+
+            <section id="section-basic-vocab">
+                <h2 class="text-2xl font-black text-green-500 mb-4 flex items-center gap-2"><span class="text-3xl">🍎</span> B. 基礎關鍵單字</h2>
+                <div id="container-basic-vocab" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            </section>
+
+            <section id="section-adv-vocab">
+                <h2 class="text-2xl font-black text-purple-500 mb-4 flex items-center gap-2"><span class="text-3xl">🚀</span> C. 進階困難單字片語</h2>
+                <div id="container-adv-vocab" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            </section>
+
+            <section id="section-sentences">
+                <h2 class="text-2xl font-black text-blue-500 mb-4 flex items-center gap-2"><span class="text-3xl">💬</span> D. 關鍵句子</h2>
+                <div id="container-sentences" class="space-y-4"></div>
+            </section>
+
+            <section id="section-reading">
+                <h2 class="text-2xl font-black text-orange-500 mb-4 flex items-center gap-2"><span class="text-3xl">🤔</span> E. 閱讀理解測驗</h2>
+                <div id="container-reading" class="space-y-6 bg-white p-5 rounded-2xl shadow-sm border border-orange-100"></div>
+            </section>
+
+            <section id="section-listening">
+                <h2 class="text-2xl font-black text-indigo-500 mb-4 flex items-center gap-2"><span class="text-3xl">🎧</span> F. 聽力練習測驗</h2>
+                <div class="bg-indigo-50 p-3 rounded-xl mb-4 text-sm text-indigo-700 font-bold">點擊卡片聽聲音，然後選出正確的句子！（不顯示字幕喔）</div>
+                <div id="container-listening" class="space-y-6 bg-white p-5 rounded-2xl shadow-sm border border-indigo-100"></div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        // --- 資料庫設定 (Time in seconds) ---
+        const DB = {
+            lesson: [
+                { id: 'l1', start: 33, end: 46, en: "Hello said farmer. Yes, the watchdog is coming today.", zh: "農夫說哈囉。是的，看門狗今天會來。" },
+                { id: 'l2', start: 95, end: 106, en: "I have news said cow. What is it asked pig. It is big news said cow.", zh: "牛說我有個消息。豬問是什麼。牛說是個大消息。" },
+                { id: 'l3', start: 169, end: 179, en: "Dog will watch the farm. He will keep it safe said Cow.", zh: "狗會看守農場。牛說他會保護農場安全。" },
+                { id: 'l4', start: 217, end: 232, en: "She saw a truck. The truck came closer and closer. Then dog got out.", zh: "她看到一輛卡車。卡車越來越靠近。然後狗下了車。" },
+                { id: 'l5', start: 307, end: 325, en: "Help she cried. Cat! called Pig. Where are you? said Cow. I'm stuck in the tree, cried Cat.", zh: "她喊救命。豬叫著貓！牛說你在哪裡？貓哭著說我被卡在樹上了。" },
+                { id: 'l6', start: 328, end: 340, en: "Well I can help! said Dog. He ran to the house. He barked and barked.", zh: "狗說：那我可以幫忙！他跑向房子。他一直叫。" },
+                { id: 'l7', start: 363, end: 377, en: "Farmer knew what to do. He got cat down. Everyone cheered.", zh: "農夫知道該怎麼做。他把貓弄下來了。大家都歡呼了。" }
+            ],
+            basicVocab: [
+                { id: 'v1', start: 33, end: 37, word: "Farmer", emoji: "👨‍🌾", pos: "n.", en: "Hello said farmer.", zh: "農夫" },
+                { id: 'v2', start: 37, end: 42, word: "Watchdog", emoji: "🐕", pos: "n.", en: "The watchdog is coming today.", zh: "看門狗" },
+                { id: 'v3', start: 95, end: 98, word: "News", emoji: "📰", pos: "n.", en: "I have news said cow.", zh: "新聞/消息" },
+                { id: 'v4', start: 169, end: 179, word: "Safe", emoji: "🛡️", pos: "adj.", en: "He will keep it safe.", zh: "安全的" },
+                { id: 'v5', start: 234, end: 238, word: "Hide", emoji: "🙈", pos: "v.", en: "I must hide said cat.", zh: "躲藏" },
+                { id: 'v6', start: 246, end: 250, word: "Tree", emoji: "🌳", pos: "n.", en: "She saw a tall tree.", zh: "樹" },
+                { id: 'v7', start: 338, end: 342, word: "Bark", emoji: "🗣️", pos: "v.", en: "He barked and barked.", zh: "吠叫" },
+                { id: 'v8', start: 373, end: 378, word: "Cheer", emoji: "🙌", pos: "v.", en: "Everyone cheered.", zh: "歡呼" }
+            ],
+            advVocab: [
+                { id: 'a1', start: 169, end: 179, word: "Keep safe", emoji: "🛡️", pos: "phr.", en: "He will keep it safe.", zh: "保持安全" },
+                { id: 'a2', start: 217, end: 226, word: "Come closer", emoji: "🚶‍♂️", pos: "phr.", en: "The truck came closer and closer.", zh: "靠近" },
+                { id: 'a3', start: 226, end: 232, word: "Get out", emoji: "🚪", pos: "phr.", en: "Then dog got out.", zh: "出來/下車" },
+                { id: 'a4', start: 300, end: 305, word: "Hold on tight", emoji: "✊", pos: "phr.", en: "She held on tight.", zh: "抓緊" },
+                { id: 'a5', start: 317, end: 323, word: "Stuck", emoji: "🕸️", pos: "adj.", en: "I'm stuck in the tree.", zh: "卡住的" }
+            ],
+            sentences: [
+                { id: 's1', start: 217, end: 232, html: "<mark>Look</mark>! A truck is coming to the farm.", en: "Look! A truck is coming to the farm.", zh: "看！一輛卡車正開往農場。" },
+                { id: 's2', start: 328, end: 340, html: "The dog is <mark>barking</mark> loudly.", en: "The dog is barking loudly.", zh: "狗正在大聲吠叫。" },
+                { id: 's3', start: 246, end: 255, html: "The cat <mark>climbed</mark> up the tall tree.", en: "The cat climbed up the tall tree.", zh: "貓爬上了高高的樹。" },
+                { id: 's4', start: 307, end: 325, html: "Please <mark>help</mark> me, I cannot get down.", en: "Please help me, I cannot get down.", zh: "請幫幫我，我下不來。" },
+                { id: 's5', start: 169, end: 179, html: "The farmer will <mark>keep</mark> us safe.", en: "The farmer will keep us safe.", zh: "農夫會保護我們的安全。" },
+                { id: 's6', start: 363, end: 377, html: "Everyone <mark>cheered</mark> for the brave dog.", en: "Everyone cheered for the brave dog.", zh: "每個人都為這隻勇敢的狗歡呼。" },
+                { id: 's7', start: 95, end: 106, html: "What is the <mark>news</mark>?", en: "What is the news?", zh: "有什麼消息？" },
+                { id: 's8', start: 234, end: 238, html: "The cat <mark>hid</mark> in the tree.", en: "The cat hid in the tree.", zh: "貓躲在樹上。" }
+            ],
+            reading: [
+                {
+                    id: 'r1',
+                    q_en: "Who is coming to the farm today?", q_zh: "今天誰要來農場？",
+                    options: [
+                        { en: "A watchdog", zh: "一隻看門狗", isCorrect: true },
+                        { en: "A little pig", zh: "一隻小豬", isCorrect: false },
+                        { en: "A black bat", zh: "一隻黑蝙蝠", isCorrect: false },
+                        { en: "A brown cow", zh: "一頭棕牛", isCorrect: false }
+                    ],
+                    exp_en: "The farmer said the watchdog is coming today.", exp_zh: "農夫說看門狗今天會來。"
+                },
+                {
+                    id: 'r2',
+                    q_en: "Why did the cat run to the top of the tree?", q_zh: "為什麼貓要跑到樹頂？",
+                    options: [
+                        { en: "To catch a bird.", zh: "為了抓鳥。", isCorrect: false },
+                        { en: "To hide from the new dog.", zh: "為了躲避新來的狗。", isCorrect: true },
+                        { en: "To sleep in the sun.", zh: "為了在陽光下睡覺。", isCorrect: false },
+                        { en: "To play with the pig.", zh: "為了和豬玩耍。", isCorrect: false }
+                    ],
+                    exp_en: "The cat was afraid and said 'I must hide'.", exp_zh: "貓感到害怕並說「我必須躲起來」。"
+                },
+                {
+                    id: 'r3',
+                    q_en: "Who said 'Well I can help!' when the cat was stuck?", q_zh: "當貓被卡住時，誰說「那我可以幫忙！」？",
+                    options: [
+                        { en: "The farmer", zh: "農夫", isCorrect: false },
+                        { en: "The bat", zh: "蝙蝠", isCorrect: false },
+                        { en: "The new dog", zh: "新來的狗", isCorrect: true },
+                        { en: "The pig", zh: "豬", isCorrect: false }
+                    ],
+                    exp_en: "The dog wanted to help the cat and ran to get the farmer.", exp_zh: "狗想幫貓的忙，所以跑去找農夫。"
+                },
+                {
+                    id: 'r4',
+                    q_en: "What did the dog do to get help?", q_zh: "狗做了什麼來尋求幫助？",
+                    options: [
+                        { en: "He climbed the tree.", zh: "他爬上樹。", isCorrect: false },
+                        { en: "He barked and barked.", zh: "他一直吠叫。", isCorrect: true },
+                        { en: "He went to sleep.", zh: "他去睡覺了。", isCorrect: false },
+                        { en: "He ate some food.", zh: "他吃了一些食物。", isCorrect: false }
+                    ],
+                    exp_en: "He barked loudly so the farmer would come out.", exp_zh: "他大聲吠叫好讓農夫出來。"
+                },
+                {
+                    id: 'r5',
+                    q_en: "How did everyone feel when the cat was saved?", q_zh: "當貓得救時，大家感覺如何？",
+                    options: [
+                        { en: "They were sad.", zh: "他們很傷心。", isCorrect: false },
+                        { en: "They were angry.", zh: "他們很生氣。", isCorrect: false },
+                        { en: "They cheered and were happy.", zh: "他們歡呼並感到高興。", isCorrect: true },
+                        { en: "They were scared.", zh: "他們很害怕。", isCorrect: false }
+                    ],
+                    exp_en: "The story says 'Everyone cheered' when the cat got down.", exp_zh: "故事說當貓下來時「每個人都歡呼了」。"
+                }
+            ],
+            listening: [
+                {
+                    id: 'ls1', start: 81, end: 87, 
+                    options: [
+                        { en: "Pig ran from his pen.", zh: "豬從他的豬圈跑了出來。", isCorrect: true },
+                        { en: "Pig slept in his pen.", zh: "豬在他的豬圈裡睡覺。", isCorrect: false },
+                        { en: "Dog ran from his pen.", zh: "狗從他的狗圈跑了出來。", isCorrect: false },
+                        { en: "Pig ran to his house.", zh: "豬跑向他的房子。", isCorrect: false }
+                    ],
+                    exp_en: "The narrator said: Pig ran from his pen.", exp_zh: "旁白說：豬從他的豬圈跑了出來。"
+                },
+                {
+                    id: 'ls2', start: 143, end: 150, 
+                    options: [
+                        { en: "Is cat big or little asked pig.", zh: "豬問貓是大還是小。", isCorrect: false },
+                        { en: "Is dog fast or slow asked pig.", zh: "豬問狗是快還是慢。", isCorrect: false },
+                        { en: "Is dog big or little asked pig.", zh: "豬問狗是大還是小。", isCorrect: true },
+                        { en: "Is dog big or little asked cow.", zh: "牛問狗是大還是小。", isCorrect: false }
+                    ],
+                    exp_en: "Pig was curious and asked if the dog was big or little.", exp_zh: "豬很好奇，問狗是大還是小。"
+                },
+                {
+                    id: 'ls3', start: 200, end: 205, 
+                    options: [
+                        { en: "Soon Dog left the barn.", zh: "很快地，狗離開了穀倉。", isCorrect: false },
+                        { en: "Soon Cat left the house.", zh: "很快地，貓離開了房子。", isCorrect: false },
+                        { en: "Soon Cow ran to the barn.", zh: "很快地，牛跑向了穀倉。", isCorrect: false },
+                        { en: "Soon Cat left the barn.", zh: "很快地，貓離開了穀倉。", isCorrect: true }
+                    ],
+                    exp_en: "The cat decided to leave the barn.", exp_zh: "貓決定離開穀倉。"
+                },
+                {
+                    id: 'ls4', start: 282, end: 287, 
+                    options: [
+                        { en: "Who lives there he asked.", zh: "他問誰住在那裡。", isCorrect: false },
+                        { en: "Who lives here he asked.", zh: "他問誰住在這裡。", isCorrect: true },
+                        { en: "Who sleeps here she asked.", zh: "她問誰睡在這裡。", isCorrect: false },
+                        { en: "Who comes here he asked.", zh: "他問誰來這裡。", isCorrect: false }
+                    ],
+                    exp_en: "The dog entered the barn and asked who lives here.", exp_zh: "狗進了穀倉問誰住在這裡。"
+                },
+                {
+                    id: 'ls5', start: 363, end: 370, 
+                    options: [
+                        { en: "Farmer didn't know what to do.", zh: "農夫不知道該怎麼做。", isCorrect: false },
+                        { en: "Farmer knew what to do.", zh: "農夫知道該怎麼做。", isCorrect: true },
+                        { en: "Dog knew what to do.", zh: "狗知道該怎麼做。", isCorrect: false },
+                        { en: "Cow knew what to play.", zh: "牛知道玩什麼。", isCorrect: false }
+                    ],
+                    exp_en: "The farmer arrived and knew how to help.", exp_zh: "農夫到了並且知道如何幫忙。"
+                }
+            ]
+        };
+
+        // --- 全局狀態與變數 ---
+        const State = {
+            showChinese: false,
+            showAdjusters: false,
+            fontSize: 16,
+            learnedCards: new Set(),
+            readingScore: 0,
+            listeningScore: 0,
+            currentTargetEnd: Infinity
+        };
+
+        let player;
+        let totalLearnableCards = 0; // Calculated during render
+
+        // --- YouTube IFrame API ---
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                videoId: 'a40Ly0wRYYE',
+                playerVars: { 
+                    'playsinline': 1, 'rel': 0, 'modestbranding': 1, 'controls': 1 
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+            // 啟動定時器監聽時間，處理自動暫停與 highlight
+            setInterval(monitorPlayback, 200);
+        }
+
+        function onPlayerStateChange(event) {
+            // 當影片播放結束或手動暫停時，清空當前目標結束時間
+            if(event.data !== YT.PlayerState.PLAYING) {
+                // optional: if user pauses manually, maybe don't reset target
+            }
+        }
+
+        function monitorPlayback() {
+            if (player && player.getPlayerState && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                const current = player.getCurrentTime();
+                // 檢查是否到達設定的片段結束點
+                if (current >= State.currentTargetEnd) {
+                    player.pauseVideo();
+                    State.currentTargetEnd = Infinity; // reset
+                }
+                updateHighlights(current);
+            }
+        }
+
+        function playSegment(id, type) {
+            if (!player || !player.seekTo) return;
+            const card = document.getElementById(id);
+            const start = parseFloat(card.dataset.start);
+            const end = parseFloat(card.dataset.end);
+            
+            State.currentTargetEnd = end;
+            player.seekTo(start, true);
+            player.playVideo();
+            
+            // 紀錄學習進度 (聽力測驗與閱讀測驗不算在普通卡片進度，分開處理)
+            if (type === 'card' && !State.learnedCards.has(id)) {
+                markCardLearned(card, id);
+            }
+        }
+
+        function adjustTime(id, type, delta) {
+            event.stopPropagation(); // 避免觸發整張卡片的點擊
+            const card = document.getElementById(id);
+            let start = parseFloat(card.dataset.start);
+            let end = parseFloat(card.dataset.end);
+            
+            if (type === 'start') {
+                start = Math.max(0, start + delta);
+                card.dataset.start = start;
+                card.querySelector('.start-time-disp').innerText = formatTime(start);
+                // 預覽：從調整後的開始時間播放
+                State.currentTargetEnd = end;
+                player.seekTo(start, true);
+            } else {
+                end = Math.max(start + 1, end + delta);
+                card.dataset.end = end;
+                card.querySelector('.end-time-disp').innerText = formatTime(end);
+                // 預覽：從調整後的結束時間前 3 秒開始播放
+                let previewStart = Math.max(start, end - 3);
+                State.currentTargetEnd = end;
+                player.seekTo(previewStart, true);
+            }
+            player.playVideo();
+            updateDataRef(id, start, end);
+        }
+
+        function updateDataRef(id, start, end) {
+            // 更新記憶體中的 DB 以供匯出
+            const arrs = [DB.lesson, DB.basicVocab, DB.advVocab, DB.sentences, DB.listening];
+            for(let arr of arrs) {
+                let item = arr.find(x => x.id === id);
+                if(item) { item.start = start; item.end = end; return; }
+            }
+        }
+
+        // --- Web Speech API ---
+        function speakText(text) {
+            event.stopPropagation();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- UI 更新與進度 ---
+        function updateHighlights(current) {
+            document.querySelectorAll('.playable-card').forEach(card => {
+                const start = parseFloat(card.dataset.start);
+                const end = parseFloat(card.dataset.end);
+                if (current >= start && current < end) {
+                    card.classList.add('glowing-border');
+                } else {
+                    card.classList.remove('glowing-border');
+                }
+            });
+        }
+
+        function markCardLearned(card, id) {
+            State.learnedCards.add(id);
+            const badge = card.querySelector('.reward-badge');
+            if(badge) badge.innerText = '🌟';
+            card.classList.add('animate-bounce-short');
+            setTimeout(() => card.classList.remove('animate-bounce-short'), 500);
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const pct = (State.learnedCards.size / totalLearnableCards) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+            document.getElementById('progress-text').innerText = `${State.learnedCards.size} / ${totalLearnableCards}`;
+            
+            if (State.learnedCards.size === totalLearnableCards && totalLearnableCards > 0) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        // --- 渲染 HTML 內容 ---
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = Math.floor(sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function genAdjusterHTML(type, val) {
+            const isStart = type === 'start';
+            const label = isStart ? 'Start' : 'End';
+            return `
+                <div class="time-adjuster hidden flex items-center bg-gray-100 rounded-lg p-1 space-x-1 border border-gray-200">
+                    <span class="text-xs text-gray-500 font-bold ml-1">${label}</span>
+                    <button onclick="adjustTime(this.closest('.playable-card').id, '${type}', -1)" class="w-6 h-6 bg-white shadow-sm rounded hover:bg-gray-200 text-sm font-bold">-</button>
+                    <span class="${type}-time-disp text-sm font-mono w-10 text-center">${formatTime(val)}</span>
+                    <button onclick="adjustTime(this.closest('.playable-card').id, '${type}', 1)" class="w-6 h-6 bg-white shadow-sm rounded hover:bg-gray-200 text-sm font-bold">+</button>
+                </div>
+            `;
+        }
+
+        function renderLesson() {
+            const cont = document.getElementById('container-lesson');
+            DB.lesson.forEach(item => {
+                totalLearnableCards++;
+                cont.innerHTML += `
+                    <div id="${item.id}" data-start="${item.start}" data-end="${item.end}" onclick="playSegment('${item.id}', 'card')" 
+                         class="playable-card relative bg-white rounded-2xl shadow-sm p-4 border border-pink-100 cursor-pointer hover:shadow-md transition group">
+                        <div class="absolute top-2 right-2 reward-badge text-xl"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex gap-2">
+                                ${genAdjusterHTML('start', item.start)}
+                                ${genAdjusterHTML('end', item.end)}
+                            </div>
+                            <span class="text-xs text-pink-400 bg-pink-50 px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition">▶️ 點擊播放</span>
+                        </div>
+                        <p class="text-lg font-bold text-gray-800 mb-1 leading-relaxed">${item.en}</p>
+                        <p class="chinese-text hidden text-pink-600 text-sm mt-2 border-t border-pink-50 pt-2">${item.zh}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderVocab(data, containerId, color) {
+            const cont = document.getElementById(containerId);
+            data.forEach(item => {
+                totalLearnableCards++;
+                cont.innerHTML += `
+                    <div id="${item.id}" data-start="${item.start}" data-end="${item.end}" onclick="playSegment('${item.id}', 'card')" 
+                         class="playable-card relative bg-white rounded-2xl shadow-sm p-4 border border-${color}-100 cursor-pointer hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="absolute top-2 right-2 reward-badge text-xl"></div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-4xl mr-2">${item.emoji}</span>
+                                <div class="flex flex-col items-end gap-1">
+                                    ${genAdjusterHTML('start', item.start)}
+                                    ${genAdjusterHTML('end', item.end)}
+                                </div>
+                            </div>
+                            <div class="flex items-baseline gap-2 mb-2">
+                                <h3 class="text-2xl font-black text-${color}-600 tracking-wide">${item.word}</h3>
+                                <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">${item.pos}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 italic">"${item.en}"</p>
+                        </div>
+                        <p class="chinese-text hidden text-${color}-600 font-bold mt-3 border-t border-${color}-50 pt-2">${item.zh}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderSentences() {
+            const cont = document.getElementById('container-sentences');
+            DB.sentences.forEach(item => {
+                totalLearnableCards++;
+                cont.innerHTML += `
+                    <div id="${item.id}" data-start="${item.start}" data-end="${item.end}" onclick="playSegment('${item.id}', 'card')" 
+                         class="playable-card relative bg-white rounded-2xl shadow-sm p-4 border-l-4 border-l-blue-400 cursor-pointer hover:shadow-md transition group">
+                        <div class="absolute top-2 right-2 reward-badge text-xl"></div>
+                        <div class="flex gap-2 mb-2">
+                            ${genAdjusterHTML('start', item.start)}
+                            ${genAdjusterHTML('end', item.end)}
+                        </div>
+                        <p class="text-lg font-medium text-gray-800 mb-1 leading-relaxed [&>mark]:bg-blue-100 [&>mark]:text-blue-700 [&>mark]:px-1 [&>mark]:rounded">${item.html}</p>
+                        <p class="chinese-text hidden text-blue-600 text-sm mt-2 border-t border-blue-50 pt-2">${item.zh}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderReading() {
+            const cont = document.getElementById('container-reading');
+            DB.reading.forEach((item, index) => {
+                let optionsHTML = item.options.map((opt, i) => `
+                    <button onclick="checkAnswer(this, 'reading', ${index}, ${opt.isCorrect})" class="w-full text-left p-3 rounded-xl border border-gray-200 hover:bg-orange-50 hover:border-orange-300 transition flex items-center justify-between group/opt">
+                        <div>
+                            <span class="font-bold text-gray-700 mr-2">${String.fromCharCode(65 + i)}.</span>
+                            <span class="text-gray-800">${opt.en}</span>
+                            <div class="chinese-text hidden text-xs text-orange-500 mt-1">${opt.zh}</div>
+                        </div>
+                        <span onclick="speakText('${opt.en}')" class="opacity-0 group-hover/opt:opacity-100 cursor-pointer text-xl" title="朗讀">🔊</span>
+                    </button>
+                `).join('');
+
+                cont.innerHTML += `
+                    <div class="border-b border-gray-100 pb-6 last:border-0 last:pb-0" id="reading-q${index}">
+                        <div class="flex items-start justify-between mb-3 group/q">
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-800 cursor-pointer" onclick="speakText('${item.q_en.replace(/'/g,"\\'")}')">
+                                    <span class="text-orange-500 mr-1">Q${index+1}.</span> ${item.q_en}
+                                </h4>
+                                <p class="chinese-text hidden text-sm text-orange-500 mt-1">${item.q_zh}</p>
+                            </div>
+                            <span onclick="speakText('${item.q_en.replace(/'/g,"\\'")}')" class="opacity-0 group-hover/q:opacity-100 cursor-pointer text-2xl" title="朗讀題目">🔊</span>
+                        </div>
+                        <div class="space-y-2 options-container">
+                            ${optionsHTML}
+                        </div>
+                        <div class="feedback hidden mt-3 p-3 rounded-xl text-sm font-bold">
+                            <div class="flex items-center gap-2 mb-1"><span class="icon text-xl"></span><span class="msg"></span></div>
+                            <p class="text-gray-600 font-normal exp-en">${item.exp_en}</p>
+                            <p class="chinese-text hidden text-orange-500 font-normal mt-1 exp-zh">${item.exp_zh}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderListening() {
+            const cont = document.getElementById('container-listening');
+            DB.listening.forEach((item, index) => {
+                let optionsHTML = item.options.map((opt, i) => `
+                    <button onclick="checkAnswer(this, 'listening', ${index}, ${opt.isCorrect})" class="w-full text-left p-3 rounded-xl border border-gray-200 hover:bg-indigo-50 hover:border-indigo-300 transition group/opt">
+                        <span class="font-bold text-gray-700 mr-2">${String.fromCharCode(65 + i)}.</span>
+                        <span class="text-gray-800">${opt.en}</span>
+                        <div class="chinese-text hidden text-xs text-indigo-500 mt-1">${opt.zh}</div>
+                    </button>
+                `).join('');
+
+                cont.innerHTML += `
+                    <div class="playable-card pb-6 mb-6 border-b border-gray-100 last:border-0 last:pb-0 last:mb-0" id="${item.id}" data-start="${item.start}" data-end="${item.end}">
+                        <div class="flex items-center justify-between mb-4 bg-indigo-50 p-3 rounded-xl cursor-pointer hover:bg-indigo-100 transition" onclick="playSegment('${item.id}', 'listening')">
+                            <div class="font-bold text-indigo-700 flex items-center gap-2">
+                                <span class="bg-indigo-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm">${index+1}</span>
+                                點擊播放聽力片段 🎧
+                            </div>
+                            <div class="flex gap-2">
+                                ${genAdjusterHTML('start', item.start)}
+                                ${genAdjusterHTML('end', item.end)}
+                            </div>
+                        </div>
+                        <div class="space-y-2 options-container pl-2">
+                            ${optionsHTML}
+                        </div>
+                        <div class="feedback hidden mt-3 p-3 rounded-xl text-sm font-bold pl-2">
+                            <div class="flex items-center gap-2 mb-1"><span class="icon text-xl"></span><span class="msg"></span></div>
+                            <p class="text-gray-600 font-normal exp-en">${item.exp_en}</p>
+                            <p class="chinese-text hidden text-indigo-500 font-normal mt-1 exp-zh">${item.exp_zh}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- 互動邏輯 ---
+        function checkAnswer(btn, type, index, isCorrect) {
+            const container = btn.closest('.options-container').parentElement;
+            const feedback = container.querySelector('.feedback');
+            const btns = container.querySelectorAll('.options-container button');
+            
+            // Disable all buttons in this question
+            btns.forEach(b => {
+                b.onclick = null;
+                b.classList.add('opacity-60', 'cursor-default');
+                b.classList.remove('hover:bg-orange-50', 'hover:border-orange-300', 'hover:bg-indigo-50', 'hover:border-indigo-300');
+            });
+            
+            // Highlight chosen
+            btn.classList.remove('opacity-60');
+            btn.classList.add('ring-2', 'ring-offset-1');
+            
+            feedback.classList.remove('hidden');
+            
+            if(isCorrect) {
+                btn.classList.add('bg-green-100', 'border-green-400', 'ring-green-400');
+                feedback.classList.add('bg-green-50', 'border', 'border-green-200');
+                feedback.querySelector('.icon').innerText = '🟢';
+                feedback.querySelector('.msg').innerText = 'Correct! 答對了！';
+                feedback.querySelector('.msg').classList.add('text-green-700');
+                
+                if(type === 'reading') {
+                    State.readingScore++;
+                    if(State.readingScore === DB.reading.length) triggerWin('閱讀理解小達人');
+                } else {
+                    State.listeningScore++;
+                    if(State.listeningScore === DB.listening.length) triggerWin('聽力測驗小達人');
+                }
+            } else {
+                btn.classList.add('bg-red-100', 'border-red-400', 'ring-red-400');
+                feedback.classList.add('bg-red-50', 'border', 'border-red-200');
+                feedback.querySelector('.icon').innerText = '🔴';
+                feedback.querySelector('.msg').innerText = 'Incorrect! 再接再厲！';
+                feedback.querySelector('.msg').classList.add('text-red-700');
+                
+                // Show correct answer
+                btns.forEach((b, i) => {
+                    let dbRef = type === 'reading' ? DB.reading[index].options : DB.listening[index].options;
+                    if(dbRef[i].isCorrect) {
+                        b.classList.remove('opacity-60');
+                        b.classList.add('bg-green-50', 'border-green-300', 'border-dashed', 'border-2');
+                    }
+                });
+            }
+            
+            // Sync current chinese state
+            if(State.showChinese) {
+                feedback.querySelector('.chinese-text').classList.remove('hidden');
+            }
+        }
+
+        function triggerWin(title) {
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, zIndex: 100 });
+            setTimeout(() => {
+                alert(`🌟🌟🌟🌟🌟\n恭喜你！${title}！\n全數答對！`);
+            }, 500);
+        }
+
+        // --- 全局控制邏輯 ---
+        function toggleChinese() {
+            State.showChinese = !State.showChinese;
+            document.querySelectorAll('.chinese-text').forEach(el => {
+                if(State.showChinese) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+        }
+
+        function toggleAdjusters() {
+            State.showAdjusters = !State.showAdjusters;
+            document.querySelectorAll('.time-adjuster').forEach(el => {
+                if(State.showAdjusters) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+        }
+
+        function changeFontSize(delta) {
+            State.fontSize += delta * 2;
+            if(State.fontSize < 12) State.fontSize = 12;
+            if(State.fontSize > 24) State.fontSize = 24;
+            document.getElementById('app-body').style.fontSize = State.fontSize + 'px';
+        }
+
+        function exportData() {
+            // 只匯出有調整時間的區域
+            const exportObj = {
+                lesson: DB.lesson.map(x => ({ text: x.en, start: x.start, end: x.end })),
+                vocab: DB.basicVocab.concat(DB.advVocab).map(x => ({ word: x.word, start: x.start, end: x.end })),
+                sentences: DB.sentences.map(x => ({ text: x.en, start: x.start, end: x.end })),
+                listening: DB.listening.map(x => ({ q_id: x.id, start: x.start, end: x.end }))
+            };
+            const jsonStr = JSON.stringify(exportObj, null, 2);
+            navigator.clipboard.writeText(jsonStr).then(() => {
+                alert("✅ 所有時間設定與原始句子已成功以 JSON 格式複製到剪貼簿！");
+            }).catch(err => {
+                alert("匯出失敗，請手動複製控制台中的內容。");
+                console.log(jsonStr);
+            });
+        }
+
+        // 面板開關
+        document.getElementById('toggle-panel-btn').addEventListener('click', function() {
+            const panel = document.getElementById('control-panel');
+            const icon = document.getElementById('panel-icon');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                panel.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        });
+
+        // --- 拖曳分隔線邏輯 ---
+        const resizer = document.getElementById('resizer');
+        const leftPanel = document.getElementById('left-panel');
+        const rightPanel = document.getElementById('right-panel');
+        const iframeCover = document.getElementById('iframe-cover');
+        let isResizing = false;
+
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            iframeCover.classList.remove('hidden'); // 遮蔽 iframe 避免吃掉事件
+            document.body.style.cursor = 'col-resize';
+            document.body.classList.add('no-select');
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            // 計算新寬度百分比
+            const newWidth = (e.clientX / window.innerWidth) * 100;
+            if(newWidth > 20 && newWidth < 80) {
+                leftPanel.style.width = `${newWidth}%`;
+                rightPanel.style.width = `${100 - newWidth}%`;
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if(isResizing) {
+                isResizing = false;
+                iframeCover.classList.add('hidden');
+                document.body.style.cursor = 'default';
+                document.body.classList.remove('no-select');
+            }
+        });
+
+        // --- 初始化啟動 ---
+        window.onload = () => {
+            renderLesson();
+            renderVocab(DB.basicVocab, 'container-basic-vocab', 'green');
+            renderVocab(DB.advVocab, 'container-adv-vocab', 'purple');
+            renderSentences();
+            renderReading();
+            renderListening();
+            updateProgressBar();
+        };
+
+    </script>
+</body>
+</html>
