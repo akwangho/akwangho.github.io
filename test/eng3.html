@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>英文考試練習卷</title>
+<title>英文句型考試卷</title>
 
 <style>
     body{
         font-family: Arial, "Microsoft JhengHei", sans-serif;
+        background:#f2f2f2;
         margin:0;
         padding:20px;
-        background:#f2f2f2;
     }
 
     .page{
         width:210mm;
         min-height:297mm;
+        background:#fff;
         margin:20px auto;
-        background:white;
         padding:25mm 20mm;
         box-sizing:border-box;
         box-shadow:0 0 10px rgba(0,0,0,0.15);
@@ -31,7 +31,7 @@
     h2{
         border-bottom:2px solid #333;
         padding-bottom:5px;
-        margin-top:28px;
+        margin-top:30px;
     }
 
     .info{
@@ -46,57 +46,22 @@
         height:22px;
     }
 
-    .word-bank{
-        border:2px dashed #777;
-        background:#fafafa;
-        padding:15px;
-        line-height:2.2;
-        font-size:20px;
-    }
-
-    .word-bank span{
-        display:inline-block;
-        margin-right:15px;
-    }
-
     .question{
-        margin:18px 0;
+        margin:22px 0;
         font-size:22px;
         line-height:2;
     }
 
-    .blank{
-        display:inline-block;
+    .writing-line{
         border-bottom:2px solid #000;
-        min-width:150px;
-        height:24px;
-        vertical-align:middle;
-    }
-
-    .smallblank{
-        display:inline-block;
-        border-bottom:2px solid #000;
-        min-width:90px;
-        height:24px;
-        vertical-align:middle;
+        height:32px;
+        margin-top:8px;
     }
 
     .writing-box{
         border:2px solid #999;
-        height:100px;
+        height:120px;
         margin-top:10px;
-    }
-
-    .answer{
-        display:none;
-        color:#d62828;
-        font-weight:bold;
-        margin-top:5px;
-        font-size:19px;
-    }
-
-    .show .answer{
-        display:block;
     }
 
     button{
@@ -113,13 +78,26 @@
         z-index:999;
     }
 
+    .answer{
+        display:none;
+        color:#d62828;
+        font-weight:bold;
+        font-size:18px;
+        margin-top:10px;
+    }
+
+    .show .answer{
+        display:block;
+    }
+
     .page-break{
         page-break-after:always;
     }
 
     @media print{
+
         body{
-            background:white;
+            background:#fff;
         }
 
         .page{
@@ -143,7 +121,7 @@
 <!-- 第一頁 -->
 <div class="page">
 
-<h1>英文句型考試練習卷</h1>
+<h1>英文句型考試卷</h1>
 
 <div class="info">
 姓名：<span class="line"></span>
@@ -151,78 +129,65 @@
 　日期：<span class="line"></span>
 </div>
 
-<h2>一、單字提示區（Word Bank）</h2>
-
-<div class="word-bank">
-<span>dress</span>
-<span>skirt</span>
-<span>T-shirt</span>
-<span>shorts</span>
-<span>sneakers</span>
-<span>pants</span>
-<span>sweater</span>
-<span>socks</span>
-<span>jacket</span>
-<span>vest</span>
-<span>scarf</span>
-<span>sandals</span>
-<span>coat</span>
-<span>shoes</span>
-<span>gloves</span>
-<span>shirt</span>
-<span>smartphone</span>
-<span>umbrella</span>
-<span>water bottle</span>
-<span>glasses</span>
-</div>
-
-<h2>二、完整句子練習</h2>
+<h2>一、翻譯句子（請完整寫出英文句子）</h2>
 
 <div class="question">
-1. How much are the（鞋子）<span class="blank"></span>?<br>
-They’re two <span class="smallblank"></span>.
+1. 這些鞋子多少錢？它們是兩百三十五元。<br>
+
+<div class="writing-line"></div>
+<div class="writing-line"></div>
+
 <div class="answer">
-Answer: shoes / hundred dollars
+How much are the shoes?<br>
+They’re two hundred thirty-five dollars.
 </div>
 </div>
 
 <div class="question">
-2. Are the（手套）<span class="blank"></span> three <span class="smallblank"></span>?<br>
+2. 這些手套是四百四十八元嗎？是的，它們是。<br>
+
+<div class="writing-line"></div>
+<div class="writing-line"></div>
+
+<div class="answer">
+Are the gloves four hundred forty-eight dollars?<br>
 Yes, they are.
-<div class="answer">
-Answer: gloves / hundred dollars
 </div>
 </div>
 
 <div class="question">
-3. Are the（運動鞋）<span class="blank"></span> five <span class="smallblank"></span>?<br>
+3. 這雙運動鞋是五百七十九元嗎？不是，它們不是。<br>
+
+<div class="writing-line"></div>
+<div class="writing-line"></div>
+
+<div class="answer">
+Are the sneakers five hundred seventy-nine dollars?<br>
 No, they’re not.
-<div class="answer">
-Answer: sneakers / hundred dollars
 </div>
 </div>
 
 <div class="question">
-4. How much is the（外套）<span class="blank"></span>?<br>
-It’s six <span class="smallblank"></span>.
+4. 這件外套多少錢？它是六百九十三元。<br>
+
+<div class="writing-line"></div>
+<div class="writing-line"></div>
+
 <div class="answer">
-Answer: jacket / hundred dollars
+How much is the jacket?<br>
+It’s six hundred ninety-three dollars.
 </div>
 </div>
 
 <div class="question">
-5. Is the（智慧型手機）<span class="blank"></span> seven <span class="smallblank"></span>?<br>
+5. 這支智慧型手機是七百八十六元嗎？是的，它是。<br>
+
+<div class="writing-line"></div>
+<div class="writing-line"></div>
+
+<div class="answer">
+Is the smartphone seven hundred eighty-six dollars?<br>
 Yes, it is.
-<div class="answer">
-Answer: smartphone / hundred dollars
-</div>
-</div>
-
-<div class="question">
-6. Is the（雨傘）<span class="blank"></span> nine <span class="smallblank"></span>?<br>
-No, it isn’t.
-<div class="answer">
-Answer: umbrella / hundred dollars
 </div>
 </div>
 
@@ -233,88 +198,122 @@ Answer: umbrella / hundred dollars
 <!-- 第二頁 -->
 <div class="page">
 
-<h1>英文考試練習卷（第二頁）</h1>
+<h1>英文句型考試卷（第二頁）</h1>
 
-<h2>三、新單字拼字練習</h2>
+<h2>二、單字拼寫</h2>
 
 <div class="question">
-1. 圍巾：<span class="blank"></span>
+1. 圍巾<br>
+
+<div class="writing-line"></div>
+
 <div class="answer">
-Answer: scarf
+scarf
 </div>
 </div>
 
 <div class="question">
-2. 背心：<span class="blank"></span>
+2. 背心<br>
+
+<div class="writing-line"></div>
+
 <div class="answer">
-Answer: vest
+vest
 </div>
 </div>
 
 <div class="question">
-3. 涼鞋：<span class="blank"></span>
+3. 涼鞋<br>
+
+<div class="writing-line"></div>
+
 <div class="answer">
-Answer: sandals
+sandals
 </div>
 </div>
 
 <div class="question">
-4. 毛衣：<span class="blank"></span>
+4. 毛衣<br>
+
+<div class="writing-line"></div>
+
 <div class="answer">
-Answer: sweater
+sweater
 </div>
 </div>
 
 <div class="question">
-5. 洋裝：<span class="blank"></span>
+5. 洋裝<br>
+
+<div class="writing-line"></div>
+
 <div class="answer">
-Answer: dress
+dress
 </div>
 </div>
 
 <div class="question">
-6. 絲襪／短襪：<span class="blank"></span>
+6. 襪子<br>
+
+<div class="writing-line"></div>
+
 <div class="answer">
-Answer: socks
+socks
 </div>
 </div>
 
-<h2>四、完整造句</h2>
+<h2>三、數字拼寫</h2>
 
 <div class="question">
-請完成句子：<br><br>
+1. 48<br>
 
-How much are the __________________________________ ?
-<br><br>
+<div class="writing-line"></div>
 
-They’re ________________________________________ .
+<div class="answer">
+forty-eight
 </div>
+</div>
+
+<div class="question">
+2. 79<br>
+
+<div class="writing-line"></div>
+
+<div class="answer">
+seventy-nine
+</div>
+</div>
+
+<div class="question">
+3. 93<br>
+
+<div class="writing-line"></div>
+
+<div class="answer">
+ninety-three
+</div>
+</div>
+
+<div class="question">
+4. 57<br>
+
+<div class="writing-line"></div>
+
+<div class="answer">
+fifty-seven
+</div>
+</div>
+
+<h2>四、挑戰題</h2>
+
+<div class="question">
+請使用 smart、smartphone、glasses 三個單字造一句完整句子。<br>
 
 <div class="writing-box"></div>
 
-<div class="question">
-請完成句子：<br><br>
-
-Is the _________________________________________ ?
-<br><br>
-
-Yes, it is. / No, it isn’t.
+<div class="answer">
+The smart girl has a smartphone and glasses.
 </div>
-
-<div class="writing-box"></div>
-
-<h2>五、挑戰題</h2>
-
-<div class="question">
-請使用下面三個單字造一句完整句子：<br><br>
-
-smart / smartphone / glasses
-</div>
-
-<div class="writing-box"></div>
-
-<div class="answer" style="display:block;margin-top:15px;">
-範例答案：The smart girl has a smartphone and glasses.
 </div>
 
 </div>
