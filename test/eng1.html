@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五年級英語期中測驗 - Unit 2 City Adventure (互動版)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft JhengHei';
+            background-color: #f0f8ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .exam-paper {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2E8B57;
+            margin-bottom: 10px;
+        }
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .student-info div {
+            border-bottom: 1px solid #333;
+            width: 30%;
+            text-align: left;
+            padding-left: 10px;
+        }
+        h2 {
+            color: #d35400;
+            border-left: 5px solid #d35400;
+            padding-left: 10px;
+            margin-top: 30px;
+        }
+        .question {
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            background-color: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .options {
+            margin-left: 20px;
+            list-style-type: upper-alpha;
+            margin-bottom: 15px;
+        }
+        .options li {
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .options li:hover {
+            background-color: #e0f7fa;
+        }
+        .reading-box {
+            background-color: #fffde7;
+            border: 2px dashed #fbc02d;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-style: italic;
+            color: #777;
+        }
+        .answer-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+        .answer-btn:hover {
+            background-color: #45a049;
+        }
+        .answer-text {
+            display: none;
+            color: #d32f2f;
+            font-weight: bold;
+            margin-left: 15px;
+            font-size: 1.1em;
+        }
+        @media print {
+            body { background-color: #fff; }
+            .exam-paper { box-shadow: none; padding: 0; border: none; }
+            .answer-btn, .answer-text { display: none !important; }
+            .question { background-color: transparent; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="exam-paper">
+    <div class="header">
+        <h1>國小五年級英語期中測驗 (互動版)</h1>
+        <p>Unit 2: City Adventure</p>
+        <div class="student-info">
+            <div>Class (班級): </div>
+            <div>Number (座號): </div>
+            <div>Name (姓名): </div>
+        </div>
+    </div>
+
+    <h2>A. Vocabulary 單字測驗 (20%, 每題 4 分)</h2>
+    <div class="question">
+        1. 腳踏車<br>
+        <ol class="options">
+            <li>bus</li>
+            <li>bike</li>
+            <li>scooter</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：B (bike)</span>
+    </div>
+    <div class="question">
+        2. 捷運<br>
+        <ol class="options">
+            <li>MRT</li>
+            <li>train</li>
+            <li>taxi</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：A (MRT)</span>
+    </div>
+    <div class="question">
+        3. 飛機<br>
+        <ol class="options">
+            <li>car</li>
+            <li>plane</li>
+            <li>bus</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：B (plane)</span>
+    </div>
+    <div class="question">
+        4. 計程車<br>
+        <ol class="options">
+            <li>taxi</li>
+            <li>scooter</li>
+            <li>train</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：A (taxi)</span>
+    </div>
+    <div class="question">
+        5. destination 的中文意思是？<br>
+        <ol class="options">
+            <li>交通工具</li>
+            <li>目的地</li>
+            <li>位置</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：B (目的地)</span>
+    </div>
+
+    <h2>B. Grammar & Sentences 文法與句型 (30%, 每題 5 分)</h2>
+    <div class="question">
+        1. How ______ we get to the park?<br>
+        <ol class="options">
+            <li>are</li>
+            <li>do</li>
+            <li>can</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：C (can)</span>
+    </div>
+    <div class="question">
+        2. We can get there ______ bus.<br>
+        <ol class="options">
+            <li>by</li>
+            <li>on</li>
+            <li>in</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：A (by)</span>
+    </div>
+    <div class="question">
+        3. Dad can ______ to the bakery by car.<br>
+        <ol class="options">
+            <li>gets</li>
+            <li>get</li>
+            <li>getting</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：B (get，助動詞後接原形動詞)</span>
+    </div>
+    <div class="question">
+        4. Jello ______ to the post office.<br>
+        <ol class="options">
+            <li>walk</li>
+            <li>walks</li>
+            <li>walking</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：B (walks，第三人稱單數)</span>
+    </div>
+    <div class="question">
+        5. ______ they get to the zoo by bike?<br>
+        <ol class="options">
+            <li>Can</li>
+            <li>Are</li>
+            <li>Do</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：A (Can)</span>
+    </div>
+    <div class="question">
+        6. No, we can't. We can get there ______ MRT.<br>
+        <ol class="options">
+            <li>by</li>
+            <li>take</li>
+            <li>ride</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：A (by)</span>
+    </div>
+
+    <h2>C. Phonics 發音測驗 (20%, 每題 5 分)</h2>
+    <p style="color: #555; font-weight: bold;">請選出正確的發音組合填入單字中 (br, pr, gr, cr)</p>
+    <div class="question">
+        1. _ _ a p e s (葡萄)<br>
+        <ol class="options">
+            <li>pr</li>
+            <li>gr</li>
+            <li>br</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：B (grapes)</span>
+    </div>
+    <div class="question">
+        2. _ _ i n c e (王子)<br>
+        <ol class="options">
+            <li>cr</li>
+            <li>br</li>
+            <li>pr</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：C (prince)</span>
+    </div>
+    <div class="question">
+        3. _ _ e a d (麵包)<br>
+        <ol class="options">
+            <li>br</li>
+            <li>gr</li>
+            <li>cr</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：A (bread)</span>
+    </div>
+    <div class="question">
+        4. _ _ a b (螃蟹)<br>
+        <ol class="options">
+            <li>pr</li>
+            <li>cr</li>
+            <li>br</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：B (crab)</span>
+    </div>
+
+    <h2>D. Reading Comprehension 閱讀測驗 (30%, 每題 10 分)</h2>
+    <div class="reading-box">
+        <strong>Tourist Spots in Sunny Town</strong><br><br>
+        Welcome to Sunny Town. Are you ready to have some fun?<br><br>
+        <strong>Spot 1:</strong> Walk to Best Bakery from Sunny Town Train Station. You can get the best pineapple cakes here.<br>
+        <strong>Spot 2:</strong> Go to Yellow Park by bike. There are many trees in the park.<br>
+        <strong>Spot 3:</strong> Are you hungry? Have lunch at Penny's Restaurant. Don't miss the best pizza in Sunny Town.
+    </div>
+    <div class="question">
+        1. How can you get to Best Bakery from the train station?<br>
+        <ol class="options">
+            <li>By bus.</li>
+            <li>By bike.</li>
+            <li>Walk.</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：C (Walk)</span>
+    </div>
+    <div class="question">
+        2. How can you get to Yellow Park?<br>
+        <ol class="options">
+            <li>By bike.</li>
+            <li>By taxi.</li>
+            <li>By MRT.</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：A (By bike)</span>
+    </div>
+    <div class="question">
+        3. What can you eat at Penny's Restaurant?<br>
+        <ol class="options">
+            <li>Pineapple cakes.</li>
+            <li>Pizza.</li>
+            <li>Grapes.</li>
+        </ol>
+        <button class="answer-btn" onclick="toggleAnswer(this)">顯示答案</button>
+        <span class="answer-text">解答：B (Pizza)</span>
+    </div>
+
+    <div class="footer">
+        Good Luck! 祝你學習愉快！
+    </div>
+</div>
+
+<script>
+    function toggleAnswer(btn) {
+        var answerSpan = btn.nextElementSibling;
+        if (answerSpan.style.display === "none" || answerSpan.style.display === "") {
+            answerSpan.style.display = "inline";
+            btn.textContent = "隱藏答案";
+            btn.style.backgroundColor = "#ff9800"; // 變成橘色提示已顯示
+        } else {
+            answerSpan.style.display = "none";
+            btn.textContent = "顯示答案";
+            btn.style.backgroundColor = "#4CAF50"; // 恢復綠色
+        }
+    }
+</script>
+
+</body>
+</html>

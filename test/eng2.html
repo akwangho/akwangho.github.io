@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式五年級英語科期中評量試卷</title>
+    <style>
+        body {
+            font-family: "DFKai-sb", "標楷體", "Microsoft JhengHei", sans-serif;
+            line-height: 1.8;
+            color: #333;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #f9f9f9;
+        }
+        .paper-container {
+            background-color: #fff;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin: 5px 0;
+            color: #000;
+        }
+        .header h2 {
+            font-size: 20px;
+            font-weight: normal;
+            margin: 5px 0;
+        }
+        .control-panel {
+            text-align: right;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+        .btn-toggle {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .btn-toggle:hover {
+            background-color: #45a049;
+        }
+        .student-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 18px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 35px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background-color: #eef;
+            padding: 5px 15px;
+            border-left: 5px solid #3366cc;
+        }
+        .question {
+            margin-bottom: 20px;
+            font-size: 19px;
+            padding-left: 10px;
+        }
+        .options {
+            margin-left: 35px;
+            word-spacing: 20px;
+            color: #555;
+        }
+        .reading-text {
+            border: 2px dashed #999;
+            padding: 25px;
+            margin: 15px 0;
+            background-color: #fffaf0;
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 19px;
+            line-height: 1.7;
+        }
+        /* 答案樣式 */
+        .ans-click {
+            cursor: pointer;
+            color: transparent;
+            border-bottom: 1px dashed #ccc;
+            transition: 0.2s;
+            padding: 0 5px;
+            font-weight: bold;
+            display: inline-block;
+            min-width: 40px;
+            text-align: center;
+        }
+        .ans-click.show {
+            color: #d32f2f;
+            border-bottom-color: transparent;
+        }
+        .write-line {
+            display: block;
+            border-bottom: 1px solid #333;
+            width: 95%;
+            height: 35px;
+            margin-top: 10px;
+            margin-left: 20px;
+            cursor: pointer;
+            position: relative;
+        }
+        .write-line .ans-text {
+            position: absolute;
+            bottom: 2px;
+            left: 10px;
+            color: transparent;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+        .write-line.show .ans-text {
+            color: #1976d2;
+        }
+        .score-box {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .score-title {
+            border-bottom: 1px solid #000;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+        }
+        @media print {
+            .control-panel { display: none; }
+            body { background: white; padding: 0; }
+            .paper-container { box-shadow: none; border: none; padding: 0; }
+            .ans-click { color: transparent !important; }
+            .ans-click.show { color: #000 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="control-panel">
+    <button class="btn-toggle" onclick="toggleAll()">顯示 / 隱藏所有答案</button>
+</div>
+
+<div class="paper-container">
+    <div class="header">
+        <h1>英語科期中評量試卷 (互動版)</h1>
+        <h2>五年級 第一學期</h2>
+    </div>
+    
+    <div class="score-box">
+        <div class="score-title">得分</div>
+        <div style="flex-grow: 1;"></div>
+    </div>
+
+    <div class="student-info">
+        <span>班級：五年 ___ 班</span>
+        <span>座號：______</span>
+        <span>姓名：__________________</span>
+    </div>
+
+    <div class="section">
+        <div class="section-title">一、字彙選擇題 (Vocabulary) - 點擊括號看答案</div>
+        <div class="question">
+            1. ( <span class="ans-click" onclick="toggleAns(this)">B</span> ) I want to buy a book. I am going to the ______.
+            <div class="options">(A) bakery (B) bookstore (C) hospital</div>
+        </div>
+        <div class="question">
+            2. ( <span class="ans-click" onclick="toggleAns(this)">A</span> ) My father is a doctor. He goes to the ______ every day.
+            <div class="options">(A) hospital (B) park (C) supermarket</div>
+        </div>
+        <div class="question">
+            3. ( <span class="ans-click" onclick="toggleAns(this)">C</span> ) We can play and ride a bike in the ______.
+            <div class="options">(A) post office (B) restaurant (C) park</div>
+        </div>
+        <div class="question">
+            4. ( <span class="ans-click" onclick="toggleAns(this)">B</span> ) Mom wants to buy some vegetables. She is going to the ______.
+            <div class="options">(A) bank (B) supermarket (C) bakery</div>
+        </div>
+        <div class="question">
+            5. ( <span class="ans-click" onclick="toggleAns(this)">C</span> ) I am hungry. I want to eat something. Let's go to the ______.
+            <div class="options">(A) post office (B) hospital (C) restaurant</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">二、發音測驗 (Phonics)</div>
+        <div class="question">
+            1. ( <span class="ans-click" onclick="toggleAns(this)">B</span> ) 哪一個單字含有與「<span style="color:red">bl</span>ack」相同的發音？
+            <div class="options">(A) clay (B) block (C) glad</div>
+        </div>
+        <div class="question">
+            2. ( <span class="ans-click" onclick="toggleAns(this)">A</span> ) 哪一個單字含有與「<span style="color:red">pl</span>ane」相同的發音？
+            <div class="options">(A) plant (B) glass (C) clean</div>
+        </div>
+        <div class="question">
+            3. ( <span class="ans-click" onclick="toggleAns(this)">C</span> ) 哪一個單字含有「<span style="color:red">gl</span>」的發音？
+            <div class="options">(A) clock (B) play (C) glass</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">三、文法選擇題 (Grammar)</div>
+        <div class="question">
+            1. ( <span class="ans-click" onclick="toggleAns(this)">C</span> ) Where ______ you going?
+            <div class="options">(A) is (B) am (C) are</div>
+        </div>
+        <div class="question">
+            2. ( <span class="ans-click" onclick="toggleAns(this)">A</span> ) He ______ going to the bank.
+            <div class="options">(A) is (B) am (C) are</div>
+        </div>
+        <div class="question">
+            3. ( <span class="ans-click" onclick="toggleAns(this)">A</span> ) A: Are you going to the bakery? B: No, I'm ______.
+            <div class="options">(A) not (B) isn't (C) aren't</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">四、閱讀測驗 (Reading Comprehension)</div>
+        <div class="reading-text">
+            Today is <b>Saturday</b>. Kevin and his dog, Lucky, are going to the <b>park</b>. <br>
+            Mr. Lin is going to the <b>supermarket</b>. <br>
+            Ms. Green is a doctor. She is going to the <b>hospital</b>.
+        </div>
+        <div class="question">
+            1. ( <span class="ans-click" onclick="toggleAns(this)">B</span> ) Where is Kevin going?
+            <div class="options">(A) supermarket (B) park (C) hospital</div>
+        </div>
+        <div class="question">
+            2. ( <span class="ans-click" onclick="toggleAns(this)">C</span> ) Who is going to the hospital?
+            <div class="options">(A) Kevin (B) Mr. Lin (C) Ms. Green</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">五、句子重組 (Unscramble) - 點擊橫線看答案</div>
+        <div class="question">
+            1. going / I / am / park / to / the / .
+            <div class="write-line" onclick="toggleAns(this)"><span class="ans-text">I am going to the park.</span></div>
+        </div>
+        <div class="question">
+            2. he / going / Where / is / ?
+            <div class="write-line" onclick="toggleAns(this)"><span class="ans-text">Where is he going?</span></div>
+        </div>
+        <div class="question">
+            3. to / are / the / going / bookstore / They / .
+            <div class="write-line" onclick="toggleAns(this)"><span class="ans-text">They are going to the bookstore.</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleAns(el) {
+        el.classList.toggle('show');
+    }
+
+    function toggleAll() {
+        const answers = document.querySelectorAll('.ans-click, .write-line');
+        let allShown = true;
+        
+        // 檢查是否所有答案都已經顯示
+        answers.forEach(ans => {
+            if (!ans.classList.contains('show')) allShown = false;
+        });
+
+        // 如果全部都顯示了，就全部隱藏；否則全部顯示
+        answers.forEach(ans => {
+            if (allShown) {
+                ans.classList.remove('show');
+            } else {
+                ans.classList.add('show');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
