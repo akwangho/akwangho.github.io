@@ -1,0 +1,539 @@
+1
+00:00:00,640 --> 00:00:03,640
+Little Fox.
+
+2
+00:00:10,600 --> 00:00:14,560
+Bat saw something brown.
+
+3
+00:00:28,160 --> 00:00:31,880
+He went to tell Cow.
+
+4
+00:00:34,560 --> 00:00:39,320
+I saw something brown. Said Bat.
+
+5
+00:00:39,920 --> 00:00:44,400
+Is it a hat? Said Cow.
+
+6
+00:00:48,360 --> 00:00:53,120
+It is not a hat. Said Bat.
+
+7
+00:00:53,120 --> 00:00:56,480
+He went to Pig.
+
+8
+00:00:57,160 --> 00:01:00,080
+I saw something brown and hard. Said
+
+9
+00:01:00,080 --> 00:01:01,200
+Bat.
+
+10
+00:01:01,200 --> 00:01:04,480
+It's not a hat.
+
+11
+00:01:05,160 --> 00:01:09,000
+Is it a box? Said Pig. A box is brown
+
+12
+00:01:09,000 --> 00:01:11,640
+and hard.
+
+13
+00:01:14,360 --> 00:01:18,840
+It is not a box. Said Bat.
+
+14
+00:01:18,840 --> 00:01:22,040
+Bat went to Cat.
+
+15
+00:01:22,040 --> 00:01:25,560
+I saw something in the barn. Said Bat.
+
+16
+00:01:25,560 --> 00:01:30,080
+It is brown and hard and small.
+
+17
+00:01:35,000 --> 00:01:39,440
+It is not a hat or a box.
+
+18
+00:01:40,840 --> 00:01:44,440
+Is it a rock? Said Cat.
+
+19
+00:01:44,440 --> 00:01:47,840
+A rock is brown and hard.
+
+20
+00:01:47,840 --> 00:01:53,280
+A rock can be small, too. Cat said.
+
+21
+00:01:54,000 --> 00:01:59,040
+It is not a rock. Said Bat.
+
+22
+00:02:02,480 --> 00:02:06,640
+Bat went back to the barn.
+
+23
+00:02:11,080 --> 00:02:14,920
+What was this thing?
+
+24
+00:02:25,720 --> 00:02:29,640
+Come look at this thing. Said Bat.
+
+25
+00:02:29,640 --> 00:02:31,640
+It is not a hat.
+
+26
+00:02:31,640 --> 00:02:33,720
+It is not a box.
+
+27
+00:02:33,720 --> 00:02:37,400
+It is not a rock. Said Bat.
+
+28
+00:02:37,400 --> 00:02:39,000
+It is brown.
+
+29
+00:02:39,000 --> 00:02:40,560
+It is hard.
+
+30
+00:02:40,560 --> 00:02:44,160
+And it is small. Said Bat.
+
+31
+00:02:44,160 --> 00:02:47,680
+Can you tell me what it is?
+
+32
+00:02:53,960 --> 00:02:58,080
+They all went into the barn.
+
+33
+00:02:58,160 --> 00:03:02,640
+The thing is over there. Said Bat.
+
+34
+00:03:03,040 --> 00:03:06,520
+They went to the spot.
+
+35
+00:03:06,520 --> 00:03:09,240
+They looked at the thing.
+
+36
+00:03:09,240 --> 00:03:13,640
+You said the thing is brown. Said Cow.
+
+37
+00:03:13,640 --> 00:03:17,640
+This thing is not brown.
+
+38
+00:03:19,840 --> 00:03:23,000
+You said the thing is hard.
+
+39
+00:03:23,000 --> 00:03:26,680
+This thing is not hard. Said Pig.
+
+40
+00:03:26,680 --> 00:03:30,840
+You said the thing is small. Said Cat.
+
+41
+00:03:30,840 --> 00:03:32,440
+You are right.
+
+42
+00:03:32,440 --> 00:03:36,600
+This thing is very small.
+
+43
+00:03:37,800 --> 00:03:41,120
+Bat flew over.
+
+44
+00:03:45,120 --> 00:03:48,880
+He looked at the thing again.
+
+45
+00:03:51,240 --> 00:03:56,400
+But where is the thing I saw? Said Bat.
+
+46
+00:03:56,800 --> 00:04:00,480
+I do not see it now.
+
+47
+00:04:08,000 --> 00:04:11,960
+Bat looked and looked.
+
+48
+00:04:19,720 --> 00:04:22,120
+The thing that was brown and hard was
+
+49
+00:04:22,120 --> 00:04:24,920
+not there.
+
+50
+00:04:29,440 --> 00:04:33,120
+This thing was yellow.
+
+51
+00:04:35,840 --> 00:04:39,520
+This thing was soft.
+
+52
+00:04:40,440 --> 00:04:43,280
+The thing made a sound.
+
+53
+00:04:43,280 --> 00:04:46,160
+It said
+
+54
+00:04:50,400 --> 00:04:55,440
+Cat said Bat what is this thing?
+
+55
+00:04:55,440 --> 00:04:59,760
+It is a chick. Said Bat.
+
+56
+00:04:59,760 --> 00:05:04,120
+It is a soft yellow chick.
+
+57
+00:05:06,080 --> 00:05:08,960
+I found it. Said Bat.
+
+58
+00:05:08,960 --> 00:05:10,600
+So it is mine.
+
+59
+00:05:10,600 --> 00:05:13,240
+Right?
+
+60
+00:05:17,880 --> 00:05:21,840
+No. Said Cow.
+
+61
+00:05:21,840 --> 00:05:26,200
+The chick must go to its mother.
+
+62
+00:05:55,040 --> 00:06:00,240
+But you have something, too. Said Cow.
+
+63
+00:06:00,800 --> 00:06:04,160
+What do I have? Said Bat.
+
+64
+00:06:04,160 --> 00:06:07,400
+You have a story. Said Cow.
+
+65
+00:06:07,400 --> 00:06:11,760
+It is about the thing in the barn.
+
+66
+00:06:12,200 --> 00:06:16,960
+You can tell this story to your friends.
+
+67
+00:06:22,880 --> 00:06:27,240
+And that is what Bat did.
+
+68
+00:06:58,640 --> 00:07:01,920
+Bat flew over the barn.
+
+69
+00:07:01,920 --> 00:07:05,400
+He saw a fox.
+
+70
+00:07:14,000 --> 00:07:17,760
+Bat flew into the barn.
+
+71
+00:07:18,400 --> 00:07:22,240
+A fox is coming. He said.
+
+72
+00:07:22,240 --> 00:07:25,320
+Cat woke up.
+
+73
+00:07:25,840 --> 00:07:30,240
+A fox is coming? She asked.
+
+74
+00:07:30,240 --> 00:07:33,440
+Pig ran into the barn.
+
+75
+00:07:33,440 --> 00:07:36,960
+A fox is coming? He asked.
+
+76
+00:07:36,960 --> 00:07:39,800
+Yes. Said Bat.
+
+77
+00:07:39,800 --> 00:07:44,200
+A fox is coming to our farm.
+
+78
+00:07:47,240 --> 00:07:50,400
+Oh, no. Said Cat.
+
+79
+00:07:50,400 --> 00:07:53,160
+We must do something.
+
+80
+00:07:53,160 --> 00:07:56,000
+The fox will see the hen house. Said
+
+81
+00:07:56,000 --> 00:07:57,480
+Pig.
+
+82
+00:07:57,480 --> 00:08:01,360
+It will eat the hens.
+
+83
+00:08:02,040 --> 00:08:05,640
+Let's get dog. Said Cat.
+
+84
+00:08:05,640 --> 00:08:08,800
+He will scare the fox away.
+
+85
+00:08:08,800 --> 00:08:11,720
+No. Said Cow.
+
+86
+00:08:11,720 --> 00:08:14,000
+Dog is sick today.
+
+87
+00:08:14,000 --> 00:08:17,680
+We must let him sleep.
+
+88
+00:08:18,080 --> 00:08:21,680
+We can stop the fox. Said Bat.
+
+89
+00:08:21,680 --> 00:08:25,000
+I know what to do.
+
+90
+00:08:38,400 --> 00:08:41,880
+Pig looked at Bat.
+
+91
+00:08:43,200 --> 00:08:46,120
+Cat looked at Bat.
+
+92
+00:08:46,120 --> 00:08:48,640
+Cow looked at Bat.
+
+93
+00:08:48,640 --> 00:08:52,000
+The fox is coming. Said Pig.
+
+94
+00:08:52,000 --> 00:08:57,440
+We have to do something. Said Cat.
+
+95
+00:08:59,760 --> 00:09:02,880
+We can hide. Said Bat.
+
+96
+00:09:02,880 --> 00:09:07,440
+Cow, you hide behind the hen house.
+
+97
+00:09:08,280 --> 00:09:11,520
+Pig, you hide behind the tractor.
+
+98
+00:09:11,520 --> 00:09:15,440
+Cat, you hide behind the windmill.
+
+99
+00:09:15,440 --> 00:09:19,040
+Where will you go? Cow asked Bat.
+
+100
+00:09:19,040 --> 00:09:23,960
+I will go to an apple tree. Said Bat.
+
+101
+00:09:30,160 --> 00:09:33,920
+Soon, the fox will be here. Said Bat.
+
+102
+00:09:33,920 --> 00:09:37,800
+And we will make some noise.
+
+103
+00:09:40,800 --> 00:09:44,960
+So Cow went to the hen house.
+
+104
+00:09:50,760 --> 00:09:54,520
+Pig went to the tractor.
+
+105
+00:09:55,520 --> 00:09:59,080
+Cat went to the windmill.
+
+106
+00:10:00,120 --> 00:10:04,160
+Bat flew to an apple tree.
+
+107
+00:10:08,280 --> 00:10:11,760
+They all waited.
+
+108
+00:10:17,040 --> 00:10:21,320
+They waited for the fox to come.
+
+109
+00:10:25,360 --> 00:10:28,120
+Bat watched from the apple tree.
+
+110
+00:10:28,120 --> 00:10:31,800
+Cow watched from the hen house.
+
+111
+00:10:31,800 --> 00:10:35,120
+Pig watched from the tractor.
+
+112
+00:10:35,120 --> 00:10:38,840
+Cat watched from the windmill.
+
+113
+00:10:39,640 --> 00:10:42,680
+At last, the fox came.
+
+114
+00:10:42,680 --> 00:10:46,040
+It looked all around.
+
+115
+00:10:50,240 --> 00:10:53,800
+Then it went to the hen house.
+
+116
+00:10:58,960 --> 00:11:02,960
+"Now!" cried Bat.
+
+117
+00:11:03,560 --> 00:11:06,839
+Bat swooped down at the fox.
+
+118
+00:11:06,839 --> 00:11:10,480
+Cat hissed at the fox.
+
+119
+00:11:10,880 --> 00:11:14,680
+Pig oinked at the fox.
+
+120
+00:11:16,160 --> 00:11:19,960
+Cow mooed at the fox.
+
+121
+00:11:20,960 --> 00:11:24,480
+Then they all did it again.
+
+122
+00:11:28,280 --> 00:11:30,400
+Swoop!
+
+123
+00:11:30,400 --> 00:11:32,040
+Hiss!
+
+124
+00:11:32,040 --> 00:11:33,360
+Oink!
+
+125
+00:11:33,360 --> 00:11:36,000
+Moo!
+
+126
+00:11:37,560 --> 00:11:39,960
+The fox ran fast.
+
+127
+00:11:39,960 --> 00:11:43,400
+The fox ran far.
+
+128
+00:11:46,760 --> 00:11:50,680
+"We did it!" cried Pig.
+
+129
+00:11:56,839 --> 00:11:59,880
+The noise was loud.
+
+130
+00:11:59,880 --> 00:12:03,160
+It woke up dog.
+
+131
+00:12:11,120 --> 00:12:14,120
+"You were sleeping." said Cat.
+
+132
+00:12:14,120 --> 00:12:15,760
+"So?"
+
+133
+00:12:15,760 --> 00:12:19,440
+"We watched the farm." said Pig.
+
+134
+00:12:19,440 --> 00:12:23,400
+"Thank you." said Dog.
+
+135
+00:12:24,800 --> 00:12:28,400
+He felt much better now.
