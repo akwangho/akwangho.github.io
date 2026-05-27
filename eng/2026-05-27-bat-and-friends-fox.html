@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bat and Friends 🦇 精聽訓練</title>
+    <title>Bat and Friends 🦇 聽力＋閱讀訓練</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -258,6 +258,13 @@
         /* 答題正確/錯誤 */
         .quiz-correct { background: #BBF7D0 !important; color: #047857 !important; }
         .quiz-wrong { background: #FECACA !important; color: #B91C1C !important; }
+
+        /* 常見字高亮（reading-teacher 視覺輔助） */
+        .sight-word {
+            background: linear-gradient(180deg, transparent 55%, #FEF08A 55%);
+            border-radius: 3px;
+            padding: 0 1px;
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen text-gray-800">
@@ -395,10 +402,10 @@
             <!-- 章節快速選 -->
             <div class="mt-3 grid grid-cols-2 gap-2">
                 <button onclick="jumpToChapter(0)" class="btn-soft btn-yellow text-sm">
-                    🐣 故事 1：The Thing in the Barn
+                    🐣 故事 1：穀倉裡的東西
                 </button>
                 <button onclick="jumpToChapter(1)" class="btn-soft btn-peach text-sm">
-                    🦊 故事 2：The Fox is Coming
+                    🦊 故事 2：狐狸來了
                 </button>
             </div>
         </div>
@@ -418,9 +425,9 @@
     <section id="right-panel" class="flex-1 overflow-y-auto p-3 md:p-4" style="width: 45%;">
         <div class="mb-3 bg-white rounded-2xl shadow p-3">
             <h2 class="text-lg md:text-xl font-black text-pink-700 flex items-center gap-2">
-                <span>🎧</span> Bat and Friends 精聽訓練
+                <span>📚</span> The Chicks and the Fox 聽力＋閱讀
             </h2>
-            <p class="text-xs md:text-sm text-gray-500 mt-1">英文預設遮住（精聽模式）。點 ▶ 聽，選「聽懂 / 大概懂 / 聽不懂」會自動揭曉答案。</p>
+            <p class="text-xs md:text-sm text-gray-500 mt-1">字幕來自官方 SRT。英文預設遮住：先聽 ▶，自評後揭曉，可 🔊 朗讀跟讀。完成 20 句拿星星！</p>
         </div>
 
         <div id="chapter-tabs" class="mb-3 flex gap-2">
@@ -439,8 +446,9 @@
 
 <script>
 /* =========================================================
- *  資料：20 句精聽（兩個故事各 10 句）
- *  時間以 SRT 為基礎手動合併，學生/老師可用 ±1s 微調
+ *  資料：20 句（兩個故事各 10 句）
+ *  英文與時間取自 SRT：The Chicks and the Fox (Bat and Friends)
+ *  eng/sub/[English (auto-generated)] The Chicks and the Fox...
  * ======================================================= */
 const VIDEO_ID = 'b-L-eY7boWA';
 
@@ -448,244 +456,244 @@ const DEFAULT_SENTENCES = [
     // ===== 故事 1：The Thing in the Barn =====
     {
         id: 's1', chapter: 0,
-        en: "Bat saw something brown.",
-        zh: "蝙蝠看到一個棕色的東西。",
-        start: 10.60, end: 14.56,
+        en: "I saw something brown. Said Bat.",
+        zh: "我看到一個棕色的東西。蝙蝠說。",
+        start: 34.56, end: 39.32,
         choices: [
+            "I saw something brown. Said Bat.",
+            "I saw something round. Said Bat.",
             "Bat saw something brown.",
-            "Bat saw something round.",
-            "Cat saw something brown.",
-            "Bat sees something brown."
+            "I see something brown. Said Bat."
         ]
     },
     {
         id: 's2', chapter: 0,
-        en: "He went to tell Cow.",
-        zh: "他去告訴牛。",
-        start: 28.16, end: 31.88,
+        en: "He went to Pig.",
+        zh: "他去找豬。",
+        start: 53.12, end: 56.48,
         choices: [
-            "He went to tell Cow.",
-            "He went to sell Cow.",
-            "He wants to tell Cow.",
-            "He went to tell now."
+            "He went to Pig.",
+            "He went to tell Pig.",
+            "He went to Cow.",
+            "He wants to Pig."
         ]
     },
     {
         id: 's3', chapter: 0,
-        en: "Is it a hat? Said Cow.",
-        zh: "是一頂帽子嗎？牛說。",
-        start: 39.92, end: 44.40,
+        en: "I saw something brown and hard. Said Bat.",
+        zh: "我看到一個棕色又硬的東西。蝙蝠說。",
+        start: 57.16, end: 61.20,
         choices: [
-            "Is it a hat? Said Cow.",
-            "Is it a cat? Said Cow.",
-            "Is that a hat? Said Cow.",
-            "Is it a hat? Said now."
+            "I saw something brown and hard. Said Bat.",
+            "I saw something brown and soft. Said Bat.",
+            "I saw something round and hard. Said Bat.",
+            "Bat saw something brown and hard."
         ]
     },
     {
         id: 's4', chapter: 0,
-        en: "It is not a hat. Said Bat.",
-        zh: "不是一頂帽子。蝙蝠說。",
-        start: 48.36, end: 53.12,
+        en: "It is not a box. Said Bat.",
+        zh: "不是盒子。蝙蝠說。",
+        start: 74.36, end: 78.84,
         choices: [
+            "It is not a box. Said Bat.",
             "It is not a hat. Said Bat.",
-            "It is not a cat. Said Bat.",
-            "It is not a hat. Said Cat.",
-            "It is a hat. Said Bat."
+            "It is not a box. Said Pig.",
+            "It is a box. Said Bat."
         ]
     },
     {
         id: 's5', chapter: 0,
-        en: "Is it a box? Said Pig.",
-        zh: "是一個盒子嗎?豬說。",
-        start: 65.16, end: 69.00,
+        en: "I saw something in the barn. Said Bat.",
+        zh: "我在穀倉裡看到一個東西。蝙蝠說。",
+        start: 82.04, end: 85.56,
         choices: [
-            "Is it a box? Said Pig.",
-            "Is it a fox? Said Pig.",
-            "Is that a box? Said Pig.",
-            "Is it a box? Said Big."
+            "I saw something in the barn. Said Bat.",
+            "I saw something on the farm. Said Bat.",
+            "I saw something in the barn. Said Cat.",
+            "Bat saw something in the barn."
         ]
     },
     {
         id: 's6', chapter: 0,
-        en: "Is it a rock? Said Cat.",
-        zh: "是一塊石頭嗎?貓說。",
-        start: 100.84, end: 104.44,
+        en: "It is brown and hard and small.",
+        zh: "它是棕色、又硬、又小。",
+        start: 85.56, end: 90.08,
         choices: [
-            "Is it a rock? Said Cat.",
-            "Is it a sock? Said Cat.",
-            "Is it a rock? Said Cow.",
-            "It is a rock. Said Cat."
+            "It is brown and hard and small.",
+            "It is brown and soft and small.",
+            "It is round and hard and small.",
+            "It is brown and hard and tall."
         ]
     },
     {
         id: 's7', chapter: 0,
-        en: "A rock is brown and hard.",
-        zh: "石頭是棕色又硬的。",
-        start: 104.44, end: 107.84,
+        en: "It is not a hat or a box.",
+        zh: "不是帽子，也不是盒子。",
+        start: 95.00, end: 99.44,
         choices: [
-            "A rock is brown and hard.",
-            "A rock is round and hard.",
-            "A rock is brown and small.",
-            "A box is brown and hard."
+            "It is not a hat or a box.",
+            "It is not a hat or a rock.",
+            "It is a hat or a box.",
+            "It is not a cat or a box."
         ]
     },
     {
         id: 's8', chapter: 0,
-        en: "Come look at this thing. Said Bat.",
-        zh: "來看看這個東西。蝙蝠說。",
-        start: 145.72, end: 149.64,
+        en: "Bat went back to the barn.",
+        zh: "蝙蝠回到穀倉。",
+        start: 122.48, end: 126.64,
         choices: [
-            "Come look at this thing. Said Bat.",
-            "Come look at this thing. Said Cat.",
-            "Look at this thing! Said Bat.",
-            "Come look at the thing. Said Bat."
+            "Bat went back to the barn.",
+            "Bat went back to the farm.",
+            "Cat went back to the barn.",
+            "Bat went into the barn."
         ]
     },
     {
         id: 's9', chapter: 0,
-        en: "It is a soft yellow chick.",
-        zh: "是一隻軟軟的黃色小雞。",
-        start: 299.76, end: 304.12,
+        en: "What was this thing?",
+        zh: "這到底是什麼東西？",
+        start: 131.08, end: 134.92,
         choices: [
-            "It is a soft yellow chick.",
-            "It is a soft yellow chair.",
-            "It is a small yellow chick.",
-            "It is a soft yellow chip."
+            "What was this thing?",
+            "Where was this thing?",
+            "What is this thing?",
+            "Who was this thing?"
         ]
     },
     {
         id: 's10', chapter: 0,
-        en: "The chick must go to its mother.",
-        zh: "小雞必須回到媽媽身邊。",
-        start: 321.84, end: 326.20,
+        en: "It is a chick. Said Bat.",
+        zh: "是一隻小雞。蝙蝠說。",
+        start: 295.44, end: 299.76,
         choices: [
-            "The chick must go to its mother.",
-            "The chick must go to its brother.",
-            "The chick wants to go to its mother.",
-            "The chick must look at its mother."
+            "It is a chick. Said Bat.",
+            "It is a check. Said Bat.",
+            "It is a chick. Said Cat.",
+            "It is a chicken. Said Bat."
         ]
     },
 
     // ===== 故事 2：The Fox is Coming =====
     {
         id: 's11', chapter: 1,
-        en: "Bat flew over the barn.",
-        zh: "蝙蝠飛過穀倉。",
-        start: 418.64, end: 421.92,
+        en: "Bat flew into the barn.",
+        zh: "蝙蝠飛進穀倉。",
+        start: 434.00, end: 437.76,
         choices: [
+            "Bat flew into the barn.",
             "Bat flew over the barn.",
-            "Cat flew over the barn.",
-            "Bat flew over the farm.",
-            "Bat flew under the barn."
+            "Cat flew into the barn.",
+            "Bat flew into the farm."
         ]
     },
     {
         id: 's12', chapter: 1,
-        en: "He saw a fox.",
-        zh: "他看到一隻狐狸。",
-        start: 421.92, end: 425.40,
+        en: "A fox is coming. He said.",
+        zh: "有狐狸要來了。他說。",
+        start: 438.40, end: 442.24,
         choices: [
-            "He saw a fox.",
-            "He saw a box.",
-            "He sees a fox.",
-            "Here is a fox."
+            "A fox is coming. He said.",
+            "A box is coming. He said.",
+            "A fox is going. He said.",
+            "The fox is coming. She said."
         ]
     },
     {
         id: 's13', chapter: 1,
-        en: "A fox is coming to our farm.",
-        zh: "有一隻狐狸要來我們的農場。",
-        start: 459.80, end: 464.20,
+        en: "Cat woke up.",
+        zh: "貓醒來了。",
+        start: 442.24, end: 445.32,
         choices: [
-            "A fox is coming to our farm.",
-            "A fox is coming to our barn.",
-            "A fox is going to our farm.",
-            "A box is coming to our farm."
+            "Cat woke up.",
+            "Cow woke up.",
+            "Cat wakes up.",
+            "Cat went up."
         ]
     },
     {
         id: 's14', chapter: 1,
-        en: "Oh, no. Said Cat. We must do something.",
-        zh: "喔不！貓說。我們必須做點什麼。",
-        start: 467.24, end: 473.16,
+        en: "Pig ran into the barn.",
+        zh: "豬跑進穀倉。",
+        start: 453.44, end: 456.96,
         choices: [
-            "Oh, no. Said Cat. We must do something.",
-            "Oh, no. Said Cat. We must do nothing.",
-            "Oh, no. Said Cow. We must do something.",
-            "Oh, no. Said Cat. We must say something."
+            "Pig ran into the barn.",
+            "Pig ran into the farm.",
+            "Cat ran into the barn.",
+            "Pig runs into the barn."
         ]
     },
     {
         id: 's15', chapter: 1,
-        en: "Let's get Dog. He will scare the fox away.",
-        zh: "我們去找狗。他會把狐狸嚇走。",
-        start: 482.04, end: 488.80,
+        en: "The fox will see the hen house. Said Pig.",
+        zh: "狐狸會看到雞舍。豬說。",
+        start: 473.16, end: 477.48,
         choices: [
-            "Let's get Dog. He will scare the fox away.",
-            "Let's get Dog. He will share the fox away.",
-            "Let's pet Dog. He will scare the fox away.",
-            "Let's get Dog. He will scare the box away."
+            "The fox will see the hen house. Said Pig.",
+            "The fox will see the barn. Said Pig.",
+            "The box will see the hen house. Said Pig.",
+            "The fox will eat the hen house. Said Pig."
         ]
     },
     {
         id: 's16', chapter: 1,
-        en: "We can hide. Said Bat.",
-        zh: "我們可以躲起來。蝙蝠說。",
-        start: 539.76, end: 542.88,
+        en: "It will eat the hens.",
+        zh: "牠會把母雞吃掉。",
+        start: 477.48, end: 481.36,
         choices: [
-            "We can hide. Said Bat.",
-            "We can ride. Said Bat.",
-            "We can hide. Said Cat.",
-            "We can't hide. Said Bat."
+            "It will eat the hens.",
+            "It will see the hens.",
+            "It will eat the eggs.",
+            "They will eat the hens."
         ]
     },
     {
         id: 's17', chapter: 1,
-        en: "Cow, you hide behind the hen house.",
-        zh: "牛,你躲在雞舍後面。",
-        start: 542.88, end: 547.44,
+        en: "Dog is sick today.",
+        zh: "狗今天生病了。",
+        start: 491.72, end: 494.00,
         choices: [
-            "Cow, you hide behind the hen house.",
-            "Cow, you hide behind the hay house.",
-            "Cow, you go behind the hen house.",
-            "Cat, you hide behind the hen house."
+            "Dog is sick today.",
+            "Dog is fine today.",
+            "Cow is sick today.",
+            "Dog was sick today."
         ]
     },
     {
         id: 's18', chapter: 1,
-        en: "I will go to an apple tree. Said Bat.",
-        zh: "我要飛到一棵蘋果樹上。蝙蝠說。",
-        start: 559.04, end: 563.96,
+        en: "We can stop the fox. Said Bat.",
+        zh: "我們可以阻止狐狸。蝙蝠說。",
+        start: 498.08, end: 501.68,
         choices: [
-            "I will go to an apple tree. Said Bat.",
-            "I will go to an apple tree. Said Cat.",
-            "I will fly to an apple tree. Said Bat.",
-            "I will go to a maple tree. Said Bat."
+            "We can stop the fox. Said Bat.",
+            "We can stop the box. Said Bat.",
+            "We can hide the fox. Said Bat.",
+            "We can stop the fox. Said Cat."
         ]
     },
     {
         id: 's19', chapter: 1,
-        en: "At last, the fox came.",
-        zh: "最後,狐狸來了。",
-        start: 639.64, end: 642.68,
+        en: "Soon, the fox will be here. Said Bat.",
+        zh: "很快狐狸就要來了。蝙蝠說。",
+        start: 570.16, end: 573.92,
         choices: [
-            "At last, the fox came.",
-            "At last, the box came.",
-            "At last, the fox ran.",
-            "At first, the fox came."
+            "Soon, the fox will be here. Said Bat.",
+            "Soon, the fox will be gone. Said Bat.",
+            "Now, the fox will be here. Said Bat.",
+            "Soon, the box will be here. Said Bat."
         ]
     },
     {
         id: 's20', chapter: 1,
-        en: "The fox ran fast. The fox ran far.",
-        zh: "狐狸跑得很快。狐狸跑得很遠。",
-        start: 697.56, end: 703.40,
+        en: "\"We did it!\" cried Pig.",
+        zh: "「我們做到了！」豬大喊。",
+        start: 706.76, end: 710.68,
         choices: [
-            "The fox ran fast. The fox ran far.",
-            "The fox ran fast. The box ran far.",
-            "The fox ran fast. The fox ran fat.",
-            "The fox ran far. The fox ran fast."
+            "\"We did it!\" cried Pig.",
+            "\"We did it!\" cried Bat.",
+            "\"We hid it!\" cried Pig.",
+            "\"We did it!\" said Pig."
         ]
     }
 ];
@@ -693,7 +701,7 @@ const DEFAULT_SENTENCES = [
 /* =========================================================
  *  狀態 & localStorage
  * ======================================================= */
-const STORAGE_KEY = 'bat-fox-listening-v1';
+const STORAGE_KEY = 'bat-fox-listening-v2';
 
 function defaultProgress() {
     const map = {};
@@ -804,6 +812,32 @@ window.onYouTubeIframeAPIReady = function () {
     });
 };
 
+/** Web Speech API 朗讀（reading-teacher：兒童友善語速與音高） */
+const SIGHT_WORDS = new Set([
+    'a', 'an', 'the', 'is', 'it', 'in', 'on', 'to', 'and', 'or', 'not', 'said',
+    'he', 'she', 'we', 'you', 'i', 'my', 'our', 'will', 'can', 'be', 'was', 'this', 'that'
+]);
+
+function highlightEnglish(text) {
+    return text.split(/(\s+)/).map(part => {
+        const w = part.replace(/[^a-zA-Z']/g, '').toLowerCase();
+        if (w && SIGHT_WORDS.has(w)) {
+            return `<span class="sight-word">${part}</span>`;
+        }
+        return part;
+    }).join('');
+}
+
+function speakText(text, rate) {
+    if (!text || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = rate != null ? rate : 0.88;
+    u.pitch = 1.12;
+    window.speechSynthesis.speak(u);
+}
+
 function playSegment(sentence, opts = {}) {
     if (!playerReady) {
         document.getElementById('now-playing').textContent = '播放器準備中…';
@@ -904,7 +938,7 @@ function renderSentences() {
                         ${playedPill} ${heardPill} ${quizPill} ${shadowedPill} ${doneCheck}
                     </div>
                     <div class="sentence-en font-bold leading-snug ${englishVisible ? 'text-gray-800' : 'text-gray-300 italic select-none'}">
-                        ${englishVisible ? s.en : '🎧 ??? 聽聽看再揭曉'}
+                        ${englishVisible ? highlightEnglish(s.en) : '🎧 ??? 聽聽看再揭曉'}
                     </div>
                     <div class="sentence-zh text-gray-500 mt-1 ${state.showZh ? '' : 'hide'}">${s.zh}</div>
                 </div>
@@ -944,8 +978,11 @@ function renderSentences() {
                 </div>
             </div>
 
-            <!-- Shadowing & 揭曉 -->
+            <!-- Shadowing & 揭曉 & 朗讀 -->
             <div class="mt-2 flex items-center gap-2 flex-wrap">
+                <button class="speak-btn btn-soft btn-sky text-xs" ${englishVisible ? '' : 'disabled'} title="用瀏覽器朗讀英文">
+                    <i class="fa-solid fa-volume-high"></i> 朗讀
+                </button>
                 <button class="shadow-btn btn-soft btn-lav text-xs"><i class="fa-solid fa-microphone"></i> Shadowing 跟讀</button>
                 <button class="reveal-btn btn-soft btn-peach text-xs">
                     <i class="fa-solid ${englishVisible ? 'fa-eye-slash' : 'fa-eye'}"></i>
@@ -1004,7 +1041,12 @@ function renderSentences() {
                 saveState();
                 renderSentences();
                 updateStats();
+                if (p2.revealed) speakText(s.en, v === 'good' ? 0.9 : 0.8);
             });
+        });
+        card.querySelector('.speak-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            speakText(s.en, 0.88);
         });
         card.querySelectorAll('.quiz-btn').forEach(b => {
             b.addEventListener('click', (e) => {
@@ -1045,6 +1087,7 @@ function renderSentences() {
             p2.revealed = !p2.revealed;
             saveState();
             renderSentences();
+            if (p2.revealed) speakText(s.en, 0.88);
         });
     });
 
