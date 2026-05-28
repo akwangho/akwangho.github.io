@@ -1530,12 +1530,29 @@ function setupResizer() {
     const resizer = document.getElementById('resizer');
     const left = document.getElementById('left-panel');
     const right = document.getElementById('right-panel');
+    const wrap = document.getElementById('player-wrap');
     let dragging = false;
+
+    function endDrag(e) {
+        if (!dragging) return;
+        dragging = false;
+        resizer.classList.remove('active');
+        document.body.style.cursor = '';
+        wrap.classList.remove('iframe-block');
+        if (e && e.pointerId !== undefined) {
+            try { resizer.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+        if (state.maskOn) applyMaskPos();
+    }
+
     resizer.addEventListener('pointerdown', (e) => {
         if (window.innerWidth <= 768) return;
         dragging = true;
         resizer.classList.add('active');
         document.body.style.cursor = 'col-resize';
+        // 蓋住 iframe，阻止它吞掉滑鼠事件導致拖曳狀態無法解除
+        wrap.classList.add('iframe-block');
+        try { resizer.setPointerCapture(e.pointerId); } catch (_) {}
     });
     document.addEventListener('pointermove', (e) => {
         if (!dragging) return;
@@ -1546,12 +1563,11 @@ function setupResizer() {
         left.style.width = pct + '%';
         right.style.width = (100 - pct) + '%';
     });
-    document.addEventListener('pointerup', () => {
-        dragging = false;
-        resizer.classList.remove('active');
-        document.body.style.cursor = '';
-        if (state.maskOn) applyMaskPos();
-    });
+    document.addEventListener('pointerup', endDrag);
+    document.addEventListener('pointercancel', endDrag);
+    // 滑鼠離開視窗時也視為結束，避免狀態卡住
+    window.addEventListener('blur', endDrag);
+    document.addEventListener('mouseleave', endDrag);
 }
 
 /* =========================================================
