@@ -713,6 +713,22 @@
 
         <!-- 精聽數量選擇 -->
         <div class="mb-3 bg-white rounded-2xl shadow p-3">
+            <!-- 🏆 總體答對進度：跨批次累積，鼓勵小朋友複習到 100% -->
+            <div class="mastery-progress mb-3 p-3 rounded-xl"
+                 style="background: linear-gradient(135deg, #FEF3C7 0%, #FCE7F3 100%);">
+                <div class="flex items-center gap-2 text-sm font-bold mb-1.5 flex-wrap">
+                    <span class="text-xl">🏆</span>
+                    <span class="text-amber-700">已答對</span>
+                    <span id="mastery-text" class="text-pink-700 text-base">0 / 0 句</span>
+                    <span id="mastery-pct" class="ml-auto text-amber-600 text-base">0%</span>
+                </div>
+                <div class="bg-white/70 rounded-full h-3 overflow-hidden shadow-inner">
+                    <div id="mastery-bar" class="h-full rounded-full transition-all duration-500"
+                         style="width:0%; background: linear-gradient(90deg, #FBBF24, #F472B6 60%, #A78BFA);"></div>
+                </div>
+                <div id="mastery-detail" class="text-xs text-gray-600 mt-1.5">🐣 故事 1：0/0 　　 🦊 故事 2：0/0</div>
+            </div>
+
             <div class="flex items-center flex-wrap gap-2 mb-2">
                 <span class="text-sm font-bold text-purple-700"><i class="fa-solid fa-list-ol"></i> 精聽數量</span>
                 <span class="text-xs text-gray-500" id="batch-info">—</span>
@@ -727,6 +743,14 @@
                 <input id="batch-custom" type="number" min="1" max="999" placeholder="N"
                     class="w-16 px-2 py-1 rounded-lg border border-purple-200 text-xs text-center" />
                 <button onclick="applyCustomBatch()" class="btn-soft btn-lav text-xs">套用</button>
+            </div>
+            <!-- 範圍篩選：全部 / 只看還沒答對 -->
+            <div class="flex flex-wrap items-center gap-1 mt-2">
+                <span class="text-xs text-gray-500">範圍：</span>
+                <button data-filter="all" class="filter-btn btn-soft btn-sky text-xs">📚 全部句子</button>
+                <button data-filter="unmastered" class="filter-btn btn-soft btn-mint text-xs">
+                    ⭐ 只看還沒答對的（<span id="unmastered-count">0</span> 句）
+                </button>
             </div>
             <div class="flex flex-wrap items-center gap-1 mt-2">
                 <span class="text-xs text-gray-500">順序：</span>
@@ -1247,6 +1271,7 @@ function defaultState() {
         batchSize: 20,          // 10 / 20 / 30 / 50 / 'all' / 自訂數字
         batchMode: 'sequential', // 'sequential' | 'random'
         batchSeed: 1,           // 隨機抽選的種子
+        batchFilter: 'all',     // 'all' | 'unmastered'（只看還沒答對的）
         tvMode: false,          // 投影電視時收起裝飾 UI、放大字級
     };
 }
@@ -1254,12 +1279,24 @@ function defaultState() {
 /* ---- 依 tab + batch 設定計算目前要顯示的句子 ---- */
 function getActiveBatch() {
     const tab = state.activeTab;
-    const pool = DEFAULT_SENTENCES.filter(s => tab === 'all' || s.chapter === tab);
+    let pool = DEFAULT_SENTENCES.filter(s => tab === 'all' || s.chapter === tab);
+    if (state.batchFilter === 'unmastered') {
+        pool = pool.filter(s => (state.progress[s.id] && state.progress[s.id].quizCorrect) !== true);
+    }
     const size = state.batchSize === 'all' ? pool.length : Math.max(1, parseInt(state.batchSize) || 20);
     if (state.batchMode === 'random') {
         return seededShuffle(pool, state.batchSeed || 1).slice(0, size);
     }
     return pool.slice(0, size);
+}
+
+/** 計算「曾經答對」的句子數量（quizCorrect 曾為 true） */
+function countMastered(scope) {
+    const pool = scope === 'all'
+        ? DEFAULT_SENTENCES
+        : DEFAULT_SENTENCES.filter(s => s.chapter === scope);
+    const mastered = pool.filter(s => state.progress[s.id] && state.progress[s.id].quizCorrect === true).length;
+    return { mastered, total: pool.length };
 }
 
 let state = loadState();
@@ -1672,8 +1709,26 @@ function renderSentences() {
     const sizeLabel = state.batchSize === 'all' ? '全部' : state.batchSize;
     const modeLabel = state.batchMode === 'random' ? '🎲 隨機' : '📖 依序';
     const infoEl = document.getElementById('batch-info');
-    if (infoEl) infoEl.textContent = `顯示 ${items.length} 句（共 ${poolSize} 句可選 · 設定：${sizeLabel} · ${modeLabel}）`;
+    const filterLabel = state.batchFilter === 'unmastered' ? ' · ⭐ 只看還沒答對' : '';
+    if (infoEl) infoEl.textContent = `顯示 ${items.length} 句（共 ${poolSize} 句可選 · 設定：${sizeLabel} · ${modeLabel}${filterLabel}）`;
     updateBatchUI();
+
+    // 篩選「只看還沒答對」且 0 句 → 顯示慶祝畫面
+    if (items.length === 0 && state.batchFilter === 'unmastered') {
+        const tab = state.activeTab;
+        const scopeLabel = tab === 'all' ? '兩個故事' : (tab === 0 ? '故事 1' : '故事 2');
+        const empty = document.createElement('div');
+        empty.className = 'bg-gradient-to-br from-amber-50 via-pink-50 to-purple-50 rounded-2xl p-6 text-center shadow';
+        empty.innerHTML = `
+            <div class="text-5xl mb-2">🎉🏆🎉</div>
+            <div class="font-black text-pink-700 text-lg mb-1">太棒了！${scopeLabel}全部答對！</div>
+            <div class="text-sm text-gray-600 mb-3">想再挑戰一次嗎？切回「📚 全部句子」可以再聽。</div>
+            <button onclick="state.batchFilter='all'; saveState(); renderSentences(); updateStats();"
+                    class="btn-soft btn-sky text-sm">📚 看全部句子</button>
+        `;
+        list.appendChild(empty);
+        return;
+    }
     items.forEach((s, idx) => {
         const p = state.progress[s.id];
         const globalIdx = DEFAULT_SENTENCES.indexOf(s) + 1;
@@ -2203,6 +2258,28 @@ function updateStats() {
     document.getElementById('progress-bar').style.width = (batchDone / batchTotal * 100) + '%';
     document.getElementById('combo-text').textContent = `Combo ${state.combo} (最佳 ${state.bestCombo})`;
     document.getElementById('star-text').textContent = `${state.stars} ⭐`;
+
+    // 🏆 總體答對進度（跨批次累積）
+    const overall = countMastered('all');
+    const ch0 = countMastered(0);
+    const ch1 = countMastered(1);
+    const overallPct = overall.total ? Math.round(overall.mastered / overall.total * 100) : 0;
+    const masteryText = document.getElementById('mastery-text');
+    const masteryPct = document.getElementById('mastery-pct');
+    const masteryBar = document.getElementById('mastery-bar');
+    const masteryDetail = document.getElementById('mastery-detail');
+    if (masteryText) masteryText.textContent = `${overall.mastered} / ${overall.total} 句`;
+    if (masteryPct) masteryPct.textContent = overallPct + '%' + (overallPct === 100 ? ' 🎉' : '');
+    if (masteryBar) masteryBar.style.width = overallPct + '%';
+    if (masteryDetail) masteryDetail.textContent =
+        `🐣 故事 1：${ch0.mastered}/${ch0.total} 　　 🦊 故事 2：${ch1.mastered}/${ch1.total}`;
+
+    // 「只看還沒答對的」按鈕的數量（依目前 tab 範圍）
+    const tabForFilter = state.activeTab;
+    const tabPool = DEFAULT_SENTENCES.filter(s => tabForFilter === 'all' || s.chapter === tabForFilter);
+    const unmasteredCount = tabPool.filter(s => (state.progress[s.id] && state.progress[s.id].quizCorrect) !== true).length;
+    const umEl = document.getElementById('unmastered-count');
+    if (umEl) umEl.textContent = unmasteredCount;
 
     // 等級判定（綜合分數 0-100，依「全部 112 句」中已完成比例）
     const overallTotal = DEFAULT_SENTENCES.length;
@@ -2741,6 +2818,20 @@ function setupBatchControls() {
             updateStats();
         });
     });
+    // 範圍篩選：全部 / 只看還沒答對的
+    document.querySelectorAll('.filter-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const prev = state.batchFilter;
+            state.batchFilter = b.dataset.filter;
+            // 切到「只看還沒答對」時重新 seed，避免每次都看到同一批
+            if (state.batchFilter !== prev && state.batchMode === 'random') {
+                state.batchSeed = Date.now();
+            }
+            saveState();
+            renderSentences();
+            updateStats();
+        });
+    });
     // 自訂數字按 Enter
     const customInput = document.getElementById('batch-custom');
     if (customInput) {
@@ -2773,6 +2864,9 @@ function updateBatchUI() {
     });
     document.querySelectorAll('.mode-btn').forEach(b => {
         b.style.boxShadow = b.dataset.mode === state.batchMode ? '0 0 0 3px #FBBF24' : '';
+    });
+    document.querySelectorAll('.filter-btn').forEach(b => {
+        b.style.boxShadow = b.dataset.filter === state.batchFilter ? '0 0 0 3px #34D399' : '';
     });
     const customInput = document.getElementById('batch-custom');
     if (customInput && typeof state.batchSize === 'number' && ![10, 20, 30, 50].includes(state.batchSize)) {
