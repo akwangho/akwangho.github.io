@@ -148,6 +148,14 @@
             border-radius: 16px;
             overflow: hidden;
             aspect-ratio: 16 / 9;
+            width: 100%;
+        }
+        #player-wrap > iframe,
+        #player-wrap > #player {
+            position: absolute;
+            inset: 0;
+            width: 100% !important;
+            height: 100% !important;
         }
 
         /* 在拖曳時讓 iframe 不吃事件 */
