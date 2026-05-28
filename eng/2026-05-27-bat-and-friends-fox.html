@@ -435,13 +435,40 @@
             <h2 class="text-lg md:text-xl font-black text-pink-700 flex items-center gap-2">
                 <span>📚</span> The Chicks and the Fox 聽力＋閱讀
             </h2>
-            <p class="text-xs md:text-sm text-gray-500 mt-1">字幕來自官方 SRT。英文預設遮住：先聽 ▶，自評後揭曉，可 🔊 朗讀跟讀。完成 20 句拿星星！</p>
+            <p class="text-xs md:text-sm text-gray-500 mt-1">字幕來自官方 SRT，全片 112 句。可選 10/20/30/50/全部 句精聽。英文預設遮住：先聽 ▶，自評後揭曉，可 🔊 朗讀跟讀。</p>
         </div>
 
         <div id="chapter-tabs" class="mb-3 flex gap-2">
             <button data-tab="0" class="tab-btn flex-1 btn-soft btn-yellow text-sm active">🐣 故事 1</button>
             <button data-tab="1" class="tab-btn flex-1 btn-soft btn-peach text-sm">🦊 故事 2</button>
             <button data-tab="all" class="tab-btn flex-1 btn-soft btn-lav text-sm">全部</button>
+        </div>
+
+        <!-- 精聽數量選擇 -->
+        <div class="mb-3 bg-white rounded-2xl shadow p-3">
+            <div class="flex items-center flex-wrap gap-2 mb-2">
+                <span class="text-sm font-bold text-purple-700"><i class="fa-solid fa-list-ol"></i> 精聽數量</span>
+                <span class="text-xs text-gray-500" id="batch-info">—</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1">
+                <button data-batch="10" class="batch-btn btn-soft btn-lav text-xs">10 句</button>
+                <button data-batch="20" class="batch-btn btn-soft btn-lav text-xs">20 句</button>
+                <button data-batch="30" class="batch-btn btn-soft btn-lav text-xs">30 句</button>
+                <button data-batch="50" class="batch-btn btn-soft btn-lav text-xs">50 句</button>
+                <button data-batch="all" class="batch-btn btn-soft btn-lav text-xs">全部</button>
+                <span class="text-xs text-gray-500 ml-2">自訂</span>
+                <input id="batch-custom" type="number" min="1" max="999" placeholder="N"
+                    class="w-16 px-2 py-1 rounded-lg border border-purple-200 text-xs text-center" />
+                <button onclick="applyCustomBatch()" class="btn-soft btn-lav text-xs">套用</button>
+            </div>
+            <div class="flex flex-wrap items-center gap-1 mt-2">
+                <span class="text-xs text-gray-500">順序：</span>
+                <button data-mode="sequential" class="mode-btn btn-soft btn-yellow text-xs">📖 依字幕順序</button>
+                <button data-mode="random" class="mode-btn btn-soft btn-yellow text-xs">🎲 隨機</button>
+                <button onclick="reshuffleBatch()" class="btn-soft btn-pink text-xs ml-1" title="重新隨機抽選">
+                    <i class="fa-solid fa-shuffle"></i> 重新抽選
+                </button>
+            </div>
         </div>
 
         <div id="sentence-list" class="space-y-3 font-size-2 pb-12">
@@ -454,262 +481,288 @@
 
 <script>
 /* =========================================================
- *  資料：20 句（兩個故事各 10 句）
- *  英文與時間取自 SRT：The Chicks and the Fox (Bat and Friends)
- *  eng/sub/[English (auto-generated)] The Chicks and the Fox...
+ *  資料：112 句完整字幕（兩個故事）
+ *  英文與時間取自 SRT，破碎片段已手動合併成完整句
+ *  故事 1：The Thing in the Barn（57 句）
+ *  故事 2：The Fox is Coming（55 句）
  * ======================================================= */
 const VIDEO_ID = 'b-L-eY7boWA';
 
 const DEFAULT_SENTENCES = [
     // ===== 故事 1：The Thing in the Barn =====
-    {
-        id: 's1', chapter: 0,
-        en: "I saw something brown. Said Bat.",
-        zh: "我看到一個棕色的東西。蝙蝠說。",
-        start: 34.56, end: 39.32,
-        choices: [
-            "I saw something brown. Said Bat.",
-            "I saw something round. Said Bat.",
-            "Bat saw something brown.",
-            "I see something brown. Said Bat."
-        ]
-    },
-    {
-        id: 's2', chapter: 0,
-        en: "He went to Pig.",
-        zh: "他去找豬。",
-        start: 53.12, end: 56.48,
-        choices: [
-            "He went to Pig.",
-            "He went to tell Pig.",
-            "He went to Cow.",
-            "He wants to Pig."
-        ]
-    },
-    {
-        id: 's3', chapter: 0,
-        en: "I saw something brown and hard. Said Bat.",
-        zh: "我看到一個棕色又硬的東西。蝙蝠說。",
-        start: 57.16, end: 61.20,
-        choices: [
-            "I saw something brown and hard. Said Bat.",
-            "I saw something brown and soft. Said Bat.",
-            "I saw something round and hard. Said Bat.",
-            "Bat saw something brown and hard."
-        ]
-    },
-    {
-        id: 's4', chapter: 0,
-        en: "It is not a box. Said Bat.",
-        zh: "不是盒子。蝙蝠說。",
-        start: 74.36, end: 78.84,
-        choices: [
-            "It is not a box. Said Bat.",
-            "It is not a hat. Said Bat.",
-            "It is not a box. Said Pig.",
-            "It is a box. Said Bat."
-        ]
-    },
-    {
-        id: 's5', chapter: 0,
-        en: "I saw something in the barn. Said Bat.",
-        zh: "我在穀倉裡看到一個東西。蝙蝠說。",
-        start: 82.04, end: 85.56,
-        choices: [
-            "I saw something in the barn. Said Bat.",
-            "I saw something on the farm. Said Bat.",
-            "I saw something in the barn. Said Cat.",
-            "Bat saw something in the barn."
-        ]
-    },
-    {
-        id: 's6', chapter: 0,
-        en: "It is brown and hard and small.",
-        zh: "它是棕色、又硬、又小。",
-        start: 85.56, end: 90.08,
-        choices: [
-            "It is brown and hard and small.",
-            "It is brown and soft and small.",
-            "It is round and hard and small.",
-            "It is brown and hard and tall."
-        ]
-    },
-    {
-        id: 's7', chapter: 0,
-        en: "It is not a hat or a box.",
-        zh: "不是帽子，也不是盒子。",
-        start: 95.00, end: 99.44,
-        choices: [
-            "It is not a hat or a box.",
-            "It is not a hat or a rock.",
-            "It is a hat or a box.",
-            "It is not a cat or a box."
-        ]
-    },
-    {
-        id: 's8', chapter: 0,
-        en: "Bat went back to the barn.",
-        zh: "蝙蝠回到穀倉。",
-        start: 122.48, end: 126.64,
-        choices: [
-            "Bat went back to the barn.",
-            "Bat went back to the farm.",
-            "Cat went back to the barn.",
-            "Bat went into the barn."
-        ]
-    },
-    {
-        id: 's9', chapter: 0,
-        en: "What was this thing?",
-        zh: "這到底是什麼東西？",
-        start: 131.08, end: 134.92,
-        choices: [
-            "What was this thing?",
-            "Where was this thing?",
-            "What is this thing?",
-            "Who was this thing?"
-        ]
-    },
-    {
-        id: 's10', chapter: 0,
-        en: "It is a chick. Said Bat.",
-        zh: "是一隻小雞。蝙蝠說。",
-        start: 295.44, end: 299.76,
-        choices: [
-            "It is a chick. Said Bat.",
-            "It is a check. Said Bat.",
-            "It is a chick. Said Cat.",
-            "It is a chicken. Said Bat."
-        ]
-    },
+    // 每句的 choices：第 1 個為正確答案，其餘 3 個為手刻易混淆選項（最小對立詞、換說話者、時態變化等）
+    { id: 's1',  chapter: 0, en: "Little Fox.", zh: "小狐狸頻道。", start: 0.64, end: 3.64,
+      choices: ["Little Fox.", "Little Box.", "Little Cat.", "Little Foxes."] },
+    { id: 's2',  chapter: 0, en: "Bat saw something brown.", zh: "蝙蝠看到棕色的東西。", start: 10.60, end: 14.56,
+      choices: ["Bat saw something brown.", "Bat saw something round.", "Cat saw something brown.", "Bat sees something brown."] },
+    { id: 's3',  chapter: 0, en: "He went to tell Cow.", zh: "他去告訴牛。", start: 28.16, end: 31.88,
+      choices: ["He went to tell Cow.", "He went to tell Cat.", "He went to sell Cow.", "He wants to tell Cow."] },
+    { id: 's4',  chapter: 0, en: "I saw something brown. Said Bat.", zh: "我看到棕色的東西。蝙蝠說。", start: 34.56, end: 39.32,
+      choices: ["I saw something brown. Said Bat.", "I saw something round. Said Bat.", "I saw something brown. Said Cat.", "I see something brown. Said Bat."] },
+    { id: 's5',  chapter: 0, en: "Is it a hat? Said Cow.", zh: "是帽子嗎？牛說。", start: 39.92, end: 44.40,
+      choices: ["Is it a hat? Said Cow.", "Is it a cat? Said Cow.", "Is it a hat? Said Cat.", "Is that a hat? Said Cow."] },
+    { id: 's6',  chapter: 0, en: "It is not a hat. Said Bat.", zh: "不是帽子。蝙蝠說。", start: 48.36, end: 53.12,
+      choices: ["It is not a hat. Said Bat.", "It is not a cat. Said Bat.", "It is not a hat. Said Cat.", "It is a hat. Said Bat."] },
+    { id: 's7',  chapter: 0, en: "He went to Pig.", zh: "他去找豬。", start: 53.12, end: 56.48,
+      choices: ["He went to Pig.", "He went to Big.", "He went to Cow.", "He went with Pig."] },
+    { id: 's8',  chapter: 0, en: "I saw something brown and hard. Said Bat.", zh: "我看到棕色又硬的東西。蝙蝠說。", start: 57.16, end: 61.20,
+      choices: ["I saw something brown and hard. Said Bat.", "I saw something brown and round. Said Bat.", "I saw something round and hard. Said Bat.", "I saw something brown and hard. Said Cat."] },
+    { id: 's9',  chapter: 0, en: "It's not a hat.", zh: "不是帽子。", start: 61.20, end: 64.48,
+      choices: ["It's not a hat.", "It's not a cat.", "It is a hat.", "It was not a hat."] },
+    { id: 's10', chapter: 0, en: "Is it a box? Said Pig. A box is brown and hard.", zh: "是盒子嗎？豬說。盒子是棕色又硬的。", start: 65.16, end: 71.64,
+      choices: ["Is it a box? Said Pig. A box is brown and hard.", "Is it a fox? Said Pig. A fox is brown and hard.", "Is it a box? Said Pig. A box is round and hard.", "Is it a box? Said Big. A box is brown and hard."] },
+    { id: 's11', chapter: 0, en: "It is not a box. Said Bat.", zh: "不是盒子。蝙蝠說。", start: 74.36, end: 78.84,
+      choices: ["It is not a box. Said Bat.", "It is not a fox. Said Bat.", "It is not a box. Said Cat.", "It is a box. Said Bat."] },
+    { id: 's12', chapter: 0, en: "Bat went to Cat.", zh: "蝙蝠去找貓。", start: 78.84, end: 82.04,
+      choices: ["Bat went to Cat.", "Bat went to Cow.", "Cat went to Bat.", "Bat went with Cat."] },
+    { id: 's13', chapter: 0, en: "I saw something in the barn. Said Bat.", zh: "我在穀倉裡看到一個東西。蝙蝠說。", start: 82.04, end: 85.56,
+      choices: ["I saw something in the barn. Said Bat.", "I saw something in the farm. Said Bat.", "I saw something in the barn. Said Cat.", "I see something in the barn. Said Bat."] },
+    { id: 's14', chapter: 0, en: "It is brown and hard and small.", zh: "它是棕色、又硬、又小。", start: 85.56, end: 90.08,
+      choices: ["It is brown and hard and small.", "It is brown and hard and tall.", "It is round and hard and small.", "It was brown and hard and small."] },
+    { id: 's15', chapter: 0, en: "It is not a hat or a box.", zh: "不是帽子,也不是盒子。", start: 95.00, end: 99.44,
+      choices: ["It is not a hat or a box.", "It is not a hat or a rock.", "It is not a cat or a box.", "It is a hat or a box."] },
+    { id: 's16', chapter: 0, en: "Is it a rock? Said Cat.", zh: "是石頭嗎？貓說。", start: 100.84, end: 104.44,
+      choices: ["Is it a rock? Said Cat.", "Is it a sock? Said Cat.", "Is it a rock? Said Cow.", "It is a rock. Said Cat."] },
+    { id: 's17', chapter: 0, en: "A rock is brown and hard.", zh: "石頭是棕色又硬的。", start: 104.44, end: 107.84,
+      choices: ["A rock is brown and hard.", "A rock is round and hard.", "A box is brown and hard.", "A rock was brown and hard."] },
+    { id: 's18', chapter: 0, en: "A rock can be small, too. Cat said.", zh: "石頭也可以是小的。貓說。", start: 107.84, end: 113.28,
+      choices: ["A rock can be small, too. Cat said.", "A rock can be small, too. Cow said.", "A rock can be tall, too. Cat said.", "A box can be small, too. Cat said."] },
+    { id: 's19', chapter: 0, en: "It is not a rock. Said Bat.", zh: "不是石頭。蝙蝠說。", start: 114.00, end: 119.04,
+      choices: ["It is not a rock. Said Bat.", "It is not a sock. Said Bat.", "It is not a rock. Said Cat.", "It is a rock. Said Bat."] },
+    { id: 's20', chapter: 0, en: "Bat went back to the barn.", zh: "蝙蝠回到穀倉。", start: 122.48, end: 126.64,
+      choices: ["Bat went back to the barn.", "Bat went back to the farm.", "Cat went back to the barn.", "Bat went into the barn."] },
+    { id: 's21', chapter: 0, en: "What was this thing?", zh: "這到底是什麼東西？", start: 131.08, end: 134.92,
+      choices: ["What was this thing?", "What is this thing?", "Where was this thing?", "Who was this thing?"] },
+    { id: 's22', chapter: 0, en: "Come look at this thing. Said Bat.", zh: "來看看這個東西。蝙蝠說。", start: 145.72, end: 149.64,
+      choices: ["Come look at this thing. Said Bat.", "Come look at that thing. Said Bat.", "Come look at this thing. Said Cat.", "Look at this thing! Said Bat."] },
+    { id: 's23', chapter: 0, en: "It is not a hat. It is not a box. It is not a rock. Said Bat.", zh: "不是帽子、不是盒子、也不是石頭。蝙蝠說。", start: 149.64, end: 157.40,
+      choices: ["It is not a hat. It is not a box. It is not a rock. Said Bat.", "It is not a cat. It is not a box. It is not a rock. Said Bat.", "It is not a hat. It is not a fox. It is not a rock. Said Bat.", "It is not a hat. It is not a box. It is not a sock. Said Bat."] },
+    { id: 's24', chapter: 0, en: "It is brown. It is hard. And it is small. Said Bat.", zh: "它是棕色的、是硬的、而且是小的。蝙蝠說。", start: 157.40, end: 164.16,
+      choices: ["It is brown. It is hard. And it is small. Said Bat.", "It is brown. It is hard. And it is tall. Said Bat.", "It is round. It is hard. And it is small. Said Bat.", "It was brown. It was hard. And it was small. Said Bat."] },
+    { id: 's25', chapter: 0, en: "Can you tell me what it is?", zh: "你可以告訴我這是什麼嗎？", start: 164.16, end: 167.68,
+      choices: ["Can you tell me what it is?", "Can you tell me where it is?", "Can you sell me what it is?", "Will you tell me what it is?"] },
+    { id: 's26', chapter: 0, en: "They all went into the barn.", zh: "大家都進到穀倉裡。", start: 173.96, end: 178.08,
+      choices: ["They all went into the barn.", "They all went into the farm.", "They all went out of the barn.", "They all run into the barn."] },
+    { id: 's27', chapter: 0, en: "The thing is over there. Said Bat.", zh: "那個東西在那邊。蝙蝠說。", start: 178.16, end: 182.64,
+      choices: ["The thing is over there. Said Bat.", "The thing is over here. Said Bat.", "The thing is over there. Said Cat.", "The thing was over there. Said Bat."] },
+    { id: 's28', chapter: 0, en: "They went to the spot.", zh: "他們走到那個地方。", start: 183.04, end: 186.52,
+      choices: ["They went to the spot.", "They went to the spots.", "They got to the spot.", "They went to the top."] },
+    { id: 's29', chapter: 0, en: "They looked at the thing.", zh: "他們看著那個東西。", start: 186.52, end: 189.24,
+      choices: ["They looked at the thing.", "They looked at the things.", "They look at the thing.", "They walked to the thing."] },
+    { id: 's30', chapter: 0, en: "You said the thing is brown. Said Cow.", zh: "你說那個東西是棕色的。牛說。", start: 189.24, end: 193.64,
+      choices: ["You said the thing is brown. Said Cow.", "You said the thing is round. Said Cow.", "You said the thing is brown. Said Cat.", "You said the thing was brown. Said Cow."] },
+    { id: 's31', chapter: 0, en: "This thing is not brown.", zh: "這個東西不是棕色的。", start: 193.64, end: 197.64,
+      choices: ["This thing is not brown.", "This thing is not round.", "That thing is not brown.", "This thing is brown."] },
+    { id: 's32', chapter: 0, en: "You said the thing is hard.", zh: "你說那個東西是硬的。", start: 199.84, end: 203.00,
+      choices: ["You said the thing is hard.", "You said the thing is hot.", "You said the thing was hard.", "You said the things are hard."] },
+    { id: 's33', chapter: 0, en: "This thing is not hard. Said Pig.", zh: "這個東西不是硬的。豬說。", start: 203.00, end: 206.68,
+      choices: ["This thing is not hard. Said Pig.", "This thing is not hot. Said Pig.", "This thing is not hard. Said Big.", "That thing is not hard. Said Pig."] },
+    { id: 's34', chapter: 0, en: "You said the thing is small. Said Cat.", zh: "你說那個東西是小的。貓說。", start: 206.68, end: 210.84,
+      choices: ["You said the thing is small. Said Cat.", "You said the thing is tall. Said Cat.", "You said the thing is small. Said Cow.", "You said the things are small. Said Cat."] },
+    { id: 's35', chapter: 0, en: "You are right. This thing is very small.", zh: "你說對了。這個東西非常小。", start: 210.84, end: 216.60,
+      choices: ["You are right. This thing is very small.", "You are right. This thing is very tall.", "You were right. This thing is very small.", "You are right. That thing is very small."] },
+    { id: 's36', chapter: 0, en: "Bat flew over.", zh: "蝙蝠飛過去。", start: 217.80, end: 221.12,
+      choices: ["Bat flew over.", "Bat flew up.", "Cat flew over.", "Bat flew under."] },
+    { id: 's37', chapter: 0, en: "He looked at the thing again.", zh: "他又看了一次那個東西。", start: 225.12, end: 228.88,
+      choices: ["He looked at the thing again.", "He looked at the things again.", "He looks at the thing again.", "She looked at the thing again."] },
+    { id: 's38', chapter: 0, en: "But where is the thing I saw? Said Bat.", zh: "但是我看到的東西在哪？蝙蝠說。", start: 231.24, end: 236.40,
+      choices: ["But where is the thing I saw? Said Bat.", "But where is the thing I see? Said Bat.", "But where was the thing I saw? Said Bat.", "But where is the thing you saw? Said Bat."] },
+    { id: 's39', chapter: 0, en: "I do not see it now.", zh: "我現在看不到它了。", start: 236.80, end: 240.48,
+      choices: ["I do not see it now.", "I do not see it here.", "I did not see it now.", "I do not see them now."] },
+    { id: 's40', chapter: 0, en: "Bat looked and looked.", zh: "蝙蝠一直看、一直看。", start: 248.00, end: 251.96,
+      choices: ["Bat looked and looked.", "Bat looks and looks.", "Cat looked and looked.", "Bat walked and walked."] },
+    { id: 's41', chapter: 0, en: "The thing that was brown and hard was not there.", zh: "那個棕色又硬的東西不見了。", start: 259.72, end: 264.92,
+      choices: ["The thing that was brown and hard was not there.", "The thing that was round and hard was not there.", "The thing that was brown and hard was not here.", "The thing that is brown and hard is not there."] },
+    { id: 's42', chapter: 0, en: "This thing was yellow.", zh: "這個東西是黃色的。", start: 269.44, end: 273.12,
+      choices: ["This thing was yellow.", "This thing is yellow.", "This thing was mellow.", "That thing was yellow."] },
+    { id: 's43', chapter: 0, en: "This thing was soft.", zh: "這個東西是軟的。", start: 275.84, end: 279.52,
+      choices: ["This thing was soft.", "This thing was small.", "This thing is soft.", "That thing was soft."] },
+    { id: 's44', chapter: 0, en: "The thing made a sound. It said...", zh: "那個東西發出聲音,它說...", start: 280.44, end: 286.16,
+      choices: ["The thing made a sound. It said...", "The thing made a song. It said...", "The thing made a sound. He said...", "The thing makes a sound. It said..."] },
+    { id: 's45', chapter: 0, en: "Cat said, Bat, what is this thing?", zh: "貓說：蝙蝠,這是什麼東西？", start: 290.40, end: 295.44,
+      choices: ["Cat said, Bat, what is this thing?", "Cat said, Bat, where is this thing?", "Cow said, Bat, what is this thing?", "Cat said, Bat, what was this thing?"] },
+    { id: 's46', chapter: 0, en: "It is a chick. Said Bat.", zh: "是一隻小雞。蝙蝠說。", start: 295.44, end: 299.76,
+      choices: ["It is a chick. Said Bat.", "It is a check. Said Bat.", "It is a chick. Said Cat.", "It is a chicken. Said Bat."] },
+    { id: 's47', chapter: 0, en: "It is a soft yellow chick.", zh: "是一隻軟軟的黃色小雞。", start: 299.76, end: 304.12,
+      choices: ["It is a soft yellow chick.", "It is a soft yellow chip.", "It is a small yellow chick.", "It is a soft yellow chair."] },
+    { id: 's48', chapter: 0, en: "I found it. Said Bat.", zh: "是我發現的。蝙蝠說。", start: 306.08, end: 308.96,
+      choices: ["I found it. Said Bat.", "I found it. Said Cat.", "I find it. Said Bat.", "I found them. Said Bat."] },
+    { id: 's49', chapter: 0, en: "So it is mine. Right?", zh: "所以它是我的,對嗎？", start: 308.96, end: 313.24,
+      choices: ["So it is mine. Right?", "So it was mine. Right?", "So it is yours. Right?", "So it is mine. Yes?"] },
+    { id: 's50', chapter: 0, en: "No. Said Cow.", zh: "不對。牛說。", start: 317.88, end: 321.84,
+      choices: ["No. Said Cow.", "No. Said Cat.", "Now. Said Cow.", "Know. Said Cow."] },
+    { id: 's51', chapter: 0, en: "The chick must go to its mother.", zh: "小雞必須回到媽媽身邊。", start: 321.84, end: 326.20,
+      choices: ["The chick must go to its mother.", "The chick must go to its brother.", "The chick must come to its mother.", "The chicks must go to their mother."] },
+    { id: 's52', chapter: 0, en: "But you have something, too. Said Cow.", zh: "但是你也有得到一樣東西。牛說。", start: 355.04, end: 360.24,
+      choices: ["But you have something, too. Said Cow.", "But you had something, too. Said Cow.", "But you have something, too. Said Cat.", "But you have something new. Said Cow."] },
+    { id: 's53', chapter: 0, en: "What do I have? Said Bat.", zh: "我有什麼？蝙蝠說。", start: 360.80, end: 364.16,
+      choices: ["What do I have? Said Bat.", "What did I have? Said Bat.", "What do I see? Said Bat.", "What do I have? Said Cat."] },
+    { id: 's54', chapter: 0, en: "You have a story. Said Cow.", zh: "你有一個故事。牛說。", start: 364.16, end: 367.40,
+      choices: ["You have a story. Said Cow.", "You have a story. Said Cat.", "You had a story. Said Cow.", "You have a storm. Said Cow."] },
+    { id: 's55', chapter: 0, en: "It is about the thing in the barn.", zh: "是關於穀倉裡那個東西的故事。", start: 367.40, end: 371.76,
+      choices: ["It is about the thing in the barn.", "It is about the things in the barn.", "It is about the thing in the farm.", "It was about the thing in the barn."] },
+    { id: 's56', chapter: 0, en: "You can tell this story to your friends.", zh: "你可以把這個故事說給朋友聽。", start: 372.20, end: 376.96,
+      choices: ["You can tell this story to your friends.", "You can tell that story to your friends.", "You can sell this story to your friends.", "You will tell this story to your friends."] },
+    { id: 's57', chapter: 0, en: "And that is what Bat did.", zh: "蝙蝠就是這樣做的。", start: 382.88, end: 387.24,
+      choices: ["And that is what Bat did.", "And this is what Bat did.", "And that is what Cat did.", "And that is what Bat does."] },
 
     // ===== 故事 2：The Fox is Coming =====
-    {
-        id: 's11', chapter: 1,
-        en: "Bat flew into the barn.",
-        zh: "蝙蝠飛進穀倉。",
-        start: 434.00, end: 437.76,
-        choices: [
-            "Bat flew into the barn.",
-            "Bat flew over the barn.",
-            "Cat flew into the barn.",
-            "Bat flew into the farm."
-        ]
-    },
-    {
-        id: 's12', chapter: 1,
-        en: "A fox is coming. He said.",
-        zh: "有狐狸要來了。他說。",
-        start: 438.40, end: 442.24,
-        choices: [
-            "A fox is coming. He said.",
-            "A box is coming. He said.",
-            "A fox is going. He said.",
-            "The fox is coming. She said."
-        ]
-    },
-    {
-        id: 's13', chapter: 1,
-        en: "Cat woke up.",
-        zh: "貓醒來了。",
-        start: 442.24, end: 445.32,
-        choices: [
-            "Cat woke up.",
-            "Cow woke up.",
-            "Cat wakes up.",
-            "Cat went up."
-        ]
-    },
-    {
-        id: 's14', chapter: 1,
-        en: "Pig ran into the barn.",
-        zh: "豬跑進穀倉。",
-        start: 453.44, end: 456.96,
-        choices: [
-            "Pig ran into the barn.",
-            "Pig ran into the farm.",
-            "Cat ran into the barn.",
-            "Pig runs into the barn."
-        ]
-    },
-    {
-        id: 's15', chapter: 1,
-        en: "The fox will see the hen house. Said Pig.",
-        zh: "狐狸會看到雞舍。豬說。",
-        start: 473.16, end: 477.48,
-        choices: [
-            "The fox will see the hen house. Said Pig.",
-            "The fox will see the barn. Said Pig.",
-            "The box will see the hen house. Said Pig.",
-            "The fox will eat the hen house. Said Pig."
-        ]
-    },
-    {
-        id: 's16', chapter: 1,
-        en: "It will eat the hens.",
-        zh: "牠會把母雞吃掉。",
-        start: 477.48, end: 481.36,
-        choices: [
-            "It will eat the hens.",
-            "It will see the hens.",
-            "It will eat the eggs.",
-            "They will eat the hens."
-        ]
-    },
-    {
-        id: 's17', chapter: 1,
-        en: "Dog is sick today.",
-        zh: "狗今天生病了。",
-        start: 491.72, end: 494.00,
-        choices: [
-            "Dog is sick today.",
-            "Dog is fine today.",
-            "Cow is sick today.",
-            "Dog was sick today."
-        ]
-    },
-    {
-        id: 's18', chapter: 1,
-        en: "We can stop the fox. Said Bat.",
-        zh: "我們可以阻止狐狸。蝙蝠說。",
-        start: 498.08, end: 501.68,
-        choices: [
-            "We can stop the fox. Said Bat.",
-            "We can stop the box. Said Bat.",
-            "We can hide the fox. Said Bat.",
-            "We can stop the fox. Said Cat."
-        ]
-    },
-    {
-        id: 's19', chapter: 1,
-        en: "Soon, the fox will be here. Said Bat.",
-        zh: "很快狐狸就要來了。蝙蝠說。",
-        start: 570.16, end: 573.92,
-        choices: [
-            "Soon, the fox will be here. Said Bat.",
-            "Soon, the fox will be gone. Said Bat.",
-            "Now, the fox will be here. Said Bat.",
-            "Soon, the box will be here. Said Bat."
-        ]
-    },
-    {
-        id: 's20', chapter: 1,
-        en: "\"We did it!\" cried Pig.",
-        zh: "「我們做到了！」豬大喊。",
-        start: 706.76, end: 710.68,
-        choices: [
-            "\"We did it!\" cried Pig.",
-            "\"We did it!\" cried Bat.",
-            "\"We hid it!\" cried Pig.",
-            "\"We did it!\" said Pig."
-        ]
-    }
+    { id: 's58', chapter: 1, en: "Bat flew over the barn.", zh: "蝙蝠飛過穀倉。", start: 418.64, end: 421.92,
+      choices: ["Bat flew over the barn.", "Bat flew over the farm.", "Cat flew over the barn.", "Bat flew under the barn."] },
+    { id: 's59', chapter: 1, en: "He saw a fox.", zh: "他看到一隻狐狸。", start: 421.92, end: 425.40,
+      choices: ["He saw a fox.", "He saw a box.", "He saw an ox.", "He sees a fox."] },
+    { id: 's60', chapter: 1, en: "Bat flew into the barn.", zh: "蝙蝠飛進穀倉。", start: 434.00, end: 437.76,
+      choices: ["Bat flew into the barn.", "Bat flew over the barn.", "Cat flew into the barn.", "Bat flew into the farm."] },
+    { id: 's61', chapter: 1, en: "A fox is coming. He said.", zh: "有狐狸要來了。他說。", start: 438.40, end: 442.24,
+      choices: ["A fox is coming. He said.", "A box is coming. He said.", "A fox is going. He said.", "A fox is coming. She said."] },
+    { id: 's62', chapter: 1, en: "Cat woke up.", zh: "貓醒過來。", start: 442.24, end: 445.32,
+      choices: ["Cat woke up.", "Cow woke up.", "Cat woke me up.", "Cat went up."] },
+    { id: 's63', chapter: 1, en: "A fox is coming? She asked.", zh: "狐狸要來了？她問。", start: 445.84, end: 450.24,
+      choices: ["A fox is coming? She asked.", "A box is coming? She asked.", "A fox is going? She asked.", "A fox is coming? He asked."] },
+    { id: 's64', chapter: 1, en: "Pig ran into the barn.", zh: "豬跑進穀倉。", start: 450.24, end: 453.44,
+      choices: ["Pig ran into the barn.", "Pig ran into the farm.", "Big ran into the barn.", "Pig runs into the barn."] },
+    { id: 's65', chapter: 1, en: "A fox is coming? He asked.", zh: "狐狸要來了？他問。", start: 453.44, end: 456.96,
+      choices: ["A fox is coming? He asked.", "A box is coming? He asked.", "A fox is going? He asked.", "A fox is coming? She asked."] },
+    { id: 's66', chapter: 1, en: "Yes. Said Bat. A fox is coming to our farm.", zh: "是的。蝙蝠說。有狐狸要來我們的農場。", start: 456.96, end: 464.20,
+      choices: ["Yes. Said Bat. A fox is coming to our farm.", "Yes. Said Cat. A fox is coming to our farm.", "Yes. Said Bat. A fox is coming to our barn.", "Yes. Said Bat. A box is coming to our farm."] },
+    { id: 's67', chapter: 1, en: "Oh, no. Said Cat. We must do something.", zh: "喔不！貓說。我們必須做點什麼。", start: 467.24, end: 473.16,
+      choices: ["Oh, no. Said Cat. We must do something.", "Oh, no. Said Cow. We must do something.", "Oh, no. Said Cat. We must do nothing.", "Oh, no. Said Cat. We must say something."] },
+    { id: 's68', chapter: 1, en: "The fox will see the hen house. Said Pig.", zh: "狐狸會看到雞舍。豬說。", start: 473.16, end: 477.48,
+      choices: ["The fox will see the hen house. Said Pig.", "The fox will eat the hen house. Said Pig.", "The box will see the hen house. Said Pig.", "The fox will see the hen house. Said Big."] },
+    { id: 's69', chapter: 1, en: "It will eat the hens.", zh: "牠會吃掉母雞。", start: 477.48, end: 481.36,
+      choices: ["It will eat the hens.", "It will eat the hen.", "It will eat the eggs.", "It will see the hens."] },
+    { id: 's70', chapter: 1, en: "Let's get Dog. Said Cat. He will scare the fox away.", zh: "我們去找狗。貓說。他會把狐狸嚇走。", start: 482.04, end: 488.80,
+      choices: ["Let's get Dog. Said Cat. He will scare the fox away.", "Let's get Dog. Said Cow. He will scare the fox away.", "Let's get Dog. Said Cat. He will share the fox away.", "Let's get Dog. Said Cat. He will scare the box away."] },
+    { id: 's71', chapter: 1, en: "No. Said Cow. Dog is sick today.", zh: "不行。牛說。狗今天生病了。", start: 488.80, end: 494.00,
+      choices: ["No. Said Cow. Dog is sick today.", "No. Said Cat. Dog is sick today.", "No. Said Cow. Dog was sick today.", "No. Said Cow. Dog is sick now."] },
+    { id: 's72', chapter: 1, en: "We must let him sleep.", zh: "我們必須讓他睡覺。", start: 494.00, end: 497.68,
+      choices: ["We must let him sleep.", "We must let her sleep.", "We can let him sleep.", "We must let him sleeps."] },
+    { id: 's73', chapter: 1, en: "We can stop the fox. Said Bat. I know what to do.", zh: "我們可以擋下狐狸。蝙蝠說。我知道怎麼做。", start: 498.08, end: 505.00,
+      choices: ["We can stop the fox. Said Bat. I know what to do.", "We can stop the box. Said Bat. I know what to do.", "We can stop the fox. Said Cat. I know what to do.", "We can stop the fox. Said Bat. I know how to do."] },
+    { id: 's74', chapter: 1, en: "Pig looked at Bat.", zh: "豬看著蝙蝠。", start: 518.40, end: 521.88,
+      choices: ["Pig looked at Bat.", "Pig looks at Bat.", "Pig looked at Cat.", "Big looked at Bat."] },
+    { id: 's75', chapter: 1, en: "Cat looked at Bat. Cow looked at Bat.", zh: "貓看著蝙蝠。牛看著蝙蝠。", start: 523.20, end: 528.64,
+      choices: ["Cat looked at Bat. Cow looked at Bat.", "Cat looked at Cow. Cow looked at Bat.", "Cow looked at Bat. Cat looked at Bat.", "Cat looked at Bat. Cat looked at Bat."] },
+    { id: 's76', chapter: 1, en: "The fox is coming. Said Pig.", zh: "狐狸要來了。豬說。", start: 528.64, end: 532.00,
+      choices: ["The fox is coming. Said Pig.", "The fox was coming. Said Pig.", "The fox is coming. Said Big.", "The box is coming. Said Pig."] },
+    { id: 's77', chapter: 1, en: "We have to do something. Said Cat.", zh: "我們必須做點什麼。貓說。", start: 532.00, end: 537.44,
+      choices: ["We have to do something. Said Cat.", "We have to do nothing. Said Cat.", "We had to do something. Said Cat.", "We have to do something. Said Cow."] },
+    { id: 's78', chapter: 1, en: "We can hide. Said Bat.", zh: "我們可以躲起來。蝙蝠說。", start: 539.76, end: 542.88,
+      choices: ["We can hide. Said Bat.", "We can ride. Said Bat.", "We can hide. Said Cat.", "We can't hide. Said Bat."] },
+    { id: 's79', chapter: 1, en: "Cow, you hide behind the hen house.", zh: "牛,你躲在雞舍後面。", start: 542.88, end: 547.44,
+      choices: ["Cow, you hide behind the hen house.", "Cow, you hide behind the barn house.", "Cat, you hide behind the hen house.", "Cow, you go behind the hen house."] },
+    { id: 's80', chapter: 1, en: "Pig, you hide behind the tractor.", zh: "豬,你躲在牽引機後面。", start: 548.28, end: 551.52,
+      choices: ["Pig, you hide behind the tractor.", "Pig, you hide behind the actor.", "Big, you hide behind the tractor.", "Pig, you go behind the tractor."] },
+    { id: 's81', chapter: 1, en: "Cat, you hide behind the windmill.", zh: "貓,你躲在風車後面。", start: 551.52, end: 555.44,
+      choices: ["Cat, you hide behind the windmill.", "Cat, you hide behind the wind.", "Cow, you hide behind the windmill.", "Cat, you go behind the windmill."] },
+    { id: 's82', chapter: 1, en: "Where will you go? Cow asked Bat.", zh: "你要去哪裡？牛問蝙蝠。", start: 555.44, end: 559.04,
+      choices: ["Where will you go? Cow asked Bat.", "Where will you go? Cat asked Bat.", "Where do you go? Cow asked Bat.", "Where will you go? Cow asked Cat."] },
+    { id: 's83', chapter: 1, en: "I will go to an apple tree. Said Bat.", zh: "我要飛到一棵蘋果樹上。蝙蝠說。", start: 559.04, end: 563.96,
+      choices: ["I will go to an apple tree. Said Bat.", "I will go to an apple tree. Said Cat.", "I will fly to an apple tree. Said Bat.", "I will go to a maple tree. Said Bat."] },
+    { id: 's84', chapter: 1, en: "Soon, the fox will be here. Said Bat.", zh: "狐狸很快就要到了。蝙蝠說。", start: 570.16, end: 573.92,
+      choices: ["Soon, the fox will be here. Said Bat.", "Soon, the fox will be gone. Said Bat.", "Now, the fox will be here. Said Bat.", "Soon, the box will be here. Said Bat."] },
+    { id: 's85', chapter: 1, en: "And we will make some noise.", zh: "然後我們要發出聲音。", start: 573.92, end: 577.80,
+      choices: ["And we will make some noise.", "And we can make some noise.", "And we will take some noise.", "And we will make some toys."] },
+    { id: 's86', chapter: 1, en: "So Cow went to the hen house.", zh: "於是牛去了雞舍。", start: 580.80, end: 584.96,
+      choices: ["So Cow went to the hen house.", "So Cow went to the barn house.", "So Cat went to the hen house.", "So Cow goes to the hen house."] },
+    { id: 's87', chapter: 1, en: "Pig went to the tractor.", zh: "豬去了牽引機。", start: 590.76, end: 594.52,
+      choices: ["Pig went to the tractor.", "Pig went to the actor.", "Big went to the tractor.", "Pig goes to the tractor."] },
+    { id: 's88', chapter: 1, en: "Cat went to the windmill.", zh: "貓去了風車。", start: 595.52, end: 599.08,
+      choices: ["Cat went to the windmill.", "Cat went to the wind.", "Cow went to the windmill.", "Cat goes to the windmill."] },
+    { id: 's89', chapter: 1, en: "Bat flew to an apple tree.", zh: "蝙蝠飛到一棵蘋果樹上。", start: 600.12, end: 604.16,
+      choices: ["Bat flew to an apple tree.", "Cat flew to an apple tree.", "Bat flew to a maple tree.", "Bat flew to an apple."] },
+    { id: 's90', chapter: 1, en: "They all waited.", zh: "他們都在等。", start: 608.28, end: 611.76,
+      choices: ["They all waited.", "They all walked.", "They all wait.", "They all watched."] },
+    { id: 's91', chapter: 1, en: "They waited for the fox to come.", zh: "他們等狐狸來。", start: 617.04, end: 621.32,
+      choices: ["They waited for the fox to come.", "They waited for the box to come.", "They waited for the fox to go.", "They wait for the fox to come."] },
+    { id: 's92', chapter: 1, en: "Bat watched from the apple tree. Cow watched from the hen house.", zh: "蝙蝠在蘋果樹上看。牛在雞舍那邊看。", start: 625.36, end: 631.80,
+      choices: ["Bat watched from the apple tree. Cow watched from the hen house.", "Cat watched from the apple tree. Cow watched from the hen house.", "Bat watched from the maple tree. Cow watched from the hen house.", "Bat watched from the apple tree. Cow watched from the barn house."] },
+    { id: 's93', chapter: 1, en: "Pig watched from the tractor.", zh: "豬在牽引機那邊看。", start: 631.80, end: 635.12,
+      choices: ["Pig watched from the tractor.", "Pig watched from the actor.", "Big watched from the tractor.", "Pig watches from the tractor."] },
+    { id: 's94', chapter: 1, en: "Cat watched from the windmill.", zh: "貓在風車那邊看。", start: 635.12, end: 638.84,
+      choices: ["Cat watched from the windmill.", "Cat watched from the wind.", "Cow watched from the windmill.", "Cat watches from the windmill."] },
+    { id: 's95', chapter: 1, en: "At last, the fox came.", zh: "最後,狐狸來了。", start: 639.64, end: 642.68,
+      choices: ["At last, the fox came.", "At first, the fox came.", "At last, the box came.", "At last, the fox ran."] },
+    { id: 's96', chapter: 1, en: "It looked all around.", zh: "牠四處張望。", start: 642.68, end: 646.04,
+      choices: ["It looked all around.", "It looks all around.", "It looked all about.", "It looked at the ground."] },
+    { id: 's97', chapter: 1, en: "Then it went to the hen house.", zh: "然後牠走向雞舍。", start: 650.24, end: 653.80,
+      choices: ["Then it went to the hen house.", "Then it went to the barn house.", "Then it ran to the hen house.", "Then it went into the hen house."] },
+    { id: 's98', chapter: 1, en: "\"Now!\" cried Bat.", zh: "「就是現在！」蝙蝠大喊。", start: 658.96, end: 662.96,
+      choices: ["\"Now!\" cried Bat.", "\"Now!\" cried Cat.", "\"No!\" cried Bat.", "\"Now!\" said Bat."] },
+    { id: 's99', chapter: 1, en: "Bat swooped down at the fox.", zh: "蝙蝠俯衝向狐狸。", start: 663.56, end: 666.839,
+      choices: ["Bat swooped down at the fox.", "Bat swooped down at the box.", "Cat swooped down at the fox.", "Bat swept down at the fox."] },
+    { id: 's100', chapter: 1, en: "Cat hissed at the fox.", zh: "貓對著狐狸發出嘶聲。", start: 666.839, end: 670.48,
+      choices: ["Cat hissed at the fox.", "Cat hissed at the box.", "Cat kissed at the fox.", "Cow hissed at the fox."] },
+    { id: 's101', chapter: 1, en: "Pig oinked at the fox.", zh: "豬對著狐狸哼叫。", start: 670.88, end: 674.68,
+      choices: ["Pig oinked at the fox.", "Pig oinked at the box.", "Big oinked at the fox.", "Pig linked at the fox."] },
+    { id: 's102', chapter: 1, en: "Cow mooed at the fox.", zh: "牛對著狐狸哞叫。", start: 676.16, end: 679.96,
+      choices: ["Cow mooed at the fox.", "Cow mooed at the box.", "Cat mooed at the fox.", "Cow moved at the fox."] },
+    { id: 's103', chapter: 1, en: "Then they all did it again.", zh: "然後他們又做了一次。", start: 680.96, end: 684.48,
+      choices: ["Then they all did it again.", "Then they all do it again.", "Then they all did it once.", "Then they did it all again."] },
+    { id: 's104', chapter: 1, en: "Swoop! Hiss! Oink! Moo!", zh: "咻！嘶！哼！哞！", start: 688.28, end: 696.00,
+      choices: ["Swoop! Hiss! Oink! Moo!", "Swoop! Hiss! Moo! Oink!", "Swoop! Kiss! Oink! Moo!", "Sweep! Hiss! Oink! Moo!"] },
+    { id: 's105', chapter: 1, en: "The fox ran fast. The fox ran far.", zh: "狐狸跑得很快。狐狸跑得很遠。", start: 697.56, end: 703.40,
+      choices: ["The fox ran fast. The fox ran far.", "The fox ran far. The fox ran fast.", "The fox ran fast. The fox ran fat.", "The box ran fast. The fox ran far."] },
+    { id: 's106', chapter: 1, en: "\"We did it!\" cried Pig.", zh: "「我們成功了！」豬大喊。", start: 706.76, end: 710.68,
+      choices: ["\"We did it!\" cried Pig.", "\"We did it!\" cried Bat.", "\"We hid it!\" cried Pig.", "\"We did it!\" said Pig."] },
+    { id: 's107', chapter: 1, en: "The noise was loud.", zh: "聲音很大。", start: 716.839, end: 719.88,
+      choices: ["The noise was loud.", "The noise was loaded.", "The voice was loud.", "The noise is loud."] },
+    { id: 's108', chapter: 1, en: "It woke up Dog.", zh: "牠把狗吵醒。", start: 719.88, end: 723.16,
+      choices: ["It woke up Dog.", "It woke up Cat.", "It woke up Doug.", "It wakes up Dog."] },
+    { id: 's109', chapter: 1, en: "\"You were sleeping.\" said Cat.", zh: "「你剛剛在睡覺。」貓說。", start: 731.12, end: 734.12,
+      choices: ["\"You were sleeping.\" said Cat.", "\"You were sleeping.\" said Cow.", "\"You are sleeping.\" said Cat.", "\"You were sleeping.\" said Bat."] },
+    { id: 's110', chapter: 1, en: "\"So?\" \"We watched the farm.\" said Pig.", zh: "「那又怎樣？」「我們幫你看著農場。」豬說。", start: 734.12, end: 739.44,
+      choices: ["\"So?\" \"We watched the farm.\" said Pig.", "\"So?\" \"We watched the barn.\" said Pig.", "\"So?\" \"We watched the farm.\" said Big.", "\"Show?\" \"We watched the farm.\" said Pig."] },
+    { id: 's111', chapter: 1, en: "\"Thank you.\" said Dog.", zh: "「謝謝你們。」狗說。", start: 739.44, end: 743.40,
+      choices: ["\"Thank you.\" said Dog.", "\"Thank you.\" said Doug.", "\"Thanks.\" said Dog.", "\"Thank you.\" said Cat."] },
+    { id: 's112', chapter: 1, en: "He felt much better now.", zh: "他現在感覺好多了。", start: 744.80, end: 748.40,
+      choices: ["He felt much better now.", "He felt much better here.", "He feels much better now.", "She felt much better now."] },
 ];
+
+/* ---- 四選一：自動生成（依長度相近、同章節，種子穩定） ---- */
+function hashCode(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) {
+        h = ((h << 5) - h) + str.charCodeAt(i);
+        h |= 0;
+    }
+    return h >>> 0;
+}
+function mulberry32(seed) {
+    return function () {
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+function seededShuffle(arr, seed) {
+    const a = [...arr];
+    const rnd = mulberry32(seed);
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(rnd() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+function getChoicesFor(sentence) {
+    const correct = sentence.en;
+    const others = DEFAULT_SENTENCES.filter(x => x.id !== sentence.id);
+    const sameChapter = others.filter(x => x.chapter === sentence.chapter);
+    const pool = sameChapter.length >= 3 ? sameChapter : others;
+    const cLen = correct.length;
+    // 依長度相近排序，從前 18 句中隨機抽 3
+    const sorted = [...pool].sort((a, b) => Math.abs(a.en.length - cLen) - Math.abs(b.en.length - cLen));
+    const top = sorted.slice(0, Math.min(18, sorted.length));
+    const seed = hashCode(sentence.id);
+    const distractors = seededShuffle(top, seed).slice(0, 3).map(s => s.en);
+    return [correct, ...distractors];
+}
 
 /* =========================================================
  *  狀態 & localStorage
  * ======================================================= */
-const STORAGE_KEY = 'bat-fox-listening-v2';
+const STORAGE_KEY = 'bat-fox-listening-v3';
 
 function defaultProgress() {
     const map = {};
@@ -746,7 +799,21 @@ function defaultState() {
         bestCombo: 0,
         progress: defaultProgress(),
         activeTab: 0,
+        batchSize: 20,          // 10 / 20 / 30 / 50 / 'all' / 自訂數字
+        batchMode: 'sequential', // 'sequential' | 'random'
+        batchSeed: 1,           // 隨機抽選的種子
     };
+}
+
+/* ---- 依 tab + batch 設定計算目前要顯示的句子 ---- */
+function getActiveBatch() {
+    const tab = state.activeTab;
+    const pool = DEFAULT_SENTENCES.filter(s => tab === 'all' || s.chapter === tab);
+    const size = state.batchSize === 'all' ? pool.length : Math.max(1, parseInt(state.batchSize) || 20);
+    if (state.batchMode === 'random') {
+        return seededShuffle(pool, state.batchSeed || 1).slice(0, size);
+    }
+    return pool.slice(0, size);
 }
 
 let state = loadState();
@@ -907,8 +974,15 @@ function applySpeed(s) {
 function renderSentences() {
     const list = document.getElementById('sentence-list');
     list.innerHTML = '';
+    const items = getActiveBatch();
+    // 更新「精聽數量」資訊
     const tab = state.activeTab;
-    const items = DEFAULT_SENTENCES.filter(s => tab === 'all' || s.chapter === tab);
+    const poolSize = DEFAULT_SENTENCES.filter(s => tab === 'all' || s.chapter === tab).length;
+    const sizeLabel = state.batchSize === 'all' ? '全部' : state.batchSize;
+    const modeLabel = state.batchMode === 'random' ? '🎲 隨機' : '📖 依序';
+    const infoEl = document.getElementById('batch-info');
+    if (infoEl) infoEl.textContent = `顯示 ${items.length} 句（共 ${poolSize} 句可選 · 設定：${sizeLabel} · ${modeLabel}）`;
+    updateBatchUI();
     items.forEach((s, idx) => {
         const p = state.progress[s.id];
         const globalIdx = DEFAULT_SENTENCES.indexOf(s) + 1;
@@ -930,7 +1004,12 @@ function renderSentences() {
         const playedPill = p.playCount > 0 ? `<span class="pill bg-pink-100 text-pink-700"><i class="fa-solid fa-play"></i> ${p.playCount}</span>` : '';
         const doneCheck = p.done ? '<span class="text-emerald-500 text-2xl ml-1">✅</span>' : '';
 
-        const choicesShuffled = shuffle([...s.choices].map((c, i) => ({ text: c, correct: i === 0 })));
+        // 四選一：優先用手動設定，否則用自動生成（依 ID 種子）
+        const rawChoices = s.choices || getChoicesFor(s);
+        const choicesShuffled = seededShuffle(
+            rawChoices.map((c, i) => ({ text: c, correct: i === 0 })),
+            hashCode(s.id) ^ 0x9e3779b9
+        );
         const englishVisible = !state.hideEnglish || p.revealed;
 
         card.innerHTML = `
@@ -1183,9 +1262,14 @@ function startShadowing(s, card) {
  *  統計 & 等級 & 進度
  * ======================================================= */
 function updateStats() {
+    // 進度條：以目前批次為範圍
+    const batchItems = getActiveBatch();
+    const batch = batchItems.map(s => state.progress[s.id]);
+    const batchDone = batch.filter(p => p.done).length;
+    const batchTotal = batch.length || 1;
+
+    // 整體統計：以所有「有嘗試過」的句子為範圍（跨批次累積）
     const all = Object.values(state.progress);
-    const done = all.filter(p => p.done).length;
-    const total = all.length;
 
     const firstAttempted = all.filter(p => p.firstHeard !== null);
     const firstGood = firstAttempted.filter(p => p.firstHeard === 'good').length;
@@ -1196,10 +1280,11 @@ function updateStats() {
     const quizRate = quizAttempted.length ? Math.round(quizCorrect / quizAttempted.length * 100) : 0;
 
     const totalReplay = all.reduce((sum, p) => sum + (p.playCount || 0), 0);
+    const totalDone = all.filter(p => p.done).length;
     const normalDone = all.filter(p => p.done && (p.lastSpeed || 1) >= 1.0).length;
-    const normalRate = total ? Math.round(normalDone / total * 100) : 0;
+    const normalRate = totalDone ? Math.round(normalDone / totalDone * 100) : 0;
     const shadowDone = all.filter(p => p.shadowed).length;
-    const shadowRate = total ? Math.round(shadowDone / total * 100) : 0;
+    const shadowRate = totalDone ? Math.round(shadowDone / totalDone * 100) : 0;
 
     document.getElementById('stat-first').textContent = firstRate + '%';
     document.getElementById('stat-quiz').textContent = quizRate + '%';
@@ -1207,14 +1292,15 @@ function updateStats() {
     document.getElementById('stat-normal').textContent = normalRate + '%';
     document.getElementById('stat-shadow').textContent = shadowRate + '%';
 
-    document.getElementById('progress-text').textContent = `${done} / ${total}`;
-    document.getElementById('progress-bar').style.width = (done / total * 100) + '%';
+    document.getElementById('progress-text').textContent = `${batchDone} / ${batchItems.length}`;
+    document.getElementById('progress-bar').style.width = (batchDone / batchTotal * 100) + '%';
     document.getElementById('combo-text').textContent = `Combo ${state.combo} (最佳 ${state.bestCombo})`;
     document.getElementById('star-text').textContent = `${state.stars} ⭐`;
 
-    // 等級判定（綜合分數 0-100）
+    // 等級判定（綜合分數 0-100，依「全部 112 句」中已完成比例）
+    const overallTotal = DEFAULT_SENTENCES.length;
     const score = Math.round(
-        (done / total) * 40 +
+        (totalDone / overallTotal) * 40 +
         (firstRate / 100) * 25 +
         (quizRate / 100) * 25 +
         (shadowRate / 100) * 10
@@ -1580,6 +1666,67 @@ function setupSpeedButtons() {
 }
 
 /* =========================================================
+ *  精聽數量（Batch）控制
+ * ======================================================= */
+function setupBatchControls() {
+    document.querySelectorAll('.batch-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const v = b.dataset.batch;
+            state.batchSize = v === 'all' ? 'all' : parseInt(v);
+            saveState();
+            renderSentences();
+            updateStats();
+        });
+    });
+    document.querySelectorAll('.mode-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            state.batchMode = b.dataset.mode;
+            if (state.batchMode === 'random' && !state.batchSeed) state.batchSeed = Date.now();
+            saveState();
+            renderSentences();
+            updateStats();
+        });
+    });
+    // 自訂數字按 Enter
+    const customInput = document.getElementById('batch-custom');
+    if (customInput) {
+        customInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); applyCustomBatch(); }
+        });
+    }
+}
+function applyCustomBatch() {
+    const input = document.getElementById('batch-custom');
+    const n = parseInt(input.value);
+    if (!n || n < 1) { input.focus(); return; }
+    state.batchSize = n;
+    saveState();
+    renderSentences();
+    updateStats();
+}
+function reshuffleBatch() {
+    state.batchMode = 'random';
+    state.batchSeed = Date.now();
+    saveState();
+    renderSentences();
+    updateStats();
+}
+function updateBatchUI() {
+    document.querySelectorAll('.batch-btn').forEach(b => {
+        const v = b.dataset.batch;
+        const val = v === 'all' ? 'all' : parseInt(v);
+        b.style.boxShadow = val === state.batchSize ? '0 0 0 3px #A78BFA' : '';
+    });
+    document.querySelectorAll('.mode-btn').forEach(b => {
+        b.style.boxShadow = b.dataset.mode === state.batchMode ? '0 0 0 3px #FBBF24' : '';
+    });
+    const customInput = document.getElementById('batch-custom');
+    if (customInput && typeof state.batchSize === 'number' && ![10, 20, 30, 50].includes(state.batchSize)) {
+        customInput.value = state.batchSize;
+    }
+}
+
+/* =========================================================
  *  套用 UI 狀態（用於匯入/重設後）
  * ======================================================= */
 function applyAllUI() {
@@ -1613,6 +1760,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupResizer();
     setupMaskInteraction();
     setupSpeedButtons();
+    setupBatchControls();
     applyAllUI();
 
     // 視窗大小變動時，重新計算遮罩位置邊界
