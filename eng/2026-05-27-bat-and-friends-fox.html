@@ -274,16 +274,40 @@
             padding: 0 1px;
         }
 
-        /* ===== 三大模式切換按鈕 ===== */
-        .mode-card {
-            border: 3px solid transparent;
-            transition: transform .15s, box-shadow .15s, border-color .15s;
+        /* ===== 三大模式切換按鈕（緊湊分段樣式，省直高） ===== */
+        #mode-switcher {
+            display: inline-flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #FBCFE8;
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 2px 8px rgba(244,114,182,.15);
+            gap: 2px;
         }
-        .mode-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
-        .mode-card.active {
-            border-color: #F472B6;
-            box-shadow: 0 0 0 4px rgba(244,114,182,.18), 0 8px 24px rgba(244,114,182,.25);
+        .mode-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 14px;
+            color: #6B7280;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: background .15s, color .15s, transform .12s;
+            white-space: nowrap;
         }
+        .mode-pill:hover { background: #FFF1F2; transform: translateY(-1px); }
+        .mode-pill .mode-emoji { font-size: 18px; line-height: 1; }
+        .mode-pill[data-mode="reading"].active { background: #FEF3C7; color: #92400E; }
+        .mode-pill[data-mode="listening"].active { background: #FBCFE8; color: #BE185D; }
+        .mode-pill[data-mode="dubbing"].active { background: #DDD6FE; color: #5B21B6; }
+        .mode-pill.active { box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+        /* 舊類別保留：避免外部 JS/樣式參照 */
+        .mode-card { display: none; }
 
         /* 題型切換按鈕 */
         .quiz-type-btn {
@@ -419,6 +443,72 @@
         .speech-diff-correct { color: #047857; font-weight: 800; }
         .speech-diff-wrong { color: #B91C1C; font-weight: 800; text-decoration: line-through; }
         .speech-diff-extra { color: #6B7280; font-style: italic; }
+
+        /* ===== Shadowing 浮動視窗（fixed，永遠在畫面中央，不被捲掉） ===== */
+        #shadow-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(45,48,71,.45);
+            backdrop-filter: blur(2px);
+            z-index: 9989;
+            display: none;
+        }
+        #shadow-backdrop.show { display: block; }
+        #shadow-overlay.float {
+            position: fixed !important;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0 !important;
+            z-index: 9990;
+            min-width: min(440px, 88vw);
+            max-width: 88vw;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 20px 28px !important;
+            box-shadow: 0 24px 60px rgba(244,114,182,.45), 0 8px 24px rgba(0,0,0,.18);
+            border: 3px solid white;
+        }
+        #shadow-overlay.float .countdown-num { font-size: 6.5rem; }
+        .shadow-close-btn {
+            position: absolute;
+            top: 8px; right: 10px;
+            background: rgba(255,255,255,.85);
+            color: #BE185D;
+            border-radius: 999px;
+            width: 32px; height: 32px;
+            border: 1px solid #FBCFE8;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 16px;
+            line-height: 1;
+            box-shadow: 0 2px 6px rgba(0,0,0,.1);
+        }
+        .shadow-close-btn:hover { background: white; color: #831843; }
+
+        /* ===== TV 模式：投影電視時收掉裝飾，把螢幕讓給內容 ===== */
+        body.tv-mode header > div { padding-top: 6px !important; padding-bottom: 6px !important; }
+        body.tv-mode .progress-meta { display: none !important; }
+        body.tv-mode .progress-bar-row { height: 8px; }
+        body.tv-mode #level-badge { display: none; }
+        body.tv-mode #settings-btn span,
+        body.tv-mode #stats-btn span,
+        body.tv-mode #tv-btn span { display: none; }
+        body.tv-mode #settings-btn,
+        body.tv-mode #stats-btn,
+        body.tv-mode #tv-btn { padding: 6px 10px; }
+        body.tv-mode #mode-switcher .mode-pill { padding: 5px 12px; font-size: 13px; }
+        body.tv-mode #mode-switcher .mode-pill span:not(.mode-emoji) { display: none; }
+        body.tv-mode #mode-switcher .mode-pill .mode-emoji { font-size: 22px; }
+        body.tv-mode .now-playing-block { display: none !important; }
+        body.tv-mode .chapter-quick .chap-text { display: none; }
+        body.tv-mode .chapter-quick .chap-emoji { font-size: 1.5em; }
+        body.tv-mode .right-panel-header { display: none; }
+        body.tv-mode .sentence-en { font-size: 1.45rem !important; }
+        body.tv-mode .sentence-zh { font-size: 1.15rem !important; }
+        body.tv-mode .left-panel-controls .speed-btn { padding: 6px 12px !important; font-size: 14px !important; }
+        body.tv-mode #control-panel,
+        body.tv-mode #stats-panel { display: none !important; }
+        /* TV 模式啟用時的視覺提示 */
+        body.tv-mode #tv-btn { background: #FBBF24 !important; color: #7C2D12; }
     </style>
 </head>
 <body class="flex flex-col h-screen text-gray-800">
@@ -430,7 +520,7 @@
             <div class="flex items-center gap-2 flex-1 min-w-[200px]">
                 <span class="text-2xl">🦇</span>
                 <div class="flex-1">
-                    <div class="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                    <div class="progress-meta flex items-center gap-2 text-xs text-gray-500 mb-1">
                         <span id="progress-text" class="font-bold text-pink-600 text-sm">0 / 20</span>
                         <span>已完成</span>
                         <span class="ml-auto flex items-center gap-1">
@@ -442,7 +532,7 @@
                             <span class="font-bold text-yellow-600" id="star-text">0 ⭐</span>
                         </span>
                     </div>
-                    <div class="bg-pink-100 rounded-full h-3 relative overflow-hidden shadow-inner">
+                    <div class="progress-bar-row bg-pink-100 rounded-full h-3 relative overflow-hidden shadow-inner">
                         <div id="progress-bar" class="h-full rounded-full transition-all duration-500"
                              style="width:0%; background: linear-gradient(90deg, #F472B6, #FB923C);"></div>
                     </div>
@@ -450,50 +540,37 @@
             </div>
 
             <div class="flex items-center gap-2 flex-wrap">
+                <!-- 三大挑戰模式：緊湊分段切換（取代原本三張卡片） -->
+                <div id="mode-switcher">
+                    <button onclick="setAppMode('reading')" data-mode="reading" class="mode-pill"
+                            title="閱讀模式：中英全顯示，先了解劇情">
+                        <span class="mode-emoji">📖</span><span>閱讀</span>
+                    </button>
+                    <button onclick="setAppMode('listening')" data-mode="listening" class="mode-pill"
+                            title="聽力挑戰：遮英文 + 答題，聽完才看答案">
+                        <span class="mode-emoji">🎧</span><span>聽力</span>
+                    </button>
+                    <button onclick="setAppMode('dubbing')" data-mode="dubbing" class="mode-pill"
+                            title="明星配音員：影片降音，跟讀錄音評分">
+                        <span class="mode-emoji">🎤</span><span>配音</span>
+                    </button>
+                </div>
+
                 <span class="level-badge text-sm" id="level-badge">🐣 初心者</span>
+                <button onclick="toggleTvMode()" id="tv-btn"
+                        class="btn-soft btn-yellow text-sm"
+                        title="TV 大字模式：投影電視時收起裝飾、放大字級">
+                    <i class="fa-solid fa-tv"></i> <span>TV</span>
+                </button>
                 <button onclick="toggleControlPanel()" id="settings-btn"
                         class="btn-soft btn-lav text-sm">
-                    <i class="fa-solid fa-gear"></i> 進階設定
+                    <i class="fa-solid fa-gear"></i> <span>進階設定</span>
                 </button>
                 <button onclick="toggleStats()" id="stats-btn"
                         class="btn-soft btn-sky text-sm">
-                    <i class="fa-solid fa-chart-line"></i> 數據
+                    <i class="fa-solid fa-chart-line"></i> <span>數據</span>
                 </button>
             </div>
-        </div>
-
-        <!-- 三大挑戰模式（主要入口） -->
-        <div id="mode-switcher" class="mt-3 grid grid-cols-3 gap-2">
-            <button onclick="setAppMode('reading')" data-mode="reading"
-                    class="mode-card bg-amber-50 hover:bg-amber-100 rounded-2xl p-2 md:p-3 text-left">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">📖</span>
-                    <div class="flex-1 min-w-0">
-                        <div class="font-black text-amber-700 text-sm md:text-base">閱讀模式</div>
-                        <div class="text-xs text-amber-600 hidden md:block">中英全顯示，先了解劇情</div>
-                    </div>
-                </div>
-            </button>
-            <button onclick="setAppMode('listening')" data-mode="listening"
-                    class="mode-card bg-pink-50 hover:bg-pink-100 rounded-2xl p-2 md:p-3 text-left">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">🎧</span>
-                    <div class="flex-1 min-w-0">
-                        <div class="font-black text-pink-700 text-sm md:text-base">聽力挑戰</div>
-                        <div class="text-xs text-pink-600 hidden md:block">遮英文 + 答題，聽完才看答案</div>
-                    </div>
-                </div>
-            </button>
-            <button onclick="setAppMode('dubbing')" data-mode="dubbing"
-                    class="mode-card bg-purple-50 hover:bg-purple-100 rounded-2xl p-2 md:p-3 text-left">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">🎤</span>
-                    <div class="flex-1 min-w-0">
-                        <div class="font-black text-purple-700 text-sm md:text-base">明星配音員</div>
-                        <div class="text-xs text-purple-600 hidden md:block">影片降音，跟讀錄音評分</div>
-                    </div>
-                </div>
-            </button>
         </div>
 
         <!-- 全局設定面板（進階） -->
@@ -516,6 +593,12 @@
                 <button onclick="changeFontSize(-1)" class="px-2 hover:font-bold">A-</button>
                 <span id="font-size-label">中</span>
                 <button onclick="changeFontSize(1)" class="px-2 hover:font-bold">A+</button>
+            </div>
+            <div class="btn-soft btn-lav text-sm flex items-center gap-2" title="Shadowing 跟讀前的倒數等待秒數">
+                <i class="fa-solid fa-microphone"></i> Shadowing 等待
+                <button onclick="changeShadowWait(-1)" class="px-2 hover:font-bold">−</button>
+                <span id="shadow-wait-label">1s</span>
+                <button onclick="changeShadowWait(1)" class="px-2 hover:font-bold">+</button>
             </div>
             <button onclick="exportJSON()" class="btn-soft btn-lav text-sm"><i class="fa-solid fa-file-export"></i> 匯出 JSON</button>
             <button onclick="importJSON()" class="btn-soft btn-lav text-sm"><i class="fa-solid fa-file-import"></i> 匯入 JSON</button>
@@ -564,7 +647,7 @@
             </div>
 
             <!-- 影片下方控制 -->
-            <div class="mt-3 flex flex-wrap items-center gap-2">
+            <div class="left-panel-controls mt-3 flex flex-wrap items-center gap-2">
                 <div class="flex items-center gap-1 bg-pink-100 rounded-xl px-2 py-1.5">
                     <i class="fa-solid fa-gauge-high text-pink-700"></i>
                     <span class="text-pink-700 font-bold text-sm">速度</span>
@@ -575,7 +658,7 @@
                 <button onclick="toggleMask()" class="btn-soft btn-pink text-xs">
                     <i class="fa-solid fa-eye-slash"></i> <span id="mask-quick-label">遮字幕</span>
                 </button>
-                <div class="ml-auto flex items-center gap-2 text-xs text-gray-500">
+                <div class="now-playing-block ml-auto flex items-center gap-2 text-xs text-gray-500">
                     <span>目前播放：</span>
                     <span id="now-playing" class="font-bold text-pink-600">—</span>
                 </div>
@@ -613,7 +696,7 @@
 
     <!-- 右：教材 -->
     <section id="right-panel" class="flex-1 overflow-y-auto p-3 md:p-4" style="width: 45%;">
-        <div class="mb-3 bg-white rounded-2xl shadow p-3">
+        <div class="right-panel-header mb-3 bg-white rounded-2xl shadow p-3">
             <h2 class="text-lg md:text-xl font-black text-pink-700 flex items-center gap-2">
                 <span>📚</span> The Chicks and the Fox 聽力＋閱讀
             </h2>
@@ -1153,6 +1236,7 @@ function defaultState() {
         speed: 1.0,
         videoVolume: 100,       // YouTube 音量（0-100）；配音模式會降到 20
         fontSize: 2,
+        shadowWaitSec: 1,       // Shadowing 倒數秒數（0~5），0 表示不倒數立刻開始
         stars: 0,
         combo: 0,
         bestCombo: 0,
@@ -1161,6 +1245,7 @@ function defaultState() {
         batchSize: 20,          // 10 / 20 / 30 / 50 / 'all' / 自訂數字
         batchMode: 'sequential', // 'sequential' | 'random'
         batchSeed: 1,           // 隨機抽選的種子
+        tvMode: false,          // 投影電視時收起裝飾 UI、放大字級
     };
 }
 
@@ -1894,6 +1979,22 @@ function showSpeechFallbackToast() {
     setTimeout(() => t.remove(), 3500);
 }
 
+// 取得 Shadowing 倒數等待秒數（限制在 0~5 的整數，預設 1）
+function getShadowWaitSec() {
+    const v = parseInt(state.shadowWaitSec, 10);
+    if (isNaN(v)) return 1;
+    return Math.max(0, Math.min(5, v));
+}
+
+// 調整 Shadowing 倒數等待秒數（0~5）
+function changeShadowWait(delta) {
+    const next = Math.max(0, Math.min(5, getShadowWaitSec() + delta));
+    state.shadowWaitSec = next;
+    saveState();
+    const label = document.getElementById('shadow-wait-label');
+    if (label) label.textContent = next + 's';
+}
+
 function startShadowing(s, card) {
     if (isSpeechRecSupported()) {
         startShadowingWithScoring(s, card);
@@ -1909,6 +2010,7 @@ function startShadowingWithScoring(s, card) {
     const cdEl = document.getElementById('shadow-countdown');
     const textEl = document.getElementById('shadow-text');
     overlay.classList.remove('hide');
+    document.getElementById('shadow-backdrop')?.classList.add('show');
     textEl.textContent = '🎧 先聽一次，準備跟讀並錄音評分';
     cdEl.textContent = '🎧';
     cdEl.classList.remove('countdown-num');
@@ -1918,7 +2020,7 @@ function startShadowingWithScoring(s, card) {
     playSegment(s, {
         silent: false,
         onEnd: () => {
-            let n = 3;
+            let n = getShadowWaitSec();
             textEl.textContent = '🎤 倒數結束後請大聲說！';
             const tick = () => {
                 cdEl.textContent = n > 0 ? n : '🎙️';
@@ -1943,6 +2045,7 @@ function startShadowingFallback(s, card) {
     const cdEl = document.getElementById('shadow-countdown');
     const textEl = document.getElementById('shadow-text');
     overlay.classList.remove('hide');
+    document.getElementById('shadow-backdrop')?.classList.add('show');
     textEl.textContent = '聽一次，準備跟讀！';
     cdEl.textContent = '🎧';
     cdEl.classList.remove('countdown-num');
@@ -1952,7 +2055,7 @@ function startShadowingFallback(s, card) {
     playSegment(s, {
         silent: false,
         onEnd: () => {
-            let n = 3;
+            let n = getShadowWaitSec();
             textEl.textContent = '輪到你了，跟著大聲說！';
             const tick = () => {
                 cdEl.textContent = n > 0 ? n : 'GO!';
@@ -1973,7 +2076,7 @@ function startShadowingFallback(s, card) {
                                 saveState();
                                 renderSentences();
                                 updateStats();
-                                setTimeout(() => overlay.classList.add('hide'), 1500);
+                                setTimeout(() => { overlay.classList.add('hide'); document.getElementById('shadow-backdrop')?.classList.remove('show'); }, 1500);
                             }
                         });
                     }, 250);
@@ -2007,7 +2110,7 @@ function recognizeShadow(s, card, overlay, cdEl, textEl) {
                       : err === 'no-speech' ? '沒聽到聲音，再試一次'
                       : `辨識失敗（${err}）`;
             textEl.innerHTML = `<div class="font-bold mb-1">${tip}</div><div class="text-xs">點 🎤 再試一次</div>`;
-            setTimeout(() => overlay.classList.add('hide'), 2500);
+            setTimeout(() => { overlay.classList.add('hide'); document.getElementById('shadow-backdrop')?.classList.remove('show'); }, 2500);
             return;
         }
         // 評分（0-100）
@@ -2046,7 +2149,7 @@ function recognizeShadow(s, card, overlay, cdEl, textEl) {
         saveState();
         renderSentences();
         updateStats();
-        setTimeout(() => overlay.classList.add('hide'), 3800);
+        setTimeout(() => { overlay.classList.add('hide'); document.getElementById('shadow-backdrop')?.classList.remove('show'); }, 3800);
     };
 
     rec.onresult = (e) => {
@@ -2285,9 +2388,27 @@ function setAppMode(mode) {
     updateModeUI();
 }
 function updateModeUI() {
-    document.querySelectorAll('#mode-switcher .mode-card').forEach(b => {
+    document.querySelectorAll('#mode-switcher [data-mode]').forEach(b => {
         b.classList.toggle('active', b.dataset.mode === state.appMode);
     });
+}
+
+/* ===== TV 模式：投影電視時收起裝飾，把畫面讓給內容 ===== */
+function toggleTvMode() {
+    state.tvMode = !state.tvMode;
+    document.body.classList.toggle('tv-mode', state.tvMode);
+    saveState();
+}
+
+/* ===== Shadowing 浮動視窗關閉（Esc / 點背景 / 點 ×） ===== */
+function closeShadowOverlay() {
+    const overlay = document.getElementById('shadow-overlay');
+    const backdrop = document.getElementById('shadow-backdrop');
+    if (overlay) overlay.classList.add('hide');
+    if (backdrop) backdrop.classList.remove('show');
+    clearTimeout(stopTimer);
+    try { if (player && playerReady) player.pauseVideo(); } catch (e) {}
+    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) {}
 }
 
 /* ===== 題型切換 ===== */
@@ -2673,6 +2794,8 @@ function applyAllUI() {
     updateModeUI();
     updateQuizTypeUI();
     document.getElementById('font-size-label').textContent = ['', '小', '中', '大', '特大'][state.fontSize];
+    const shadowWaitLabel = document.getElementById('shadow-wait-label');
+    if (shadowWaitLabel) shadowWaitLabel.textContent = getShadowWaitSec() + 's';
     const list = document.getElementById('sentence-list');
     list.classList.remove('font-size-1', 'font-size-2', 'font-size-3', 'font-size-4');
     list.classList.add('font-size-' + state.fontSize);
@@ -2691,6 +2814,8 @@ function applyAllUI() {
     document.getElementById('mask-opacity').value = state.maskOpacity;
     document.getElementById('mask-opacity-val').textContent = state.maskOpacity + '%';
     applySpeed(state.speed);
+    // 套用 TV 模式（從 localStorage 還原）
+    document.body.classList.toggle('tv-mode', !!state.tvMode);
 }
 
 /* =========================================================
@@ -2713,6 +2838,14 @@ document.addEventListener('DOMContentLoaded', () => {
             state.maskPos.x = Math.min(state.maskPos.x, Math.max(0, wr.width - state.maskPos.w));
             state.maskPos.y = Math.min(state.maskPos.y, Math.max(0, wr.height - state.maskPos.h));
             applyMaskPos();
+        }
+    });
+
+    // Esc 關閉 Shadowing 浮動視窗
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const ov = document.getElementById('shadow-overlay');
+            if (ov && !ov.classList.contains('hide')) closeShadowOverlay();
         }
     });
 });
