@@ -673,23 +673,25 @@
             </div>
 
             <!-- 章節快速選 -->
-            <div class="mt-3 grid grid-cols-2 gap-2">
+            <div class="chapter-quick mt-3 grid grid-cols-2 gap-2">
                 <button onclick="jumpToChapter(0)" class="btn-soft btn-yellow text-sm">
-                    🐣 故事 1：穀倉裡的東西
+                    <span class="chap-emoji">🐣</span> <span class="chap-text">故事 1：穀倉裡的東西</span>
                 </button>
                 <button onclick="jumpToChapter(1)" class="btn-soft btn-peach text-sm">
-                    🦊 故事 2：狐狸來了
+                    <span class="chap-emoji">🦊</span> <span class="chap-text">故事 2：狐狸來了</span>
                 </button>
             </div>
         </div>
-
-        <!-- Shadowing 倒數覆蓋 (固定底部) -->
-        <div id="shadow-overlay" class="hide mt-3 bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl p-4 text-center shadow-lg">
-            <div class="text-pink-700 font-bold mb-1"><i class="fa-solid fa-microphone"></i> Shadowing 跟讀</div>
-            <div id="shadow-text" class="text-sm text-gray-600 mb-2">準備好就跟著大聲說！</div>
-            <div id="shadow-countdown" class="countdown-num text-pink-500">3</div>
-        </div>
     </section>
+
+    <!-- Shadowing 浮動視窗（fixed 置中，瀏覽器放大也看得到，不會被裁掉） -->
+    <div id="shadow-backdrop" onclick="closeShadowOverlay()"></div>
+    <div id="shadow-overlay" class="hide float bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl p-4 text-center shadow-lg">
+        <button class="shadow-close-btn" onclick="closeShadowOverlay()" title="關閉 (Esc)">×</button>
+        <div class="text-pink-700 font-bold mb-1 text-lg"><i class="fa-solid fa-microphone"></i> Shadowing 跟讀</div>
+        <div id="shadow-text" class="text-sm text-gray-600 mb-2">準備好就跟著大聲說！</div>
+        <div id="shadow-countdown" class="countdown-num text-pink-500">3</div>
+    </div>
 
     <!-- 分隔線 -->
     <div id="resizer"></div>
