@@ -788,7 +788,7 @@ function defaultState() {
     return {
         hideEnglish: true,      // 預設：精聽模式，遮住英文
         showTimeEditor: false,
-        quizMode: false,
+        quizMode: true,         // 預設開啟四選一（聽完播放再揭曉選項）
         maskOn: false,
         maskOpacity: 85,
         maskPos: { x: 0, y: 0, w: 0, h: 0, set: false },
@@ -942,10 +942,13 @@ function playSegment(sentence, opts = {}) {
 
     if (!opts.silent) {
         const p = state.progress[sentence.id];
+        const wasFirstPlay = (p.playCount || 0) === 0;
         p.playCount = (p.playCount || 0) + 1;
         p.lastSpeed = state.speed;
         saveState();
         updateStats();
+        // 第一次播放後重繪一次以揭曉四選一選項（之後的播放不再重繪以避免閃爍）
+        if (wasFirstPlay) renderSentences();
     }
     markCardAsPlaying(sentence.id);
 }
@@ -1054,16 +1057,23 @@ function renderSentences() {
                 </div>
             </div>
 
-            <!-- 四選一 -->
+            <!-- 四選一：選項要先按 ▶ 播放後才會出現 -->
             <div class="quiz-box mt-2 bg-sky-50/60 rounded-xl p-2 ${state.quizMode ? '' : 'hide'}">
                 <div class="text-xs font-bold text-sky-700 mb-1"><i class="fa-solid fa-circle-question"></i> 四選一：你剛剛聽到的是？</div>
-                <div class="quiz-choices grid grid-cols-1 gap-1">
-                    ${choicesShuffled.map(c => `
-                        <button class="quiz-btn btn-soft btn-sky text-xs text-left" data-correct="${c.correct}" style="padding:6px 10px; white-space:normal;">
-                            ${c.text}
-                        </button>
-                    `).join('')}
-                </div>
+                ${p.playCount > 0 ? `
+                    <div class="quiz-choices grid grid-cols-1 gap-1">
+                        ${choicesShuffled.map(c => `
+                            <button class="quiz-btn btn-soft btn-sky text-xs text-left" data-correct="${c.correct}" style="padding:6px 10px; white-space:normal;">
+                                ${c.text}
+                            </button>
+                        `).join('')}
+                    </div>
+                ` : `
+                    <div class="quiz-locked flex items-center justify-center gap-2 py-3 text-sky-500 italic text-xs">
+                        <i class="fa-solid fa-headphones text-base"></i>
+                        <span>請先按 <i class="fa-solid fa-play text-pink-400"></i> 播放，再選你聽到的句子</span>
+                    </div>
+                `}
             </div>
 
             <!-- Shadowing & 揭曉 & 朗讀 -->
