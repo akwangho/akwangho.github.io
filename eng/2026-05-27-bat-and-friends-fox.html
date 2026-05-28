@@ -321,7 +321,7 @@
             <button onclick="toggleHideEnglish()" class="btn-soft btn-pink-strong text-sm" style="background:#F472B6;color:white;"><i class="fa-solid fa-eye-slash"></i> <span id="hideen-btn-label">全部遮英文（精聽模式）</span></button>
             <button onclick="revealAll()" class="btn-soft btn-peach text-sm"><i class="fa-solid fa-eye"></i> 全部揭曉</button>
             <button onclick="rehideAll()" class="btn-soft btn-pink text-sm"><i class="fa-solid fa-mask"></i> 全部重新遮住</button>
-            <button onclick="toggleChinese()" class="btn-soft btn-sky text-sm"><i class="fa-solid fa-language"></i> <span id="zh-btn-label">顯示中文</span></button>
+            <button onclick="toggleAllChinese()" class="btn-soft btn-sky text-sm"><i class="fa-solid fa-language"></i> <span id="zh-btn-label">全部顯示中文</span></button>
             <button onclick="toggleTimeEditor()" class="btn-soft btn-peach text-sm"><i class="fa-solid fa-sliders"></i> <span id="te-btn-label">顯示時間調整</span></button>
             <button onclick="toggleQuizMode()" class="btn-soft btn-mint text-sm"><i class="fa-solid fa-circle-question"></i> <span id="quiz-btn-label">啟用四選一</span></button>
             <button onclick="toggleMask()" class="btn-soft btn-pink text-sm"><i class="fa-solid fa-eye-slash"></i> <span id="mask-btn-label">開啟字幕遮罩</span></button>
@@ -435,7 +435,7 @@
             <h2 class="text-lg md:text-xl font-black text-pink-700 flex items-center gap-2">
                 <span>📚</span> The Chicks and the Fox 聽力＋閱讀
             </h2>
-            <p class="text-xs md:text-sm text-gray-500 mt-1">字幕來自官方 SRT，全片 112 句。可選 10/20/30/50/全部 句精聽。英文預設遮住：先聽 ▶，自評後揭曉，可 🔊 朗讀跟讀。</p>
+            <p class="text-xs md:text-sm text-gray-500 mt-1">字幕來自官方 SRT，全片 112 句。可選 10/20/30/50/全部 句精聽。英文預設遮住：先聽 ▶，自評後揭曉；遇到生僻字再點英文後面的 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs bg-sky-50 text-sky-600"><i class="fa-solid fa-language"></i>看中文</span> 看翻譯。</p>
         </div>
 
         <div id="chapter-tabs" class="mb-3 flex gap-2">
@@ -778,6 +778,7 @@ function defaultProgress() {
             endDelta: 0,
             done: false,
             revealed: false,    // 是否已揭曉英文
+            showZh: false,      // 是否顯示這句的中文翻譯（個別控制）
         };
     });
     return map;
@@ -785,7 +786,6 @@ function defaultProgress() {
 
 function defaultState() {
     return {
-        showZh: false,
         hideEnglish: true,      // 預設：精聽模式，遮住英文
         showTimeEditor: false,
         quizMode: false,
@@ -1026,8 +1026,9 @@ function renderSentences() {
                     </div>
                     <div class="sentence-en font-bold leading-snug ${englishVisible ? 'text-gray-800' : 'text-gray-300 italic select-none'}">
                         ${englishVisible ? highlightEnglish(s.en) : '🎧 ??? 聽聽看再揭曉'}
+                        ${englishVisible ? `<button class="zh-toggle-btn ml-1 align-middle inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-normal ${p.showZh ? 'bg-sky-200 text-sky-800' : 'bg-sky-50 text-sky-600 hover:bg-sky-100'}" title="${p.showZh ? '隱藏中文翻譯' : '顯示中文翻譯（有看不懂的單字可以點）'}"><i class="fa-solid fa-language"></i>${p.showZh ? '隱藏中' : '看中文'}</button>` : ''}
                     </div>
-                    <div class="sentence-zh text-gray-500 mt-1 ${state.showZh ? '' : 'hide'}">${s.zh}</div>
+                    <div class="sentence-zh text-gray-500 mt-1 ${p.showZh ? '' : 'hide'}">${s.zh}</div>
                 </div>
             </div>
 
@@ -1085,6 +1086,21 @@ function renderSentences() {
         card.addEventListener('click', (e) => {
             if (e.target.closest('button')) return;
             playSegment(s);
+        });
+        card.querySelector('.zh-toggle-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const p2 = state.progress[s.id];
+            p2.showZh = !p2.showZh;
+            saveState();
+            // 不重繪整個列表，直接切換這張卡片即可（保留 hover/focus 狀態）
+            const zhEl = card.querySelector('.sentence-zh');
+            if (zhEl) zhEl.classList.toggle('hide', !p2.showZh);
+            const btn = card.querySelector('.zh-toggle-btn');
+            if (btn) {
+                btn.innerHTML = `<i class="fa-solid fa-language"></i>${p2.showZh ? '隱藏中' : '看中文'}`;
+                btn.title = p2.showZh ? '隱藏中文翻譯' : '顯示中文翻譯（有看不懂的單字可以點）';
+                btn.className = `zh-toggle-btn ml-1 align-middle inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-normal ${p2.showZh ? 'bg-sky-200 text-sky-800' : 'bg-sky-50 text-sky-600 hover:bg-sky-100'}`;
+            }
         });
         card.querySelectorAll('.te-btn').forEach(b => {
             b.addEventListener('click', (e) => {
@@ -1172,6 +1188,8 @@ function renderSentences() {
             e.stopPropagation();
             const p2 = state.progress[s.id];
             p2.revealed = !p2.revealed;
+            // 重新遮回英文時，把中文也一起遮回（精聽模式才乾淨）
+            if (!p2.revealed) p2.showZh = false;
             saveState();
             renderSentences();
             if (p2.revealed) speakText(s.en, 0.88);
@@ -1373,9 +1391,11 @@ function toggleControlPanel() {
 function toggleStats() {
     document.getElementById('stats-panel').classList.toggle('hide');
 }
-function toggleChinese() {
-    state.showZh = !state.showZh;
-    document.getElementById('zh-btn-label').textContent = state.showZh ? '隱藏中文' : '顯示中文';
+function toggleAllChinese() {
+    // 批次操作：若有任一句尚未顯示中文，則全部顯示；否則全部隱藏。
+    const anyHidden = Object.values(state.progress).some(p => !p.showZh);
+    Object.values(state.progress).forEach(p => { p.showZh = anyHidden; });
+    document.getElementById('zh-btn-label').textContent = anyHidden ? '全部隱藏中文' : '全部顯示中文';
     saveState(); renderSentences();
 }
 function toggleHideEnglish() {
@@ -1389,7 +1409,7 @@ function revealAll() {
     saveState(); renderSentences();
 }
 function rehideAll() {
-    Object.values(state.progress).forEach(p => p.revealed = false);
+    Object.values(state.progress).forEach(p => { p.revealed = false; p.showZh = false; });
     saveState(); renderSentences();
 }
 function toggleTimeEditor() {
@@ -1730,7 +1750,9 @@ function updateBatchUI() {
  *  套用 UI 狀態（用於匯入/重設後）
  * ======================================================= */
 function applyAllUI() {
-    document.getElementById('zh-btn-label').textContent = state.showZh ? '隱藏中文' : '顯示中文';
+    // 中文批次按鈕：若所有句子都已顯示，則顯示「全部隱藏中文」，否則顯示「全部顯示中文」
+    const allShown = Object.values(state.progress).every(p => p.showZh);
+    document.getElementById('zh-btn-label').textContent = allShown ? '全部隱藏中文' : '全部顯示中文';
     document.getElementById('hideen-btn-label').textContent =
         state.hideEnglish ? '全部遮英文（精聽模式）' : '英文全顯示（備課模式）';
     document.getElementById('te-btn-label').textContent = state.showTimeEditor ? '隱藏時間調整' : '顯示時間調整';
