@@ -273,6 +273,152 @@
             border-radius: 3px;
             padding: 0 1px;
         }
+
+        /* ===== 三大模式切換按鈕 ===== */
+        .mode-card {
+            border: 3px solid transparent;
+            transition: transform .15s, box-shadow .15s, border-color .15s;
+        }
+        .mode-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+        .mode-card.active {
+            border-color: #F472B6;
+            box-shadow: 0 0 0 4px rgba(244,114,182,.18), 0 8px 24px rgba(244,114,182,.25);
+        }
+
+        /* 題型切換按鈕 */
+        .quiz-type-btn {
+            background: rgba(255,255,255,.5);
+            color: #047857;
+            font-weight: 700;
+            transition: background-color .15s;
+        }
+        .quiz-type-btn:hover { background: rgba(255,255,255,.9); }
+        .quiz-type-btn.active {
+            background: #047857;
+            color: white;
+            box-shadow: 0 2px 6px rgba(4,120,87,.4);
+        }
+
+        /* ===== Combo 火熱狀態（5+） ===== */
+        @keyframes combo-glow {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(251,146,60,.25), 0 0 20px rgba(251,146,60,.35); }
+            50%      { box-shadow: 0 0 0 8px rgba(251,146,60,.35), 0 0 30px rgba(244,114,182,.55); }
+        }
+        .combo-hot {
+            animation: combo-glow 1.4s ease-in-out infinite;
+            border-color: #FB923C !important;
+        }
+        @keyframes combo-banner-in {
+            0%   { transform: translate(-50%, -120%) scale(.4); opacity: 0; }
+            60%  { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        @keyframes combo-banner-out {
+            to { transform: translate(-50%, -50%) scale(.9); opacity: 0; }
+        }
+        #combo-banner {
+            position: fixed;
+            left: 50%; top: 22%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #F472B6 0%, #FB923C 60%, #FBBF24 100%);
+            color: white;
+            font-weight: 900;
+            font-size: 2.2rem;
+            padding: 14px 32px;
+            border-radius: 999px;
+            box-shadow: 0 12px 30px rgba(244,114,182,.5);
+            text-shadow: 0 2px 8px rgba(0,0,0,.18);
+            letter-spacing: 1px;
+            z-index: 9998;
+            pointer-events: none;
+            animation: combo-banner-in .4s cubic-bezier(.2,.9,.4,1.3);
+        }
+        #combo-banner.fading {
+            animation: combo-banner-out .35s forwards;
+        }
+
+        /* ===== 填空：單字卡 & 空格 ===== */
+        .cloze-blank {
+            display: inline-block;
+            min-width: 70px;
+            padding: 2px 10px;
+            margin: 0 2px;
+            border-bottom: 3px dashed #94A3B8;
+            color: #94A3B8;
+            font-style: italic;
+            background: #F8FAFC;
+            border-radius: 6px 6px 0 0;
+            text-align: center;
+            vertical-align: baseline;
+        }
+        .cloze-blank.filled { color: #0F172A; font-style: normal; background: #FEF9C3; border-bottom-color: #FBBF24; }
+        .cloze-blank.correct { background: #BBF7D0; color: #047857; border-bottom-color: #34D399; }
+        .cloze-blank.wrong { background: #FECACA; color: #B91C1C; border-bottom-color: #EF4444; animation: shake .4s; }
+        .cloze-blank.drag-over { background: #DBEAFE; border-bottom-color: #38BDF8; }
+        .cloze-chip {
+            display: inline-block;
+            padding: 4px 12px;
+            margin: 3px;
+            border-radius: 999px;
+            background: #BAE6FD;
+            color: #075985;
+            font-weight: 700;
+            cursor: grab;
+            user-select: none;
+            transition: transform .15s, box-shadow .15s, opacity .15s;
+            font-size: 0.95em;
+        }
+        .cloze-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,.1); }
+        .cloze-chip.dragging { opacity: .35; cursor: grabbing; }
+        .cloze-chip.used { opacity: .25; pointer-events: none; }
+        .cloze-chip.wrong-pick { animation: shake .35s; background: #FECACA; color: #B91C1C; }
+
+        /* ===== 句子重組 ===== */
+        .scramble-area {
+            min-height: 56px;
+            padding: 8px;
+            border: 2px dashed #C4B5FD;
+            border-radius: 12px;
+            background: #FAF5FF;
+        }
+        .scramble-area.drag-over { background: #EDE9FE; border-color: #A78BFA; }
+        .scramble-bank {
+            min-height: 48px;
+            padding: 6px;
+            border-radius: 12px;
+            background: #F1F5F9;
+        }
+        .scramble-chip {
+            display: inline-block;
+            padding: 4px 10px;
+            margin: 3px;
+            border-radius: 8px;
+            background: white;
+            border: 2px solid #DDD6FE;
+            color: #5B21B6;
+            font-weight: 700;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.92em;
+            transition: transform .15s;
+        }
+        .scramble-chip:hover { transform: translateY(-1px); border-color: #A78BFA; }
+        .scramble-chip.dragging { opacity: .35; cursor: grabbing; }
+        .scramble-chip.correct-pos { background: #DCFCE7; border-color: #34D399; color: #047857; }
+
+        /* ===== 語音評分 ===== */
+        .speech-result {
+            margin-top: 8px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+        .speech-result.perfect { background: linear-gradient(135deg, #DCFCE7, #FEF3C7); color: #047857; }
+        .speech-result.great { background: #FEF3C7; color: #92400E; }
+        .speech-result.try { background: #FEE2E2; color: #B91C1C; }
+        .speech-diff-correct { color: #047857; font-weight: 800; }
+        .speech-diff-wrong { color: #B91C1C; font-weight: 800; text-decoration: line-through; }
+        .speech-diff-extra { color: #6B7280; font-style: italic; }
     </style>
 </head>
 <body class="flex flex-col h-screen text-gray-800">
@@ -307,7 +453,7 @@
                 <span class="level-badge text-sm" id="level-badge">🐣 初心者</span>
                 <button onclick="toggleControlPanel()" id="settings-btn"
                         class="btn-soft btn-lav text-sm">
-                    <i class="fa-solid fa-gear"></i> 設定
+                    <i class="fa-solid fa-gear"></i> 進階設定
                 </button>
                 <button onclick="toggleStats()" id="stats-btn"
                         class="btn-soft btn-sky text-sm">
@@ -316,14 +462,54 @@
             </div>
         </div>
 
-        <!-- 全局設定面板 -->
+        <!-- 三大挑戰模式（主要入口） -->
+        <div id="mode-switcher" class="mt-3 grid grid-cols-3 gap-2">
+            <button onclick="setAppMode('reading')" data-mode="reading"
+                    class="mode-card bg-amber-50 hover:bg-amber-100 rounded-2xl p-2 md:p-3 text-left">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">📖</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-black text-amber-700 text-sm md:text-base">閱讀模式</div>
+                        <div class="text-xs text-amber-600 hidden md:block">中英全顯示，先了解劇情</div>
+                    </div>
+                </div>
+            </button>
+            <button onclick="setAppMode('listening')" data-mode="listening"
+                    class="mode-card bg-pink-50 hover:bg-pink-100 rounded-2xl p-2 md:p-3 text-left">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🎧</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-black text-pink-700 text-sm md:text-base">聽力挑戰</div>
+                        <div class="text-xs text-pink-600 hidden md:block">遮英文 + 答題，聽完才看答案</div>
+                    </div>
+                </div>
+            </button>
+            <button onclick="setAppMode('dubbing')" data-mode="dubbing"
+                    class="mode-card bg-purple-50 hover:bg-purple-100 rounded-2xl p-2 md:p-3 text-left">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🎤</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-black text-purple-700 text-sm md:text-base">明星配音員</div>
+                        <div class="text-xs text-purple-600 hidden md:block">影片降音，跟讀錄音評分</div>
+                    </div>
+                </div>
+            </button>
+        </div>
+
+        <!-- 全局設定面板（進階） -->
         <div id="control-panel" class="hide mt-3 pt-3 border-t border-pink-200 flex flex-wrap gap-2">
             <button onclick="toggleHideEnglish()" class="btn-soft btn-pink-strong text-sm" style="background:#F472B6;color:white;"><i class="fa-solid fa-eye-slash"></i> <span id="hideen-btn-label">全部遮英文（精聽模式）</span></button>
             <button onclick="revealAll()" class="btn-soft btn-peach text-sm"><i class="fa-solid fa-eye"></i> 全部揭曉</button>
             <button onclick="rehideAll()" class="btn-soft btn-pink text-sm"><i class="fa-solid fa-mask"></i> 全部重新遮住</button>
             <button onclick="toggleAllChinese()" class="btn-soft btn-sky text-sm"><i class="fa-solid fa-language"></i> <span id="zh-btn-label">全部顯示中文</span></button>
             <button onclick="toggleTimeEditor()" class="btn-soft btn-peach text-sm"><i class="fa-solid fa-sliders"></i> <span id="te-btn-label">顯示時間調整</span></button>
-            <button onclick="toggleQuizMode()" class="btn-soft btn-mint text-sm"><i class="fa-solid fa-circle-question"></i> <span id="quiz-btn-label">啟用四選一</span></button>
+            <button onclick="toggleQuizMode()" class="btn-soft btn-mint text-sm"><i class="fa-solid fa-circle-question"></i> <span id="quiz-btn-label">啟用題目區</span></button>
+            <div class="btn-soft btn-mint text-sm flex items-center gap-1">
+                <i class="fa-solid fa-puzzle-piece"></i> 題型：
+                <button onclick="setQuizType('mc')" data-qt="mc" class="quiz-type-btn px-2 py-0.5 rounded-md text-xs">四選一</button>
+                <button onclick="setQuizType('cloze')" data-qt="cloze" class="quiz-type-btn px-2 py-0.5 rounded-md text-xs">填空</button>
+                <button onclick="setQuizType('scramble')" data-qt="scramble" class="quiz-type-btn px-2 py-0.5 rounded-md text-xs">重組</button>
+            </div>
             <button onclick="toggleMask()" class="btn-soft btn-pink text-sm"><i class="fa-solid fa-eye-slash"></i> <span id="mask-btn-label">開啟字幕遮罩</span></button>
             <div class="btn-soft btn-yellow text-sm flex items-center gap-2">
                 <i class="fa-solid fa-text-height"></i>
@@ -339,13 +525,9 @@
 
         <!-- 數據面板 -->
         <div id="stats-panel" class="hide mt-3 pt-3 border-t border-pink-200">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center">
-                <div class="bg-pink-50 rounded-xl p-2">
-                    <div class="text-xs text-pink-700 font-bold">首次聽懂率</div>
-                    <div class="text-lg font-black text-pink-600" id="stat-first">0%</div>
-                </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
                 <div class="bg-sky-50 rounded-xl p-2">
-                    <div class="text-xs text-sky-700 font-bold">無字幕理解</div>
+                    <div class="text-xs text-sky-700 font-bold">答題正確率</div>
                     <div class="text-lg font-black text-sky-600" id="stat-quiz">0%</div>
                 </div>
                 <div class="bg-amber-50 rounded-xl p-2">
@@ -435,7 +617,7 @@
             <h2 class="text-lg md:text-xl font-black text-pink-700 flex items-center gap-2">
                 <span>📚</span> The Chicks and the Fox 聽力＋閱讀
             </h2>
-            <p class="text-xs md:text-sm text-gray-500 mt-1">字幕來自官方 SRT，全片 112 句。可選 10/20/30/50/全部 句精聽。英文預設遮住：先聽 ▶，自評後揭曉；遇到生僻字再點英文後面的 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs bg-sky-50 text-sky-600"><i class="fa-solid fa-language"></i>看中文</span> 看翻譯。</p>
+            <p class="text-xs md:text-sm text-gray-500 mt-1">三大模式一鍵切換：<b>📖 閱讀</b>看劇情、<b>🎧 聽力</b>遮英文挑戰、<b>🎤 配音</b>降影片音量錄音評分。題型可在「進階設定」切換四選一／填空／句子重組。</p>
         </div>
 
         <div id="chapter-tabs" class="mb-3 flex gap-2">
@@ -745,6 +927,175 @@ function seededShuffle(arr, seed) {
     }
     return a;
 }
+
+/* ---- 文字輔助：斷詞、normalize、Levenshtein、escape ---- */
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+
+// 把句子拆成 [{ token, isWord }] 的陣列，保留標點和空白
+function tokenize(sentence) {
+    const out = [];
+    const re = /([A-Za-z']+)|([^A-Za-z']+)/g;
+    let m;
+    while ((m = re.exec(sentence)) !== null) {
+        if (m[1]) out.push({ token: m[1], isWord: true });
+        else out.push({ token: m[2], isWord: false });
+    }
+    return out;
+}
+// 只取單字（小寫、去標點）
+function wordsOnly(sentence) {
+    return tokenize(sentence).filter(t => t.isWord).map(t => t.token.toLowerCase());
+}
+// 比對兩句的字差異：回傳 [{ index, correctWord, wrongWord }]（以正確句的索引為準）
+function diffWords(correctSentence, wrongSentence) {
+    const cTokens = tokenize(correctSentence).filter(t => t.isWord);
+    const wTokens = tokenize(wrongSentence).filter(t => t.isWord);
+    const diffs = [];
+    const len = Math.min(cTokens.length, wTokens.length);
+    for (let i = 0; i < len; i++) {
+        if (cTokens[i].token.toLowerCase() !== wTokens[i].token.toLowerCase()) {
+            diffs.push({ index: i, correctWord: cTokens[i].token, wrongWord: wTokens[i].token });
+        }
+    }
+    // 長度不同時，視為「結尾差異」
+    if (cTokens.length !== wTokens.length) {
+        // 加一個尾端差異標記（用於 Bat went to Pig / He went with Pig 之類）
+        // 但通常我們選相同長度的選項
+    }
+    return diffs;
+}
+// 計算正確句每個位置，跟干擾選項的差異 → 回傳每個位置的 { index, score, candidates }
+function rankClozePositions(correctSentence, allChoices) {
+    const cWords = tokenize(correctSentence).filter(t => t.isWord);
+    if (cWords.length === 0) return [];
+    const wrongChoices = allChoices.filter(c => c !== correctSentence);
+    const wrongTokenized = wrongChoices.map(c => tokenize(c).filter(t => t.isWord));
+    const ranked = [];
+    for (let i = 0; i < cWords.length; i++) {
+        const cw = cWords[i].token.toLowerCase();
+        let diffCount = 0;
+        const wrongAtPos = [];
+        const seenLower = new Set([cw]);
+        for (const wt of wrongTokenized) {
+            if (i < wt.length) {
+                const ww = wt[i].token;
+                if (ww.toLowerCase() !== cw) {
+                    diffCount++;
+                    if (!seenLower.has(ww.toLowerCase())) {
+                        wrongAtPos.push(ww);
+                        seenLower.add(ww.toLowerCase());
+                    }
+                }
+            }
+        }
+        if (diffCount === 0) continue;
+        const lenBonus = Math.min(cWords[i].token.length, 6);
+        const score = diffCount * 3 + wrongAtPos.length * 2 + lenBonus;
+        ranked.push({
+            index: i,
+            score,
+            correctWord: cWords[i].token,
+            wrongWords: wrongAtPos, // 不含正確字
+        });
+    }
+    return ranked.sort((a, b) => b.score - a.score);
+}
+
+// 為一句話挑出 1～3 個挖空位置（依 sentence ID 種子決定數量與選擇）
+// 回傳：{ blanks: [{ index, correctWord, candidates }], wordBank: [可選字...] }
+function pickClozeTarget(correctSentence, allChoices, sentenceId) {
+    const ranked = rankClozePositions(correctSentence, allChoices);
+    if (ranked.length === 0) return null;
+
+    // 用 ID 種子決定挖幾個空格（1/2/3）：權重 40%/35%/25%
+    const seed = hashCode(sentenceId || correctSentence);
+    const rnd = mulberry32(seed);
+    const r = rnd();
+    let nBlanks;
+    if (r < 0.40) nBlanks = 1;
+    else if (r < 0.75) nBlanks = 2;
+    else nBlanks = 3;
+    // 上限：可用位置數、句子單字數的一半（避免句子被挖太空）
+    const cWords = wordsOnly(correctSentence);
+    const maxByHalf = Math.max(1, Math.floor(cWords.length / 2));
+    nBlanks = Math.min(nBlanks, ranked.length, maxByHalf);
+
+    // 從 ranked 前 K 名中（K = min(ranked.length, nBlanks+2)）隨機挑 nBlanks 個
+    const pool = ranked.slice(0, Math.min(ranked.length, nBlanks + 2));
+    const picked = seededShuffle(pool, seed ^ 0xc0ffee).slice(0, nBlanks);
+    // 按句子原順序排
+    picked.sort((a, b) => a.index - b.index);
+
+    // 每個空格的選項：正確字 + 該位置干擾字（去重去過）
+    const blanks = picked.map(p => {
+        const candidates = [p.correctWord, ...p.wrongWords];
+        return {
+            index: p.index,
+            correctWord: p.correctWord,
+            candidates,
+        };
+    });
+
+    // word bank：所有空格的字加起來去重（小寫去重，保留原 case）
+    const seen = new Set();
+    const wordBank = [];
+    blanks.forEach(b => {
+        b.candidates.forEach(w => {
+            const k = w.toLowerCase();
+            if (!seen.has(k)) {
+                seen.add(k);
+                wordBank.push(w);
+            }
+        });
+    });
+
+    return { blanks, wordBank };
+}
+// Levenshtein 距離（標準動態規劃）
+function levenshtein(a, b) {
+    if (a === b) return 0;
+    const m = a.length, n = b.length;
+    if (m === 0) return n;
+    if (n === 0) return m;
+    const dp = Array(n + 1);
+    for (let j = 0; j <= n; j++) dp[j] = j;
+    for (let i = 1; i <= m; i++) {
+        let prev = dp[0];
+        dp[0] = i;
+        for (let j = 1; j <= n; j++) {
+            const tmp = dp[j];
+            if (a[i - 1] === b[j - 1]) dp[j] = prev;
+            else dp[j] = 1 + Math.min(prev, dp[j], dp[j - 1]);
+            prev = tmp;
+        }
+    }
+    return dp[n];
+}
+// 計算兩個句子的相似度（0~1，以單字為單位）
+function similarityScore(target, said) {
+    const a = wordsOnly(target);
+    const b = wordsOnly(said);
+    if (a.length === 0 && b.length === 0) return 1;
+    if (a.length === 0 || b.length === 0) return 0;
+    const dist = levenshtein(a.join(' '), b.join(' '));
+    const maxLen = Math.max(a.join(' ').length, b.join(' ').length);
+    return Math.max(0, 1 - dist / maxLen);
+}
+// 產生視覺化的單字級 diff（給語音評分回饋）
+function wordLevelDiff(target, said) {
+    const a = wordsOnly(target);
+    const b = wordsOnly(said);
+    // 兩端最長共同子序列做對齊（簡化版：用 set 標記哪些單字念對了）
+    const saidSet = new Set(b);
+    return a.map(w => ({
+        word: w,
+        ok: saidSet.has(w)
+    }));
+}
 function getChoicesFor(sentence) {
     const correct = sentence.en;
     const others = DEFAULT_SENTENCES.filter(x => x.id !== sentence.id);
@@ -769,8 +1120,7 @@ function defaultProgress() {
     DEFAULT_SENTENCES.forEach(s => {
         map[s.id] = {
             playCount: 0,
-            firstHeard: null,   // 'good' | 'ok' | 'bad'
-            quizCorrect: null,  // true | false
+            quizCorrect: null,  // true | false（四選一/填空/重組，任一答對即記錄）
             quizAttempts: 0,
             shadowed: false,
             lastSpeed: null,
@@ -779,6 +1129,10 @@ function defaultProgress() {
             done: false,
             revealed: false,    // 是否已揭曉英文
             showZh: false,      // 是否顯示這句的中文翻譯（個別控制）
+            clozeWrongOnce: false, // 填空答錯過一次（用於顯示提示按鈕）
+            clozeHintShown: false, // 已點過字首提示
+            scrambleDone: false,   // 句子重組答對
+            speechScore: null,     // 最近一次語音評分（0-100）
         };
     });
     return map;
@@ -786,13 +1140,18 @@ function defaultProgress() {
 
 function defaultState() {
     return {
+        // 三大模式：'reading' | 'listening' | 'dubbing'
+        appMode: 'listening',
+        // 題型：'mc'（四選一）| 'cloze'（填空）| 'scramble'（句子重組，僅長句適用）
+        quizType: 'mc',
         hideEnglish: true,      // 預設：精聽模式，遮住英文
         showTimeEditor: false,
-        quizMode: true,         // 預設開啟四選一（聽完播放再揭曉選項）
-        maskOn: false,
+        quizMode: true,         // 預設開啟題目區（聽完播放再揭曉選項）
+        maskOn: true,           // 預設開啟字幕遮罩（YouTube 內建字幕會干擾聽力訓練）
         maskOpacity: 85,
         maskPos: { x: 0, y: 0, w: 0, h: 0, set: false },
         speed: 1.0,
+        videoVolume: 100,       // YouTube 音量（0-100）；配音模式會降到 20
         fontSize: 2,
         stars: 0,
         combo: 0,
@@ -829,11 +1188,11 @@ function loadState() {
         const savedProgress = parsed.progress || {};
         DEFAULT_SENTENCES.forEach(s => {
             merged.progress[s.id] = { ...def.progress[s.id], ...(merged.progress[s.id] || {}) };
-            // 舊資料相容：已自評或答過題的句子預設揭曉
+            // 舊資料相容：答過題的句子預設揭曉
             const savedField = savedProgress[s.id] || {};
             if (!('revealed' in savedField)) {
                 const p = merged.progress[s.id];
-                if (p.firstHeard !== null || p.quizCorrect !== null || p.done) {
+                if (p.quizCorrect !== null || p.done) {
                     p.revealed = true;
                 }
             }
@@ -859,6 +1218,10 @@ let playerReady = false;
 let stopTimer = null;
 let currentPlayingId = null;
 
+// 本次 session 已「完整播放過」的句子（不持久化）。題目區只在這些句子上顯示，
+// 強制使用者每次都要「先聽完」才能看到選項，避免讀題作弊。
+const _playedInSession = new Set();
+
 const ytTag = document.createElement('script');
 ytTag.src = 'https://www.youtube.com/iframe_api';
 document.head.appendChild(ytTag);
@@ -877,10 +1240,12 @@ window.onYouTubeIframeAPIReady = function () {
             onReady: () => {
                 playerReady = true;
                 applySpeed(state.speed);
+                try { player.setVolume && player.setVolume(state.videoVolume != null ? state.videoVolume : 100); } catch (e) {}
             },
             onStateChange: (e) => {
                 if (e.data === YT.PlayerState.PLAYING) {
                     applySpeed(state.speed);
+                    try { player.setVolume && player.setVolume(state.videoVolume != null ? state.videoVolume : 100); } catch (e) {}
                 }
             }
         }
@@ -937,18 +1302,20 @@ function playSegment(sentence, opts = {}) {
         currentPlayingId = null;
         document.getElementById('now-playing').textContent = '—';
         markCardAsNotPlaying(sentence.id);
+        // 播放「完成」時才把這句加入本 session 已聽過清單，並重繪揭曉題目區
+        if (!opts.silent && !_playedInSession.has(sentence.id)) {
+            _playedInSession.add(sentence.id);
+            renderSentences();
+        }
         if (opts.onEnd) opts.onEnd();
     }, realDuration + 120);
 
     if (!opts.silent) {
         const p = state.progress[sentence.id];
-        const wasFirstPlay = (p.playCount || 0) === 0;
         p.playCount = (p.playCount || 0) + 1;
         p.lastSpeed = state.speed;
         saveState();
         updateStats();
-        // 第一次播放後重繪一次以揭曉四選一選項（之後的播放不再重繪以避免閃爍）
-        if (wasFirstPlay) renderSentences();
     }
     markCardAsPlaying(sentence.id);
 }
@@ -969,6 +1336,240 @@ function applySpeed(s) {
         }
     });
     saveState();
+}
+
+/* =========================================================
+ *  填空 / 句子重組 事件處理
+ * ======================================================= */
+function setupClozeHandlers(card, s) {
+    const chips = card.querySelectorAll('.cloze-chip');
+    const blanks = card.querySelectorAll('.cloze-blank');
+    if (!chips.length || !blanks.length) return;
+    let resolved = false;
+
+    // 每個空格可以反覆嘗試；單一 chip 不會「用掉」（多空格可能用到不同 chip，且錯了也可以再試）
+    const totalBlanks = blanks.length;
+    const isAllCorrect = () => [...card.querySelectorAll('.cloze-blank')].every(b => b.classList.contains('correct'));
+    const findNextEmpty = () => card.querySelector('.cloze-blank:not(.correct):not(.filled)') || card.querySelector('.cloze-blank:not(.correct)');
+
+    const tryFill = (blank, chip) => {
+        if (resolved || blank.classList.contains('correct')) return;
+        const userWord = chip.dataset.word;
+        const correctWord = blank.dataset.correct || '';
+        blank.textContent = userWord;
+        blank.classList.remove('wrong');
+        blank.classList.add('filled');
+        blank.dataset.filled = userWord;
+        const isCorrect = userWord.toLowerCase() === correctWord.toLowerCase();
+        const p2 = state.progress[s.id];
+        p2.quizAttempts = (p2.quizAttempts || 0) + 1;
+
+        if (isCorrect) {
+            blank.classList.add('correct');
+            burst(blank);
+            saveState();
+            // 全部空格都對才算完成
+            if (isAllCorrect()) {
+                resolved = true;
+                p2.quizCorrect = true;
+                p2.revealed = true;
+                bumpCombo();
+                state.stars += 1;
+                if (p2.lastSpeed >= 1.0 && !p2.done) {
+                    p2.done = true;
+                    state.stars += 1;
+                    if (allChapterDone(s.chapter)) bigConfetti();
+                }
+                saveState();
+                setTimeout(() => { renderSentences(); updateStats(); }, 900);
+            }
+        } else {
+            blank.classList.add('wrong');
+            chip.classList.add('wrong-pick');
+            p2.quizCorrect = false;
+            p2.clozeWrongOnce = true;
+            breakCombo();
+            saveState();
+            // 700ms 後復原，讓使用者再試
+            setTimeout(() => {
+                blank.classList.remove('wrong', 'filled');
+                blank.removeAttribute('data-filled');
+                blank.textContent = '';
+                chip.classList.remove('wrong-pick');
+                // 第一次答錯：重繪以顯示「💡 給提示」按鈕
+                if (!state.progress[s.id].clozeHintShown && !card.querySelector('.cloze-hint-btn')) {
+                    renderSentences();
+                }
+            }, 700);
+        }
+    };
+
+    chips.forEach(chip => {
+        chip.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const blank = findNextEmpty();
+            if (!blank) return;
+            tryFill(blank, chip);
+        });
+        chip.addEventListener('dragstart', (e) => {
+            chip.classList.add('dragging');
+            try {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', chip.dataset.word);
+            } catch (err) {}
+        });
+        chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+    });
+    blanks.forEach(blank => {
+        blank.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // 點已填入但還沒對的空格可以清空重來
+            if (blank.classList.contains('filled') && !blank.classList.contains('correct')) {
+                blank.classList.remove('filled', 'wrong');
+                blank.removeAttribute('data-filled');
+                blank.textContent = '';
+            }
+        });
+        blank.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (!blank.classList.contains('correct')) blank.classList.add('drag-over');
+        });
+        blank.addEventListener('dragleave', () => blank.classList.remove('drag-over'));
+        blank.addEventListener('drop', (e) => {
+            e.preventDefault();
+            blank.classList.remove('drag-over');
+            if (blank.classList.contains('correct')) return;
+            const word = (e.dataTransfer.getData('text/plain') || '').trim();
+            const chip = [...card.querySelectorAll('.cloze-chip')].find(c => c.dataset.word === word);
+            if (!chip) return;
+            tryFill(blank, chip);
+        });
+    });
+
+    // 字首提示按鈕：對所有未完成的空格顯示字首
+    const hintBtn = card.querySelector('.cloze-hint-btn');
+    if (hintBtn) {
+        hintBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const p2 = state.progress[s.id];
+            p2.clozeHintShown = true;
+            saveState();
+            card.querySelectorAll('.cloze-blank:not(.correct)').forEach(b => {
+                const ans = b.dataset.correct || '';
+                b.textContent = ans[0] + '____';
+                b.style.color = '#92400E';
+                b.style.fontWeight = 'bold';
+                b.style.background = '#FEF3C7';
+            });
+            hintBtn.style.display = 'none';
+        });
+    }
+}
+
+function setupScrambleHandlers(card, s) {
+    const area = card.querySelector('.scramble-area');
+    const bank = card.querySelector('.scramble-bank');
+    if (!area || !bank) return;
+    const chips = card.querySelectorAll('.scramble-chip');
+
+    const setupChip = (chip) => {
+        chip.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // 點擊：在 bank → 移到 area；在 area → 移回 bank
+            if (chip.parentElement === bank) {
+                area.appendChild(chip);
+            } else {
+                bank.appendChild(chip);
+            }
+        });
+        chip.addEventListener('dragstart', (e) => {
+            chip.classList.add('dragging');
+            try {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', chip.dataset.word);
+            } catch (err) {}
+        });
+        chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+    };
+    chips.forEach(setupChip);
+
+    const handleDrop = (container) => {
+        container.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            container.classList.add('drag-over');
+            // 計算 drop 插入位置：依滑鼠 x 與現有 chip 中心點比較
+            const dragging = card.querySelector('.scramble-chip.dragging');
+            if (!dragging) return;
+            const after = [...container.querySelectorAll('.scramble-chip:not(.dragging)')].find(c => {
+                const r = c.getBoundingClientRect();
+                return e.clientX < r.left + r.width / 2;
+            });
+            if (after) container.insertBefore(dragging, after);
+            else container.appendChild(dragging);
+        });
+        container.addEventListener('dragleave', () => container.classList.remove('drag-over'));
+        container.addEventListener('drop', (e) => {
+            e.preventDefault();
+            container.classList.remove('drag-over');
+        });
+    };
+    handleDrop(area);
+    handleDrop(bank);
+
+    const checkBtn = card.querySelector('.scramble-check-btn');
+    const resetBtn = card.querySelector('.scramble-reset-btn');
+    if (checkBtn) {
+        checkBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const userWords = [...area.querySelectorAll('.scramble-chip')].map(c => c.dataset.word);
+            const target = (area.dataset.target || '').split(' ').filter(Boolean);
+            const p2 = state.progress[s.id];
+            p2.quizAttempts = (p2.quizAttempts || 0) + 1;
+
+            // 逐字檢查
+            let allCorrect = userWords.length === target.length;
+            area.querySelectorAll('.scramble-chip').forEach((c, i) => {
+                c.classList.remove('correct-pos');
+                c.classList.remove('wrong-pick');
+                if (i < target.length && c.dataset.word.toLowerCase() === target[i].toLowerCase()) {
+                    c.classList.add('correct-pos');
+                } else {
+                    allCorrect = false;
+                }
+            });
+            if (allCorrect) {
+                p2.quizCorrect = true;
+                p2.scrambleDone = true;
+                p2.revealed = true;
+                bumpCombo();
+                state.stars += 1;
+                burst(area);
+                if (p2.lastSpeed >= 1.0 && !p2.done) {
+                    p2.done = true;
+                    state.stars += 1;
+                    if (allChapterDone(s.chapter)) bigConfetti();
+                }
+                saveState();
+                setTimeout(() => { renderSentences(); updateStats(); }, 900);
+            } else {
+                area.classList.add('animate-shake');
+                breakCombo();
+                p2.quizCorrect = false;
+                saveState();
+                setTimeout(() => area.classList.remove('animate-shake'), 400);
+            }
+        });
+    }
+    if (resetBtn) {
+        resetBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // 把 area 內所有 chip 移回 bank
+            [...area.querySelectorAll('.scramble-chip')].forEach(c => {
+                c.classList.remove('correct-pos', 'wrong-pick');
+                bank.appendChild(c);
+            });
+        });
+    }
 }
 
 /* =========================================================
@@ -993,17 +1594,14 @@ function renderSentences() {
         card.className = `card bg-white rounded-2xl shadow border-2 border-pink-100 p-3 md:p-4 ${p.done ? 'card-done' : ''}`;
         card.dataset.id = s.id;
 
-        const heardPill = p.firstHeard ? ({
-            good: '<span class="pill bg-emerald-100 text-emerald-700"><i class="fa-solid fa-check"></i> 聽懂</span>',
-            ok:   '<span class="pill bg-yellow-100 text-yellow-700"><i class="fa-solid fa-circle-half-stroke"></i> 大概懂</span>',
-            bad:  '<span class="pill bg-rose-100 text-rose-700"><i class="fa-solid fa-xmark"></i> 聽不懂</span>',
-        })[p.firstHeard] : '';
-
         const quizPill = (p.quizCorrect === true)
             ? '<span class="pill bg-emerald-100 text-emerald-700"><i class="fa-solid fa-medal"></i> 答對</span>'
             : (p.quizCorrect === false ? '<span class="pill bg-rose-100 text-rose-700"><i class="fa-solid fa-xmark"></i> 答錯</span>' : '');
 
         const shadowedPill = p.shadowed ? '<span class="pill bg-purple-100 text-purple-700"><i class="fa-solid fa-microphone"></i> 已跟讀</span>' : '';
+        const speechPill = p.speechScore != null
+            ? `<span class="pill ${p.speechScore >= 90 ? 'bg-amber-100 text-amber-700' : p.speechScore >= 70 ? 'bg-yellow-100 text-yellow-700' : 'bg-rose-100 text-rose-700'}" title="最佳發音相似度">🎙️ ${p.speechScore}%</span>`
+            : '';
         const playedPill = p.playCount > 0 ? `<span class="pill bg-pink-100 text-pink-700"><i class="fa-solid fa-play"></i> ${p.playCount}</span>` : '';
         const doneCheck = p.done ? '<span class="text-emerald-500 text-2xl ml-1">✅</span>' : '';
 
@@ -1014,6 +1612,87 @@ function renderSentences() {
             hashCode(s.id) ^ 0x9e3779b9
         );
         const englishVisible = !state.hideEnglish || p.revealed;
+        // 本 session 中是否已完成過這句的播放（題目區依此揭曉）
+        const quizUnlocked = _playedInSession.has(s.id);
+
+        // 依題型產生題目內容
+        let quizTitle = '四選一', quizSubtitle = '你剛剛聽到的是？', quizContent = '';
+        // 句子重組：長度不夠就回退 MC
+        const wordCount = wordsOnly(s.en).length;
+        let effectiveType = state.quizType;
+        if (effectiveType === 'scramble' && wordCount < 4) effectiveType = 'mc';
+
+        if (effectiveType === 'mc') {
+            quizTitle = '四選一';
+            quizSubtitle = '你剛剛聽到的是？';
+            quizContent = `
+                <div class="quiz-choices grid grid-cols-1 gap-1">
+                    ${choicesShuffled.map(c => `
+                        <button class="quiz-btn btn-soft btn-sky text-xs text-left" data-correct="${c.correct}" style="padding:6px 10px; white-space:normal;">
+                            ${escapeHtml(c.text)}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        } else if (effectiveType === 'cloze') {
+            quizTitle = '填空';
+            const clozeData = pickClozeTarget(s.en, rawChoices, s.id);
+            if (!clozeData) {
+                // 找不到差異字 → 回退 MC
+                quizTitle = '四選一';
+                quizSubtitle = '你剛剛聽到的是？（這句沒辦法挖空）';
+                quizContent = `
+                    <div class="quiz-choices grid grid-cols-1 gap-1">
+                        ${choicesShuffled.map(c => `
+                            <button class="quiz-btn btn-soft btn-sky text-xs text-left" data-correct="${c.correct}" style="padding:6px 10px; white-space:normal;">
+                                ${escapeHtml(c.text)}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                const nBlanks = clozeData.blanks.length;
+                quizSubtitle = nBlanks === 1
+                    ? '挑出剛剛聽到的字（可點擊或拖曳）'
+                    : `挑出剛剛聽到的 ${nBlanks} 個字（可點擊或拖曳到對應空格）`;
+                const blankByIndex = new Map(clozeData.blanks.map((b, ord) => [b.index, { ord, ...b }]));
+                const cTokens = tokenize(s.en);
+                let wIdx = -1;
+                const sentenceHTML = cTokens.map(t => {
+                    if (t.isWord) wIdx++;
+                    if (t.isWord && blankByIndex.has(wIdx)) {
+                        const b = blankByIndex.get(wIdx);
+                        return `<span class="cloze-blank" data-correct="${escapeHtml(b.correctWord)}" data-blank-ord="${b.ord}" aria-label="空格"></span>`;
+                    }
+                    return t.isWord ? escapeHtml(t.token) : escapeHtml(t.token).replace(/ /g, '&nbsp;');
+                }).join('');
+                // word bank：所有空格的候選字合併，亂序顯示
+                const chipsHTML = seededShuffle(clozeData.wordBank, hashCode(s.id) ^ 0xdeadbeef)
+                    .map(w => `<span class="cloze-chip" draggable="true" data-word="${escapeHtml(w)}">${escapeHtml(w)}</span>`).join('');
+                const hintHTML = p.clozeWrongOnce && !p.clozeHintShown
+                    ? `<button class="cloze-hint-btn btn-soft btn-yellow text-xs mt-2"><i class="fa-solid fa-lightbulb"></i> 給提示（字首）</button>`
+                    : '';
+                quizContent = `
+                    <div class="cloze-sentence text-sky-900 leading-loose mb-2 select-none">${sentenceHTML}</div>
+                    <div class="cloze-chips flex flex-wrap items-center">${chipsHTML}</div>
+                    ${hintHTML}
+                `;
+            }
+        } else if (effectiveType === 'scramble') {
+            quizTitle = '句子重組';
+            quizSubtitle = '把單字拖到上面排成你剛剛聽到的句子';
+            const wordTokens = tokenize(s.en).filter(t => t.isWord).map(t => t.token);
+            const shuffledWords = seededShuffle(wordTokens.map((w, i) => ({ w, origIndex: i })), hashCode(s.id) ^ 0xbeef0101);
+            const bankHTML = shuffledWords.map(o =>
+                `<span class="scramble-chip" draggable="true" data-word="${escapeHtml(o.w)}" data-orig="${o.origIndex}">${escapeHtml(o.w)}</span>`
+            ).join('');
+            quizContent = `
+                <div class="scramble-area mb-2" data-target="${escapeHtml(wordTokens.join(' '))}"></div>
+                <div class="scramble-bank">${bankHTML}</div>
+                <button class="scramble-check-btn btn-soft btn-mint text-xs mt-2"><i class="fa-solid fa-check"></i> 檢查答案</button>
+                <button class="scramble-reset-btn btn-soft btn-yellow text-xs mt-2 ml-1"><i class="fa-solid fa-rotate-left"></i> 重來</button>
+            `;
+        }
 
         card.innerHTML = `
             <div class="flex items-start gap-2">
@@ -1025,7 +1704,7 @@ function renderSentences() {
                     <div class="flex items-center flex-wrap gap-1 mb-1">
                         <span class="pill bg-pink-50 text-pink-700">#${globalIdx}</span>
                         <span class="text-xs text-gray-400 font-mono">${fmtTime(s.start + p.startDelta)} - ${fmtTime(s.end + p.endDelta)}</span>
-                        ${playedPill} ${heardPill} ${quizPill} ${shadowedPill} ${doneCheck}
+                        ${playedPill} ${quizPill} ${shadowedPill} ${speechPill} ${doneCheck}
                     </div>
                     <div class="sentence-en font-bold leading-snug ${englishVisible ? 'text-gray-800' : 'text-gray-300 italic select-none'}">
                         ${englishVisible ? highlightEnglish(s.en) : '🎧 ??? 聽聽看再揭曉'}
@@ -1047,31 +1726,16 @@ function renderSentences() {
                 <span class="text-xs text-gray-400 ml-2">已調整：${(p.startDelta >= 0 ? '+' : '') + p.startDelta.toFixed(0)}s / ${(p.endDelta >= 0 ? '+' : '') + p.endDelta.toFixed(0)}s</span>
             </div>
 
-            <!-- Round 1：自評 -->
-            <div class="mt-3 bg-pink-50/60 rounded-xl p-2">
-                <div class="text-xs font-bold text-pink-700 mb-1"><i class="fa-solid fa-headphones"></i> Round 1：聽完選一個（無字幕）</div>
-                <div class="flex flex-wrap gap-1">
-                    <button class="assess-btn btn-soft btn-mint text-xs" data-v="good">😎 聽懂</button>
-                    <button class="assess-btn btn-soft btn-yellow text-xs" data-v="ok">🤔 大概懂</button>
-                    <button class="assess-btn btn-soft btn-pink text-xs" data-v="bad">😵 聽不懂</button>
-                </div>
-            </div>
-
-            <!-- 四選一：選項要先按 ▶ 播放後才會出現 -->
+            <!-- 題目區：依 state.quizType 切換（mc / cloze / scramble），要播放「完成」後才出題 -->
             <div class="quiz-box mt-2 bg-sky-50/60 rounded-xl p-2 ${state.quizMode ? '' : 'hide'}">
-                <div class="text-xs font-bold text-sky-700 mb-1"><i class="fa-solid fa-circle-question"></i> 四選一：你剛剛聽到的是？</div>
-                ${p.playCount > 0 ? `
-                    <div class="quiz-choices grid grid-cols-1 gap-1">
-                        ${choicesShuffled.map(c => `
-                            <button class="quiz-btn btn-soft btn-sky text-xs text-left" data-correct="${c.correct}" style="padding:6px 10px; white-space:normal;">
-                                ${c.text}
-                            </button>
-                        `).join('')}
-                    </div>
-                ` : `
+                <div class="text-xs font-bold text-sky-700 mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>${quizTitle}：${quizSubtitle}</span>
+                </div>
+                ${quizUnlocked ? quizContent : `
                     <div class="quiz-locked flex items-center justify-center gap-2 py-3 text-sky-500 italic text-xs">
                         <i class="fa-solid fa-headphones text-base"></i>
-                        <span>請先按 <i class="fa-solid fa-play text-pink-400"></i> 播放，再選你聽到的句子</span>
+                        <span>請先按 <i class="fa-solid fa-play text-pink-400"></i> 播放並聽完，題目才會出現</span>
                     </div>
                 `}
             </div>
@@ -1081,7 +1745,9 @@ function renderSentences() {
                 <button class="speak-btn btn-soft btn-sky text-xs" ${englishVisible ? '' : 'disabled'} title="用瀏覽器朗讀英文">
                     <i class="fa-solid fa-volume-high"></i> 朗讀
                 </button>
-                <button class="shadow-btn btn-soft btn-lav text-xs"><i class="fa-solid fa-microphone"></i> Shadowing 跟讀</button>
+                <button class="shadow-btn btn-soft btn-lav text-xs" title="${isSpeechRecSupported() ? '聽 → 倒數 → 錄音 → 評分（需要麥克風權限）' : '聽 → 倒數 → 再播一次跟讀（需 Chrome/Edge 才能評分）'}">
+                    <i class="fa-solid fa-microphone"></i> ${isSpeechRecSupported() ? 'Shadowing 評分' : 'Shadowing 跟讀'}
+                </button>
                 <button class="reveal-btn btn-soft btn-peach text-xs">
                     <i class="fa-solid ${englishVisible ? 'fa-eye-slash' : 'fa-eye'}"></i>
                     ${englishVisible ? '重新遮住' : '揭曉答案'}
@@ -1126,37 +1792,6 @@ function renderSentences() {
                 playSegment(s);
             });
         });
-        card.querySelectorAll('.assess-btn').forEach(b => {
-            b.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const v = b.dataset.v;
-                const p2 = state.progress[s.id];
-                const wasFirst = p2.firstHeard === null;
-                p2.firstHeard = v;
-                p2.revealed = true;
-                // 「聽懂」+ 1.0 速度才算完成
-                if (v === 'good' && p2.lastSpeed >= 1.0) {
-                    if (!p2.done) {
-                        p2.done = true;
-                        state.combo += 1;
-                        state.bestCombo = Math.max(state.bestCombo, state.combo);
-                        state.stars += 1;
-                        if (state.combo % 3 === 0) state.stars += 1;
-                        burst(card);
-                        if (allChapterDone(s.chapter)) bigConfetti();
-                    }
-                } else if (v === 'bad') {
-                    state.combo = 0;
-                }
-                if (wasFirst) {
-                    // 第一次選擇後給一點即時回饋
-                }
-                saveState();
-                renderSentences();
-                updateStats();
-                if (p2.revealed) speakText(s.en, v === 'good' ? 0.9 : 0.8);
-            });
-        });
         card.querySelector('.speak-btn')?.addEventListener('click', (e) => {
             e.stopPropagation();
             speakText(s.en, 0.88);
@@ -1171,8 +1806,7 @@ function renderSentences() {
                 if (correct) {
                     b.classList.add('quiz-correct');
                     p2.quizCorrect = true;
-                    state.combo += 1;
-                    state.bestCombo = Math.max(state.bestCombo, state.combo);
+                    bumpCombo();
                     state.stars += 1;
                     burst(b);
                     if (p2.lastSpeed >= 1.0 && !p2.done) {
@@ -1183,13 +1817,19 @@ function renderSentences() {
                 } else {
                     b.classList.add('quiz-wrong', 'animate-shake');
                     p2.quizCorrect = false;
-                    state.combo = 0;
+                    breakCombo();
                     setTimeout(() => b.classList.remove('animate-shake'), 400);
                 }
                 saveState();
                 setTimeout(() => { renderSentences(); updateStats(); }, 700);
             });
         });
+
+        // ===== 填空：點擊 + 拖曳 =====
+        setupClozeHandlers(card, s);
+        // ===== 句子重組：拖曳排序 =====
+        setupScrambleHandlers(card, s);
+
         card.querySelector('.shadow-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             startShadowing(s, card);
@@ -1238,7 +1878,67 @@ function markCardAsNotPlaying(id) {
 /* =========================================================
  *  Shadowing
  * ======================================================= */
+/* ---- 語音辨識：偵測支援 ---- */
+function isSpeechRecSupported() {
+    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+}
+
+let _fallbackToastShown = false;
+function showSpeechFallbackToast() {
+    if (_fallbackToastShown) return;
+    _fallbackToastShown = true;
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;top:18%;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FB923C,#F472B6);color:white;font-weight:700;padding:10px 20px;border-radius:999px;box-shadow:0 6px 16px rgba(0,0,0,.25);z-index:9999;font-size:0.95rem;';
+    t.innerHTML = '💡 想體驗評分功能？請改用 <b>Chrome</b> 或 <b>Edge</b> 瀏覽器';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+}
+
 function startShadowing(s, card) {
+    if (isSpeechRecSupported()) {
+        startShadowingWithScoring(s, card);
+    } else {
+        showSpeechFallbackToast();
+        startShadowingFallback(s, card);
+    }
+}
+
+// 支援評分的版本：聽一次 → 倒數 → 錄音 → 評分
+function startShadowingWithScoring(s, card) {
+    const overlay = document.getElementById('shadow-overlay');
+    const cdEl = document.getElementById('shadow-countdown');
+    const textEl = document.getElementById('shadow-text');
+    overlay.classList.remove('hide');
+    textEl.textContent = '🎧 先聽一次，準備跟讀並錄音評分';
+    cdEl.textContent = '🎧';
+    cdEl.classList.remove('countdown-num');
+    void cdEl.offsetWidth;
+    cdEl.classList.add('countdown-num');
+
+    playSegment(s, {
+        silent: false,
+        onEnd: () => {
+            let n = 3;
+            textEl.textContent = '🎤 倒數結束後請大聲說！';
+            const tick = () => {
+                cdEl.textContent = n > 0 ? n : '🎙️';
+                cdEl.classList.remove('countdown-num');
+                void cdEl.offsetWidth;
+                cdEl.classList.add('countdown-num');
+                if (n > 0) {
+                    n--;
+                    setTimeout(tick, 900);
+                } else {
+                    recognizeShadow(s, card, overlay, cdEl, textEl);
+                }
+            };
+            tick();
+        }
+    });
+}
+
+// 不支援的瀏覽器：保留原本「再播一次給學生跟唸」
+function startShadowingFallback(s, card) {
     const overlay = document.getElementById('shadow-overlay');
     const cdEl = document.getElementById('shadow-countdown');
     const textEl = document.getElementById('shadow-text');
@@ -1249,11 +1949,9 @@ function startShadowing(s, card) {
     void cdEl.offsetWidth;
     cdEl.classList.add('countdown-num');
 
-    // 第一次播放原句
     playSegment(s, {
         silent: false,
         onEnd: () => {
-            // 倒數 3,2,1，再播放一次讓學生跟讀
             let n = 3;
             textEl.textContent = '輪到你了，跟著大聲說！';
             const tick = () => {
@@ -1286,6 +1984,87 @@ function startShadowing(s, card) {
     });
 }
 
+// 語音辨識 + 評分
+function recognizeShadow(s, card, overlay, cdEl, textEl) {
+    const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new Rec();
+    rec.lang = 'en-US';
+    rec.interimResults = false;
+    rec.maxAlternatives = 3;
+    rec.continuous = false;
+
+    textEl.innerHTML = `🎙️ 請大聲說：<b>${escapeHtml(s.en)}</b>`;
+    cdEl.textContent = '🎙️';
+
+    let finished = false;
+    const finish = (transcript, err) => {
+        if (finished) return;
+        finished = true;
+        try { rec.stop(); } catch (e) {}
+        if (err && !transcript) {
+            cdEl.textContent = '❌';
+            const tip = err === 'not-allowed' ? '請允許使用麥克風權限'
+                      : err === 'no-speech' ? '沒聽到聲音，再試一次'
+                      : `辨識失敗（${err}）`;
+            textEl.innerHTML = `<div class="font-bold mb-1">${tip}</div><div class="text-xs">點 🎤 再試一次</div>`;
+            setTimeout(() => overlay.classList.add('hide'), 2500);
+            return;
+        }
+        // 評分（0-100）
+        const score = Math.round(similarityScore(s.en, transcript) * 100);
+        const tier = score >= 90 ? 'perfect' : score >= 70 ? 'great' : 'try';
+        const tierLabel = score >= 90 ? '🌟🌟🌟 PERFECT!'
+                       : score >= 70 ? '🌟🌟 GREAT!'
+                                     : '🌟 加油 Try Again!';
+        const diff = wordLevelDiff(s.en, transcript);
+        const diffHTML = diff.map(d =>
+            `<span class="${d.ok ? 'speech-diff-correct' : 'speech-diff-wrong'}">${escapeHtml(d.word)}</span>`
+        ).join(' ');
+
+        textEl.innerHTML = `
+            <div class="speech-result ${tier} text-left">
+                <div class="text-base font-black mb-1">${tierLabel} · 相似度 ${score}%</div>
+                <div class="text-xs mb-1">辨識到：「${escapeHtml(transcript)}」</div>
+                <div class="text-xs leading-relaxed">${diffHTML}</div>
+            </div>
+        `;
+        cdEl.textContent = score >= 90 ? '🌟🌟🌟' : score >= 70 ? '🌟🌟' : '🌟';
+
+        const p2 = state.progress[s.id];
+        p2.speechScore = Math.max(p2.speechScore || 0, score);
+        if (score >= 70) {
+            p2.shadowed = true;
+            state.stars += score >= 90 ? 3 : 2;
+            if (score >= 90) {
+                burst(card);
+                bumpCombo();
+                if (allChapterDone(s.chapter)) bigConfetti();
+            }
+        } else {
+            state.stars += 1; // 鼓勵獎
+        }
+        saveState();
+        renderSentences();
+        updateStats();
+        setTimeout(() => overlay.classList.add('hide'), 3800);
+    };
+
+    rec.onresult = (e) => {
+        // 取信心最高的 transcript
+        const transcript = e.results[0][0].transcript;
+        finish(transcript, null);
+    };
+    rec.onerror = (e) => { finish('', e.error || 'unknown'); };
+    rec.onend = () => { if (!finished) finish('', 'no-speech'); };
+
+    try {
+        rec.start();
+    } catch (e) {
+        finish('', e.message || 'start-failed');
+    }
+    setTimeout(() => { if (!finished) finish('', 'timeout'); }, 9000);
+}
+
 /* =========================================================
  *  統計 & 等級 & 進度
  * ======================================================= */
@@ -1299,10 +2078,6 @@ function updateStats() {
     // 整體統計：以所有「有嘗試過」的句子為範圍（跨批次累積）
     const all = Object.values(state.progress);
 
-    const firstAttempted = all.filter(p => p.firstHeard !== null);
-    const firstGood = firstAttempted.filter(p => p.firstHeard === 'good').length;
-    const firstRate = firstAttempted.length ? Math.round(firstGood / firstAttempted.length * 100) : 0;
-
     const quizAttempted = all.filter(p => p.quizCorrect !== null);
     const quizCorrect = quizAttempted.filter(p => p.quizCorrect === true).length;
     const quizRate = quizAttempted.length ? Math.round(quizCorrect / quizAttempted.length * 100) : 0;
@@ -1314,7 +2089,6 @@ function updateStats() {
     const shadowDone = all.filter(p => p.shadowed).length;
     const shadowRate = totalDone ? Math.round(shadowDone / totalDone * 100) : 0;
 
-    document.getElementById('stat-first').textContent = firstRate + '%';
     document.getElementById('stat-quiz').textContent = quizRate + '%';
     document.getElementById('stat-replay').textContent = totalReplay;
     document.getElementById('stat-normal').textContent = normalRate + '%';
@@ -1328,10 +2102,9 @@ function updateStats() {
     // 等級判定（綜合分數 0-100，依「全部 112 句」中已完成比例）
     const overallTotal = DEFAULT_SENTENCES.length;
     const score = Math.round(
-        (totalDone / overallTotal) * 40 +
-        (firstRate / 100) * 25 +
-        (quizRate / 100) * 25 +
-        (shadowRate / 100) * 10
+        (totalDone / overallTotal) * 50 +
+        (quizRate / 100) * 35 +
+        (shadowRate / 100) * 15
     );
     let levelText = '🐣 初心者 Beginner';
     let recommend = '先用 0.75x 慢速熟悉發音，再升級到 1.0x。';
@@ -1370,6 +2143,84 @@ function burst(originEl) {
         colors: ['#F472B6', '#FB923C', '#FBBF24', '#34D399', '#38BDF8', '#A78BFA']
     });
 }
+/* ---- Combo 變動：統一更新並觸發視覺/音效 ---- */
+function bumpCombo() {
+    state.combo += 1;
+    state.bestCombo = Math.max(state.bestCombo, state.combo);
+    onComboChanged(state.combo);
+}
+function breakCombo() {
+    state.combo = 0;
+    // 撤銷所有發光
+    document.querySelectorAll('#sentence-list .combo-hot').forEach(c => c.classList.remove('combo-hot'));
+}
+
+/* ---- Combo 熱血視覺 + 音效 ---- */
+let _audioCtx = null;
+function getAudioCtx() {
+    if (_audioCtx) return _audioCtx;
+    try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    return _audioCtx;
+}
+function playBeep(freq, dur, vol = 0.06) {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    gain.gain.value = vol;
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + dur);
+}
+function playComboSound(combo) {
+    // 升調 do-mi-sol-do（依 combo 階段）
+    const notes = [523, 659, 784, 1047];
+    const idx = Math.min(notes.length - 1, Math.floor(combo / 5) - 1);
+    if (idx < 0) return;
+    playBeep(notes[idx], 0.18, 0.08);
+    setTimeout(() => playBeep(notes[idx] * 1.5, 0.16, 0.06), 100);
+}
+function showComboBanner(combo) {
+    // 移除舊的
+    document.querySelectorAll('#combo-banner').forEach(n => n.remove());
+    const div = document.createElement('div');
+    div.id = 'combo-banner';
+    let label = 'Combo!';
+    if (combo >= 20) label = `🔥🔥 INSANE x${combo}!`;
+    else if (combo >= 15) label = `⚡ UNSTOPPABLE x${combo}!`;
+    else if (combo >= 10) label = `🌟 AMAZING x${combo}!`;
+    else if (combo >= 5)  label = `✨ COMBO x${combo}!`;
+    div.textContent = label;
+    document.body.appendChild(div);
+    setTimeout(() => div.classList.add('fading'), 900);
+    setTimeout(() => div.remove(), 1300);
+}
+function onComboChanged(newCombo) {
+    // 5 連擊以上：橫幅 + 音效，所有 done 卡片發光
+    if (newCombo >= 5 && newCombo % 5 === 0) {
+        showComboBanner(newCombo);
+        playComboSound(newCombo);
+        // 全部 done 的卡片加上 hot
+        document.querySelectorAll('#sentence-list .card.card-done').forEach(c => {
+            c.classList.add('combo-hot');
+        });
+        // 6 秒後撤銷發光（避免一直閃）
+        setTimeout(() => {
+            document.querySelectorAll('#sentence-list .combo-hot').forEach(c => c.classList.remove('combo-hot'));
+        }, 6000);
+    }
+    // combo badge 也加閃動
+    const cb = document.getElementById('combo-text');
+    if (cb && newCombo > 0) {
+        cb.classList.remove('animate-pop');
+        void cb.offsetWidth;
+        cb.classList.add('animate-pop');
+    }
+}
+
 function bigConfetti() {
     const duration = 1500;
     const end = Date.now() + duration;
@@ -1401,6 +2252,56 @@ function toggleControlPanel() {
 function toggleStats() {
     document.getElementById('stats-panel').classList.toggle('hide');
 }
+
+/* ===== 三大模式：一鍵切換情境 ===== */
+function setAppMode(mode) {
+    state.appMode = mode;
+    if (mode === 'reading') {
+        // 閱讀模式：英文全顯示、中文全顯示、關題目區、遮罩關閉、影片正常音量
+        state.hideEnglish = false;
+        state.quizMode = false;
+        state.maskOn = false;
+        state.videoVolume = 100;
+        Object.values(state.progress).forEach(p => { p.revealed = true; p.showZh = true; });
+        try { if (player) { player.unMute && player.unMute(); player.setVolume && player.setVolume(100); } } catch (e) {}
+    } else if (mode === 'listening') {
+        // 聽力挑戰：遮英文、開題目區、遮罩可選、影片正常音量
+        state.hideEnglish = true;
+        state.quizMode = true;
+        state.videoVolume = 100;
+        Object.values(state.progress).forEach(p => { p.revealed = false; p.showZh = false; });
+        try { if (player) { player.unMute && player.unMute(); player.setVolume && player.setVolume(100); } } catch (e) {}
+    } else if (mode === 'dubbing') {
+        // 配音員：英文顯示（要看著唸）、關題目區、影片降到 20% 音量
+        state.hideEnglish = false;
+        state.quizMode = false;
+        state.videoVolume = 20;
+        Object.values(state.progress).forEach(p => { p.revealed = true; });
+        try { if (player) { player.setVolume && player.setVolume(20); } } catch (e) {}
+    }
+    saveState();
+    applyAllUI();
+    renderSentences();
+    updateModeUI();
+}
+function updateModeUI() {
+    document.querySelectorAll('#mode-switcher .mode-card').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === state.appMode);
+    });
+}
+
+/* ===== 題型切換 ===== */
+function setQuizType(t) {
+    state.quizType = t;
+    saveState();
+    updateQuizTypeUI();
+    renderSentences();
+}
+function updateQuizTypeUI() {
+    document.querySelectorAll('.quiz-type-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.qt === state.quizType);
+    });
+}
 function toggleAllChinese() {
     // 批次操作：若有任一句尚未顯示中文，則全部顯示；否則全部隱藏。
     const anyHidden = Object.values(state.progress).some(p => !p.showZh);
@@ -1429,7 +2330,7 @@ function toggleTimeEditor() {
 }
 function toggleQuizMode() {
     state.quizMode = !state.quizMode;
-    document.getElementById('quiz-btn-label').textContent = state.quizMode ? '關閉四選一' : '啟用四選一';
+    document.getElementById('quiz-btn-label').textContent = state.quizMode ? '關閉題目區' : '啟用題目區';
     saveState(); renderSentences();
 }
 function toggleMask() {
@@ -1766,9 +2667,11 @@ function applyAllUI() {
     document.getElementById('hideen-btn-label').textContent =
         state.hideEnglish ? '全部遮英文（精聽模式）' : '英文全顯示（備課模式）';
     document.getElementById('te-btn-label').textContent = state.showTimeEditor ? '隱藏時間調整' : '顯示時間調整';
-    document.getElementById('quiz-btn-label').textContent = state.quizMode ? '關閉四選一' : '啟用四選一';
+    document.getElementById('quiz-btn-label').textContent = state.quizMode ? '關閉題目區' : '啟用題目區';
     document.getElementById('mask-btn-label').textContent = state.maskOn ? '關閉字幕遮罩' : '開啟字幕遮罩';
     document.getElementById('mask-quick-label').textContent = state.maskOn ? '關遮罩' : '遮字幕';
+    updateModeUI();
+    updateQuizTypeUI();
     document.getElementById('font-size-label').textContent = ['', '小', '中', '大', '特大'][state.fontSize];
     const list = document.getElementById('sentence-list');
     list.classList.remove('font-size-1', 'font-size-2', 'font-size-3', 'font-size-4');
@@ -1776,6 +2679,14 @@ function applyAllUI() {
     if (state.maskOn) {
         document.getElementById('subtitle-mask').classList.add('show');
         document.getElementById('mask-controls').classList.remove('hide');
+        // 預設位置：若還沒手動設定過，等下個 frame 影片區塊有尺寸時自動計算
+        if (!state.maskPos.set) {
+            requestAnimationFrame(() => {
+                try { resetMaskPosition(); } catch (e) {}
+            });
+        } else {
+            applyMaskPos();
+        }
     }
     document.getElementById('mask-opacity').value = state.maskOpacity;
     document.getElementById('mask-opacity-val').textContent = state.maskOpacity + '%';
