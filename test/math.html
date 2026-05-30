@@ -3,251 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小數兩位數計算練習 - 小猴子苦苦哀求版</title>
+    <title>小學數學觀念強化練習題</title>
     <style>
         body {
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background-color: #f0f8ff; /* 溫柔的愛麗絲藍 */
-            padding: 20px;
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            background-color: #f4f7f6;
             color: #333;
+            line-height: 1.6;
+            padding: 20px;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(70, 130, 180, 0.15);
-            border: 4px solid #87ceeb;
-        }
-        .header-section {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .monkey-img {
-            width: 150px;
-            height: auto;
-            border-radius: 50%;
-            border: 4px dashed #5f9ea0;
-            padding: 5px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         h1 {
-            color: #4682b4;
-            margin-top: 15px;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
         }
-        
-        /* 小猴子的懇求叮嚀區塊設計 */
-        .tips-box {
-            background-color: #e0ffff;
-            border-left: 8px solid #4682b4;
-            padding: 20px;
-            margin: 20px 0 30px 0;
-            border-radius: 0 15px 15px 0;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        .quiz-item {
+            background: #fafafa;
+            border-left: 5px solid #3498db;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
         }
-        .tips-title {
-            color: #005f6b;
-            font-size: 1.3em;
+        .question {
+            font-size: 1.1em;
             font-weight: bold;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
         }
-        .tips-list {
-            list-style: none;
-            padding-left: 0;
+        .options {
+            margin-bottom: 10px;
         }
-        .tips-list li {
-            margin-bottom: 15px;
-            font-size: 1.15em;
-            line-height: 1.6;
-            position: relative;
-            padding-left: 40px;
-            color: #2f4f4f;
+        .option {
+            margin: 5px 0;
         }
-        .tips-list li::before {
-            content: '🥺';
-            position: absolute;
-            left: 0;
-            top: 0;
-            font-size: 1.3em;
-        }
-        .highlight {
-            background-color: #b0e0e6;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            color: #005f6b;
-        }
-
-        .practice-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .q-box {
-            font-size: 1.2em;
-            padding: 15px;
-            background: #fdfdfd;
-            border: 2px solid #add8e6;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-        .q-box:hover {
-            transform: scale(1.02);
-            background: #f0f8ff;
-        }
-        .q-num {
-            background: #5f9ea0;
-            color: white;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            margin-right: 15px;
-            font-size: 0.9em;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-        .btn-container {
-            text-align: center;
-            margin: 40px 0;
-        }
-        #show-ans-btn {
-            background-color: #4682b4;
+        .btn-ans {
+            background-color: #3498db;
             color: white;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.2em;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 6px rgba(70, 130, 180, 0.3);
-        }
-        #show-ans-btn:hover {
-            background-color: #4169e1;
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 6px 12px rgba(70, 130, 180, 0.4);
-        }
-        #answer-section {
-            display: none;
-            margin-top: 30px;
-            padding: 25px;
-            background-color: #f0f8ff;
-            border: 3px dashed #4682b4;
-            border-radius: 15px;
-        }
-        .ans-item {
-            margin-bottom: 12px;
-            padding: 10px;
-            border-bottom: 1px dashed #add8e6;
-            font-size: 1.1em;
-        }
-        .ans-val {
-            color: #d35400;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-        .soft-comment {
-            color: #5f9ea0;
+            padding: 6px 12px;
             font-size: 0.9em;
-            margin-left: 8px;
-            font-style: italic;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
         }
-        @media (max-width: 600px) {
-            .practice-grid { grid-template-columns: 1fr; }
+        .btn-ans:hover {
+            background-color: #2980b9;
+        }
+        .answer-block {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 15px;
+            background-color: #e8f4fd;
+            border-radius: 4px;
+            border: 1px dashed #3498db;
+        }
+        .correct-ans {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .rationale {
+            font-size: 0.95em;
+            color: #555;
+            margin-top: 5px;
         }
     </style>
+    <script>
+        function toggleAnswer(id) {
+            var ansBlock = document.getElementById('ans-' + id);
+            var btn = document.getElementById('btn-' + id);
+            if (ansBlock.style.display === 'none' || ansBlock.style.display === '') {
+                ansBlock.style.display = 'block';
+                btn.textContent = '隱藏答案';
+            } else {
+                ansBlock.style.display = 'none';
+                btn.textContent = '顯示答案與解析';
+            }
+        }
+    </script>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-section">
-        <img src="monkey_pretty_please.png" alt="小猴子" class="monkey-img">
-        <h1>🐒 小猴子拜託你：小數計算練習</h1>
-    </div>
-
-    <div class="tips-box">
-        <div class="tips-title">📢 寫考卷前，小猴子眼淚汪汪地求求你：</div>
-        <ul class="tips-list">
-            <li><span class="highlight">拜託拜託，借位跟進位的時候，老老實實把數字劃掉好不好...</span> 算我怕你了，不要再把進位放在心裡了啦，每次都差那個 1 就全錯了，小猴子看了心好痛啊！</li>
-            <li><span class="highlight">求求你字寫漂亮一點、分開一點好嗎...</span> 你寫的數字常常黏在一起，結果自己看錯自己寫的數字被扣分，這真的太可惜了啦，給點面子寫整齊一點嘛！</li>
-            <li><span class="highlight">小猴子給你跪了，請一定要乖乖寫直式...</span> 就算你覺得題目看起來超級簡單，也請你在旁邊把直式列出來好不好？不要太相信心算，穩穩地把分數拿下來才是最棒的啊！</li>
-        </ul>
-    </div>
-
-    <div class="practice-grid">
-        <div class="q-box"><div class="q-num">1</div> 14.5 + 8.75 = ?</div>
-        <div class="q-box"><div class="q-num">2</div> 20 - 5.38 = ?</div>
-        <div class="q-box"><div class="q-num">3</div> 3.4 × 15 = ?</div>
-        <div class="q-box"><div class="q-num">4</div> 12.05 - 6.8 = ?</div>
-        <div class="q-box"><div class="q-num">5</div> 9.9 + 1.15 = ?</div>
-        <div class="q-box"><div class="q-num">6</div> 100 - 8.42 = ?</div>
-        <div class="q-box"><div class="q-num">7</div> 0.75 × 24 = ?</div>
-        <div class="q-box"><div class="q-num">8</div> 4.68 + 15.32 = ?</div>
-        <div class="q-box"><div class="q-num">9</div> 1.25 × 36 = ?</div>
-        <div class="q-box"><div class="q-num">10</div> 15.4 - 9.85 = ?</div>
-        
-        <div class="q-box"><div class="q-num">11</div> 18.5 + 2.5 × 6 = ?</div>
-        <div class="q-box"><div class="q-num">12</div> (14.2 - 5.8) × 5 = ?</div>
-        <div class="q-box"><div class="q-num">13</div> 50 - 4.5 × 8 = ?</div>
-        <div class="q-box"><div class="q-num">14</div> 3.15 × 12 + 6.2 = ?</div>
-        <div class="q-box"><div class="q-num">15</div> 100 - (15.5 + 4.5) × 3 = ?</div>
-        <div class="q-box"><div class="q-num">16</div> 0.8 × 45 - 12.6 = ?</div>
-        <div class="q-box"><div class="q-num">17</div> (8.25 + 3.75) × 14 = ?</div>
-        <div class="q-box"><div class="q-num">18</div> 42.8 - (16.4 + 8.65) = ?</div>
-        <div class="q-box"><div class="q-num">19</div> 2.4 × 15 + 18.5 = ?</div>
-        <div class="q-box"><div class="q-num">20</div> (30 - 12.5) × 4 = ?</div>
-    </div>
-
-    <div class="btn-container">
-        <button id="show-ans-btn" onclick="showAnswers()">🥺 我都有乖乖聽話，點我對答案！</button>
-    </div>
-
-    <div id="answer-section">
-        <h3 style="color: #005f6b;">📝 小猴子期待的對答案時間：</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="ans-item">1. 答案：<span class="ans-val">23.25</span> <span class="soft-comment">(進位有乖乖寫上去對吧？)</span></div>
-            <div class="ans-item">2. 答案：<span class="ans-val">14.62</span> <span class="soft-comment">(20.00 借位，謝謝你有劃掉數字喔！)</span></div>
-            <div class="ans-item">3. 答案：<span class="ans-val">51</span></div>
-            <div class="ans-item">4. 答案：<span class="ans-val">5.25</span> <span class="soft-comment">(6.80 有對齊小數點，太棒了)</span></div>
-            <div class="ans-item">5. 答案：<span class="ans-val">11.05</span> <span class="soft-comment">(9.90 + 1.15)</span></div>
-            <div class="ans-item">6. 答案：<span class="ans-val">91.58</span> <span class="soft-comment">(最容易錯的連續借位，你寫對了嗎？)</span></div>
-            <div class="ans-item">7. 答案：<span class="ans-val">18</span> <span class="soft-comment">(18.00)</span></div>
-            <div class="ans-item">8. 答案：<span class="ans-val">20</span> <span class="soft-comment">(20.00，剛好進位成整數！)</span></div>
-            <div class="ans-item">9. 答案：<span class="ans-val">45</span> <span class="soft-comment">(45.00)</span></div>
-            <div class="ans-item">10. 答案：<span class="ans-val">5.55</span> <span class="soft-comment">(15.40 減 9.85)</span></div>
-            <div class="ans-item">11. 答案：<span class="ans-val">33.5</span> <span class="soft-comment">(先乘後加：18.5 + 15)</span></div>
-            <div class="ans-item">12. 答案：<span class="ans-val">42</span> <span class="soft-comment">(括號先：8.4 × 5)</span></div>
-            <div class="ans-item">13. 答案：<span class="ans-val">14</span> <span class="soft-comment">(先乘：50 - 36)</span></div>
-            <div class="ans-item">14. 答案：<span class="ans-val">44</span> <span class="soft-comment">(37.8 + 6.2)</span></div>
-            <div class="ans-item">15. 答案：<span class="ans-val">40</span> <span class="soft-comment">(100 - 20 × 3 = 100 - 60)</span></div>
-            <div class="ans-item">16. 答案：<span class="ans-val">23.4</span> <span class="soft-comment">(36 - 12.6)</span></div>
-            <div class="ans-item">17. 答案：<span class="ans-val">168</span> <span class="soft-comment">(12 × 14)</span></div>
-            <div class="ans-item">18. 答案：<span class="ans-val">17.75</span> <span class="soft-comment">(42.80 - 25.05)</span></div>
-            <div class="ans-item">19. 答案：<span class="ans-val">54.5</span> <span class="soft-comment">(36 + 18.5)</span></div>
-            <div class="ans-item">20. 答案：<span class="ans-val">70</span> <span class="soft-comment">(17.5 × 4)</span></div>
+    <h1>四個角落與面積：小學數學強化練習題</h1>
+    
+    <div class="quiz-item">
+        <div class="question">1. 小明用一條長 32 公分的鐵絲圍成一個正方形，這個正方形的面積是多少平方公分？</div>
+        <div class="options">
+            <div class="option">① 32 平方公分</div>
+            <div class="option">② 64 平方公分</div>
+            <div class="option">③ 128 平方公分</div>
+            <div class="option">④ 256 平方公分</div>
+        </div>
+        <button class="btn-ans" id="btn-1" onclick="toggleAnswer(1)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-1">
+            <div class="correct-ans">正確答案：② 64 平方公分</div>
+            <div class="rationale">解析：正方形有 4 個邊，所以邊長為 32 ÷ 4 = 8 公分。面積公式為邊長 × 邊長，即 8 × 8 = 64 平方公分。</div>
         </div>
     </div>
-</div>
 
-<script>
-    function showAnswers() {
-        var ansSection = document.getElementById('answer-section');
-        var btn = document.getElementById('show-ans-btn');
-        ansSection.style.display = 'block';
-        btn.style.display = 'none';
-        window.scrollTo({ top: ansSection.offsetTop, behavior: 'smooth' });
-    }
-</script>
+    <div class="quiz-item">
+        <div class="question">2. 有一個長方形花圃的長是 3 公尺，寬是 50 公分，請問花圃的面積是多少平方公分？</div>
+        <div class="options">
+            <div class="option">① 150 平方公分</div>
+            <div class="option">② 1500 平方公分</div>
+            <div class="option">③ 15000 平方公分</div>
+            <div class="option">④ 15 平方公尺</div>
+        </div>
+        <button class="btn-ans" id="btn-2" onclick="toggleAnswer(2)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-2">
+            <div class="correct-ans">正確答案：③ 15000 平方公分</div>
+            <div class="rationale">解析：題目問的是平方公分，要先將單位的「公尺」換算為「公分」。長 3 公尺 = 300 公分。面積 = 長 × 寬，即 300 × 50 = 15000 平方公分。</div>
+        </div>
+    </div>
+
+    <div class="quiz-item">
+        <div class="question">3. 有一塊正方形地毯的面積是 49 平方公尺，這塊地毯的周長是多少公尺？</div>
+        <div class="options">
+            <div class="option">① 7 公尺</div>
+            <div class="option">② 28 公尺</div>
+            <div class="option">③ 49 公尺</div>
+            <div class="option">④ 98 公尺</div>
+        </div>
+        <button class="btn-ans" id="btn-3" onclick="toggleAnswer(3)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-3">
+            <div class="correct-ans">正確答案：② 28 公尺</div>
+            <div class="rationale">解析：因為 7 × 7 = 49，所以正方形地毯的邊長是 7 公尺。周長是 4 個邊長的總和，即 7 × 4 = 28 公尺。</div>
+        </div>
+    </div>
+
+    <div class="quiz-item">
+        <div class="question">4. 老師用一根長 40 公分的絲帶圍成一個正方形相框，這個相框的面積是多少平方公分？</div>
+        <div class="options">
+            <div class="option">① 100 平方公分</div>
+            <div class="option">② 160 平方公分</div>
+            <div class="option">③ 400 平方公分</div>
+            <div class="option">④ 1600 平方公分</div>
+        </div>
+        <button class="btn-ans" id="btn-4" onclick="toggleAnswer(4)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-4">
+            <div class="correct-ans">正確答案：① 100 平方公分</div>
+            <div class="rationale">解析：先求邊長：40 ÷ 4 = 10 公分。再求面積：10 × 10 = 100 平方公分。</div>
+        </div>
+    </div>
+
+    <div class="quiz-item">
+        <div class="question">5. 一張長方形書桌的長是 1 公尺 20 公分，寬是 80 公分，請問書桌的面積是多少平方公分？</div>
+        <div class="options">
+            <div class="option">① 96 平方公分</div>
+            <div class="option">② 960 平方公分</div>
+            <div class="option">③ 9600 平方公分</div>
+            <div class="option">④ 96000 平方公分</div>
+        </div>
+        <button class="btn-ans" id="btn-5" onclick="toggleAnswer(5)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-5">
+            <div class="correct-ans">正確答案：③ 9600 平方公分</div>
+            <div class="rationale">解析：長 1 公尺 20 公分 = 120 公分。長方形面積 = 長 × 寬，即 120 × 80 = 9600 平方公分。</div>
+        </div>
+    </div>
+
+    <div class="quiz-item">
+        <div class="question">6. 一個長方形看板的長是 4 公尺，寬是 25 公分，請問這個看板的面積是多少平方公尺？</div>
+        <div class="options">
+            <div class="option">① 1 平方公尺</div>
+            <div class="option">② 10 平方公尺</div>
+            <div class="option">③ 100 平方公尺</div>
+            <div class="option">④ 10000 平方公尺</div>
+        </div>
+        <button class="btn-ans" id="btn-6" onclick="toggleAnswer(6)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-6">
+            <div class="correct-ans">正確答案：① 1 平方公尺</div>
+            <div class="rationale">解析：本題問的是「平方公尺」。我們先算平方公分：長 400 公分 × 寬 25 公分 = 10000 平方公分。因為 1 平方公尺 = 10000 平方公分，所以答案是 1 平方公尺。</div>
+        </div>
+    </div>
+
+    <div class="quiz-item">
+        <div class="question">7. 小華繞著一個正方形公圓走了一圈，一共走了 80 公尺，請問這個公園的面積是多少平方公尺？</div>
+        <div class="options">
+            <div class="option">① 20 平方公尺</div>
+            <div class="option">② 400 平方公尺</div>
+            <div class="option">③ 1600 平方公尺</div>
+            <div class="option">④ 6400 平方公尺</div>
+        </div>
+        <button class="btn-ans" id="btn-7" onclick="toggleAnswer(7)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-7">
+            <div class="correct-ans">正確答案：② 400 平方公尺</div>
+            <div class="rationale">解析：走一圈的長度就是周長。正方形邊長 = 80 ÷ 4 = 20 公尺。面積 = 20 × 20 = 400 平方公尺。</div>
+        </div>
+    </div>
+
+    <div class="quiz-item">
+        <div class="question">8. 一塊正方形墊子的面積是 64 平方公分，請問這塊墊子的周長是多少公分？</div>
+        <div class="options">
+            <div class="option">① 8 公分</div>
+            <div class="option">② 16 公分</div>
+            <div class="option">③ 32 公分</div>
+            <div class="option">④ 256 公分</div>
+        </div>
+        <button class="btn-ans" id="btn-8" onclick="toggleAnswer(8)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-8">
+            <div class="correct-ans">正確答案：③ 32 公分</div>
+            <div class="rationale">解析：利用乘法表想一想，多少乘以自己會是 64？ 答案是 8 × 8 = 64，所以邊長是 8 公分。周長 = 8 × 4 = 32 公分。</div>
+        </div>
+    </div>
+
+    <div class="quiz-item">
+        <div class="question">9. 媽媽買了一張長 2 公尺、寬 60 公分的長方形布料，請問這張布料的面積是多少平方公分？</div>
+        <div class="options">
+            <div class="option">① 120 平方公分</div>
+            <div class="option">② 1200 平方公分</div>
+            <div class="option">③ 12000 平方公分</div>
+            <div class="option">④ 120000 平方公分</div>
+        </div>
+        <button class="btn-ans" id="btn-9" onclick="toggleAnswer(9)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-9">
+            <div class="correct-ans">正確答案：③ 12000 平方公分</div>
+            <div class="rationale">解析：單位換算：長 2 公尺 = 200 公分。面積 = 200 × 60 = 12000 平方公分。</div>
+        </div>
+    </div>
+
+    <div class="quiz-item">
+        <div class="question">10. 挑戰題：爸爸用繩子圍出一個長 8 公分、寬 4 公分的長方形。如果小明用「同樣長」的繩子改圍成一個正方形，這個正方形的面積是多少平方公分？</div>
+        <div class="options">
+            <div class="option">① 24 平方公分</div>
+            <div class="option">② 32 平方公分</div>
+            <div class="option">③ 36 平方公分</div>
+            <div class="option">④ 144 平方公分</div>
+        </div>
+        <button class="btn-ans" id="btn-10" onclick="toggleAnswer(10)">顯示答案與解析</button>
+        <div class="answer-block" id="ans-10">
+            <div class="correct-ans">正確答案：③ 36 平方公分</div>
+            <div class="rationale">解析：同樣長的繩子代表「周長相同」。長方形周長 = (8 + 4) × 2 = 24 公分。正方形邊長 = 24 ÷ 4 = 6 公分。正方形面積 = 6 × 6 = 36 平方公分。</div>
+        </div>
+    </div>
+
+</div>
 
 </body>
 </html>
