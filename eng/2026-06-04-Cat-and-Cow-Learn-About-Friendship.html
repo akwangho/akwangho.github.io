@@ -613,7 +613,11 @@ function setMainMode(mode){
     document.getElementById('view-quiz').classList.toggle('hide', mode!=='quiz');
     clearTimeout(stopTimer);
     try{ if(player&&player.pauseVideo) player.pauseVideo(); }catch(e){}
-    if(mode==='quiz') state.maskFull=false;
+    if(mode==='quiz'){
+        state.maskFull=false;
+        // 進入闖關時清掉遮罩上殘留的字幕（即使剛剛是延遲字幕狀態），避免干擾
+        const sub=document.getElementById('mask-subtitle'); if(sub){ sub.textContent=''; sub.dataset.id=''; }
+    }
     applyMask();
     updatePlaybackUI();
 }
