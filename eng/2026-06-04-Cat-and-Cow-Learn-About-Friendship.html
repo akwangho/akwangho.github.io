@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat &amp; Cow 學當朋友 🐱🐮 聽力闖關</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #FFF7ED 0%, #FDF4FF 45%, #EFF6FF 100%);
+            margin: 0;
+            color: #334155;
+            min-height: 100vh;
+        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-thumb { background: #FBCFE8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #F472B6; }
+
+        /* ===== Header ===== */
+        header {
+            position: sticky; top: 0; z-index: 40;
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 4px solid #FBCFE8;
+            padding: 10px 16px;
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        }
+        .brand { font-weight: 900; color: #BE185D; font-size: 1.05rem; }
+        .main-tabs { display: flex; gap: 8px; }
+        .mtab {
+            border: none; cursor: pointer;
+            padding: 8px 16px; border-radius: 999px;
+            font-weight: 800; font-size: .95rem;
+            background: #F1F5F9; color: #64748B;
+            transition: all .15s;
+        }
+        .mtab:hover { transform: translateY(-1px); }
+        .mtab.active { background: linear-gradient(135deg,#F472B6,#FB923C); color: #fff; box-shadow: 0 4px 12px rgba(244,114,182,.4); }
+        .hstats { margin-left: auto; font-weight: 800; color: #475569; font-size: .9rem; }
+        .hstats span { color: #D97706; }
+
+        main { max-width: 1040px; margin: 0 auto; padding: 16px; }
+
+        /* ===== Player ===== */
+        #player-card { background:#fff; border-radius: 22px; box-shadow: 0 8px 28px rgba(0,0,0,.08); padding: 12px; }
+        #player-wrap { position: relative; background:#000; border-radius: 16px; overflow: hidden; aspect-ratio: 16/9; width: 100%; }
+        #player-wrap > #player, #player-wrap > iframe { position:absolute; inset:0; width:100%!important; height:100%!important; }
+
+        #subtitle-mask {
+            position: absolute; display: none;
+            background: rgba(15,23,42,.92);
+            border: 2px dashed rgba(244,114,182,.6);
+            border-radius: 10px; cursor: move; z-index: 10;
+            user-select: none; touch-action: none;
+            align-items: center; justify-content: center;
+        }
+        #subtitle-mask.show { display: flex; }
+        #subtitle-mask .resize-handle {
+            position: absolute; right:-9px; bottom:-9px;
+            width: 20px; height: 20px; background:#F472B6;
+            border: 3px solid #fff; border-radius: 50%;
+            cursor: nwse-resize; box-shadow: 0 2px 6px rgba(0,0,0,.3); z-index: 2;
+        }
+        #mask-subtitle {
+            color: #fff; font-weight: 800; text-align: center;
+            font-size: clamp(1rem, 3.2vw, 2rem); line-height: 1.3;
+            padding: 0 16px; text-shadow: 0 2px 8px rgba(0,0,0,.6);
+            pointer-events: none;
+        }
+        .iframe-block::after { content:''; position:absolute; inset:0; z-index:5; }
+
+        /* ===== Buttons ===== */
+        .mini-btn, .big-btn, .seg {
+            border: none; cursor: pointer; font-weight: 800;
+            border-radius: 12px; transition: transform .12s, box-shadow .12s, background .12s;
+            white-space: nowrap;
+        }
+        .mini-btn { padding: 7px 13px; font-size: .85rem; background:#E2E8F0; color:#334155; }
+        .mini-btn:hover { transform: translateY(-1px); }
+        .mini-btn.pink { background:#FBCFE8; color:#BE185D; }
+        .mini-btn.pink-strong, .big-btn.pink-strong { background: linear-gradient(135deg,#F472B6,#EC4899); color:#fff; }
+        .mini-btn.sky { background:#BAE6FD; color:#075985; }
+        .mini-btn.mint { background:#BBF7D0; color:#047857; }
+        .mini-btn.yellow { background:#FEF08A; color:#92400E; }
+        .mini-btn.lav { background:#DDD6FE; color:#5B21B6; }
+        .mini-btn.gray { background:#E2E8F0; color:#475569; }
+        .big-btn { padding: 12px 26px; font-size: 1.05rem; border-radius: 16px; color:#fff; }
+        .big-btn.pink-strong:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(244,114,182,.4); }
+
+        .seg { padding: 7px 13px; font-size:.85rem; background:#F1F5F9; color:#64748B; }
+        .seg:hover { background:#E2E8F0; }
+        .seg.on { background:#334155; color:#fff; box-shadow: 0 2px 8px rgba(51,65,85,.35); }
+        .speed-btn.on, .pmode-btn.on { background: linear-gradient(135deg,#F472B6,#FB923C); color:#fff; }
+
+        .lbl { font-weight: 800; color:#64748B; font-size:.85rem; }
+        .hide { display: none !important; }
+
+        /* ===== Control cards ===== */
+        .ctrl-card, .settings-card { background:#fff; border-radius: 18px; box-shadow: 0 6px 20px rgba(0,0,0,.06); padding: 14px; margin-top: 14px; }
+        .ctrl-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .ctrl-row:last-child { margin-bottom: 0; }
+        .tip { font-size:.82rem; color:#64748B; line-height: 1.6; margin: 6px 0 0; }
+        input[type=range] { accent-color:#F472B6; }
+        .num-in { width: 80px; padding: 7px 10px; border:2px solid #DDD6FE; border-radius: 10px; font-size:.85rem; text-align:center; }
+
+        .settings-card h3 { font-weight:900; color:#BE185D; font-size:1.2rem; margin:0 0 12px; }
+        .set-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 0; border-top:1px dashed #E2E8F0; }
+        .set-row:first-of-type { border-top:none; }
+        .set-lbl { font-weight:900; color:#475569; width:140px; min-width:140px; }
+        .seg-wrap { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .chk { font-weight:800; color:#475569; display:flex; align-items:center; gap:8px; cursor:pointer; }
+        .chk input { width:18px; height:18px; accent-color:#F472B6; }
+        .start { display:block; width:100%; margin-top:16px; }
+
+        /* ===== Session ===== */
+        .session-bar { display:flex; align-items:center; justify-content:space-between; margin-top:14px; }
+        #session-progress { font-weight:900; color:#BE185D; font-size:1.1rem; }
+        .stage-card { background:#fff; border-radius:18px; box-shadow:0 6px 20px rgba(0,0,0,.07); padding:18px; margin-top:10px; text-align:center; }
+        .stage-tag { display:inline-block; padding:4px 14px; border-radius:999px; font-weight:900; font-size:.85rem; margin-bottom:6px; }
+        .stage-tag.quiz { background:#DBEAFE; color:#1D4ED8; }
+        .stage-tag.shadow { background:#EDE9FE; color:#6D28D9; }
+        .stage-hint { color:#64748B; font-size:.9rem; margin-bottom:6px; }
+        .listen .listen-title { font-weight:900; color:#BE185D; font-size:1.25rem; margin-top:4px; }
+        .listen .listen-sub { color:#94A3B8; font-size:.85rem; margin-top:2px; }
+        .zh-hint { margin-top:10px; background:#FEF9C3; color:#854D0E; font-weight:800; border-radius:12px; padding:8px 12px; display:inline-block; }
+
+        .shadow-en { font-size:1.5rem; font-weight:900; color:#1E293B; margin:6px 0; line-height:1.4; }
+        .shadow-zh { color:#64748B; font-size:.95rem; }
+        .shadow-status { min-height:26px; font-size:.9rem; color:#475569; margin-top:6px; }
+
+        .reveal-en { font-size:1.4rem; font-weight:900; color:#1E293B; margin:10px 0 2px; line-height:1.4; }
+        .reveal-zh { color:#64748B; font-size:.95rem; }
+        .sum-title { font-weight:900; color:#BE185D; font-size:1.3rem; }
+        .sum-rows { margin:8px auto; display:inline-flex; flex-direction:column; gap:4px; color:#475569; font-size:1rem; }
+
+        /* sight words */
+        .sight-word { background: linear-gradient(180deg, transparent 55%, #FEF08A 55%); border-radius:3px; padding:0 1px; }
+
+        /* ===== Quiz: MC ===== */
+        .quiz-opt {
+            display:block; width:100%; text-align:left;
+            padding:11px 14px; border-radius:12px; border:2px solid #BAE6FD;
+            background:#F0F9FF; color:#075985; font-weight:800; font-size:1rem;
+            cursor:pointer; transition: all .12s;
+        }
+        .quiz-opt:hover:not(:disabled) { background:#E0F2FE; transform: translateY(-1px); }
+        .quiz-opt:disabled { cursor:default; }
+        .opt-correct { background:#BBF7D0 !important; border-color:#34D399 !important; color:#047857 !important; }
+        .opt-wrong { background:#FECACA !important; border-color:#F87171 !important; color:#B91C1C !important; }
+
+        /* ===== Quiz: Cloze ===== */
+        .cloze-sentence { font-size:1.4rem; font-weight:800; color:#1E293B; line-height:2; text-align:center; margin-bottom:10px; }
+        .cloze-blank { display:inline-block; min-width:74px; padding:2px 10px; margin:0 3px; border-bottom:3px dashed #94A3B8; color:#94A3B8; background:#F8FAFC; border-radius:6px 6px 0 0; text-align:center; cursor:pointer; }
+        .cloze-blank.filled { color:#0F172A; background:#FEF9C3; border-bottom-color:#FBBF24; }
+        .cloze-blank.correct { background:#BBF7D0; color:#047857; border-bottom-color:#34D399; }
+        .cloze-blank.wrong { background:#FECACA; color:#B91C1C; animation: shake .4s; }
+        .cloze-blank.hinted { color:#92400E; background:#FEF3C7; font-style:italic; }
+        .cloze-blank.drag-over { background:#DBEAFE; border-bottom-color:#38BDF8; }
+        .cloze-chips { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+        .cloze-chip { padding:6px 14px; border-radius:999px; background:#BAE6FD; color:#075985; font-weight:800; cursor:grab; user-select:none; font-size:1rem; }
+        .cloze-chip:hover { transform: translateY(-2px); }
+        .cloze-chip.wrong-pick { animation: shake .35s; background:#FECACA; color:#B91C1C; }
+
+        /* ===== Quiz: Scramble ===== */
+        .scramble-area { min-height:58px; padding:10px; border:2px dashed #C4B5FD; border-radius:12px; background:#FAF5FF; display:flex; flex-wrap:wrap; gap:6px; justify-content:center; align-items:center; margin-bottom:8px; }
+        .scramble-area.drag-over { background:#EDE9FE; border-color:#A78BFA; }
+        .scramble-bank { min-height:52px; padding:8px; border-radius:12px; background:#F1F5F9; display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+        .scramble-chip { padding:6px 12px; border-radius:10px; background:#fff; border:2px solid #DDD6FE; color:#5B21B6; font-weight:800; cursor:grab; user-select:none; font-size:1rem; }
+        .scramble-chip:hover { transform: translateY(-1px); border-color:#A78BFA; }
+        .scramble-chip.dragging { opacity:.4; }
+        .scramble-chip.correct-pos { background:#DCFCE7; border-color:#34D399; color:#047857; }
+
+        /* ===== Speech result ===== */
+        .speech-result { margin-top:6px; padding:8px 12px; border-radius:12px; font-size:.9rem; display:inline-block; text-align:left; }
+        .speech-result.perfect { background: linear-gradient(135deg,#DCFCE7,#FEF3C7); color:#047857; }
+        .speech-result.great { background:#FEF3C7; color:#92400E; }
+        .speech-result.try { background:#FEE2E2; color:#B91C1C; }
+        .sd-ok { color:#047857; font-weight:900; }
+        .sd-no { color:#B91C1C; font-weight:900; text-decoration: line-through; }
+
+        /* ===== Toast ===== */
+        .toast { position:fixed; top:14%; left:50%; transform:translate(-50%,-12px); opacity:0; z-index:9999;
+            padding:10px 22px; border-radius:999px; font-weight:900; box-shadow:0 8px 22px rgba(0,0,0,.2); transition: all .3s; pointer-events:none; }
+        .toast.show { opacity:1; transform:translate(-50%,0); }
+        .toast.good { background: linear-gradient(135deg,#34D399,#10B981); color:#fff; }
+        .toast.bad { background: linear-gradient(135deg,#FB923C,#F472B6); color:#fff; }
+
+        .countdown-num { font-size:4rem; font-weight:900; color:#A78BFA; text-shadow:0 0 24px rgba(167,139,250,.6); margin:6px 0; }
+        @keyframes count-zoom { 0%{transform:scale(.5);opacity:0;}50%{transform:scale(1.3);opacity:1;}100%{transform:scale(1);opacity:1;} }
+        .count-anim { animation: count-zoom .8s ease-out; }
+        @keyframes shake { 0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);} }
+        .animate-shake { animation: shake .4s; }
+
+        @media (max-width:640px){
+            .set-lbl { width:100%; min-width:100%; }
+            .hstats { width:100%; margin-left:0; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">🐱🐮 Cat &amp; Cow 學當朋友</div>
+    <div class="main-tabs">
+        <button data-main="playback" class="mtab" onclick="setMainMode('playback')">🎬 大螢幕播放</button>
+        <button data-main="quiz" class="mtab" onclick="setMainMode('quiz')">🎯 闖關測驗</button>
+    </div>
+    <div class="hstats">⭐ <span id="stars-text">0</span> · 已學 <span id="learned-text">0 / 0</span></div>
+</header>
+
+<main>
+    <!-- 共用播放器（兩種模式都在這上面播放） -->
+    <div id="player-card">
+        <div id="player-wrap">
+            <div id="player"></div>
+            <div id="subtitle-mask">
+                <span id="mask-subtitle"></span>
+                <div class="resize-handle"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 模式一：純播放學習 ===== -->
+    <div id="view-playback">
+        <div class="ctrl-card">
+            <div class="ctrl-row">
+                <button class="mini-btn pink-strong" id="pp-btn" onclick="togglePlayPause()">▶ 播放</button>
+                <button class="mini-btn yellow" onclick="restartVideo()">⏮ 從頭播</button>
+                <button class="mini-btn sky" onclick="enterFullscreen()">⛶ 全螢幕</button>
+                <span class="lbl">速度</span>
+                <button class="seg speed-btn" data-speed="0.75" onclick="applySpeed(0.75)">0.75x</button>
+                <button class="seg speed-btn" data-speed="0.85" onclick="applySpeed(0.85)">0.85x</button>
+                <button class="seg speed-btn" data-speed="1" onclick="applySpeed(1)">1.0x</button>
+            </div>
+            <div class="ctrl-row">
+                <span class="lbl">觀看模式</span>
+                <button class="seg pmode-btn" data-pmode="normal" onclick="setPlaybackMode('normal')">📺 正常（看原字幕）</button>
+                <button class="seg pmode-btn" data-pmode="mask" onclick="setPlaybackMode('mask')">🙈 遮字幕（猜畫面）</button>
+                <button class="seg pmode-btn" data-pmode="delay" onclick="setPlaybackMode('delay')">⏱️ 延遲字幕</button>
+            </div>
+            <div class="ctrl-row hide" id="delay-extra">
+                <span class="lbl">延遲方式</span>
+                <button class="seg dstyle-btn" data-dstyle="smart" onclick="setDelayStyle('smart')">🧠 整句講完才出現</button>
+                <button class="seg dstyle-btn" data-dstyle="fixed" onclick="setDelayStyle('fixed')">⏱️ 慢一秒出現</button>
+            </div>
+            <div class="ctrl-row hide" id="mask-extra">
+                <button class="mini-btn lav" id="maskfull-btn" onclick="toggleMaskFull()">⬛ 遮住整個畫面</button>
+                <span class="lbl">遮罩濃度</span>
+                <input id="mask-op" type="range" min="60" max="100" value="92" oninput="setMaskOpacity(parseInt(this.value))" style="width:130px;">
+                <span id="mask-op-val" class="lbl">92%</span>
+                <button class="mini-btn pink" onclick="resetMaskPos()">↺ 重設遮罩位置</button>
+            </div>
+            <p class="tip">🙈 <b>遮字幕</b>：先把影片字幕遮起來，讓小朋友看畫面猜猜看在說什麼。⏱️ <b>延遲字幕</b>：先用耳朵聽，字幕才慢慢出現在遮罩上 — 可選「🧠 整句講完才出現」（聽完整句再對答案，學習效果最好）或「慢一秒出現」。遮罩可用右下角圓點<b>拖大</b>，或按「遮住整個畫面」只用耳朵聽；全螢幕或視窗縮放時遮罩與字幕會自動跟著調整。</p>
+        </div>
+    </div>
+
+    <!-- ===== 模式二：闖關測驗 ===== -->
+    <div id="view-quiz" class="hide">
+        <div id="quiz-settings" class="settings-card">
+            <h3>🎯 闖關設定</h3>
+            <div class="set-row">
+                <span class="set-lbl">每次學習數量</span>
+                <div class="seg-wrap">
+                    <button class="seg" data-k="quizQuantity" data-v="10" onclick="setSetting('quizQuantity','10')">10 句</button>
+                    <button class="seg" data-k="quizQuantity" data-v="20" onclick="setSetting('quizQuantity','20')">20 句</button>
+                    <button class="seg" data-k="quizQuantity" data-v="30" onclick="setSetting('quizQuantity','30')">30 句</button>
+                    <button class="seg" data-k="quizQuantity" data-v="50" onclick="setSetting('quizQuantity','50')">50 句</button>
+                    <button class="seg" data-k="quizQuantity" data-v="all" onclick="setSetting('quizQuantity','all')">全部</button>
+                    <input id="qty-custom" type="number" min="1" max="200" placeholder="自訂" class="num-in">
+                    <button class="mini-btn lav" onclick="applyCustomQty()">套用</button>
+                </div>
+            </div>
+            <div class="set-row">
+                <span class="set-lbl">播放順序</span>
+                <button class="seg" data-k="quizOrder" data-v="sequential" onclick="setSetting('quizOrder','sequential')">📖 固定（依字幕）</button>
+                <button class="seg" data-k="quizOrder" data-v="random" onclick="setSetting('quizOrder','random')">🎲 隨機</button>
+            </div>
+            <div class="set-row">
+                <span class="set-lbl">題型</span>
+                <button class="seg" data-k="quizType" data-v="mc" onclick="setSetting('quizType','mc')">四選一</button>
+                <button class="seg" data-k="quizType" data-v="scramble" onclick="setSetting('quizType','scramble')">拖曳重組</button>
+                <button class="seg" data-k="quizType" data-v="cloze" onclick="setSetting('quizType','cloze')">克漏字</button>
+                <button class="seg" data-k="quizType" data-v="random" onclick="setSetting('quizType','random')">🎲 隨機</button>
+            </div>
+            <div class="set-row">
+                <span class="set-lbl">測驗 / 跟讀順序</span>
+                <button class="seg" data-k="quizFlow" data-v="quiz-first" onclick="setSetting('quizFlow','quiz-first')">先測驗 → 跟讀</button>
+                <button class="seg" data-k="quizFlow" data-v="shadow-first" onclick="setSetting('quizFlow','shadow-first')">先跟讀 → 測驗</button>
+                <button class="seg" data-k="quizFlow" data-v="random" onclick="setSetting('quizFlow','random')">🎲 隨機</button>
+            </div>
+            <div class="set-row">
+                <span class="set-lbl">範圍</span>
+                <button class="seg" data-k="scope" data-v="all" onclick="setSetting('scope','all')">全部</button>
+                <button class="seg" data-k="scope" data-v="0" onclick="setSetting('scope','0')">🎵 故事1：許願</button>
+                <button class="seg" data-k="scope" data-v="1" onclick="setSetting('scope','1')">🤝 故事2：當朋友</button>
+            </div>
+            <div class="set-row">
+                <label class="chk"><input type="checkbox" id="onlynew" onchange="toggleOnlyNew(this)"> 只練「從來沒學過」的句子</label>
+            </div>
+            <button class="big-btn pink-strong start" onclick="startSession()">🚀 開始闖關</button>
+        </div>
+
+        <div id="quiz-session" class="hide">
+            <div class="session-bar">
+                <span id="session-progress">第 1 / 1 句</span>
+                <button class="mini-btn gray" onclick="confirmExit()">✕ 結束</button>
+            </div>
+            <div id="stage"></div>
+        </div>
+    </div>
+</main>
+
+<script>
+/* =========================================================
+ *  Cat & Cow Learn About Friendship — 聽力闖關
+ *  影片： https://www.youtube.com/watch?v=VlbnkfIUxBw
+ *  字幕： eng/sub/2026-06-04-Cat-and-Cow-Learn-About-Friendship.srt
+ *  （SRT 破碎片段已合併為完整句子；故事1=許願，故事2=當朋友）
+ * ======================================================= */
+const VIDEO_ID = 'VlbnkfIUxBw';
+const SUBTITLE_DELAY = 1.0; // 延遲字幕：聽到後幾秒才顯示
+
+const DEFAULT_SENTENCES = [
+    // ===== 故事 1：The Wish（許願） =====
+    { id:'s1',  chapter:0, en:"Little Fox.", zh:"小狐狸頻道。", start:0.88,  end:4.28 },
+    { id:'s2',  chapter:0, en:"The sun was up.", zh:"太陽升起來了。", start:6.32, end:10.20 },
+    { id:'s3',  chapter:0, en:"The sky was blue.", zh:"天空是藍色的。", start:20.48, end:24.52 },
+    { id:'s4',  chapter:0, en:"Cat said, \"I can jump. I can jump over the gate. Watch me jump.\"", zh:"貓說：「我會跳。我可以跳過柵欄。看我跳！」", start:32.16, end:44.28 },
+    { id:'s5',  chapter:0, en:"Bat said, \"I can fly. I can fly over the tree. Watch me fly.\"", zh:"蝙蝠說：「我會飛。我可以飛過樹。看我飛！」", start:48.96, end:58.56 },
+    { id:'s6',  chapter:0, en:"Cow said, \"I can walk. I can walk around the well.\"", zh:"牛說：「我會走路。我可以繞著井走。」", start:68.64, end:76.28 },
+    { id:'s7',  chapter:0, en:"\"And I can make a wish.\"", zh:"「而且我可以許願。」", start:78.24, end:83.60 },
+    { id:'s8',  chapter:0, en:"\"A wish,\" said Bat.", zh:"「許願？」蝙蝠說。", start:83.60, end:87.84 },
+    { id:'s9',  chapter:0, en:"\"I want to make a wish.\"", zh:"「我也想許願。」", start:88.00, end:90.72 },
+    { id:'s10', chapter:0, en:"\"So do I,\" said Cat.", zh:"「我也是。」貓說。", start:90.72, end:94.40 },
+    { id:'s11', chapter:0, en:"Cow said, \"You can make a wish. I will help you.\"", zh:"牛說：「你們可以許願，我會幫你們。」", start:94.40, end:101.80 },
+    { id:'s12', chapter:0, en:"Cat and Bat went to the well.", zh:"貓和蝙蝠走到井邊。", start:103.20, end:108.04 },
+    { id:'s13', chapter:0, en:"\"How do we make a wish?\" said Cat.", zh:"「我們要怎麼許願？」貓說。", start:113.84, end:118.24 },
+    { id:'s14', chapter:0, en:"\"Watch me,\" said Cow.", zh:"「看我做。」牛說。", start:118.24, end:121.20 },
+    { id:'s15', chapter:0, en:"\"I will show you what to do.\"", zh:"「我示範給你們看。」", start:121.20, end:125.56 },
+    { id:'s16', chapter:0, en:"\"Tell us, Cow,\" said Cat. \"Tell us how to make a wish.\"", zh:"「告訴我們吧，牛。」貓說。「告訴我們怎麼許願。」", start:133.84, end:140.56 },
+    { id:'s17', chapter:0, en:"Cow said, \"Walk around the well three times.\"", zh:"牛說：「繞著井走三圈。」", start:140.56, end:145.28 },
+    { id:'s18', chapter:0, en:"\"Say, 'Please, please, pretty please.'\"", zh:"「然後說：『拜託、拜託、求求你。』」", start:145.28, end:150.16 },
+    { id:'s19', chapter:0, en:"Cow went around the well.", zh:"牛繞著井走。", start:150.16, end:154.28 },
+    { id:'s20', chapter:0, en:"She said, \"Please, please, pretty please.\"", zh:"她說：「拜託、拜託、求求你。」", start:165.68, end:171.04 },
+    { id:'s21', chapter:0, en:"Then Cat went around the well.", zh:"然後貓繞著井走。", start:171.04, end:175.56 },
+    { id:'s22', chapter:0, en:"She said, \"Please, please, pretty please.\"", zh:"她說：「拜託、拜託、求求你。」", start:176.96, end:181.12 },
+    { id:'s23', chapter:0, en:"\"Two.\"", zh:"「兩圈。」", start:181.12, end:182.80 },
+    { id:'s24', chapter:0, en:"Then Bat went around the well.", zh:"然後蝙蝠繞著井走。", start:182.80, end:187.24 },
+    { id:'s25', chapter:0, en:"He said, \"Please, please, pretty please.\"", zh:"他說：「拜託、拜託、求求你。」", start:190.32, end:195.92 },
+    { id:'s26', chapter:0, en:"Cow said, \"Now sing to the well. You must sing your wish.\"", zh:"牛說：「現在對著井唱歌。你必須把願望唱出來。」", start:195.92, end:203.04 },
+    { id:'s27', chapter:0, en:"Cat sang, \"I'm tired of this farm.\"", zh:"貓唱著：「我厭倦了這個農場。」", start:203.04, end:207.76 },
+    { id:'s28', chapter:0, en:"\"I think it is a bore. I want to see new places I've never seen before.\"", zh:"「我覺得好無聊。我想去看看從沒看過的新地方。」", start:207.76, end:219.64 },
+    { id:'s29', chapter:0, en:"\"I can't sing,\" said Bat.", zh:"「我不會唱歌。」蝙蝠說。", start:220.56, end:223.90 },
+    { id:'s30', chapter:0, en:"\"I will not get my wish.\"", zh:"「我的願望不會實現。」", start:224.00, end:227.36 },
+    { id:'s31', chapter:0, en:"Cow said, \"Just try, Bat.\" But Bat was too sad.", zh:"牛說：「試試看嘛，蝙蝠。」但蝙蝠太難過了。", start:227.36, end:233.92 },
+    { id:'s32', chapter:0, en:"\"It will not work,\" he said.", zh:"「沒有用的。」他說。", start:233.92, end:237.04 },
+    { id:'s33', chapter:0, en:"\"I must fly away now.\"", zh:"「我現在必須飛走了。」", start:237.04, end:241.32 },
+    { id:'s34', chapter:0, en:"Bat flew away.", zh:"蝙蝠飛走了。", start:247.68, end:251.40 },
+    { id:'s35', chapter:0, en:"He did not know how to sing.", zh:"他不知道怎麼唱歌。", start:251.84, end:256.28 },
+    { id:'s36', chapter:0, en:"He heard Redbird sing.", zh:"他聽到紅鳥在唱歌。", start:256.80, end:261.08 },
+    { id:'s37', chapter:0, en:"He tried to sing like Redbird, but he was not good at all.", zh:"他試著像紅鳥一樣唱，但他唱得一點都不好。", start:266.32, end:278.24 },
+    { id:'s38', chapter:0, en:"He tried to sing like Cat, but he was not good at all.", zh:"他試著像貓一樣唱，但他唱得一點都不好。", start:278.24, end:286.08 },
+    { id:'s39', chapter:0, en:"Bat sang and sang.", zh:"蝙蝠唱了又唱。", start:286.08, end:289.36 },
+    { id:'s40', chapter:0, en:"He tried and tried.", zh:"他試了又試。", start:289.36, end:293.56 },
+    { id:'s41', chapter:0, en:"He wanted to sing his wish again.", zh:"他想再把願望唱一次。", start:301.52, end:306.36 },
+    { id:'s42', chapter:0, en:"Cat was still at the well, but she sang a new song.", zh:"貓還在井邊，但她唱了一首新歌。", start:310.48, end:317.20 },
+    { id:'s43', chapter:0, en:"\"Forget the wish I made before.\"", zh:"「忘掉我之前許的願望吧。」", start:317.20, end:321.28 },
+    { id:'s44', chapter:0, en:"\"This is one that I want more.\"", zh:"「這個才是我更想要的。」", start:321.28, end:325.60 },
+    { id:'s45', chapter:0, en:"\"Please help Bat.\"", zh:"「請幫幫蝙蝠。」", start:325.60, end:329.48 },
+    { id:'s46', chapter:0, en:"And Bat did sing.", zh:"然後蝙蝠真的唱了。", start:332.48, end:336.48 },
+    { id:'s47', chapter:0, en:"Bat sang to the well,", zh:"蝙蝠對著井唱歌，", start:337.20, end:340.56 },
+    { id:'s48', chapter:0, en:"\"Give Cat new things to see.\"", zh:"「讓貓看到新的東西。」", start:340.56, end:346.12 },
+    { id:'s49', chapter:0, en:"Then Cat and Bat and Cow went away.", zh:"然後貓、蝙蝠和牛一起出發了。", start:347.04, end:351.50 },
+    { id:'s50', chapter:0, en:"They saw many new things and they sang.", zh:"他們看到許多新事物，一路唱著歌。", start:351.84, end:360.60 },
+
+    // ===== 故事 2：Learn About Friendship（學會當朋友） =====
+    { id:'s51', chapter:1, en:"Pig and Dog were playing catch.", zh:"豬和狗在玩接球。", start:368.88, end:373.40 },
+    { id:'s52', chapter:1, en:"\"Good throw, Pig,\" said Dog.", zh:"「丟得好，豬！」狗說。", start:374.24, end:377.68 },
+    { id:'s53', chapter:1, en:"\"Good catch, Dog,\" said Pig.", zh:"「接得好，狗！」豬說。", start:377.68, end:381.52 },
+    { id:'s54', chapter:1, en:"\"We are a good team.\"", zh:"「我們是很棒的隊伍。」", start:381.52, end:385.80 },
+    { id:'s55', chapter:1, en:"Cat woke up.", zh:"貓醒過來。", start:387.28, end:390.16 },
+    { id:'s56', chapter:1, en:"She saw Pig and Dog playing.", zh:"她看到豬和狗在玩。", start:390.16, end:394.60 },
+    { id:'s57', chapter:1, en:"\"Can I play catch too?\" asked Cat.", zh:"「我也可以一起玩接球嗎？」貓問。", start:402.96, end:406.32 },
+    { id:'s58', chapter:1, en:"\"Okay,\" said Pig.", zh:"「好啊。」豬說。", start:406.32, end:409.28 },
+    { id:'s59', chapter:1, en:"\"Okay,\" said Dog.", zh:"「好啊。」狗說。", start:409.28, end:413.20 },
+    { id:'s60', chapter:1, en:"Cat threw the ball to Pig.", zh:"貓把球丟給豬。", start:413.20, end:417.56 },
+    { id:'s61', chapter:1, en:"\"Too high!\" called Pig.", zh:"「太高了！」豬喊。", start:419.04, end:423.48 },
+    { id:'s62', chapter:1, en:"Cat threw the ball to Dog.", zh:"貓把球丟給狗。", start:423.68, end:427.96 },
+    { id:'s63', chapter:1, en:"\"Too low,\" called Dog.", zh:"「太低了。」狗喊。", start:429.84, end:434.24 },
+    { id:'s64', chapter:1, en:"Dog threw the ball to Cat.", zh:"狗把球丟給貓。", start:434.24, end:438.76 },
+    { id:'s65', chapter:1, en:"Cat missed it.", zh:"貓沒接到。", start:438.80, end:442.52 },
+    { id:'s66', chapter:1, en:"Pig threw the ball to Cat.", zh:"豬把球丟給貓。", start:444.56, end:447.76 },
+    { id:'s67', chapter:1, en:"Cat missed it again.", zh:"貓又沒接到。", start:447.76, end:451.64 },
+    { id:'s68', chapter:1, en:"Cat could not throw.", zh:"貓不會丟球。", start:452.00, end:454.72 },
+    { id:'s69', chapter:1, en:"Cat could not catch.", zh:"貓不會接球。", start:454.72, end:457.44 },
+    { id:'s70', chapter:1, en:"But she liked chasing the ball.", zh:"但她喜歡追球。", start:457.44, end:461.88 },
+    { id:'s71', chapter:1, en:"Soon the game was over.", zh:"不久遊戲就結束了。", start:468.80, end:472.76 },
+    { id:'s72', chapter:1, en:"\"Catch is fun.\" Cat said, \"Can I play again?\"", zh:"「接球好好玩。」貓說：「我可以再玩一次嗎？」", start:476.24, end:481.36 },
+    { id:'s73', chapter:1, en:"\"Maybe,\" said Pig.", zh:"「也許吧。」豬說。", start:481.36, end:487.64 },
+    { id:'s74', chapter:1, en:"\"We'll see,\" said Dog.", zh:"「再看看吧。」狗說。", start:489.68, end:494.76 },
+    { id:'s75', chapter:1, en:"Dog and Pig were playing catch again.", zh:"狗和豬又在玩接球了。", start:500.32, end:504.48 },
+    { id:'s76', chapter:1, en:"\"Can I play?\" asked Cat.", zh:"「我可以一起玩嗎？」貓問。", start:505.68, end:510.28 },
+    { id:'s77', chapter:1, en:"Dog looked at Pig.", zh:"狗看著豬。", start:512.16, end:514.88 },
+    { id:'s78', chapter:1, en:"Pig looked at Dog.", zh:"豬看著狗。", start:514.88, end:518.76 },
+    { id:'s79', chapter:1, en:"\"No, Cat,\" said Dog.", zh:"「不行，貓。」狗說。", start:520.00, end:524.60 },
+    { id:'s80', chapter:1, en:"\"No, Cat,\" said Pig.", zh:"「不行，貓。」豬說。", start:524.60, end:530.40 },
+    { id:'s81', chapter:1, en:"\"Why not?\" asked Cat.", zh:"「為什麼不行？」貓問。", start:530.40, end:533.60 },
+    { id:'s82', chapter:1, en:"\"You are not good at catch,\" said Dog.", zh:"「你不擅長接球。」狗說。", start:533.60, end:537.92 },
+    { id:'s83', chapter:1, en:"\"You stink,\" said Pig.", zh:"「你超爛的。」豬說。", start:537.92, end:543.16 },
+    { id:'s84', chapter:1, en:"\"Oh,\" said Cat.", zh:"「喔。」貓說。", start:546.32, end:552.08 },
+    { id:'s85', chapter:1, en:"Cat found Bat.", zh:"貓去找蝙蝠。", start:552.08, end:556.20 },
+    { id:'s86', chapter:1, en:"\"Pig and Dog are mean,\" she said.", zh:"「豬和狗好壞。」她說。", start:557.04, end:561.20 },
+    { id:'s87', chapter:1, en:"\"They said I stink at catch.\"", zh:"「他們說我接球超爛。」", start:561.20, end:565.52 },
+    { id:'s88', chapter:1, en:"\"That is mean,\" said Bat.", zh:"「這樣很過分。」蝙蝠說。", start:565.52, end:569.60 },
+    { id:'s89', chapter:1, en:"\"But they are right, Cat. You are not good at catch.\"", zh:"「但他們說得對，貓。你真的不擅長接球。」", start:569.60, end:576.28 },
+    { id:'s90', chapter:1, en:"\"Oh,\" said Cat.", zh:"「喔。」貓說。", start:580.08, end:583.40 },
+    { id:'s91', chapter:1, en:"She found Cow.", zh:"她去找牛。", start:584.80, end:588.00 },
+    { id:'s92', chapter:1, en:"\"Bat and Pig and Dog are mean,\" said Cat.", zh:"「蝙蝠、豬和狗都好壞。」貓說。", start:588.00, end:593.20 },
+    { id:'s93', chapter:1, en:"\"They said I stink at catch.\"", zh:"「他們說我接球超爛。」", start:593.20, end:597.04 },
+    { id:'s94', chapter:1, en:"\"They're right, Cat,\" said Cow.", zh:"「他們說得對，貓。」牛說。", start:597.04, end:600.24 },
+    { id:'s95', chapter:1, en:"\"You are not good at catch.\"", zh:"「你真的不擅長接球。」", start:600.24, end:604.28 },
+    { id:'s96', chapter:1, en:"\"Oh,\" said Cat.", zh:"「喔。」貓說。", start:606.08, end:609.48 },
+    { id:'s97', chapter:1, en:"Cat ran into the barn.", zh:"貓跑進穀倉。", start:609.52, end:613.80 },
+    { id:'s98', chapter:1, en:"\"I have no friends here.\"", zh:"「我在這裡沒有朋友。」", start:616.64, end:621.08 },
+    { id:'s99', chapter:1, en:"\"I will run away.\"", zh:"「我要離家出走。」", start:621.44, end:625.40 },
+    { id:'s100', chapter:1, en:"Cat wrote a note.", zh:"貓寫了一張紙條。", start:631.92, end:635.72 },
+    { id:'s101', chapter:1, en:"\"No one loves me.\"", zh:"「沒有人愛我。」", start:636.24, end:638.96 },
+    { id:'s102', chapter:1, en:"\"I am running away.\"", zh:"「我要離家出走了。」", start:638.96, end:642.92 },
+    { id:'s103', chapter:1, en:"Then Cat left the barn.", zh:"然後貓離開了穀倉。", start:644.48, end:648.68 },
+    { id:'s104', chapter:1, en:"The friends saw the note.", zh:"朋友們看到了紙條。", start:654.80, end:658.92 },
+    { id:'s105', chapter:1, en:"\"Cat ran away,\" Cow cried.", zh:"「貓離家出走了！」牛哭著說。", start:661.12, end:666.04 },
+    { id:'s106', chapter:1, en:"\"We did not let Cat play,\" said Dog.", zh:"「我們不讓貓一起玩。」狗說。", start:670.88, end:675.44 },
+    { id:'s107', chapter:1, en:"\"We said mean things to Cat,\" said Bat.", zh:"「我們對貓說了很過分的話。」蝙蝠說。", start:675.44, end:681.48 },
+    { id:'s108', chapter:1, en:"\"I miss Cat,\" said Pig.", zh:"「我好想念貓。」豬說。", start:683.12, end:688.28 },
+    { id:'s109', chapter:1, en:"\"Cat is not good at catch,\" said Dog.", zh:"「貓是不擅長接球。」狗說。", start:693.28, end:697.44 },
+    { id:'s110', chapter:1, en:"\"But she is good at other things.\"", zh:"「但她擅長別的事情。」", start:697.44, end:701.44 },
+    { id:'s111', chapter:1, en:"\"Cat is good at running,\" said Bat.", zh:"「貓很擅長跑步。」蝙蝠說。", start:701.44, end:706.68 },
+    { id:'s112', chapter:1, en:"\"Cat is good at sleeping,\" said Cow.", zh:"「貓很擅長睡覺。」牛說。", start:708.32, end:713.72 },
+    { id:'s113', chapter:1, en:"\"Cat is good at sharing,\" said Pig.", zh:"「貓很擅長分享。」豬說。", start:716.80, end:721.96 },
+    { id:'s114', chapter:1, en:"\"Yes,\" said Dog.", zh:"「對啊。」狗說。", start:726.24, end:729.36 },
+    { id:'s115', chapter:1, en:"\"And she is good at—\"", zh:"「而且她還很擅長——」", start:729.36, end:731.12 },
+    { id:'s116', chapter:1, en:"Boom!", zh:"砰！", start:731.12, end:733.44 },
+    { id:'s117', chapter:1, en:"The barn door opened.", zh:"穀倉的門打開了。", start:733.44, end:736.00 },
+    { id:'s118', chapter:1, en:"In came Cat.", zh:"貓走了進來。", start:736.00, end:739.60 },
+    { id:'s119', chapter:1, en:"\"I am good at being friends,\" she said.", zh:"「我很擅長當朋友。」她說。", start:739.60, end:745.56 },
+    { id:'s120', chapter:1, en:"\"Welcome back, Cat!\"", zh:"「歡迎回來，貓！」", start:747.28, end:749.68 },
+    { id:'s121', chapter:1, en:"\"I missed everyone,\" said Cat.", zh:"「我好想念大家。」貓說。", start:749.68, end:753.68 },
+    { id:'s122', chapter:1, en:"\"So I came back.\"", zh:"「所以我回來了。」", start:753.68, end:757.28 },
+    { id:'s123', chapter:1, en:"\"We are a good team,\" said Pig.", zh:"「我們是很棒的隊伍。」豬說。", start:770.04, end:775.76 },
+];
+
+/* =========================================================
+ *  小工具
+ * ======================================================= */
+function hashCode(str){ let h=0; for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0; } return h>>>0; }
+function mulberry32(seed){ return function(){ let t=seed+=0x6D2B79F5; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
+function seededShuffle(arr,seed){ const a=[...arr]; const rnd=mulberry32(seed>>>0); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+function tokenize(sentence){ const out=[]; const re=/([A-Za-z']+)|([^A-Za-z']+)/g; let m; while((m=re.exec(sentence))!==null){ if(m[1])out.push({token:m[1],isWord:true}); else out.push({token:m[2],isWord:false}); } return out; }
+function wordsOnly(sentence){ return tokenize(sentence).filter(t=>t.isWord).map(t=>t.token.toLowerCase()); }
+
+function rankClozePositions(correctSentence, allChoices){
+    const cWords=tokenize(correctSentence).filter(t=>t.isWord);
+    if(cWords.length===0) return [];
+    const wrongChoices=allChoices.filter(c=>c!==correctSentence);
+    const wrongTokenized=wrongChoices.map(c=>tokenize(c).filter(t=>t.isWord));
+    const ranked=[];
+    for(let i=0;i<cWords.length;i++){
+        const cw=cWords[i].token.toLowerCase();
+        let diffCount=0; const wrongAtPos=[]; const seen=new Set([cw]);
+        for(const wt of wrongTokenized){
+            if(i<wt.length){ const ww=wt[i].token; if(ww.toLowerCase()!==cw){ diffCount++; if(!seen.has(ww.toLowerCase())){ wrongAtPos.push(ww); seen.add(ww.toLowerCase()); } } }
+        }
+        if(diffCount===0) continue;
+        const lenBonus=Math.min(cWords[i].token.length,6);
+        ranked.push({ index:i, score:diffCount*3+wrongAtPos.length*2+lenBonus, correctWord:cWords[i].token, wrongWords:wrongAtPos });
+    }
+    return ranked.sort((a,b)=>b.score-a.score);
+}
+function pickClozeTarget(correctSentence, allChoices, sentenceId){
+    const ranked=rankClozePositions(correctSentence, allChoices);
+    if(ranked.length===0) return null;
+    const seed=hashCode(sentenceId||correctSentence);
+    const rnd=mulberry32(seed); const r=rnd();
+    let nBlanks = r<0.45?1 : r<0.8?2 : 3;
+    const cWords=wordsOnly(correctSentence);
+    nBlanks=Math.min(nBlanks, ranked.length, Math.max(1,Math.floor(cWords.length/2)));
+    const pool=ranked.slice(0, Math.min(ranked.length, nBlanks+2));
+    const picked=seededShuffle(pool, seed^0xc0ffee).slice(0,nBlanks).sort((a,b)=>a.index-b.index);
+    const blanks=picked.map(p=>({ index:p.index, correctWord:p.correctWord, candidates:[p.correctWord,...p.wrongWords] }));
+    const seen=new Set(); const wordBank=[];
+    blanks.forEach(b=>b.candidates.forEach(w=>{ const k=w.toLowerCase(); if(!seen.has(k)){ seen.add(k); wordBank.push(w); } }));
+    // 確保至少 3 個干擾選項可選（從其它句子借字）
+    if(wordBank.length<4){
+        const extra=wordsOnly(allChoices.join(' ')).filter(w=>!seen.has(w));
+        for(const w of shuffle(extra)){ if(wordBank.length>=Math.max(4,blanks.length+3))break; if(!seen.has(w)){ seen.add(w); wordBank.push(w); } }
+    }
+    return { blanks, wordBank };
+}
+function levenshtein(a,b){ if(a===b)return 0; const m=a.length,n=b.length; if(!m)return n; if(!n)return m; const dp=Array(n+1); for(let j=0;j<=n;j++)dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=a[i-1]===b[j-1]?prev:1+Math.min(prev,dp[j],dp[j-1]); prev=tmp; } } return dp[n]; }
+function similarityScore(target,said){ const a=wordsOnly(target),b=wordsOnly(said); if(!a.length&&!b.length)return 1; if(!a.length||!b.length)return 0; const dist=levenshtein(a.join(' '),b.join(' ')); const maxLen=Math.max(a.join(' ').length,b.join(' ').length); return Math.max(0,1-dist/maxLen); }
+function wordLevelDiff(target,said){ const a=wordsOnly(target),b=wordsOnly(said); const set=new Set(b); return a.map(w=>({word:w,ok:set.has(w)})); }
+
+function getChoicesFor(sentence){
+    const correct=sentence.en;
+    const others=DEFAULT_SENTENCES.filter(x=>x.id!==sentence.id && x.en!==correct);
+    const sameChapter=others.filter(x=>x.chapter===sentence.chapter);
+    const pool=sameChapter.length>=3?sameChapter:others;
+    const cLen=correct.length;
+    const sorted=[...pool].sort((a,b)=>Math.abs(a.en.length-cLen)-Math.abs(b.en.length-cLen));
+    const seen=new Set([correct]); const uniq=[];
+    for(const s of sorted){ if(!seen.has(s.en)){ seen.add(s.en); uniq.push(s); } }
+    const top=uniq.slice(0, Math.min(18, uniq.length));
+    const distractors=seededShuffle(top, hashCode(sentence.id)).slice(0,3).map(s=>s.en);
+    return [correct, ...distractors];
+}
+
+const SIGHT_WORDS=new Set(['a','an','the','is','it','in','on','to','at','and','or','not','said','he','she','we','you','i','my','our','will','can','be','was','were','this','that','they','her','him']);
+function highlightEnglish(text){ return text.split(/(\s+)/).map(part=>{ const w=part.replace(/[^a-zA-Z']/g,'').toLowerCase(); return (w&&SIGHT_WORDS.has(w))?`<span class="sight-word">${escapeHtml(part)}</span>`:escapeHtml(part); }).join(''); }
+
+/* =========================================================
+ *  狀態 & 儲存
+ * ======================================================= */
+const STORAGE_KEY='cat-cow-friendship-v2';
+function defaultProgress(){ const m={}; DEFAULT_SENTENCES.forEach(s=>{ m[s.id]={ learned:false, playCount:0, quizCorrect:null, quizAttempts:0, shadowed:false, speechScore:null, lastAt:null }; }); return m; }
+function defaultState(){
+    return {
+        mainMode:'playback',
+        playbackMode:'mask',         // 'normal' | 'mask' | 'delay'
+        speed:1.0,
+        maskFull:false,
+        maskOpacity:92,
+        delayStyle:'smart',          // 'smart'(整句講完才出現) | 'fixed'(慢一秒)
+        maskPos:{xr:0.05,yr:0.72,wr:0.90,hr:0.24,set:false},  // 以「比例」儲存，畫面縮放時自動換算
+        quizQuantity:'20',           // '10'|'20'|'30'|'50'|'all'|自訂數字字串
+        quizOrder:'sequential',      // 'sequential'|'random'
+        quizType:'random',           // 'mc'|'cloze'|'scramble'|'random'
+        quizFlow:'quiz-first',       // 'quiz-first'|'shadow-first'|'random'
+        onlyNew:false,
+        scope:'all',                 // 'all'|'0'|'1'
+        stars:0,
+        progress:defaultProgress(),
+    };
+}
+let state=loadState();
+function loadState(){
+    try{
+        const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return defaultState();
+        const parsed=JSON.parse(raw); const def=defaultState();
+        const merged={...def, ...parsed};
+        merged.progress={...def.progress, ...(parsed.progress||{})};
+        DEFAULT_SENTENCES.forEach(s=>{ merged.progress[s.id]={...def.progress[s.id], ...(merged.progress[s.id]||{})}; });
+        merged.maskPos={...def.maskPos, ...(parsed.maskPos||{})};
+        if(typeof merged.maskPos.wr!=='number') merged.maskPos={...def.maskPos};
+        return merged;
+    }catch(e){ return defaultState(); }
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+
+/* =========================================================
+ *  YouTube 播放器
+ * ======================================================= */
+let player=null, playerReady=false, stopTimer=null, currentPlayingId=null, rafId=null;
+const ytTag=document.createElement('script');
+ytTag.src='https://www.youtube.com/iframe_api';
+document.head.appendChild(ytTag);
+
+window.onYouTubeIframeAPIReady=function(){
+    player=new YT.Player('player',{
+        videoId:VIDEO_ID,
+        playerVars:{ playsinline:1, rel:0, modestbranding:1, cc_load_policy:0, iv_load_policy:3 },
+        events:{
+            onReady:()=>{ playerReady=true; applySpeed(state.speed); applyMask(); updatePPBtn(); },
+            onStateChange:(e)=>{ if(e.data===YT.PlayerState.PLAYING) applySpeed(state.speed); updatePPBtn(); }
+        }
+    });
+};
+
+function applySpeed(s){
+    state.speed=parseFloat(s); saveState();
+    if(playerReady){ try{ player.setPlaybackRate(state.speed); }catch(e){} }
+    document.querySelectorAll('.speed-btn').forEach(b=>b.classList.toggle('on', Math.abs(parseFloat(b.dataset.speed)-state.speed)<0.01));
+}
+
+// 播放單句並在句尾自動暫停（闖關 / 跟讀用）
+function playSegment(sentence, opts={}){
+    if(!playerReady) return;
+    clearTimeout(stopTimer);
+    const startT=Math.max(0, sentence.start);
+    const dur=Math.max(0.4, sentence.end-startT);
+    try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
+    applySpeed(state.speed);
+    currentPlayingId=sentence.id;
+    const realDur=(dur/state.speed)*1000;
+    stopTimer=setTimeout(()=>{ try{ player.pauseVideo(); }catch(e){} currentPlayingId=null; updatePPBtn(); if(opts.onEnd) opts.onEnd(); }, realDur+150);
+    if(!opts.silent){ const p=state.progress[sentence.id]; p.playCount=(p.playCount||0)+1; saveState(); }
+}
+
+/* =========================================================
+ *  模式切換
+ * ======================================================= */
+function setMainMode(mode){
+    state.mainMode=mode; saveState();
+    document.querySelectorAll('[data-main]').forEach(b=>b.classList.toggle('active', b.dataset.main===mode));
+    document.getElementById('view-playback').classList.toggle('hide', mode!=='playback');
+    document.getElementById('view-quiz').classList.toggle('hide', mode!=='quiz');
+    clearTimeout(stopTimer);
+    try{ if(player&&player.pauseVideo) player.pauseVideo(); }catch(e){}
+    if(mode==='quiz') state.maskFull=false;
+    applyMask();
+    updatePlaybackUI();
+}
+
+/* =========================================================
+ *  字幕遮罩
+ * ======================================================= */
+function applyMask(){
+    const m=document.getElementById('subtitle-mask');
+    const wrap=document.getElementById('player-wrap');
+    const sub=document.getElementById('mask-subtitle');
+    if(!m||!wrap) return;
+    let on=true, full=false;
+    if(state.mainMode==='playback'){ on=state.playbackMode!=='normal'; full=state.maskFull; }
+    else { on=true; full=false; }   // 闖關時一定遮住影片內建字幕（避免直接看到答案）
+    if(!on){ m.classList.remove('show'); return; }
+    m.classList.add('show');
+    const r=wrap.getBoundingClientRect();
+    if(r.width<5){ requestAnimationFrame(applyMask); return; }
+    // maskPos 以「比例」儲存，每次依目前播放器尺寸換算成 px → 全螢幕/視窗縮放會自動跟著調整
+    let px;
+    if(full){ px={ x:0, y:0, w:r.width, h:r.height }; }
+    else {
+        const mp=state.maskPos;
+        const xr=(typeof mp.xr==='number')?mp.xr:0.05, yr=(typeof mp.yr==='number')?mp.yr:0.72;
+        const wr=(typeof mp.wr==='number')?mp.wr:0.90, hr=(typeof mp.hr==='number')?mp.hr:0.24;
+        px={ x:xr*r.width, y:yr*r.height, w:wr*r.width, h:hr*r.height };
+        px.x=Math.max(0, Math.min(px.x, r.width-px.w));
+        px.y=Math.max(0, Math.min(px.y, r.height-px.h));
+    }
+    m.style.left=px.x+'px'; m.style.top=px.y+'px'; m.style.width=px.w+'px'; m.style.height=px.h+'px';
+    m.style.background=`rgba(15,23,42,${state.maskOpacity/100})`;
+    // 字幕大小隨播放畫面尺寸調整（大螢幕 / 全螢幕會自動放大）
+    if(sub){ sub.style.fontSize=Math.round(Math.max(15, Math.min(r.width*0.032, 54)))+'px'; }
+}
+function resetMaskPos(){ state.maskPos={ xr:0.05, yr:0.72, wr:0.90, hr:0.24, set:true }; state.maskFull=false; applyMask(); updatePlaybackUI(); saveState(); }
+function toggleMaskFull(){ state.maskFull=!state.maskFull; saveState(); applyMask(); updatePlaybackUI(); }
+function setMaskOpacity(v){ state.maskOpacity=v; document.getElementById('mask-op-val').textContent=v+'%'; applyMask(); saveState(); }
+
+function setupMaskInteraction(){
+    const m=document.getElementById('subtitle-mask');
+    const handle=m.querySelector('.resize-handle');
+    const wrap=document.getElementById('player-wrap');
+    let mode=null, sx,sy,sw,sh,ox,oy;
+    const pt=e=>e.touches&&e.touches.length?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY};
+    function down(e,md){
+        if(state.maskFull) return;            // 整片遮住時不拖曳
+        if(state.mainMode!=='playback') return;
+        e.preventDefault(); e.stopPropagation();
+        mode=md; const p=pt(e); sx=p.x; sy=p.y;
+        const r=m.getBoundingClientRect(), wr=wrap.getBoundingClientRect();
+        ox=r.left-wr.left; oy=r.top-wr.top; sw=r.width; sh=r.height;
+        wrap.classList.add('iframe-block');
+        document.addEventListener('pointermove',move); document.addEventListener('pointerup',up);
+    }
+    function move(e){
+        if(!mode) return; const p=pt(e); const dx=p.x-sx, dy=p.y-sy; const wr=wrap.getBoundingClientRect();
+        if(mode==='move'){
+            const nx=Math.max(0,Math.min(wr.width-sw, ox+dx)), ny=Math.max(0,Math.min(wr.height-sh, oy+dy));
+            state.maskPos.xr=nx/wr.width; state.maskPos.yr=ny/wr.height;
+            state.maskPos.wr=sw/wr.width; state.maskPos.hr=sh/wr.height;
+        } else {
+            const nw=Math.max(60, Math.min(wr.width-ox, sw+dx)), nh=Math.max(30, Math.min(wr.height-oy, sh+dy));
+            state.maskPos.wr=nw/wr.width; state.maskPos.hr=nh/wr.height;
+            state.maskPos.xr=ox/wr.width; state.maskPos.yr=oy/wr.height;
+        }
+        state.maskPos.set=true; applyMask();
+    }
+    function up(){ mode=null; wrap.classList.remove('iframe-block'); document.removeEventListener('pointermove',move); document.removeEventListener('pointerup',up); saveState(); }
+    m.addEventListener('pointerdown', e=>{ if(e.target.classList.contains('resize-handle')) return; down(e,'move'); });
+    handle.addEventListener('pointerdown', e=>down(e,'resize'));
+}
+
+/* =========================================================
+ *  純播放模式
+ * ======================================================= */
+function setPlaybackMode(m){
+    state.playbackMode=m; saveState();
+    applyMask(); updatePlaybackUI();
+    const el=document.getElementById('mask-subtitle'); if(el && m!=='delay'){ el.textContent=''; el.dataset.id=''; }
+}
+function setDelayStyle(s){ state.delayStyle=s; saveState(); const el=document.getElementById('mask-subtitle'); if(el){ el.textContent=''; el.dataset.id=''; } updatePlaybackUI(); }
+function togglePlayPause(){ if(!playerReady) return; clearTimeout(stopTimer); let st=-1; try{ st=player.getPlayerState(); }catch(e){} if(st===1){ try{player.pauseVideo();}catch(e){} } else { try{player.playVideo();}catch(e){} } setTimeout(updatePPBtn,200); }
+function restartVideo(){ if(!playerReady) return; clearTimeout(stopTimer); try{ player.seekTo(0,true); player.playVideo(); }catch(e){} setTimeout(updatePPBtn,200); }
+function enterFullscreen(){ const w=document.getElementById('player-wrap'); const fn=w.requestFullscreen||w.webkitRequestFullscreen||w.msRequestFullscreen; if(fn) fn.call(w); }
+function updatePPBtn(){ const b=document.getElementById('pp-btn'); if(!b||!playerReady) return; let st=-1; try{ st=player.getPlayerState(); }catch(e){} b.textContent=st===1?'⏸ 暫停':'▶ 播放'; }
+
+function updatePlaybackUI(){
+    document.querySelectorAll('.speed-btn').forEach(b=>b.classList.toggle('on', Math.abs(parseFloat(b.dataset.speed)-state.speed)<0.01));
+    document.querySelectorAll('.pmode-btn').forEach(b=>b.classList.toggle('on', b.dataset.pmode===state.playbackMode));
+    document.getElementById('mask-extra').classList.toggle('hide', state.playbackMode==='normal');
+    document.getElementById('delay-extra').classList.toggle('hide', state.playbackMode!=='delay');
+    document.querySelectorAll('.dstyle-btn').forEach(b=>b.classList.toggle('on', b.dataset.dstyle===state.delayStyle));
+    const fb=document.getElementById('maskfull-btn'); if(fb) fb.textContent=state.maskFull?'🔳 只遮字幕區':'⬛ 遮住整個畫面';
+    const op=document.getElementById('mask-op'); if(op) op.value=state.maskOpacity;
+    const opv=document.getElementById('mask-op-val'); if(opv) opv.textContent=state.maskOpacity+'%';
+    updatePPBtn();
+}
+function startPlaybackLoop(){
+    cancelAnimationFrame(rafId); let last=0;
+    const loop=(ts)=>{ if(ts-last>120){ last=ts; if(state.mainMode==='playback') updateMaskSubtitle(); } rafId=requestAnimationFrame(loop); };
+    rafId=requestAnimationFrame(loop);
+}
+function updateMaskSubtitle(){
+    const el=document.getElementById('mask-subtitle'); if(!el) return;
+    if(!playerReady || state.playbackMode!=='delay'){ if(el.textContent){ el.textContent=''; el.dataset.id=''; } return; }
+    let t=0; try{ t=player.getCurrentTime(); }catch(e){ return; }
+    let target=null;
+    if(state.delayStyle==='smart'){
+        // 智能延遲：顯示「最近一句已經完整講完」的句子（聽完整句後才對字幕）
+        for(const s of DEFAULT_SENTENCES){ if(t>=s.end){ if(!target || s.end>target.end) target=s; } }
+    } else {
+        // 固定延遲：句子開始一秒後才顯示
+        const cur=DEFAULT_SENTENCES.find(x=> t>=x.start && t<=x.end);
+        if(cur && t>=cur.start+SUBTITLE_DELAY) target=cur;
+    }
+    if(target){ if(el.dataset.id!==target.id){ el.dataset.id=target.id; el.textContent=target.en; } }
+    else { if(el.dataset.id){ el.dataset.id=''; el.textContent=''; } }
+}
+
+/* =========================================================
+ *  闖關設定
+ * ======================================================= */
+function setSetting(k,v){ state[k]=v; saveState(); updateSettingsUI(); }
+function applyCustomQty(){ const n=parseInt(document.getElementById('qty-custom').value); if(!n||n<1){ document.getElementById('qty-custom').focus(); return; } setSetting('quizQuantity', String(n)); }
+function toggleOnlyNew(cb){ state.onlyNew=cb.checked; saveState(); }
+function updateSettingsUI(){
+    document.querySelectorAll('.seg[data-k]').forEach(b=>b.classList.toggle('on', String(state[b.dataset.k])===b.dataset.v));
+    const ci=document.getElementById('qty-custom'); if(ci && !['10','20','30','50','all'].includes(String(state.quizQuantity))) ci.value=state.quizQuantity;
+    const on=document.getElementById('onlynew'); if(on) on.checked=!!state.onlyNew;
+}
+
+/* =========================================================
+ *  闖關流程
+ * ======================================================= */
+let session=null;
+function buildQueue(){
+    let pool=DEFAULT_SENTENCES.filter(s=> state.scope==='all' || s.chapter===parseInt(state.scope));
+    if(state.onlyNew) pool=pool.filter(s=>!state.progress[s.id].learned);
+    if(state.quizOrder==='random') pool=seededShuffle(pool, (Date.now()&0x7fffffff));
+    const qty=state.quizQuantity==='all'?pool.length:Math.min(pool.length, parseInt(state.quizQuantity)||20);
+    return pool.slice(0, qty);
+}
+function startSession(){
+    if(!playerReady){ alert('影片還在載入中，請稍等一下再開始 🙏'); return; }
+    const queue=buildQueue();
+    if(!queue.length){ alert('找不到符合條件的句子。\n（也許「只練沒學過的句子」已全部學完，試著取消勾選或換個範圍）'); return; }
+    session={ queue, index:0 };
+    document.getElementById('quiz-settings').classList.add('hide');
+    document.getElementById('quiz-session').classList.remove('hide');
+    runSentence();
+}
+function confirmExit(){ if(confirm('確定要結束這次闖關嗎？目前進度會保留。')) exitToSettings(); }
+function exitToSettings(){ session=null; clearTimeout(stopTimer); try{ player.pauseVideo&&player.pauseVideo(); }catch(e){} document.getElementById('quiz-session').classList.add('hide'); document.getElementById('quiz-settings').classList.remove('hide'); updateSettingsUI(); }
+
+function updateSessionProgress(){ const el=document.getElementById('session-progress'); if(el) el.textContent=`第 ${session.index+1} / ${session.queue.length} 句`; }
+
+function runSentence(){
+    const s=session.queue[session.index];
+    let flow=state.quizFlow; if(flow==='random') flow=Math.random()<0.5?'quiz-first':'shadow-first';
+    session.phases= flow==='shadow-first' ? ['shadow','quiz'] : ['quiz','shadow'];
+    session.phaseIndex=0; session.result={ quiz:null, shadow:null };
+    updateSessionProgress();
+    renderListenStage(s);
+}
+function renderListenStage(s){
+    const stage=document.getElementById('stage'); session.started=false;
+    stage.innerHTML=`
+        <div class="stage-card listen">
+            <div style="font-size:3rem;">🎧</div>
+            <div class="listen-title">仔細聽這一句…</div>
+            <div class="listen-sub">聽完會自動出題。聽不清楚可以重聽。</div>
+            <div id="listen-zh" class="zh-hint hide">${escapeHtml(s.zh)}</div>
+            <div class="mt-3" style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+                <button class="mini-btn pink" id="ls-replay">🔁 重聽</button>
+                <button class="mini-btn yellow" id="ls-zh">💡 中文提示</button>
+                <button class="mini-btn mint" id="ls-go">開始作答 ▶</button>
+            </div>
+        </div>`;
+    const go=()=>{ if(session.started) return; session.started=true; startPhase(s); };
+    document.getElementById('ls-replay').onclick=()=>playSegment(s,{onEnd:()=>{}});
+    document.getElementById('ls-zh').onclick=()=>document.getElementById('listen-zh').classList.toggle('hide');
+    document.getElementById('ls-go').onclick=go;
+    playSegment(s,{ onEnd:()=>setTimeout(go,500) });
+}
+function startPhase(s){ const phase=session.phases[session.phaseIndex]; if(phase==='quiz') renderQuizPhase(s); else renderShadowPhase(s); }
+function advancePhase(){ session.phaseIndex++; const s=session.queue[session.index]; if(session.phaseIndex<session.phases.length) startPhase(s); else finishSentence(s); }
+
+/* ---- 測驗 ---- */
+function renderQuizPhase(s){
+    const stage=document.getElementById('stage');
+    let type=state.quizType; if(type==='random') type=['mc','cloze','scramble'][Math.floor(Math.random()*3)];
+    if(type==='scramble' && wordsOnly(s.en).length<4) type='mc';
+    const label={mc:'四選一',cloze:'克漏字',scramble:'拖曳重組'}[type]||'測驗';
+    const hint={mc:'你剛剛聽到的是哪一句？',cloze:'把聽到的字填進空格（可點或拖）',scramble:'把單字排成你聽到的句子'}[type];
+    stage.innerHTML=`<div class="stage-card"><div class="stage-tag quiz">📝 測驗 · ${label}</div><div class="stage-hint">${hint}</div><div class="mt-2" style="display:flex;justify-content:center;"><button class="mini-btn sky" id="quiz-replay">🔁 沒聽清楚？再聽一次</button></div><div id="quiz-host" class="mt-2"></div></div>`;
+    const host=document.getElementById('quiz-host');
+    document.getElementById('quiz-replay').onclick=()=>playSegment(s,{onEnd:()=>{}});
+    const onResult=(correct)=>{
+        const p=state.progress[s.id]; p.quizAttempts=(p.quizAttempts||0)+1; p.quizCorrect=correct; session.result.quiz=correct;
+        if(correct){ state.stars+=1; updateHeader(); }
+        saveState(); showToast(correct?'答對了！ 🎉':'沒關係，記起來囉 💪', correct);
+        setTimeout(advancePhase, correct?900:1500);
+    };
+    if(type==='mc') renderMC(host,s,onResult);
+    else if(type==='cloze') renderCloze(host,s,onResult);
+    else renderScramble(host,s,onResult);
+}
+function renderMC(host,s,onResult){
+    const raw=s.choices||getChoicesFor(s);
+    const choices=shuffle(raw.map((c,i)=>({text:c,correct:i===0})));
+    host.innerHTML=`<div style="display:grid;gap:8px;">${choices.map(c=>`<button class="quiz-opt" data-c="${c.correct}">${escapeHtml(c.text)}</button>`).join('')}</div>`;
+    let done=false;
+    host.querySelectorAll('.quiz-opt').forEach(b=>{
+        b.onclick=()=>{ if(done)return; done=true; const correct=b.dataset.c==='true';
+            host.querySelectorAll('.quiz-opt').forEach(x=>{ x.disabled=true; if(x.dataset.c==='true') x.classList.add('opt-correct'); });
+            if(correct) burst(b); else b.classList.add('opt-wrong','animate-shake');
+            onResult(correct);
+        };
+    });
+}
+function renderCloze(host,s,onResult){
+    const raw=s.choices||getChoicesFor(s);
+    const data=pickClozeTarget(s.en, raw, s.id);
+    if(!data){ renderMC(host,s,onResult); return; }
+    const blankByIndex=new Map(data.blanks.map((b,ord)=>[b.index,{ord,...b}]));
+    const toks=tokenize(s.en); let wi=-1;
+    const sentenceHTML=toks.map(t=>{ if(t.isWord) wi++; if(t.isWord&&blankByIndex.has(wi)){ const b=blankByIndex.get(wi); return `<span class="cloze-blank" data-correct="${escapeHtml(b.correctWord)}"></span>`; } return t.isWord?escapeHtml(t.token):escapeHtml(t.token).replace(/ /g,'&nbsp;'); }).join('');
+    const chipsHTML=shuffle([...data.wordBank]).map(w=>`<span class="cloze-chip" draggable="true" data-word="${escapeHtml(w)}">${escapeHtml(w)}</span>`).join('');
+    host.innerHTML=`<div class="cloze-sentence">${sentenceHTML}</div><div class="cloze-chips">${chipsHTML}</div><div class="mt-2" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;"><button class="mini-btn yellow hint-btn">💡 提示</button><button class="mini-btn gray skip-btn">看答案</button></div>`;
+    let resolved=false;
+    const blanks=[...host.querySelectorAll('.cloze-blank')];
+    const chipsEls=[...host.querySelectorAll('.cloze-chip')];
+    const allCorrect=()=>blanks.every(b=>b.classList.contains('correct'));
+    const nextEmpty=()=>blanks.find(b=>!b.classList.contains('correct')&&!b.classList.contains('filled'))||blanks.find(b=>!b.classList.contains('correct'));
+    const tryFill=(blank,chip)=>{
+        if(resolved||blank.classList.contains('correct')) return;
+        const ok=chip.dataset.word.toLowerCase()===(blank.dataset.correct||'').toLowerCase();
+        blank.textContent=chip.dataset.word; blank.classList.add('filled');
+        if(ok){ blank.classList.remove('filled','wrong'); blank.classList.add('correct'); burst(blank); if(allCorrect()){ resolved=true; onResult(true); } }
+        else { blank.classList.add('wrong'); chip.classList.add('wrong-pick'); setTimeout(()=>{ blank.classList.remove('wrong','filled'); blank.textContent=''; chip.classList.remove('wrong-pick'); },600); }
+    };
+    chipsEls.forEach(chip=>{
+        chip.onclick=()=>{ const b=nextEmpty(); if(b) tryFill(b,chip); };
+        chip.addEventListener('dragstart', e=>{ chip.classList.add('dragging'); try{ e.dataTransfer.setData('text/plain', chip.dataset.word); }catch(_){} });
+        chip.addEventListener('dragend', ()=>chip.classList.remove('dragging'));
+    });
+    blanks.forEach(blank=>{
+        blank.onclick=()=>{ if(blank.classList.contains('filled')&&!blank.classList.contains('correct')){ blank.classList.remove('filled','wrong'); blank.textContent=''; } };
+        blank.addEventListener('dragover', e=>{ e.preventDefault(); if(!blank.classList.contains('correct')) blank.classList.add('drag-over'); });
+        blank.addEventListener('dragleave', ()=>blank.classList.remove('drag-over'));
+        blank.addEventListener('drop', e=>{ e.preventDefault(); blank.classList.remove('drag-over'); if(blank.classList.contains('correct')) return; const word=(e.dataTransfer.getData('text/plain')||'').trim(); const chip=chipsEls.find(c=>c.dataset.word===word); if(chip) tryFill(blank,chip); });
+    });
+    host.querySelector('.hint-btn').onclick=()=>{ blanks.filter(b=>!b.classList.contains('correct')).forEach(b=>{ const a=b.dataset.correct||''; b.textContent=a[0]+'…'; b.classList.add('hinted'); }); };
+    host.querySelector('.skip-btn').onclick=()=>{ if(resolved) return; resolved=true; blanks.forEach(b=>{ b.textContent=b.dataset.correct; b.classList.remove('wrong','filled'); b.classList.add('correct'); }); onResult(false); };
+}
+function renderScramble(host,s,onResult){
+    const wordTokens=tokenize(s.en).filter(t=>t.isWord).map(t=>t.token);
+    if(wordTokens.length<4){ renderMC(host,s,onResult); return; }
+    const shuffled=shuffle(wordTokens.map((w,i)=>({w,i})));
+    host.innerHTML=`
+        <div class="scramble-area" data-target="${escapeHtml(wordTokens.join(' '))}"></div>
+        <div class="scramble-bank">${shuffled.map(o=>`<span class="scramble-chip" draggable="true" data-word="${escapeHtml(o.w)}">${escapeHtml(o.w)}</span>`).join('')}</div>
+        <div class="mt-2" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+            <button class="mini-btn mint check-btn">✔ 檢查</button>
+            <button class="mini-btn yellow reset-btn">↺ 重來</button>
+            <button class="mini-btn gray skip-btn">看答案</button>
+        </div>`;
+    const area=host.querySelector('.scramble-area'), bank=host.querySelector('.scramble-bank');
+    const chips=[...host.querySelectorAll('.scramble-chip')];
+    chips.forEach(chip=>{
+        chip.onclick=()=>{ if(chip.parentElement===bank) area.appendChild(chip); else bank.appendChild(chip); };
+        chip.addEventListener('dragstart', e=>{ chip.classList.add('dragging'); try{ e.dataTransfer.setData('text/plain', chip.dataset.word); }catch(_){} });
+        chip.addEventListener('dragend', ()=>chip.classList.remove('dragging'));
+    });
+    [area,bank].forEach(cont=>{
+        cont.addEventListener('dragover', e=>{ e.preventDefault(); const d=host.querySelector('.scramble-chip.dragging'); if(!d) return; const after=[...cont.querySelectorAll('.scramble-chip:not(.dragging)')].find(c=>{ const r=c.getBoundingClientRect(); return e.clientX<r.left+r.width/2; }); if(after) cont.insertBefore(d,after); else cont.appendChild(d); });
+    });
+    let done=false;
+    host.querySelector('.check-btn').onclick=()=>{
+        if(done) return;
+        const user=[...area.querySelectorAll('.scramble-chip')].map(c=>c.dataset.word);
+        let ok=user.length===wordTokens.length;
+        area.querySelectorAll('.scramble-chip').forEach((c,i)=>{ c.classList.remove('correct-pos'); if(i<wordTokens.length && c.dataset.word.toLowerCase()===wordTokens[i].toLowerCase()) c.classList.add('correct-pos'); else ok=false; });
+        if(ok){ done=true; burst(area); onResult(true); }
+        else { area.classList.add('animate-shake'); setTimeout(()=>area.classList.remove('animate-shake'),400); }
+    };
+    host.querySelector('.reset-btn').onclick=()=>{ [...area.querySelectorAll('.scramble-chip')].forEach(c=>{ c.classList.remove('correct-pos'); bank.appendChild(c); }); };
+    host.querySelector('.skip-btn').onclick=()=>{ if(done) return; done=true; bank.innerHTML=''; area.innerHTML=wordTokens.map(w=>`<span class="scramble-chip correct-pos">${escapeHtml(w)}</span>`).join(''); onResult(false); };
+}
+
+/* ---- 跟讀 Shadowing ---- */
+function isSpeechRecSupported(){ return !!(window.SpeechRecognition||window.webkitSpeechRecognition); }
+function renderShadowPhase(s){
+    const stage=document.getElementById('stage');
+    stage.innerHTML=`
+        <div class="stage-card">
+            <div class="stage-tag shadow">🎤 跟讀 Shadowing</div>
+            <div class="shadow-en">${highlightEnglish(s.en)}</div>
+            <div class="shadow-zh">${escapeHtml(s.zh)}</div>
+            <div id="shadow-cd" class="countdown-num">🎧</div>
+            <div id="shadow-status" class="shadow-status">準備好，跟著大聲念！</div>
+            <div class="mt-2" style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+                <button class="mini-btn sky" id="sh-replay">🔊 再聽一次</button>
+            </div>
+        </div>`;
+    document.getElementById('sh-replay').onclick=()=>playSegment(s,{onEnd:()=>{}});
+    const onDone=(score)=>{ session.result.shadow=score; setTimeout(advancePhase, 900); };
+    if(session.phaseIndex>0){ playSegment(s,{ onEnd:()=>sessionShadow(s,onDone) }); }
+    else { sessionShadow(s,onDone); }
+}
+function sessionShadow(s, onDone){
+    const statusEl=document.getElementById('shadow-status');
+    const cdEl=document.getElementById('shadow-cd');
+    const animateCd=(txt)=>{ cdEl.textContent=txt; cdEl.classList.remove('count-anim'); void cdEl.offsetWidth; cdEl.classList.add('count-anim'); };
+    const record=()=>{
+        if(!isSpeechRecSupported()){
+            statusEl.innerHTML='這個瀏覽器不能評分，<b>跟著大聲念一次</b>就好！（想要分數請用 Chrome / Edge）';
+            animateCd('⭐'); state.progress[s.id].shadowed=true; saveState();
+            setTimeout(()=>onDone(null), 1600); return;
+        }
+        recognizeOnce(s, statusEl, cdEl, onDone);
+    };
+    let n=3; statusEl.textContent='準備好，跟著大聲念！';
+    const tick=()=>{ animateCd(n>0?n:'🎙️'); if(n>0){ n--; setTimeout(tick,800); } else record(); };
+    tick();
+}
+function recognizeOnce(s, statusEl, cdEl, onDone){
+    const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
+    const rec=new Rec(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=3; rec.continuous=false;
+    statusEl.innerHTML='🎙️ 請大聲說出來！';
+    let finished=false;
+    const finish=(transcript,err)=>{
+        if(finished) return; finished=true; try{ rec.stop(); }catch(e){}
+        if(err && !transcript){
+            cdEl.textContent='❌';
+            statusEl.textContent= err==='not-allowed'?'請允許使用麥克風權限再試一次':err==='no-speech'?'沒聽到聲音，下次大聲一點～':'辨識失敗：'+err;
+            setTimeout(()=>onDone(null), 1800); return;
+        }
+        const score=Math.round(similarityScore(s.en, transcript)*100);
+        const tier=score>=90?'perfect':score>=70?'great':'try';
+        const tierLabel=score>=90?'🌟🌟🌟 PERFECT!':score>=70?'🌟🌟 GREAT!':'🌟 再試試！';
+        const diff=wordLevelDiff(s.en, transcript).map(d=>`<span class="${d.ok?'sd-ok':'sd-no'}">${escapeHtml(d.word)}</span>`).join(' ');
+        statusEl.innerHTML=`<div class="speech-result ${tier}"><div style="font-size:1.1rem;font-weight:900;">${tierLabel} · ${score} 分</div><div style="font-size:.8rem;margin-top:2px;">聽到你說：「${escapeHtml(transcript)}」</div><div style="font-size:.85rem;margin-top:4px;">${diff}</div></div>`;
+        cdEl.textContent=score>=90?'🌟🌟🌟':score>=70?'🌟🌟':'🌟';
+        const p=state.progress[s.id]; p.speechScore=Math.max(p.speechScore||0, score); p.shadowed=true;
+        state.stars += score>=90?3:score>=70?2:1; saveState(); updateHeader();
+        if(score>=90) burst(cdEl);
+        setTimeout(()=>onDone(score), 2600);
+    };
+    rec.onresult=e=>finish(e.results[0][0].transcript, null);
+    rec.onerror=e=>finish('', e.error||'unknown');
+    rec.onend=()=>{ if(!finished) finish('','no-speech'); };
+    try{ rec.start(); }catch(e){ finish('', e.message||'start-failed'); }
+    setTimeout(()=>{ if(!finished) finish('','timeout'); }, 9000);
+}
+
+/* ---- 完成一句 / 完成全部 ---- */
+function finishSentence(s){
+    const p=state.progress[s.id]; p.learned=true; p.lastAt=Date.now(); saveState(); updateHeader();
+    const q=session.result.quiz, sh=session.result.shadow;
+    const last=session.index>=session.queue.length-1;
+    document.getElementById('stage').innerHTML=`
+        <div class="stage-card">
+            <div style="font-size:2.6rem;">${q!==false?'🎉':'💪'}</div>
+            <div class="sum-title">這一句完成！</div>
+            <div class="sum-rows">
+                <div>📝 測驗：<b>${q===true?'✅ 答對':q===false?'➖ 已看答案':'—'}</b></div>
+                <div>🎤 跟讀：<b>${sh==null?'—':sh+' 分'}</b></div>
+            </div>
+            <div class="reveal-en">${highlightEnglish(s.en)}</div>
+            <div class="reveal-zh">${escapeHtml(s.zh)}</div>
+            <div class="mt-3" style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+                <button class="mini-btn sky" id="sum-replay">🔊 再聽發音</button>
+                <button class="big-btn pink-strong" id="sum-next">${last?'🏁 完成闖關':'下一句 ▶'}</button>
+            </div>
+        </div>`;
+    document.getElementById('sum-replay').onclick=()=>playSegment(s,{onEnd:()=>{}});
+    document.getElementById('sum-next').onclick=()=> last ? finishSession() : nextSentence();
+}
+function nextSentence(){ session.index++; runSentence(); }
+function finishSession(){
+    bigConfetti();
+    const n=session.queue.length;
+    const correct=session.queue.filter(s=>state.progress[s.id].quizCorrect===true).length;
+    const shadowScores=session.queue.map(s=>state.progress[s.id].speechScore).filter(v=>v!=null);
+    const avg=shadowScores.length?Math.round(shadowScores.reduce((a,b)=>a+b,0)/shadowScores.length):null;
+    document.getElementById('stage').innerHTML=`
+        <div class="stage-card">
+            <div style="font-size:3.2rem;">🏆</div>
+            <div class="sum-title">闖關完成！</div>
+            <div class="sum-rows">
+                <div>這次練了 <b>${n}</b> 句</div>
+                <div>測驗答對 <b>${correct}</b> 句</div>
+                <div>跟讀平均 <b>${avg==null?'—':avg+' 分'}</b></div>
+                <div>⭐ 累計星星 <b>${state.stars}</b></div>
+            </div>
+            <div class="mt-3" style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+                <button class="big-btn pink-strong" id="again-btn">🔁 再來一輪</button>
+            </div>
+        </div>`;
+    document.getElementById('again-btn').onclick=exitToSettings;
+}
+
+/* =========================================================
+ *  效果 & 抬頭
+ * ======================================================= */
+function burst(el){ if(typeof confetti!=='function'||!el) return; const r=el.getBoundingClientRect(); confetti({ particleCount:38, startVelocity:28, spread:60, origin:{ x:(r.left+r.width/2)/window.innerWidth, y:(r.top+r.height/2)/window.innerHeight }, colors:['#F472B6','#FB923C','#FBBF24','#34D399','#38BDF8','#A78BFA'] }); }
+function bigConfetti(){ if(typeof confetti!=='function') return; const end=Date.now()+1400; (function frame(){ confetti({particleCount:5,angle:60,spread:70,origin:{x:0},colors:['#F472B6','#FB923C','#FBBF24','#34D399','#38BDF8','#A78BFA']}); confetti({particleCount:5,angle:120,spread:70,origin:{x:1},colors:['#F472B6','#FB923C','#FBBF24','#34D399','#38BDF8','#A78BFA']}); if(Date.now()<end) requestAnimationFrame(frame); })(); }
+function showToast(msg, good){ const t=document.createElement('div'); t.className='toast '+(good?'good':'bad'); t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),300); }, 1200); }
+function updateHeader(){ document.getElementById('stars-text').textContent=state.stars; const learned=Object.values(state.progress).filter(p=>p.learned).length; document.getElementById('learned-text').textContent=`${learned} / ${DEFAULT_SENTENCES.length}`; }
+
+/* =========================================================
+ *  初始化
+ * ======================================================= */
+document.addEventListener('DOMContentLoaded', ()=>{
+    setupMaskInteraction();
+    updateSettingsUI();
+    updatePlaybackUI();
+    updateHeader();
+    setMainMode(state.mainMode || 'playback');
+    startPlaybackLoop();
+    window.addEventListener('resize', ()=>applyMask());
+    document.addEventListener('fullscreenchange', ()=>setTimeout(applyMask, 80));
+    document.addEventListener('webkitfullscreenchange', ()=>setTimeout(applyMask, 80));
+    // 播放器尺寸一變動（全螢幕、視窗縮放、版面改變）就重算遮罩位置與字幕大小
+    try{ new ResizeObserver(()=>applyMask()).observe(document.getElementById('player-wrap')); }catch(e){}
+});
+</script>
+</body>
+</html>
