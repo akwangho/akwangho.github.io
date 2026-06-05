@@ -41,8 +41,13 @@
         }
         .mtab:hover { transform: translateY(-1px); }
         .mtab.active { background: linear-gradient(135deg,#F472B6,#FB923C); color: #fff; box-shadow: 0 4px 12px rgba(244,114,182,.4); }
-        .hstats { margin-left: auto; font-weight: 800; color: #475569; font-size: .9rem; }
-        .hstats span { color: #D97706; }
+        .hstats { margin-left: auto; font-weight: 800; color: #475569; font-size: .9rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .hstat-pill { background:#FEF3C7; color:#B45309; padding:3px 10px; border-radius:999px; }
+        .hstat-pill span { color:#B45309; }
+        .hstat-learn span { color: #BE185D; }
+        .hp-bar { width:120px; height:11px; background:#FCE7F3; border-radius:999px; overflow:hidden; box-shadow:inset 0 1px 2px rgba(0,0,0,.1); flex:0 0 auto; }
+        .hp-fill { display:block; height:100%; width:0%; background:linear-gradient(90deg,#F472B6,#FB923C); border-radius:999px; transition:width .6s cubic-bezier(.4,0,.2,1); }
+        .hp-pct { color:#D97706; min-width:36px; text-align:right; }
 
         main { max-width: 1040px; margin: 0 auto; padding: 16px; }
 
@@ -241,7 +246,12 @@
         <button data-main="shadow" class="mtab" onclick="setMainMode('shadow')">🎤 跟讀挑戰</button>
         <button data-main="quiz" class="mtab" onclick="setMainMode('quiz')">🎯 闖關測驗</button>
     </div>
-    <div class="hstats">⭐ <span id="stars-text">0</span> · 已學 <span id="learned-text">0 / 0</span></div>
+    <div class="hstats">
+        <span class="hstat-pill">⭐ <span id="stars-text">0</span></span>
+        <span class="hstat-learn">📚 已學 <span id="learned-text">0 / 0</span></span>
+        <span class="hp-bar" title="總複習進度"><span class="hp-fill" id="hp-fill"></span></span>
+        <span id="hp-pct" class="hp-pct">0%</span>
+    </div>
 </header>
 
 <main>
@@ -585,7 +595,19 @@ function pickClozeTarget(correctSentence, allChoices, sentenceId){
     return { blanks, wordBank };
 }
 function levenshtein(a,b){ if(a===b)return 0; const m=a.length,n=b.length; if(!m)return n; if(!n)return m; const dp=Array(n+1); for(let j=0;j<=n;j++)dp[j]=j; for(let i=1;i<=m;i++){ let prev=dp[0]; dp[0]=i; for(let j=1;j<=n;j++){ const tmp=dp[j]; dp[j]=a[i-1]===b[j-1]?prev:1+Math.min(prev,dp[j],dp[j-1]); prev=tmp; } } return dp[n]; }
-function similarityScore(target,said){ const a=wordsOnly(target),b=wordsOnly(said); if(!a.length&&!b.length)return 1; if(!a.length||!b.length)return 0; const dist=levenshtein(a.join(' '),b.join(' ')); const maxLen=Math.max(a.join(' ').length,b.join(' ').length); return Math.max(0,1-dist/maxLen); }
+// 回傳 0~1 的相似度（× 100 即 0~100 分；完全唸對 = 1 → 100 分）
+function similarityScore(target,said){
+    const a=wordsOnly(target), b=wordsOnly(said);
+    if(!a.length && !b.length) return 1;
+    if(!a.length || !b.length) return 0;
+    const aJoin=a.join(' '), bJoin=b.join(' ');
+    // 逐字母相似度（抓發音/拼字接近度）
+    const charSim=1 - levenshtein(aJoin,bJoin)/Math.max(aJoin.length,bJoin.length);
+    // 逐單字相似度（levenshtein 直接吃字串陣列：比較整個單字是否相同、順序對不對）
+    const wordSim=1 - levenshtein(a,b)/Math.max(a.length,b.length);
+    // 以單字為主、字母為輔；夾在 0~1，整句唸對必得 1（= 100 分）
+    return Math.max(0, Math.min(1, 0.55*wordSim + 0.45*charSim));
+}
 function wordLevelDiff(target,said){ const a=wordsOnly(target),b=wordsOnly(said); const set=new Set(b); return a.map(w=>({word:w,ok:set.has(w)})); }
 
 function getChoicesFor(sentence){
@@ -1039,26 +1061,53 @@ function sessionShadow(s, onDone){
     const tick=()=>{ animateCd(n>0?n:'🎙️'); if(n>0){ n--; setTimeout(tick,800); } else record(); };
     tick();
 }
-// 共用：啟動一次語音辨識，結束時回呼 onFinish(topTranscript, error, alternatives[])
-function captureSpeech(onFinish){
+/* 共用：啟動一次語音辨識。
+ * 重點：用 continuous + interimResults 持續收音，並「累積整句」，
+ *       小朋友唸到一半停頓也不會被切斷；偵測到一段「靜默」才結算 →
+ *       解決「只唸一個字就結束、只辨識到一個字」的問題。
+ * opts: { silence: 停頓多久算唸完(ms), noSpeech: 多久沒開口算沒聲音(ms),
+ *         maxMs: 最長收音時間(ms), onPartial: fn(目前聽到的文字) }
+ * 回呼 onFinish(fullTranscript, error, alternatives[]) */
+function captureSpeech(onFinish, opts){
+    opts=opts||{};
     const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
     if(!Rec){ onFinish('', 'unsupported', []); return null; }
-    const rec=new Rec(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=3; rec.continuous=false;
-    let finished=false;
-    const finish=(transcript,err,alts)=>{ if(finished) return; finished=true; try{ rec.stop(); }catch(e){} onFinish(transcript, err||null, alts||[]); };
-    rec.onresult=e=>{ const r=e.results[0]; const alts=[]; for(let i=0;i<r.length;i++) alts.push(r[i].transcript); finish(alts[0]||'', null, alts); };
-    rec.onerror=e=>finish('', e.error||'unknown', []);
-    rec.onend=()=>{ if(!finished) finish('', 'no-speech', []); };
-    try{ rec.start(); }catch(e){ finish('', e.message||'start-failed', []); }
-    setTimeout(()=>{ if(!finished) finish('', 'timeout', []); }, 9000);
+    const rec=new Rec();
+    rec.lang='en-US'; rec.interimResults=true; rec.maxAlternatives=3; rec.continuous=true;
+    const SIL=opts.silence||2000, NOSPEECH=opts.noSpeech||7000, HARD=opts.maxMs||15000;
+    let finished=false, started=false, finalText='', interimText='';
+    let silenceTimer=null, noSpeechTimer=null, hardTimer=null;
+    const clearAll=()=>{ clearTimeout(silenceTimer); clearTimeout(noSpeechTimer); clearTimeout(hardTimer); };
+    const finish=(err)=>{
+        if(finished) return; finished=true; clearAll(); try{ rec.stop(); }catch(e){}
+        const text=(finalText+' '+interimText).trim();
+        onFinish(text, text?null:(err||'no-speech'), text?[text]:[]);
+    };
+    const armSilence=()=>{ clearTimeout(silenceTimer); silenceTimer=setTimeout(()=>finish(null), SIL); };
+    rec.onresult=e=>{
+        if(!started){ started=true; clearTimeout(noSpeechTimer); }
+        interimText='';
+        for(let i=e.resultIndex;i<e.results.length;i++){
+            const res=e.results[i];
+            if(res.isFinal) finalText=(finalText+' '+(res[0].transcript||'')).trim();
+            else interimText+=(res[0].transcript||'');
+        }
+        const live=(finalText+' '+interimText).trim();
+        if(live){ armSilence(); if(opts.onPartial){ try{ opts.onPartial(live); }catch(_){} } }
+    };
+    rec.onerror=e=>finish(e.error||'unknown');
+    rec.onend=()=>finish(null);            // 自然結束時，用目前累積到的內容結算
+    try{ rec.start(); }catch(e){ finish(e.message||'start-failed'); return null; }
+    noSpeechTimer=setTimeout(()=>finish('no-speech'), NOSPEECH);
+    hardTimer=setTimeout(()=>finish(null), HARD);
     return rec;
 }
 // 從所有候選辨識結果中，取分數最高的那個（對小朋友比較寬容）
 function bestSpeechScore(targetEn, transcript, alts){
     const list=(alts&&alts.length)?alts:(transcript?[transcript]:[]);
     let best=-1, bestT='';
-    list.forEach(t=>{ const sc=Math.round(similarityScore(targetEn,t)*100); if(sc>best){ best=sc; bestT=t; } });
-    return { score:best, transcript:bestT, hasResult:list.length>0 };
+    list.forEach(t=>{ const sc=Math.max(0, Math.min(100, Math.round(similarityScore(targetEn,t)*100))); if(sc>best){ best=sc; bestT=t; } });
+    return { score:Math.max(0,best), transcript:bestT, hasResult:list.length>0 };
 }
 function recognizeOnce(s, statusEl, cdEl, onDone){
     statusEl.innerHTML='🎙️ 請大聲說出來！';
@@ -1079,7 +1128,7 @@ function recognizeOnce(s, statusEl, cdEl, onDone){
         state.stars += score>=90?3:score>=70?2:1; saveState(); updateHeader();
         if(score>=90) burst(cdEl);
         setTimeout(()=>onDone(score), 2600);
-    });
+    }, { onPartial:(t)=>{ statusEl.innerHTML=`🎙️ <b>聽到：</b>${escapeHtml(t)}`; } });
 }
 
 /* ---- 完成一句 / 完成全部 ---- */
@@ -1243,14 +1292,17 @@ function beginShadowAttempt(s){
         if(!shadowSession||shadowSession.gen!==myGen) return;
         if(n>0){ animateCd(n); statusEl.innerHTML='準備…<b>換你唸！</b>'; n--; setTimeout(tick,600); }
         else {
-            animateCd('🎙️'); statusEl.innerHTML='🎙️ <b>大聲唸出來！</b>';
+            animateCd('🎙️'); statusEl.innerHTML='🎙️ <b>換你唸，整句大聲唸出來！</b>';
             shadowSession.rec=captureSpeech((transcript,err,alts)=>{
                 if(!shadowSession||shadowSession.gen!==myGen) return; // 已被 replay / skip / exit 作廢
                 shadowSession.rec=null;
                 const r=bestSpeechScore(s.en, transcript, alts);
                 if(!r.hasResult){ handleShadowError(s, err||'no-speech', myGen); return; }
                 scoreShadow(s, r.score, r.transcript, myGen);
-            });
+            }, { silence:2200, onPartial:(t)=>{
+                if(!shadowSession||shadowSession.gen!==myGen) return;
+                statusEl.innerHTML=`🎙️ <b>聽到：</b>${escapeHtml(t)}`;
+            }});
         }
     };
     tick();
@@ -1405,7 +1457,15 @@ function animateNumber(el, to, dur){
 function burst(el){ if(typeof confetti!=='function'||!el) return; const r=el.getBoundingClientRect(); confetti({ particleCount:38, startVelocity:28, spread:60, origin:{ x:(r.left+r.width/2)/window.innerWidth, y:(r.top+r.height/2)/window.innerHeight }, colors:['#F472B6','#FB923C','#FBBF24','#34D399','#38BDF8','#A78BFA'] }); }
 function bigConfetti(){ if(typeof confetti!=='function') return; const end=Date.now()+1400; (function frame(){ confetti({particleCount:5,angle:60,spread:70,origin:{x:0},colors:['#F472B6','#FB923C','#FBBF24','#34D399','#38BDF8','#A78BFA']}); confetti({particleCount:5,angle:120,spread:70,origin:{x:1},colors:['#F472B6','#FB923C','#FBBF24','#34D399','#38BDF8','#A78BFA']}); if(Date.now()<end) requestAnimationFrame(frame); })(); }
 function showToast(msg, good){ const t=document.createElement('div'); t.className='toast '+(good?'good':'bad'); t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),300); }, 1200); }
-function updateHeader(){ document.getElementById('stars-text').textContent=state.stars; const learned=Object.values(state.progress).filter(p=>p.learned).length; document.getElementById('learned-text').textContent=`${learned} / ${DEFAULT_SENTENCES.length}`; }
+function updateHeader(){
+    document.getElementById('stars-text').textContent=state.stars;
+    const total=DEFAULT_SENTENCES.length;
+    const learned=Object.values(state.progress).filter(p=>p.learned).length;
+    document.getElementById('learned-text').textContent=`${learned} / ${total}`;
+    const pct=total?Math.round(learned/total*100):0;
+    const fill=document.getElementById('hp-fill'); if(fill) fill.style.width=pct+'%';
+    const pe=document.getElementById('hp-pct'); if(pe) pe.textContent=pct+'%';
+}
 
 /* =========================================================
  *  初始化
