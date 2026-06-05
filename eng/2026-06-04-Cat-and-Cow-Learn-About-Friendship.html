@@ -332,6 +332,9 @@
                 <button class="seg speed-btn" data-speed="0.85" onclick="applySpeed(0.85)">0.85x</button>
                 <button class="seg speed-btn" data-speed="1" onclick="applySpeed(1)">1.0x</button>
             </div>
+            <div class="set-row">
+                <label class="chk"><input type="checkbox" id="shadow-onlynew" onchange="toggleShadowOnlyNew(this)"> 只練「從來沒學過」的句子</label>
+            </div>
             <p class="tip">🎧 <b>玩法</b>：影片唸一句 → 換你<b>大聲跟著唸</b> → 馬上評分 → 自動接下一句，一氣呵成！<br>🔥 <b>一次就唸對</b>（沒有按「再聽一次」）會累積<b>連擊加成</b>，分數越衝越高；按了「再聽一次」雖然沒有加成，但一樣能練到熟～<br>🎤 評分需要麥克風（建議用 Chrome／Edge；若瀏覽器不能評分，也能照樣開心跟讀拿分）。</p>
             <div id="shadow-best" class="hide"></div>
             <button class="big-btn pink-strong start" onclick="startShadowSession()">🚀 開始跟讀</button>
@@ -651,6 +654,7 @@ function defaultState(){
         shadowQuantity:'10',         // '5'|'10'|'20'|'all'|自訂數字字串
         shadowOrder:'sequential',    // 'sequential'|'random'
         shadowScope:'all',           // 'all'|'0'|'1'
+        shadowOnlyNew:false,         // 只練從來沒學過的句子
         shadowBest:0,                // 跟讀挑戰歷史最高總分
         stars:0,
         progress:defaultProgress(),
@@ -864,6 +868,7 @@ function updateSettingsUI(){
     const ci=document.getElementById('qty-custom'); if(ci && !['10','20','30','50','all'].includes(String(state.quizQuantity))) ci.value=state.quizQuantity;
     const sci=document.getElementById('shadow-qty-custom'); if(sci && !['5','10','20','all'].includes(String(state.shadowQuantity))) sci.value=state.shadowQuantity;
     const on=document.getElementById('onlynew'); if(on) on.checked=!!state.onlyNew;
+    const son=document.getElementById('shadow-onlynew'); if(son) son.checked=!!state.shadowOnlyNew;
 }
 
 /* =========================================================
@@ -1195,8 +1200,10 @@ function updateShadowBestLabel(){
     if(state.shadowBest>0){ el.classList.remove('hide'); el.textContent=`🏅 最佳紀錄：${state.shadowBest} 分　— 破紀錄會有驚喜！`; }
     else { el.classList.add('hide'); el.textContent=''; }
 }
+function toggleShadowOnlyNew(cb){ state.shadowOnlyNew=cb.checked; saveState(); }
 function buildShadowQueue(){
     let pool=DEFAULT_SENTENCES.filter(s=> state.shadowScope==='all' || s.chapter===parseInt(state.shadowScope));
+    if(state.shadowOnlyNew) pool=pool.filter(s=>!state.progress[s.id].learned);
     if(state.shadowOrder==='random') pool=seededShuffle(pool, (Date.now()&0x7fffffff));
     const qty=state.shadowQuantity==='all'?pool.length:Math.min(pool.length, parseInt(state.shadowQuantity)||10);
     return pool.slice(0, qty);
@@ -1207,7 +1214,7 @@ function abortShadowRec(){
 function startShadowSession(){
     if(!playerReady){ alert('影片還在載入中，請稍等一下再開始 🙏'); return; }
     const queue=buildShadowQueue();
-    if(!queue.length){ alert('找不到符合條件的句子，換個範圍再試試 🙏'); return; }
+    if(!queue.length){ alert('找不到符合條件的句子。\n（也許「只練沒學過的句子」已全部練完，試著取消勾選或換個範圍）'); return; }
     shadowSession={ queue, index:0, totalScore:0, combo:0, bestCombo:0, perfectCount:0, firstTryCount:0,
                     doneCount:0, scores:[], gen:0, replayed:false, autoRetry:0, advancingFrom:-1, rec:null, advTimer:null };
     document.getElementById('shadow-settings').classList.add('hide');
