@@ -196,9 +196,39 @@
         @keyframes shake { 0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);} }
         .animate-shake { animation: shake .4s; }
 
+        /* ===== Shadow Challenge（跟讀挑戰） ===== */
+        #shadow-best { text-align:center; font-weight:900; color:#B45309; margin-top:10px; background:#FEF3C7; border-radius:12px; padding:8px 12px; }
+        .sc-hud { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:14px; background:#fff; border-radius:16px; box-shadow:0 6px 20px rgba(0,0,0,.06); padding:10px 14px; }
+        .sc-hud-item { font-weight:900; color:#475569; font-size:.95rem; }
+        .sc-hud-item span { color:#BE185D; }
+        .sc-hud .mini-btn { margin-left:auto; }
+        .sc-combo-wrap { background:linear-gradient(135deg,#FB923C,#EF4444); color:#fff !important; padding:4px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(239,68,68,.35); }
+        .sc-combo-wrap span { color:#fff !important; }
+        .sc-combo-wrap.pop { animation:count-zoom .5s ease-out; }
+        .sc-bar { height:14px; background:#FCE7F3; border-radius:999px; overflow:hidden; margin-top:10px; box-shadow:inset 0 1px 3px rgba(0,0,0,.08); }
+        .sc-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#F472B6,#FB923C); border-radius:999px; transition:width .5s cubic-bezier(.4,0,.2,1); }
+        .sc-card { position:relative; }
+        .sc-sentence { font-size:1.75rem; font-weight:900; color:#1E293B; margin:8px 0 4px; line-height:1.4; }
+        .sc-actions { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:14px; }
+        .sc-pts { font-size:1.3rem; font-weight:900; }
+        .sc-pts-sub { font-size:.85rem; font-weight:800; opacity:.85; }
+        .sc-bonus { font-weight:900; color:#C2410C; margin-top:4px; }
+        .sc-bonus.muted { color:#94A3B8; font-weight:700; }
+        .score-big { font-size:3.8rem; font-weight:900; background:linear-gradient(135deg,#F472B6,#FB923C); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1.1; margin-top:6px; }
+        .sc-final-sub { color:#94A3B8; font-weight:800; margin-top:-2px; }
+        .sc-grade-msg { margin-top:10px; font-weight:900; color:#BE185D; font-size:1.05rem; }
+        .grade-badge { display:inline-flex; align-items:center; justify-content:center; width:88px; height:88px; border-radius:50%; font-size:2.8rem; font-weight:900; color:#fff; margin-bottom:6px; box-shadow:0 8px 24px rgba(0,0,0,.18); animation:count-zoom .7s ease-out; }
+        .grade-S { background:linear-gradient(135deg,#FBBF24,#F472B6); }
+        .grade-A { background:linear-gradient(135deg,#34D399,#22D3EE); }
+        .grade-B { background:linear-gradient(135deg,#60A5FA,#A78BFA); }
+        .grade-C { background:linear-gradient(135deg,#FB923C,#FBBF24); }
+        .grade-D { background:linear-gradient(135deg,#94A3B8,#CBD5E1); }
+
         @media (max-width:640px){
             .set-lbl { width:100%; min-width:100%; }
             .hstats { width:100%; margin-left:0; }
+            .sc-sentence { font-size:1.4rem; }
+            .score-big { font-size:3rem; }
         }
     </style>
 </head>
@@ -208,6 +238,7 @@
     <div class="brand">🐱🐮 Cat &amp; Cow 學當朋友</div>
     <div class="main-tabs">
         <button data-main="playback" class="mtab" onclick="setMainMode('playback')">🎬 大螢幕播放</button>
+        <button data-main="shadow" class="mtab" onclick="setMainMode('shadow')">🎤 跟讀挑戰</button>
         <button data-main="quiz" class="mtab" onclick="setMainMode('quiz')">🎯 闖關測驗</button>
     </div>
     <div class="hstats">⭐ <span id="stars-text">0</span> · 已學 <span id="learned-text">0 / 0</span></div>
@@ -256,6 +287,55 @@
                 <button class="mini-btn pink" onclick="resetMaskPos()">↺ 重設遮罩位置</button>
             </div>
             <p class="tip">🙈 <b>遮字幕</b>：先把影片字幕遮起來，讓小朋友看畫面猜猜看在說什麼。⏱️ <b>延遲字幕</b>：先用耳朵聽，字幕才慢慢出現在遮罩上 — 可選「🧠 整句講完才出現」（聽完整句再對答案，學習效果最好）或「慢一秒出現」。遮罩可用右下角圓點<b>拖大</b>，或按「遮住整個畫面」只用耳朵聽；全螢幕或視窗縮放時遮罩與字幕會自動跟著調整。</p>
+        </div>
+    </div>
+
+    <!-- ===== 模式：跟讀挑戰（影片唸一句 → 換你唸 → 評分 → 自動下一句） ===== -->
+    <div id="view-shadow" class="hide">
+        <div id="shadow-settings" class="settings-card">
+            <h3>🎤 跟讀挑戰設定</h3>
+            <div class="set-row">
+                <span class="set-lbl">要唸幾句</span>
+                <div class="seg-wrap">
+                    <button class="seg" data-k="shadowQuantity" data-v="5" onclick="setSetting('shadowQuantity','5')">5 句</button>
+                    <button class="seg" data-k="shadowQuantity" data-v="10" onclick="setSetting('shadowQuantity','10')">10 句</button>
+                    <button class="seg" data-k="shadowQuantity" data-v="20" onclick="setSetting('shadowQuantity','20')">20 句</button>
+                    <button class="seg" data-k="shadowQuantity" data-v="all" onclick="setSetting('shadowQuantity','all')">全部</button>
+                    <input id="shadow-qty-custom" type="number" min="1" max="200" placeholder="自訂" class="num-in">
+                    <button class="mini-btn lav" onclick="applyShadowQty()">套用</button>
+                </div>
+            </div>
+            <div class="set-row">
+                <span class="set-lbl">順序</span>
+                <button class="seg" data-k="shadowOrder" data-v="sequential" onclick="setSetting('shadowOrder','sequential')">📖 照順序</button>
+                <button class="seg" data-k="shadowOrder" data-v="random" onclick="setSetting('shadowOrder','random')">🎲 隨機</button>
+            </div>
+            <div class="set-row">
+                <span class="set-lbl">範圍</span>
+                <button class="seg" data-k="shadowScope" data-v="all" onclick="setSetting('shadowScope','all')">全部</button>
+                <button class="seg" data-k="shadowScope" data-v="0" onclick="setSetting('shadowScope','0')">🎵 故事1：許願</button>
+                <button class="seg" data-k="shadowScope" data-v="1" onclick="setSetting('shadowScope','1')">🤝 故事2：當朋友</button>
+            </div>
+            <div class="set-row">
+                <span class="set-lbl">唸的速度</span>
+                <button class="seg speed-btn" data-speed="0.75" onclick="applySpeed(0.75)">0.75x</button>
+                <button class="seg speed-btn" data-speed="0.85" onclick="applySpeed(0.85)">0.85x</button>
+                <button class="seg speed-btn" data-speed="1" onclick="applySpeed(1)">1.0x</button>
+            </div>
+            <p class="tip">🎧 <b>玩法</b>：影片唸一句 → 換你<b>大聲跟著唸</b> → 馬上評分 → 自動接下一句，一氣呵成！<br>🔥 <b>一次就唸對</b>（沒有按「再聽一次」）會累積<b>連擊加成</b>，分數越衝越高；按了「再聽一次」雖然沒有加成，但一樣能練到熟～<br>🎤 評分需要麥克風（建議用 Chrome／Edge；若瀏覽器不能評分，也能照樣開心跟讀拿分）。</p>
+            <div id="shadow-best" class="hide"></div>
+            <button class="big-btn pink-strong start" onclick="startShadowSession()">🚀 開始跟讀</button>
+        </div>
+
+        <div id="shadow-session" class="hide">
+            <div class="sc-hud">
+                <div class="sc-hud-item">📍 <span id="sc-progress">1 / 1</span></div>
+                <div class="sc-hud-item sc-combo-wrap hide" id="sc-combo">🔥 連擊 <span id="sc-combo-n">0</span></div>
+                <div class="sc-hud-item">⭐ 總分 <span id="sc-total">0</span></div>
+                <button class="mini-btn gray" onclick="confirmExitShadow()">✕ 結束</button>
+            </div>
+            <div class="sc-bar"><div class="sc-bar-fill" id="sc-bar-fill"></div></div>
+            <div id="sc-stage"></div>
         </div>
     </div>
 
@@ -545,6 +625,11 @@ function defaultState(){
         quizFlow:'quiz-first',       // 'quiz-first'|'shadow-first'|'random'
         onlyNew:false,
         scope:'all',                 // 'all'|'0'|'1'
+        // 跟讀挑戰
+        shadowQuantity:'10',         // '5'|'10'|'20'|'all'|自訂數字字串
+        shadowOrder:'sequential',    // 'sequential'|'random'
+        shadowScope:'all',           // 'all'|'0'|'1'
+        shadowBest:0,                // 跟讀挑戰歷史最高總分
         stars:0,
         progress:defaultProgress(),
     };
@@ -610,14 +695,22 @@ function setMainMode(mode){
     state.mainMode=mode; saveState();
     document.querySelectorAll('[data-main]').forEach(b=>b.classList.toggle('active', b.dataset.main===mode));
     document.getElementById('view-playback').classList.toggle('hide', mode!=='playback');
+    document.getElementById('view-shadow').classList.toggle('hide', mode!=='shadow');
     document.getElementById('view-quiz').classList.toggle('hide', mode!=='quiz');
     clearTimeout(stopTimer);
     try{ if(player&&player.pauseVideo) player.pauseVideo(); }catch(e){}
-    if(mode==='quiz'){
+    // 離開跟讀挑戰：停止錄音與計時器，避免麥克風在背景持續占用
+    if(mode!=='shadow' && shadowSession){
+        clearTimeout(shadowSession.advTimer); abortShadowRec(); shadowSession.gen++; shadowSession=null;
+        document.getElementById('shadow-session').classList.add('hide');
+        document.getElementById('shadow-settings').classList.remove('hide');
+    }
+    if(mode==='quiz' || mode==='shadow'){
         state.maskFull=false;
-        // 進入闖關時清掉遮罩上殘留的字幕（即使剛剛是延遲字幕狀態），避免干擾
+        // 進入闖關/跟讀時清掉遮罩上殘留的字幕（即使剛剛是延遲字幕狀態），避免干擾
         const sub=document.getElementById('mask-subtitle'); if(sub){ sub.textContent=''; sub.dataset.id=''; }
     }
+    if(mode==='shadow') updateShadowBestLabel();
     applyMask();
     updatePlaybackUI();
 }
@@ -747,6 +840,7 @@ function toggleOnlyNew(cb){ state.onlyNew=cb.checked; saveState(); }
 function updateSettingsUI(){
     document.querySelectorAll('.seg[data-k]').forEach(b=>b.classList.toggle('on', String(state[b.dataset.k])===b.dataset.v));
     const ci=document.getElementById('qty-custom'); if(ci && !['10','20','30','50','all'].includes(String(state.quizQuantity))) ci.value=state.quizQuantity;
+    const sci=document.getElementById('shadow-qty-custom'); if(sci && !['5','10','20','all'].includes(String(state.shadowQuantity))) sci.value=state.shadowQuantity;
     const on=document.getElementById('onlynew'); if(on) on.checked=!!state.onlyNew;
 }
 
@@ -945,34 +1039,47 @@ function sessionShadow(s, onDone){
     const tick=()=>{ animateCd(n>0?n:'🎙️'); if(n>0){ n--; setTimeout(tick,800); } else record(); };
     tick();
 }
-function recognizeOnce(s, statusEl, cdEl, onDone){
+// 共用：啟動一次語音辨識，結束時回呼 onFinish(topTranscript, error, alternatives[])
+function captureSpeech(onFinish){
     const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!Rec){ onFinish('', 'unsupported', []); return null; }
     const rec=new Rec(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=3; rec.continuous=false;
-    statusEl.innerHTML='🎙️ 請大聲說出來！';
     let finished=false;
-    const finish=(transcript,err)=>{
-        if(finished) return; finished=true; try{ rec.stop(); }catch(e){}
-        if(err && !transcript){
+    const finish=(transcript,err,alts)=>{ if(finished) return; finished=true; try{ rec.stop(); }catch(e){} onFinish(transcript, err||null, alts||[]); };
+    rec.onresult=e=>{ const r=e.results[0]; const alts=[]; for(let i=0;i<r.length;i++) alts.push(r[i].transcript); finish(alts[0]||'', null, alts); };
+    rec.onerror=e=>finish('', e.error||'unknown', []);
+    rec.onend=()=>{ if(!finished) finish('', 'no-speech', []); };
+    try{ rec.start(); }catch(e){ finish('', e.message||'start-failed', []); }
+    setTimeout(()=>{ if(!finished) finish('', 'timeout', []); }, 9000);
+    return rec;
+}
+// 從所有候選辨識結果中，取分數最高的那個（對小朋友比較寬容）
+function bestSpeechScore(targetEn, transcript, alts){
+    const list=(alts&&alts.length)?alts:(transcript?[transcript]:[]);
+    let best=-1, bestT='';
+    list.forEach(t=>{ const sc=Math.round(similarityScore(targetEn,t)*100); if(sc>best){ best=sc; bestT=t; } });
+    return { score:best, transcript:bestT, hasResult:list.length>0 };
+}
+function recognizeOnce(s, statusEl, cdEl, onDone){
+    statusEl.innerHTML='🎙️ 請大聲說出來！';
+    captureSpeech((transcript,err,alts)=>{
+        const r=bestSpeechScore(s.en, transcript, alts);
+        if(!r.hasResult){
             cdEl.textContent='❌';
-            statusEl.textContent= err==='not-allowed'?'請允許使用麥克風權限再試一次':err==='no-speech'?'沒聽到聲音，下次大聲一點～':'辨識失敗：'+err;
+            statusEl.textContent= err==='not-allowed'?'請允許使用麥克風權限再試一次':err==='no-speech'?'沒聽到聲音，下次大聲一點～':'辨識失敗：'+(err||'unknown');
             setTimeout(()=>onDone(null), 1800); return;
         }
-        const score=Math.round(similarityScore(s.en, transcript)*100);
+        const score=r.score;
         const tier=score>=90?'perfect':score>=70?'great':'try';
         const tierLabel=score>=90?'🌟🌟🌟 PERFECT!':score>=70?'🌟🌟 GREAT!':'🌟 再試試！';
-        const diff=wordLevelDiff(s.en, transcript).map(d=>`<span class="${d.ok?'sd-ok':'sd-no'}">${escapeHtml(d.word)}</span>`).join(' ');
-        statusEl.innerHTML=`<div class="speech-result ${tier}"><div style="font-size:1.1rem;font-weight:900;">${tierLabel} · ${score} 分</div><div style="font-size:.8rem;margin-top:2px;">聽到你說：「${escapeHtml(transcript)}」</div><div style="font-size:.85rem;margin-top:4px;">${diff}</div></div>`;
+        const diff=wordLevelDiff(s.en, r.transcript).map(d=>`<span class="${d.ok?'sd-ok':'sd-no'}">${escapeHtml(d.word)}</span>`).join(' ');
+        statusEl.innerHTML=`<div class="speech-result ${tier}"><div style="font-size:1.1rem;font-weight:900;">${tierLabel} · ${score} 分</div><div style="font-size:.8rem;margin-top:2px;">聽到你說：「${escapeHtml(r.transcript)}」</div><div style="font-size:.85rem;margin-top:4px;">${diff}</div></div>`;
         cdEl.textContent=score>=90?'🌟🌟🌟':score>=70?'🌟🌟':'🌟';
         const p=state.progress[s.id]; p.speechScore=Math.max(p.speechScore||0, score); p.shadowed=true;
         state.stars += score>=90?3:score>=70?2:1; saveState(); updateHeader();
         if(score>=90) burst(cdEl);
         setTimeout(()=>onDone(score), 2600);
-    };
-    rec.onresult=e=>finish(e.results[0][0].transcript, null);
-    rec.onerror=e=>finish('', e.error||'unknown');
-    rec.onend=()=>{ if(!finished) finish('','no-speech'); };
-    try{ rec.start(); }catch(e){ finish('', e.message||'start-failed'); }
-    setTimeout(()=>{ if(!finished) finish('','timeout'); }, 9000);
+    });
 }
 
 /* ---- 完成一句 / 完成全部 ---- */
@@ -1023,6 +1130,276 @@ function finishSession(){
 }
 
 /* =========================================================
+ *  跟讀挑戰（流暢版 Shadowing）
+ *  影片唸一句 → 換小朋友唸 → 即時評分 → 自動接下一句
+ *  「一次就唸對」(沒按再聽一次) 會累積連擊加成；最後結算總分 + 評等
+ * ======================================================= */
+let shadowSession=null;
+
+function applyShadowQty(){
+    const n=parseInt(document.getElementById('shadow-qty-custom').value);
+    if(!n||n<1){ document.getElementById('shadow-qty-custom').focus(); return; }
+    setSetting('shadowQuantity', String(n));
+}
+function updateShadowBestLabel(){
+    const el=document.getElementById('shadow-best'); if(!el) return;
+    if(state.shadowBest>0){ el.classList.remove('hide'); el.textContent=`🏅 最佳紀錄：${state.shadowBest} 分　— 破紀錄會有驚喜！`; }
+    else { el.classList.add('hide'); el.textContent=''; }
+}
+function buildShadowQueue(){
+    let pool=DEFAULT_SENTENCES.filter(s=> state.shadowScope==='all' || s.chapter===parseInt(state.shadowScope));
+    if(state.shadowOrder==='random') pool=seededShuffle(pool, (Date.now()&0x7fffffff));
+    const qty=state.shadowQuantity==='all'?pool.length:Math.min(pool.length, parseInt(state.shadowQuantity)||10);
+    return pool.slice(0, qty);
+}
+function abortShadowRec(){
+    if(shadowSession && shadowSession.rec){ try{ shadowSession.rec.abort?shadowSession.rec.abort():shadowSession.rec.stop(); }catch(e){} shadowSession.rec=null; }
+}
+function startShadowSession(){
+    if(!playerReady){ alert('影片還在載入中，請稍等一下再開始 🙏'); return; }
+    const queue=buildShadowQueue();
+    if(!queue.length){ alert('找不到符合條件的句子，換個範圍再試試 🙏'); return; }
+    shadowSession={ queue, index:0, totalScore:0, combo:0, bestCombo:0, perfectCount:0, firstTryCount:0,
+                    doneCount:0, scores:[], gen:0, replayed:false, autoRetry:0, advancingFrom:-1, rec:null, advTimer:null };
+    document.getElementById('shadow-settings').classList.add('hide');
+    document.getElementById('shadow-session').classList.remove('hide');
+    document.getElementById('sc-combo').classList.add('hide');
+    document.getElementById('sc-bar-fill').style.width='0%';
+    runShadowSentence();
+}
+function confirmExitShadow(){ if(!shadowSession || confirm('確定要結束這次跟讀嗎？目前進度會保留。')) exitShadow(); }
+function exitShadow(){
+    if(shadowSession){ clearTimeout(shadowSession.advTimer); abortShadowRec(); shadowSession.gen++; }
+    shadowSession=null;
+    clearTimeout(stopTimer);
+    try{ player.pauseVideo&&player.pauseVideo(); }catch(e){}
+    document.getElementById('shadow-session').classList.add('hide');
+    document.getElementById('shadow-settings').classList.remove('hide');
+    updateSettingsUI(); updateShadowBestLabel();
+}
+function updateShadowHUD(){
+    if(!shadowSession) return;
+    const total=shadowSession.queue.length;
+    document.getElementById('sc-progress').textContent=`${Math.min(shadowSession.index+1,total)} / ${total}`;
+    document.getElementById('sc-total').textContent=shadowSession.totalScore;
+    document.getElementById('sc-bar-fill').style.width=(shadowSession.doneCount/total*100)+'%';
+    const comboWrap=document.getElementById('sc-combo');
+    if(shadowSession.combo>=2){
+        comboWrap.classList.remove('hide');
+        document.getElementById('sc-combo-n').textContent=shadowSession.combo;
+        comboWrap.classList.remove('pop'); void comboWrap.offsetWidth; comboWrap.classList.add('pop');
+    } else comboWrap.classList.add('hide');
+}
+function runShadowSentence(){
+    const s=shadowSession.queue[shadowSession.index];
+    shadowSession.replayed=false; shadowSession.autoRetry=0; shadowSession.advancingFrom=-1; shadowSession.gen++;
+    renderShadowChallenge(s);
+    updateShadowHUD();
+    const st=document.getElementById('sc-status'); if(st) st.textContent='🎧 仔細聽…';
+    playSegment(s,{ onEnd:()=> beginShadowAttempt(s) });
+}
+function renderShadowChallenge(s){
+    document.getElementById('sc-stage').innerHTML=`
+        <div class="stage-card sc-card" id="sc-card">
+            <div class="stage-tag shadow">🎤 跟讀挑戰</div>
+            <div id="sc-cd" class="countdown-num">🎧</div>
+            <div id="sc-status" class="shadow-status">🎧 仔細聽…</div>
+            <div class="sc-sentence">${highlightEnglish(s.en)}</div>
+            <div class="shadow-zh">${escapeHtml(s.zh)}</div>
+            <div id="sc-result"></div>
+            <div id="sc-actions" class="sc-actions">
+                <button class="mini-btn sky" id="sc-replay">🔊 再聽一次</button>
+            </div>
+        </div>`;
+    document.getElementById('sc-replay').onclick=()=>replayShadow(s);
+}
+function replayShadow(s){
+    if(!shadowSession) return;
+    shadowSession.replayed=true;          // 按了再聽一次 → 這句沒有連擊加成
+    shadowSession.gen++;                   // 讓正在進行的倒數／辨識作廢
+    abortShadowRec();
+    const st=document.getElementById('sc-status'); if(st) st.textContent='🔊 再聽一次…';
+    const cd=document.getElementById('sc-cd'); if(cd) cd.textContent='🎧';
+    playSegment(s,{ onEnd:()=> beginShadowAttempt(s) });
+}
+function beginShadowAttempt(s){
+    if(!shadowSession || shadowSession.queue[shadowSession.index]!==s) return;
+    const myGen=++shadowSession.gen;
+    const cdEl=document.getElementById('sc-cd');
+    const statusEl=document.getElementById('sc-status');
+    if(!cdEl||!statusEl) return;
+    const animateCd=(t)=>{ cdEl.textContent=t; cdEl.classList.remove('count-anim'); void cdEl.offsetWidth; cdEl.classList.add('count-anim'); };
+
+    // 不支援語音辨識（例如 iOS Safari）→ 不評分，但仍鼓勵開口、給完成分數
+    if(!isSpeechRecSupported()){
+        let n=3;
+        const tick=()=>{ if(!shadowSession||shadowSession.gen!==myGen) return;
+            if(n>0){ animateCd(n); statusEl.innerHTML='準備…<b>跟著大聲唸！</b>'; n--; setTimeout(tick,600); }
+            else { animateCd('🗣️'); statusEl.innerHTML='🗣️ <b>大聲唸出來！</b>'; setTimeout(()=>scoreShadow(s,null,'',myGen), 1500); } };
+        tick(); return;
+    }
+    let n=3;
+    const tick=()=>{
+        if(!shadowSession||shadowSession.gen!==myGen) return;
+        if(n>0){ animateCd(n); statusEl.innerHTML='準備…<b>換你唸！</b>'; n--; setTimeout(tick,600); }
+        else {
+            animateCd('🎙️'); statusEl.innerHTML='🎙️ <b>大聲唸出來！</b>';
+            shadowSession.rec=captureSpeech((transcript,err,alts)=>{
+                if(!shadowSession||shadowSession.gen!==myGen) return; // 已被 replay / skip / exit 作廢
+                shadowSession.rec=null;
+                const r=bestSpeechScore(s.en, transcript, alts);
+                if(!r.hasResult){ handleShadowError(s, err||'no-speech', myGen); return; }
+                scoreShadow(s, r.score, r.transcript, myGen);
+            });
+        }
+    };
+    tick();
+}
+function handleShadowError(s, err, myGen){
+    if(!shadowSession||shadowSession.gen!==myGen) return;
+    const cdEl=document.getElementById('sc-cd'), statusEl=document.getElementById('sc-status'), actions=document.getElementById('sc-actions');
+    // 沒聽到聲音 → 自動再給一次機會（最多一次），讓流程更順
+    if((err==='no-speech'||err==='timeout') && shadowSession.autoRetry<1){
+        shadowSession.autoRetry++;
+        if(cdEl) cdEl.textContent='👂';
+        if(statusEl) statusEl.innerHTML='沒聽到聲音～<b>再大聲唸一次！</b>';
+        setTimeout(()=>{ if(shadowSession&&shadowSession.gen===myGen) beginShadowAttempt(s); }, 850);
+        return;
+    }
+    if(cdEl) cdEl.textContent='🎤';
+    if(statusEl) statusEl.innerHTML=(err==='not-allowed'||err==='service-not-allowed')
+        ? '請允許「<b>麥克風</b>」權限後再試 🎤'
+        : '沒聽清楚～再試一次吧！';
+    if(actions){
+        actions.innerHTML=`
+            <button class="mini-btn mint" id="sc-retry">🎙️ 再試一次</button>
+            <button class="mini-btn sky" id="sc-replay-e">🔊 再聽一次</button>
+            <button class="mini-btn gray" id="sc-skip">⏭ 跳過</button>`;
+        document.getElementById('sc-retry').onclick=()=>beginShadowAttempt(s);
+        document.getElementById('sc-replay-e').onclick=()=>replayShadow(s);
+        document.getElementById('sc-skip').onclick=()=>scoreShadow(s, 0, '', ++shadowSession.gen);
+    }
+}
+function scoreShadow(s, score, transcript, myGen){
+    if(!shadowSession || shadowSession.gen!==myGen) return;
+    shadowSession.gen++;            // 鎖定本句，忽略任何遲到的回呼
+    abortShadowRec();
+    const noScore=(score===null);
+    let mult=1, stars=0, tier='try', tierLabel='', points=0;
+    if(noScore){
+        stars=2; tier='great'; tierLabel='🎉 唸完囉！'; points=60; shadowSession.combo=0;
+    } else {
+        stars = score>=90?3:score>=70?2:score>=50?1:0;
+        tier = score>=90?'perfect':score>=70?'great':'try';
+        tierLabel = score>=90?'🌟🌟🌟 PERFECT!':score>=70?'🌟🌟 GREAT!':score>=50?'🌟 不錯喔！':'💪 再加油！';
+        if(!shadowSession.replayed && score>=70){
+            shadowSession.combo++;
+            shadowSession.bestCombo=Math.max(shadowSession.bestCombo, shadowSession.combo);
+            mult=Math.min(1+0.2*shadowSession.combo, 2.5);   // 連擊越多加成越高（上限 2.5 倍）
+            shadowSession.firstTryCount++;
+        } else {
+            shadowSession.combo=0;
+        }
+        points=Math.round(score*mult);
+        if(score>=90) shadowSession.perfectCount++;
+    }
+    shadowSession.totalScore+=points;
+    shadowSession.scores.push(noScore?null:score);
+    shadowSession.doneCount++;
+
+    // 同步到整體學習進度與抬頭星星
+    const p=state.progress[s.id];
+    if(!noScore) p.speechScore=Math.max(p.speechScore||0, score);
+    p.shadowed=true; p.learned=true; p.lastAt=Date.now();
+    state.stars += noScore?1:(score>=90?3:score>=70?2:1);
+    saveState(); updateHeader();
+
+    renderShadowResult(s, {score, transcript, points, mult, stars, tier, tierLabel, noScore});
+    updateShadowHUD();
+    if(!noScore && score>=90) burst(document.getElementById('sc-card'));
+    else if(stars>=2) burst(document.getElementById('sc-cd'));
+
+    shadowSession.advTimer=setTimeout(()=>advanceShadow(), noScore?1700:2300);
+}
+function renderShadowResult(s, r){
+    const cd=document.getElementById('sc-cd');
+    const statusEl=document.getElementById('sc-status');
+    const resultEl=document.getElementById('sc-result');
+    const actions=document.getElementById('sc-actions');
+    if(cd){ cd.textContent = r.noScore?'⭐' : r.score>=90?'🌟🌟🌟':r.score>=70?'🌟🌟':r.score>=50?'🌟':'💪';
+        cd.classList.remove('count-anim'); void cd.offsetWidth; cd.classList.add('count-anim'); }
+    if(statusEl) statusEl.innerHTML=`<span style="font-weight:900;">${r.tierLabel}</span>`;
+    let bonusLine='';
+    if(!r.noScore){
+        if(r.mult>1.001) bonusLine=`<div class="sc-bonus">🔥 一次過 ×${r.mult.toFixed(1)} 連擊加成！</div>`;
+        else if(shadowSession.replayed) bonusLine=`<div class="sc-bonus muted">（用了「再聽一次」，這次沒有連擊加成）</div>`;
+    }
+    const diff = r.noScore ? '' : `<div style="font-size:.85rem;margin-top:6px;">${wordLevelDiff(s.en, r.transcript).map(d=>`<span class="${d.ok?'sd-ok':'sd-no'}">${escapeHtml(d.word)}</span>`).join(' ')}</div>`;
+    const heard = (r.noScore||!r.transcript) ? '' : `<div style="font-size:.8rem;color:#94A3B8;margin-top:4px;">聽到你說：「${escapeHtml(r.transcript)}」</div>`;
+    if(resultEl) resultEl.innerHTML=`
+        <div class="speech-result ${r.tier}">
+            <div class="sc-pts">+${r.points} 分　<span class="sc-pts-sub">${r.noScore?'完成':r.score+'% 準確'}</span></div>
+            ${bonusLine}${diff}${heard}
+        </div>`;
+    const last=shadowSession.index>=shadowSession.queue.length-1;
+    if(actions){
+        actions.innerHTML=`
+            <button class="mini-btn sky" id="sc-replay2">🔊 再聽發音</button>
+            <button class="big-btn pink-strong" id="sc-next">${last?'🏁 看成績':'下一句 ▶'}</button>`;
+        document.getElementById('sc-replay2').onclick=()=>playSegment(s,{onEnd:()=>{}});
+        document.getElementById('sc-next').onclick=()=>advanceShadow();
+    }
+}
+function advanceShadow(){
+    if(!shadowSession) return;
+    if(shadowSession.advancingFrom===shadowSession.index) return;  // 避免計時器與按鈕重複觸發
+    shadowSession.advancingFrom=shadowSession.index;
+    clearTimeout(shadowSession.advTimer); shadowSession.advTimer=null;
+    if(shadowSession.index>=shadowSession.queue.length-1){ finishShadowSession(); return; }
+    shadowSession.index++;
+    runShadowSentence();
+}
+function finishShadowSession(){
+    const ss=shadowSession; if(!ss) return;
+    clearTimeout(ss.advTimer);
+    bigConfetti();
+    const valid=ss.scores.filter(v=>v!=null);
+    const avg=valid.length?Math.round(valid.reduce((a,b)=>a+b,0)/valid.length):null;
+    const total=ss.totalScore;
+    const grade = avg==null?'★' : avg>=92?'S':avg>=82?'A':avg>=70?'B':avg>=55?'C':'D';
+    const gradeMsg = {'S':'太神啦！發音超棒！','A':'非常厲害，繼續保持！','B':'很好，再衝高一點！','C':'有進步，多練幾次更棒！','D':'勇敢開口最棒了！','★':'整輪唸完，好厲害！'}[grade];
+    const isRecord = total>(state.shadowBest||0);
+    if(isRecord){ state.shadowBest=total; saveState(); }
+    updateShadowBestLabel();
+    document.getElementById('sc-stage').innerHTML=`
+        <div class="stage-card sc-end">
+            <div class="grade-badge grade-${grade}">${grade}</div>
+            <div class="sum-title">${isRecord?'🎉 新紀錄！':'🏆 跟讀完成！'}</div>
+            <div class="score-big" id="sc-final">0</div>
+            <div class="sc-final-sub">總分</div>
+            <div class="sum-rows">
+                <div>唸了 <b>${ss.queue.length}</b> 句　平均準確 <b>${avg==null?'—':avg+'%'}</b></div>
+                <div>🌟 完美 <b>${ss.perfectCount}</b> 句　⚡ 一次過 <b>${ss.firstTryCount}</b> 句</div>
+                <div>🔥 最高連擊 <b>${ss.bestCombo}</b>　🏅 最佳紀錄 <b>${state.shadowBest}</b></div>
+            </div>
+            <div class="sc-grade-msg">${gradeMsg}</div>
+            <div class="mt-3" style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+                <button class="big-btn pink-strong" id="sc-again">🔁 再挑戰一次</button>
+                <button class="mini-btn gray" id="sc-back">⚙ 回設定</button>
+            </div>
+        </div>`;
+    animateNumber(document.getElementById('sc-final'), total, 1400);
+    document.getElementById('sc-again').onclick=()=>startShadowSession();
+    document.getElementById('sc-back').onclick=()=>exitShadow();
+    shadowSession=null;
+}
+function animateNumber(el, to, dur){
+    if(!el) return; dur=dur||1200; const start=performance.now();
+    const step=(t)=>{ const k=Math.min(1,(t-start)/dur); const e=1-Math.pow(1-k,3); el.textContent=Math.round(to*e); if(k<1) requestAnimationFrame(step); else el.textContent=to; };
+    requestAnimationFrame(step);
+}
+
+/* =========================================================
  *  效果 & 抬頭
  * ======================================================= */
 function burst(el){ if(typeof confetti!=='function'||!el) return; const r=el.getBoundingClientRect(); confetti({ particleCount:38, startVelocity:28, spread:60, origin:{ x:(r.left+r.width/2)/window.innerWidth, y:(r.top+r.height/2)/window.innerHeight }, colors:['#F472B6','#FB923C','#FBBF24','#34D399','#38BDF8','#A78BFA'] }); }
@@ -1038,6 +1415,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     updateSettingsUI();
     updatePlaybackUI();
     updateHeader();
+    updateShadowBestLabel();
     setMainMode(state.mainMode || 'playback');
     startPlaybackLoop();
     window.addEventListener('resize', ()=>applyMask());
