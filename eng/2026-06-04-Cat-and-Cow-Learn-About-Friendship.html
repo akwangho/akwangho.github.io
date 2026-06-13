@@ -1249,6 +1249,8 @@ function updateShadowHUD(){
 function runShadowSentence(){
     const s=shadowSession.queue[shadowSession.index];
     shadowSession.replayed=false; shadowSession.autoRetry=0; shadowSession.advancingFrom=-1; shadowSession.gen++;
+    // 本句計分追蹤：再試一次採「保留最佳」，避免重複加分、且失手不扣分
+    shadowSession.cur={ committed:false, bestScore:-1, points:0, mult:1, starsAdded:0, countedPerfect:false };
     renderShadowChallenge(s);
     updateShadowHUD();
     const st=document.getElementById('sc-status'); if(st) st.textContent='🎧 仔細聽…';
@@ -1341,44 +1343,77 @@ function handleShadowError(s, err, myGen){
 }
 function scoreShadow(s, score, transcript, myGen){
     if(!shadowSession || shadowSession.gen!==myGen) return;
-    shadowSession.gen++;            // 鎖定本句，忽略任何遲到的回呼
+    shadowSession.gen++;            // 鎖定本次回呼，忽略任何遲到的結果
     abortShadowRec();
     const noScore=(score===null);
-    let mult=1, stars=0, tier='try', tierLabel='', points=0;
-    if(noScore){
-        stars=2; tier='great'; tierLabel='🎉 唸完囉！'; points=60; shadowSession.combo=0;
-    } else {
-        stars = score>=90?3:score>=70?2:score>=50?1:0;
+    const cur=shadowSession.cur || (shadowSession.cur={ committed:false, bestScore:-1, points:0, mult:1, starsAdded:0, countedPerfect:false });
+    const isRetry=cur.committed;
+
+    // 本次嘗試的星等 / 標語（顯示用）
+    let tier, tierLabel;
+    if(noScore){ tier='great'; tierLabel='🎉 唸完囉！'; }
+    else {
         tier = score>=90?'perfect':score>=70?'great':'try';
         tierLabel = score>=90?'🌟🌟🌟 PERFECT!':score>=70?'🌟🌟 GREAT!':score>=50?'🌟 不錯喔！':'💪 再加油！';
-        if(!shadowSession.replayed && score>=70){
+    }
+
+    // 連擊倍率：只在「第一次嘗試」決定並鎖定；再試一次沿用同一倍率（再試不會破壞、也不再新增連擊）
+    let mult;
+    if(!isRetry){
+        if(!noScore && !shadowSession.replayed && score>=70){
             shadowSession.combo++;
             shadowSession.bestCombo=Math.max(shadowSession.bestCombo, shadowSession.combo);
-            mult=Math.min(1+0.2*shadowSession.combo, 2.5);   // 連擊越多加成越高（上限 2.5 倍）
             shadowSession.firstTryCount++;
+            mult=Math.min(1+0.2*shadowSession.combo, 2.5);   // 連擊越多加成越高（上限 2.5 倍）
         } else {
             shadowSession.combo=0;
+            mult=1;
         }
-        points=Math.round(score*mult);
-        if(score>=90) shadowSession.perfectCount++;
+        cur.mult=mult;
+    } else {
+        mult=cur.mult;
     }
-    shadowSession.totalScore+=points;
-    shadowSession.scores.push(noScore?null:score);
-    shadowSession.doneCount++;
 
-    // 同步到整體學習進度與抬頭星星
+    // 保留本句最佳：再試一次只會更好不會更差（想拿高分就放心多試幾次）
+    const improved = !cur.committed || (!noScore && score>cur.bestScore);
+    if(improved){
+        if(cur.committed){    // 回滾上一次本句的計分，換成更好的成績（避免重複加分）
+            shadowSession.totalScore -= cur.points;
+            state.stars -= cur.starsAdded;
+            if(cur.countedPerfect) shadowSession.perfectCount--;
+        }
+        let points, starsAdded, countedPerfect=false;
+        if(noScore){ points=60; starsAdded=1; }
+        else {
+            points=Math.round(score*mult);
+            starsAdded = score>=90?3:score>=70?2:1;
+            if(score>=90){ countedPerfect=true; shadowSession.perfectCount++; }
+        }
+        shadowSession.totalScore += points;
+        state.stars += starsAdded;
+        cur.points=points; cur.starsAdded=starsAdded; cur.countedPerfect=countedPerfect;
+        if(!noScore) cur.bestScore=score;
+    }
+
+    // scores 陣列：每句一格，存「本句最佳」
+    if(cur.committed){ shadowSession.scores[shadowSession.scores.length-1]= noScore?null:cur.bestScore; }
+    else { shadowSession.scores.push(noScore?null:score); shadowSession.doneCount++; }
+    cur.committed=true;
+
+    // 同步到整體學習進度與抬頭星星（speechScore 保留最高）
     const p=state.progress[s.id];
     if(!noScore) p.speechScore=Math.max(p.speechScore||0, score);
     p.shadowed=true; p.learned=true; p.lastAt=Date.now();
-    state.stars += noScore?1:(score>=90?3:score>=70?2:1);
     saveState(); updateHeader();
 
-    renderShadowResult(s, {score, transcript, points, mult, stars, tier, tierLabel, noScore});
+    const dispStars = noScore?2:(score>=90?3:score>=70?2:score>=50?1:0);
+    renderShadowResult(s, { score, transcript, points:cur.points, mult, stars:dispStars, tier, tierLabel, noScore, isRetry, best:cur.bestScore, improved });
     updateShadowHUD();
     if(!noScore && score>=90) burst(document.getElementById('sc-card'));
-    else if(stars>=2) burst(document.getElementById('sc-cd'));
+    else if(dispStars>=2) burst(document.getElementById('sc-cd'));
 
-    shadowSession.advTimer=setTimeout(()=>advanceShadow(), noScore?1700:2300);
+    // 不支援評分（noScore）→ 維持流暢自動前進；有評分 → 停下，讓小朋友自己選「再試一次 / 下一句」
+    if(noScore){ shadowSession.advTimer=setTimeout(()=>advanceShadow(), 1700); }
 }
 function renderShadowResult(s, r){
     const cd=document.getElementById('sc-cd');
@@ -1390,24 +1425,51 @@ function renderShadowResult(s, r){
     if(statusEl) statusEl.innerHTML=`<span style="font-weight:900;">${r.tierLabel}</span>`;
     let bonusLine='';
     if(!r.noScore){
-        if(r.mult>1.001) bonusLine=`<div class="sc-bonus">🔥 一次過 ×${r.mult.toFixed(1)} 連擊加成！</div>`;
-        else if(shadowSession.replayed) bonusLine=`<div class="sc-bonus muted">（用了「再聽一次」，這次沒有連擊加成）</div>`;
+        if(r.mult>1.001) bonusLine=`<div class="sc-bonus">🔥 連擊加成 ×${r.mult.toFixed(1)}！</div>`;
+        else if(!r.isRetry && shadowSession.replayed) bonusLine=`<div class="sc-bonus muted">（用了「再聽一次」，這次沒有連擊加成）</div>`;
+    }
+    // 再試一次的鼓勵訊息：進步就刷新最佳，失手也保留最佳、不扣分
+    let retryNote='';
+    if(!r.noScore && r.isRetry){
+        retryNote = r.improved
+            ? `<div class="sc-bonus">📈 進步了！刷新本句最佳 <b>${r.best}</b> 分 🎉</div>`
+            : `<div class="sc-bonus muted">已幫你保留最佳 <b>${r.best}</b> 分（這次 ${r.score} 分）👍 再試試！</div>`;
     }
     const diff = r.noScore ? '' : `<div style="font-size:.85rem;margin-top:6px;">${wordLevelDiff(s.en, r.transcript).map(d=>`<span class="${d.ok?'sd-ok':'sd-no'}">${escapeHtml(d.word)}</span>`).join(' ')}</div>`;
     const heard = (r.noScore||!r.transcript) ? '' : `<div style="font-size:.8rem;color:#94A3B8;margin-top:4px;">聽到你說：「${escapeHtml(r.transcript)}」</div>`;
     if(resultEl) resultEl.innerHTML=`
         <div class="speech-result ${r.tier}">
-            <div class="sc-pts">+${r.points} 分　<span class="sc-pts-sub">${r.noScore?'完成':r.score+'% 準確'}</span></div>
-            ${bonusLine}${diff}${heard}
+            <div class="sc-pts">本句 +${r.points} 分　<span class="sc-pts-sub">${r.noScore?'完成':'這次 '+r.score+'% 準確'}</span></div>
+            ${bonusLine}${retryNote}${diff}${heard}
         </div>`;
     const last=shadowSession.index>=shadowSession.queue.length-1;
     if(actions){
-        actions.innerHTML=`
-            <button class="mini-btn sky" id="sc-replay2">🔊 再聽發音</button>
-            <button class="big-btn pink-strong" id="sc-next">${last?'🏁 看成績':'下一句 ▶'}</button>`;
-        document.getElementById('sc-replay2').onclick=()=>playSegment(s,{onEnd:()=>{}});
-        document.getElementById('sc-next').onclick=()=>advanceShadow();
+        if(r.noScore){
+            actions.innerHTML=`<button class="mini-btn sky" id="sc-replay2">🔊 再聽發音</button>`;
+            const rb=document.getElementById('sc-replay2'); if(rb) rb.onclick=()=>playSegment(s,{onEnd:()=>{}});
+        } else {
+            actions.innerHTML=`
+                <button class="mini-btn sky" id="sc-replay2">🔊 再聽發音</button>
+                <button class="mini-btn mint" id="sc-retry2">🔁 再試一次（拚更高分）</button>
+                <button class="big-btn pink-strong" id="sc-next">${last?'🏁 看成績':'下一句 ▶'}</button>`;
+            document.getElementById('sc-replay2').onclick=()=>playSegment(s,{onEnd:()=>{}});
+            document.getElementById('sc-retry2').onclick=()=>retryShadow(s);
+            document.getElementById('sc-next').onclick=()=>advanceShadow();
+        }
     }
+}
+function retryShadow(s){
+    if(!shadowSession) return;
+    clearTimeout(shadowSession.advTimer); shadowSession.advTimer=null;
+    shadowSession.advancingFrom=-1;
+    shadowSession.gen++;             // 作廢任何進行中的回呼
+    abortShadowRec();
+    const resultEl=document.getElementById('sc-result'); if(resultEl) resultEl.innerHTML='';
+    const actions=document.getElementById('sc-actions');
+    if(actions){ actions.innerHTML='<button class="mini-btn sky" id="sc-replay">🔊 再聽一次</button>'; const rb=document.getElementById('sc-replay'); if(rb) rb.onclick=()=>replayShadow(s); }
+    const st=document.getElementById('sc-status'); if(st) st.innerHTML='🎧 再聽一次，準備挑戰更高分！';
+    const cd=document.getElementById('sc-cd'); if(cd) cd.textContent='🎧';
+    playSegment(s,{ onEnd:()=> beginShadowAttempt(s) });
 }
 function advanceShadow(){
     if(!shadowSession) return;
