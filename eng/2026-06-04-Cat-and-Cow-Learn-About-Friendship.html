@@ -417,6 +417,7 @@
  * ======================================================= */
 const VIDEO_ID = 'VlbnkfIUxBw';
 const SUBTITLE_DELAY = 1.0; // 延遲字幕：聽到後幾秒才顯示
+const COUNTDOWN_MS = 350;   // 跟讀倒數 3·2·1 每格毫秒（加快，讓麥克風盡快出現開始聽）
 
 const DEFAULT_SENTENCES = [
     // ===== 故事 1：The Wish（許願） =====
@@ -1041,18 +1042,22 @@ function renderShadowPhase(s){
             <div class="shadow-zh">${escapeHtml(s.zh)}</div>
             <div id="shadow-cd" class="countdown-num">🎧</div>
             <div id="shadow-status" class="shadow-status">準備好，跟著大聲念！</div>
-            <div class="mt-2" style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+            <div id="shadow-actions" class="mt-2" style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
                 <button class="mini-btn sky" id="sh-replay">🔊 再聽一次</button>
             </div>
         </div>`;
     document.getElementById('sh-replay').onclick=()=>playSegment(s,{onEnd:()=>{}});
-    const onDone=(score)=>{ session.result.shadow=score; setTimeout(advancePhase, 900); };
+    // 本句跟讀計分追蹤：再試一次「保留最佳」、失手不扣分、星星不重複累加
+    session.shadowBestScore=null; session.shadowStarsAdded=0;
+    const onDone=(score)=>{ session.result.shadow=score; setTimeout(advancePhase, 300); };
     if(session.phaseIndex>0){ playSegment(s,{ onEnd:()=>sessionShadow(s,onDone) }); }
     else { sessionShadow(s,onDone); }
 }
 function sessionShadow(s, onDone){
     const statusEl=document.getElementById('shadow-status');
     const cdEl=document.getElementById('shadow-cd');
+    const actions=document.getElementById('shadow-actions');
+    if(actions){ actions.innerHTML='<button class="mini-btn sky" id="sh-replay">🔊 再聽一次</button>'; const rb=document.getElementById('sh-replay'); if(rb) rb.onclick=()=>playSegment(s,{onEnd:()=>{}}); }
     const animateCd=(txt)=>{ cdEl.textContent=txt; cdEl.classList.remove('count-anim'); void cdEl.offsetWidth; cdEl.classList.add('count-anim'); };
     const record=()=>{
         if(!isSpeechRecSupported()){
@@ -1063,7 +1068,7 @@ function sessionShadow(s, onDone){
         recognizeOnce(s, statusEl, cdEl, onDone);
     };
     let n=3; statusEl.textContent='準備好，跟著大聲念！';
-    const tick=()=>{ animateCd(n>0?n:'🎙️'); if(n>0){ n--; setTimeout(tick,800); } else record(); };
+    const tick=()=>{ animateCd(n>0?n:'🎙️'); if(n>0){ n--; setTimeout(tick,COUNTDOWN_MS); } else record(); };
     tick();
 }
 /* 共用：啟動一次語音辨識。
@@ -1121,19 +1126,46 @@ function recognizeOnce(s, statusEl, cdEl, onDone){
         if(!r.hasResult){
             cdEl.textContent='❌';
             statusEl.textContent= err==='not-allowed'?'請允許使用麥克風權限再試一次':err==='no-speech'?'沒聽到聲音，下次大聲一點～':'辨識失敗：'+(err||'unknown');
-            setTimeout(()=>onDone(null), 1800); return;
+            renderQuizShadowActions(s, onDone);
+            return;
         }
         const score=r.score;
         const tier=score>=90?'perfect':score>=70?'great':'try';
         const tierLabel=score>=90?'🌟🌟🌟 PERFECT!':score>=70?'🌟🌟 GREAT!':'🌟 再試試！';
+        const isRetry=(session.shadowBestScore!=null);
+        const improved=!isRetry || score>session.shadowBestScore;
         const diff=wordLevelDiff(s.en, r.transcript).map(d=>`<span class="${d.ok?'sd-ok':'sd-no'}">${escapeHtml(d.word)}</span>`).join(' ');
-        statusEl.innerHTML=`<div class="speech-result ${tier}"><div style="font-size:1.1rem;font-weight:900;">${tierLabel} · ${score} 分</div><div style="font-size:.8rem;margin-top:2px;">聽到你說：「${escapeHtml(r.transcript)}」</div><div style="font-size:.85rem;margin-top:4px;">${diff}</div></div>`;
+        let note='';
+        if(isRetry) note = improved
+            ? `<div class="sc-bonus" style="margin-top:4px;">📈 進步了！刷新最佳 <b>${score}</b> 分 🎉</div>`
+            : `<div class="sc-bonus muted" style="margin-top:4px;">已保留最佳 <b>${session.shadowBestScore}</b> 分（這次 ${score} 分）👍</div>`;
+        statusEl.innerHTML=`<div class="speech-result ${tier}"><div style="font-size:1.1rem;font-weight:900;">${tierLabel} · ${score} 分</div>${note}<div style="font-size:.8rem;margin-top:2px;">聽到你說：「${escapeHtml(r.transcript)}」</div><div style="font-size:.85rem;margin-top:4px;">${diff}</div></div>`;
         cdEl.textContent=score>=90?'🌟🌟🌟':score>=70?'🌟🌟':'🌟';
+        // 保留最佳 + 回滾上次星星，避免重試重複加分
+        if(improved){
+            const starsAdded = score>=90?3:score>=70?2:1;
+            state.stars -= (session.shadowStarsAdded||0);
+            state.stars += starsAdded;
+            session.shadowStarsAdded=starsAdded;
+            session.shadowBestScore=score;
+        }
         const p=state.progress[s.id]; p.speechScore=Math.max(p.speechScore||0, score); p.shadowed=true;
-        state.stars += score>=90?3:score>=70?2:1; saveState(); updateHeader();
+        session.result.shadow=session.shadowBestScore;
+        saveState(); updateHeader();
         if(score>=90) burst(cdEl);
-        setTimeout(()=>onDone(score), 2600);
+        renderQuizShadowActions(s, onDone);
     }, { onPartial:(t)=>{ statusEl.innerHTML=`🎙️ <b>聽到：</b>${escapeHtml(t)}`; } });
+}
+function renderQuizShadowActions(s, onDone){
+    const actions=document.getElementById('shadow-actions');
+    if(!actions) return;
+    actions.innerHTML=`
+        <button class="mini-btn sky" id="sh-replay2">🔊 再聽發音</button>
+        <button class="mini-btn mint" id="sh-retry">🔁 再試一次（拚高分）</button>
+        <button class="big-btn pink-strong" id="sh-cont">下一步 ▶</button>`;
+    document.getElementById('sh-replay2').onclick=()=>playSegment(s,{onEnd:()=>{}});
+    document.getElementById('sh-retry').onclick=()=>playSegment(s,{ onEnd:()=>sessionShadow(s,onDone) });
+    document.getElementById('sh-cont').onclick=()=>onDone(session.shadowBestScore!=null?session.shadowBestScore:null);
 }
 
 /* ---- 完成一句 / 完成全部 ---- */
@@ -1292,14 +1324,14 @@ function beginShadowAttempt(s){
     if(!isSpeechRecSupported()){
         let n=3;
         const tick=()=>{ if(!shadowSession||shadowSession.gen!==myGen) return;
-            if(n>0){ animateCd(n); statusEl.innerHTML='準備…<b>跟著大聲唸！</b>'; n--; setTimeout(tick,600); }
+            if(n>0){ animateCd(n); statusEl.innerHTML='準備…<b>跟著大聲唸！</b>'; n--; setTimeout(tick,COUNTDOWN_MS); }
             else { animateCd('🗣️'); statusEl.innerHTML='🗣️ <b>大聲唸出來！</b>'; setTimeout(()=>scoreShadow(s,null,'',myGen), 1500); } };
         tick(); return;
     }
     let n=3;
     const tick=()=>{
         if(!shadowSession||shadowSession.gen!==myGen) return;
-        if(n>0){ animateCd(n); statusEl.innerHTML='準備…<b>換你唸！</b>'; n--; setTimeout(tick,600); }
+        if(n>0){ animateCd(n); statusEl.innerHTML='準備…<b>換你唸！</b>'; n--; setTimeout(tick,COUNTDOWN_MS); }
         else {
             animateCd('🎙️'); statusEl.innerHTML='🎙️ <b>換你唸，整句大聲唸出來！</b>';
             shadowSession.rec=captureSpeech((transcript,err,alts)=>{
