@@ -10,6 +10,7 @@
 - `eng/index.html` — `eng/` 資料夾的索引頁；課程清單由 `<script>` 內的 `lessonList` 陣列渲染。
 - `eng/sub/` — 字幕檔（`.srt`），檔名格式 `YYYY-MM-DD-<標題>.srt`。
 - `eng/2026-06-27-Peter-Rabbit-Benjamin-Harvest-Feast.html`、`eng/2026-06-04-Cat-and-Cow-Learn-About-Friendship.html` — 最新的聽力闖關頁，可直接當作**引擎範本**。
+- `.agents/skills/youtube-listening-lesson/` — **YouTube 連結 → Whisper 字幕 → 新聽力闖關頁** 的 Agent Skill；腳本在 `scripts/create-listening-lesson.py`。
 
 ## 任務：依影片 + 字幕「新增一個聽力闖關故事頁」
 
