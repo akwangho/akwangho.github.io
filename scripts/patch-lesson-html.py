@@ -75,7 +75,7 @@ def replace_button_group(html: str, key: str, chapters: list[dict]) -> str:
 
 
 def patch_comment(html: str, srt_path: str | None, video_url: str | None) -> str:
-    extra = "Whisper medium.en 重新轉錄；SRT 碎片已合併為完整句子"
+    extra = "Whisper large-v3 逐字對齊；SRT 碎片已合併為完整句子"
     if srt_path:
         extra += f"；字幕： {srt_path}"
     block = re.search(r"/\* ={57}\n \* .*?={55} \*/", html, re.S)

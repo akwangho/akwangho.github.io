@@ -30,7 +30,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--page-title", help="Browser <title> (defaults to title + 聽力闖關)")
     p.add_argument("--lesson-date", default=date.today().isoformat())
     p.add_argument("--template", default=str(DEFAULT_TEMPLATE))
-    p.add_argument("--model", default="medium.en")
+    p.add_argument("--model", default="large-v3")
+    p.add_argument("--fast", action="store_true", help="Use medium.en (faster, less accurate)")
     p.add_argument("--skip-transcribe", action="store_true")
     p.add_argument("--include-channel-intro", action="store_true")
     return p.parse_args()
@@ -120,6 +121,7 @@ def main() -> int:
                 "--model",
                 args.model,
             ]
+            + (["--fast"] if args.fast else [])
         )
 
     template = Path(args.template)

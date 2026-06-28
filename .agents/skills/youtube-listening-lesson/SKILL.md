@@ -1,32 +1,55 @@
 ---
 name: youtube-listening-lesson
 description: >-
-  Transcribes YouTube videos with faster-whisper, writes SRT subtitles, and scaffolds
-  new eng/ listening-lesson HTML pages (DEFAULT_SENTENCES + chapter buttons + eng/index.html).
-  Use when the user pastes a YouTube link, asks to auto-generate subtitles, create a new
-  聽力闖關 page, or add a Little Fox / English story lesson from video.
+  Transcribes YouTube videos with faster-whisper (large-v3, word-level timestamps),
+  writes aligned SRT subtitles, and scaffolds eng/ listening-lesson HTML pages.
+  Use when the user pastes a YouTube link, asks to auto-generate subtitles, fix
+  subtitle/audio misalignment, or create a 聽力闖關 page from Little Fox stories.
 ---
 
 # YouTube → 聽力闖關頁
 
 從 YouTube 連結自動轉字幕，並依 [`AGENTS.md`](../../AGENTS.md) 規格產生新的 `eng/*.html` 聽力闖關頁。
 
-## 觸發情境
+## 核心原則：字幕必須對齊發音
 
-使用者貼上 YouTube URL，或說「幫這支影片做聽力教材 / 自動產生字幕 / 新增闖關頁」。
+**每一句 `en` 必須是影片實際說出的英文**，時間軸用 **word-level timestamps**（首字 start、末字 end）。
 
-## 前置條件（本機一次安裝）
+常見 Whisper 錯誤（必修正或重轉）：
+- 對白順序顛倒：`Where is that rabbit, said the farmer` → 聽到的是 `"Where is that rabbit?" he said.`
+- 主詞錯誤：`said farmer` / `Hello said farmer` → 應為 `he said` / `the farmer said`
+- 碎片：`said the bunnies.` 應併入前句
+
+**不要**把 Whisper 原文改寫成「文法較漂亮但發音不同」的句子；合併片段時保留 spoken words。
+
+## 前置條件
 
 ```bash
 brew install yt-dlp ffmpeg
 pip3 install faster-whisper
 ```
 
-暫存目錄 `scripts/.cache/` 已在 `.gitignore`。
+## 轉錄（預設 large-v3 + 逐字時間）
 
-## 一鍵腳本（貼連結後先跑這個）
+```bash
+python3 scripts/transcribe-youtube.py \
+  --video-id VIDEO_ID \
+  --output-srt "eng/sub/YYYY-MM-DD-slug.srt" \
+  --json "scripts/.cache/VIDEO_ID.json"
+```
 
-向使用者確認：**標題**、**slug**（英文連字號）、**emoji**（卡片用）。然後：
+已有快取音訊時加 `--skip-download`。
+
+| 參數 | 說明 |
+|------|------|
+| 預設 `large-v3` + `int8`（CPU） | 準確度優先；GPU 可用 `float32` |
+| `--fast` | 改用 `medium.en`（草稿用） |
+| JSON 內 `words[]` | 每字 `{word,start,end}` |
+| `initial_prompt` | Little Fox / Peter Rabbit 詞彙提示 |
+
+共用工具：[`scripts/subtitle_utils.py`](../../scripts/subtitle_utils.py)（逐字對齊、對白正規化）
+
+## 一鍵建立新頁
 
 ```bash
 python3 scripts/create-listening-lesson.py \
@@ -38,86 +61,64 @@ python3 scripts/create-listening-lesson.py \
   --include-channel-intro
 ```
 
-產出：
-| 檔案 | 說明 |
-|------|------|
-| `eng/sub/YYYY-MM-DD-{slug}.srt` | Whisper 英文字幕 |
-| `scripts/.cache/{id}.json` | 原始 segments |
-| `scripts/.cache/{id}-sentences-draft.json` | 草稿句子（**zh 空白**） |
-| `eng/YYYY-MM-DD-{slug}.html` | 從最新範本複製，已換 VIDEO_ID / title |
-| `eng/index.html` | 已插入 lessonList 卡片 |
+## Agent 必做：合併 + 繁中 + 對齊驗收
 
-## Agent 必做：潤飾句子 + 繁中翻譯
+1. 讀 `scripts/.cache/{id}.json`（含 `words`）
+2. **重轉後 segment 索引會變** — 勿沿用舊 `SENTENCE_MAP` 的 `segments` 數字；用 `remap_sentence_map()` 或逐字 token 對齊
+3. 合併片段為教學句；`en` = Whisper 逐字合併後再 `normalize_spoken_line()`（**整句**做一次，含多段拼接）
+4. **`start`/`end` 用 `range_bounds` 或 `spoken_from_token_sequence`**（word 首尾時間）
+5. 填 `zh`（繁體、「」引號）
+6. 設定 `chapters`（0 起算）
+7. 存 `scripts/.cache/{id}-sentences.json` + 用 `sentences_to_srt()` 寫 SRT
 
-腳本只做機械步驟；**合併碎片、修正 ASR、寫 zh 由 Agent 完成**。
+### 對白正規化（必做）
 
-1. 讀 `scripts/.cache/{id}-sentences-draft.json`
-2. 對照 Whisper JSON，修正 `en`（完整句、標點、引號 `\"`、專有名詞）
-3. 略過 `[Music]`、不完整殘句（如 `"They need—"`）
-4. 為每句填 `zh`（繁體、引號「」、全形標點）
-5. 設定 `chapters` 陣列（章節按鈕標籤），`chapter` 從 0 起算
-6. 存成 `scripts/.cache/{id}-sentences.json`
+Whisper 常把 Little Fox 旁白說的 `he said` 辨成 `Cried the farmer` / `said farmer`。`normalize_spoken_line()` 規則：
 
-合併規則與 HTML 欄位詳見 [reference.md](reference.md)。
+- `Stop! Thief! Cried the farmer.` → `"Stop! Thief!" he cried.`
+- `Where is that rabbit? Cried the farmer.` → `"Where is that rabbit?" he said.`
+- `Whispered Benjamin.` → `"…" Benjamin whispered.`
+- **禁止**改寫成文法漂亮但發音不同的句子
 
-### 常見 ASR 修正
+### 對齊驗收（必做）
 
-- `Timmy tiptoes` → `Timmy Tiptoes`
-- `Silver tail` → `Silvertail`
-- `Fishes!`（誤聽）→ `These nut pies are delicious!`（依上下文）
-- 多段對白合併：`"No," Peter said.` + `We collected these nuts.` → 一句
+抽查 5–10 句，尤其含 `said` / `cried` / `farmer` 的對白：
+- [ ] 字幕每個字與聽到的發音一致（不是文法改寫版）
+- [ ] 播放片段時句子在正確時間出現/結束
+- [ ] 無 `said farmer` 這類 ASR 倒裝殘句
 
 ## 寫入 HTML
 
 ```bash
 python3 scripts/patch-lesson-html.py \
-  --html "eng/YYYY-MM-DD-{slug}.html" \
+  --html "eng/YYYY-MM-DD-slug.html" \
   --sentences-json "scripts/.cache/{id}-sentences.json" \
-  --srt-path "eng/sub/YYYY-MM-DD-{slug}.srt" \
+  --srt-path "eng/sub/YYYY-MM-DD-slug.srt" \
   --video-url "https://www.youtube.com/watch?v=VIDEO_ID"
 ```
 
-會更新：`DEFAULT_SENTENCES`、測驗/跟讀的章節按鈕（`scope` + `shadowScope`）、script 註解。
-
 **不要改** `DEFAULT_SENTENCES` 之後的引擎 JS。
 
-## 驗收清單
+## 既有頁重轉字幕
 
-```
-- [ ] VIDEO_ID、title、brand 無舊故事殘留
-- [ ] DEFAULT_SENTENCES id 連續 s1…sN
-- [ ] 每句 en 完整；zh 已填
-- [ ] start/end 與影片對齊（抽查 5–10 句）
-- [ ] 章節按鈕數量 = chapters 數 +「全部」
-- [ ] eng/index.html href 與檔名一致
-- [ ] 不修改根目錄 index.html
+```bash
+python3 scripts/transcribe-youtube.py \
+  --video-id VIDEO_ID \
+  --skip-download \
+  --output-srt "eng/sub/....srt" \
+  --json "scripts/.cache/VIDEO_ID.json"
+
+python3 scripts/build-{story}-sentences.py   # 或更新 sentences JSON
+python3 scripts/patch-lesson-html.py ...
 ```
 
 ## 腳本一覽
 
 | 腳本 | 用途 |
 |------|------|
-| `scripts/create-listening-lesson.py` | 主流程：轉錄 + 複製範本 + index |
-| `scripts/transcribe-youtube.py` | 僅轉錄 SRT/JSON |
-| `scripts/merge-whisper-segments.py` | 草稿句子（可單獨重跑） |
-| `scripts/patch-lesson-html.py` | 注入句子與章節按鈕 |
+| `scripts/transcribe-youtube.py` | large-v3 轉錄 + word JSON + SRT |
+| `scripts/subtitle_utils.py` | 逐字時間、對白正規化、`remap_sentence_map`、`sentences_to_srt` |
+| `scripts/create-listening-lesson.py` | 新頁 scaffold |
+| `scripts/patch-lesson-html.py` | 注入 DEFAULT_SENTENCES |
 
-## 範本
-
-預設範本：`eng/2026-06-27-Peter-Rabbit-Benjamin-Harvest-Feast.html`  
-可用 `--template eng/2026-06-04-Cat-and-Cow-Learn-About-Friendship.html` 覆寫。
-
-完整範例見 [examples.md](examples.md)。
-
-## 僅更新既有頁字幕
-
-已有 HTML，只需重轉字幕：
-
-```bash
-python3 scripts/transcribe-youtube.py \
-  --video-id VIDEO_ID \
-  --output-srt "eng/sub/....srt" \
-  --json "scripts/.cache/VIDEO_ID.json"
-```
-
-再依新 JSON 更新 sentences JSON → `patch-lesson-html.py`。
+詳見 [reference.md](reference.md)、[examples.md](examples.md).

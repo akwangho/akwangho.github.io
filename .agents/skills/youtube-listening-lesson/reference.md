@@ -22,9 +22,10 @@
 ```
 
 - `chapter`：0 起算，對應按鈕 `data-v="0"`…
-- `start` / `end`：秒（浮點）；合併多段 SRT 時取首段 start、末段 end
-- `en` 內雙引號在 HTML 中寫 `\"`
+- **start** / **end**：秒（浮點）；優先用 word timestamps 首末字，不是 Whisper segment 邊界
+- **en**：Whisper 逐字合併 → `normalize_spoken_line()` 整句修正（含 `Cried the farmer` → `he said/cried`）；HTML 內 `\"` 逸出雙引號
 - `zh`：繁體中文，引號「」，內層『』
+- **重轉後**：舊 `segments` 索引失效 → 用 `remap_sentence_map()` 或 `spoken_from_token_sequence()`
 
 ## 章節分段
 
@@ -72,9 +73,16 @@
 
 ## Whisper 設定
 
-- 模型：`medium.en`（英文兒童故事預設）
-- `vad_filter=True`、`word_timestamps=True`
-- 首次執行會下載 ~1.5GB 模型
+- **預設模型**：`large-v3`（`transcribe-youtube.py`）；草稿可用 `--fast` → `medium.en`
+- **逐字時間**：JSON 每段含 `words: [{word, start, end}]`；HTML `start`/`end` 取合併段內首末字
+- **initial_prompt**：Little Fox / Peter Rabbit 角色名，提升對白準確度
+- **對白修正**：用 `subtitle_utils.normalize_spoken_line`；禁止改成與發音不符的「漂亮英文」
+
+## 對齊驗收
+
+1. 含 `said` / `cried` / `farmer` 的句子逐句聽音比對
+2. 確認無 `said farmer`、`Hello said farmer` 等 ASR 倒裝
+3. 播放跟讀片段，字幕起訖應貼合該句發音
 
 ## 疑難排解
 
