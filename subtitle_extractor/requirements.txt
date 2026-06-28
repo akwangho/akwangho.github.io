@@ -1,0 +1,16 @@
+# Hard Subtitle Extractor — runtime dependencies
+opencv-python-headless>=4.8
+numpy>=1.24
+rapidfuzz>=3.0
+PyYAML>=6.0
+tqdm>=4.66
+
+# OCR engine (PP-OCR / PaddleOCR models via ONNX Runtime — no paddlepaddle build needed).
+# This is the default, cross-platform PaddleOCR-compatible engine.
+rapidocr-onnxruntime>=1.2
+
+# Optional: the original PaddleOCR engine. Only installs cleanly where
+# paddlepaddle has wheels (often NOT on macOS / Python 3.13). RapidOCR above
+# uses the same PP-OCR detection + recognition models, so it is preferred.
+# paddleocr>=2.7
+# paddlepaddle>=2.6

@@ -1,0 +1,30 @@
+# Hard Subtitle Extractor — default configuration.
+# Every key here can be overridden from the CLI (see `python main.py --help`).
+
+# --- Frame sampling -----------------------------------------------------------
+fps: 3                     # frames per second to sample (NOT the native fps)
+# 3 fps gives ~0.33s timing granularity, plenty for burned-in story subtitles.
+
+# --- Subtitle region ----------------------------------------------------------
+crop_mode: ratio           # "ratio" -> bottom crop_ratio band; "box" -> use crop_box
+crop_ratio: 0.28           # bottom fraction of the frame that holds the subtitle
+crop_box: null             # [x, y, w, h] in pixels when crop_mode == "box"
+
+# --- Subtitle change detection ------------------------------------------------
+difference_threshold: 30   # per-pixel grayscale abs-diff that counts as "changed"
+minimum_change_pixels: 6000  # tuned above background flicker + karaoke highlight,
+                             # below a full subtitle-line appear/replace/disappear
+text_threshold: 150        # luminance cutoff used to isolate bright subtitle text
+
+# --- OCR ----------------------------------------------------------------------
+ocr_language: en           # en | ch (PP-OCR language pack)
+use_gpu: false             # PP-OCR / RapidOCR GPU mode (requires GPU onnxruntime)
+
+# --- Merge / de-duplication ---------------------------------------------------
+merge_similarity: 90       # >= this RapidFuzz ratio -> treat as the same subtitle
+min_duration: 0.30         # drop cues shorter than this many seconds (flicker)
+max_gap: 0.40              # bridge gaps shorter than this between identical cues
+
+# --- Misc ---------------------------------------------------------------------
+llm_correction: false      # reserved for future AI OCR correction
+debug: false               # dump per-OCR crops + text under output/debug/
