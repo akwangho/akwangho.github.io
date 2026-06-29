@@ -22,6 +22,35 @@ description: >-
 
 **不要**把 Whisper 原文改寫成「文法較漂亮但發音不同」的句子；合併片段時保留 spoken words。
 
+## 釜底抽薪校時：CTC 強制對齊（首選）
+
+時間軸若漂移（句子起訖落在錯字、播放片段吃到下一句），**不要**靠 Whisper 逐字時間做模糊比對。改用 **強制對齊 (forced alignment)**：把「已知正確文本」＋音訊餵進聲學對齊器，直接得到每字精準時間，再取每句首/末字當 `start`/`end`。
+
+實作：[`scripts/align-lesson.py`](../../scripts/align-lesson.py)，使用 `torchaudio` 的 CTC `forced_align`（MMS_FA 多語對齊模型）。**不需** stable-ts／openai-whisper（在 Intel mac + Python 3.13 上 torch 無法安裝，且 stable-ts 依賴 numba/llvmlite 難編譯）。
+
+```bash
+# 一次性：建立可裝 torch 的 venv（Intel mac 需 Python 3.11；torch 2.2.2 為最後支援版本）
+python3.11 -m venv scripts/.cache/align-venv
+scripts/.cache/align-venv/bin/pip install "torch==2.2.2" "torchaudio==2.2.2" "numpy<2"
+
+# 用「HTML 內既有 DEFAULT_SENTENCES 文本」重新校時（先 dry-run 看報表，確認後加 --apply）
+scripts/.cache/align-venv/bin/python scripts/align-lesson.py \
+  --html eng/YYYY-MM-DD-slug.html \
+  --wav scripts/.cache/VIDEO_ID.wav \
+  --sentences-json scripts/.cache/VIDEO_ID-sentences.json \
+  --srt eng/sub/YYYY-MM-DD-slug.srt \
+  --apply
+```
+
+重點：
+- 文本來源 = HTML 的 `DEFAULT_SENTENCES`（只重算 `start`/`end`，不動 `en`/`zh`/章節）。
+- emission 以 ~30s 分段計算後拼接（wav2vec2 self-attention 是 O(T²)，整段會爆記憶體），快取於 `*.emission.pt`。
+- 逐章 `forced_align`，並在每章首句前注入「片頭／各集標題」**錨點**（僅供對齊、不輸出時間），避免章節交界漂移。
+- 句末會夾到下一句起點，**不**吃到下一句。
+- `-`（blank）與 `*`（star）為 MMS 特殊符號，token 化時必須剔除（如 `Good-bye` → `goodbye`）。
+
+驗收見下方「對齊驗收」。
+
 ## 前置條件
 
 ```bash
@@ -118,6 +147,7 @@ python3 scripts/patch-lesson-html.py ...
 |------|------|
 | `scripts/transcribe-youtube.py` | large-v3 轉錄 + word JSON + SRT |
 | `scripts/subtitle_utils.py` | 逐字時間、對白正規化、`remap_sentence_map`、`sentences_to_srt` |
+| `scripts/align-lesson.py` | **CTC 強制對齊校時（首選）**：torchaudio MMS_FA，回填 HTML/JSON/SRT |
 | `scripts/create-listening-lesson.py` | 新頁 scaffold |
 | `scripts/patch-lesson-html.py` | 注入 DEFAULT_SENTENCES |
 
