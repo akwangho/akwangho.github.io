@@ -834,9 +834,9 @@ function updateMaskSubtitle(){
         // 智能延遲：顯示「最近一句已經完整講完」的句子（聽完整句後才對字幕）
         for(const s of DEFAULT_SENTENCES){ if(t>=s.end){ if(!target || s.end>target.end) target=s; } }
     } else {
-        // 固定延遲：句子開始一秒後才顯示
-        const cur=DEFAULT_SENTENCES.find(x=> t>=x.start && t<=x.end);
-        if(cur && t>=cur.start+SUBTITLE_DELAY) target=cur;
+        // 固定延遲：整句延後一秒 — 開始後一秒才出現，結束後一秒才消失
+        const cur=DEFAULT_SENTENCES.find(x=> t>=x.start+SUBTITLE_DELAY && t<=x.end+SUBTITLE_DELAY);
+        if(cur) target=cur;
     }
     if(target){ if(el.dataset.id!==target.id){ el.dataset.id=target.id; el.textContent=target.en; } }
     else { if(el.dataset.id){ el.dataset.id=''; el.textContent=''; } }
