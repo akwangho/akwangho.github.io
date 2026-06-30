@@ -91,7 +91,7 @@ python3 scripts/create-listening-lesson.py \
   --include-channel-intro
 ```
 
-## Agent 必做：合併 + 繁中 + 對齊驗收
+## Agent 必做：合併 + 繁中 + 對齊驗收 + 完整性稽核
 
 1. 讀 `scripts/.cache/{id}.json`（含 `words`）
 2. **重轉後 segment 索引會變** — 勿沿用舊 `SENTENCE_MAP` 的 `segments` 數字；用 `remap_sentence_map()` 或逐字 token 對齊
@@ -100,6 +100,7 @@ python3 scripts/create-listening-lesson.py \
 5. 填 `zh`（繁體、「」引號）
 6. 設定 `chapters`（0 起算）
 7. 存 `scripts/.cache/{id}-sentences.json` + 用 `sentences_to_srt()` 寫 SRT
+8. **`python3 scripts/audit-littlefox-srt.py {story} --audit-only`** — 確認無合併/遺漏；有問題則 `--apply`（不帶 `--audit-only`）修復
 
 ### 對白正規化（必做）
 
@@ -116,6 +117,43 @@ Whisper 常把 Little Fox 旁白說的 `he said` 辨成 `Cried the farmer` / `sa
 - [ ] 字幕每個字與聽到的發音一致（不是文法改寫版）
 - [ ] 播放片段時句子在正確時間出現/結束
 - [ ] 無 `said farmer` 這類 ASR 倒裝殘句
+
+### 字幕完整性稽核（必做 — OCR/合併遺漏）
+
+Whisper 或硬字幕 OCR 常把**連續對白合成一 cue**，導致像 `Silvertail bent deeper.` 整句消失。修正流程：
+
+1. **對照 Little Fox 官方 supplement 台詞**（逐句一行）：
+   - 例：[Harvest Feast Ep.4](https://www.littlefox.com/hk/supplement/org/C0007888)
+   - 例：[Peter Rabbit Ep.1–4](https://www.littlefox.com/en/supplement/org/C0007023)
+2. **跑稽核腳本**（只報告）：
+   ```bash
+   python3 scripts/audit-littlefox-srt.py all --audit-only
+   ```
+3. **套用已知修復並同步 SRT + HTML**：
+   ```bash
+   python3 scripts/audit-littlefox-srt.py harvest-feast   # 或 full-story / boot / all
+   ```
+4. **逐條驗收**：新增/拆分的 cue 在影片中各有一句發音；時間軸可先用相鄰 cue 間隙估算，再用 `align-lesson.py` 精修。
+5. **繁中校對**：腳本以 OpenCC 轉繁體並統一譯名（如 `班傑明`）；繁中在 HTML `DEFAULT_SENTENCES`，SRT 僅英文。
+
+支援 slug：`harvest-feast`、`full-story`、`boot`（見 `STORIES`）。
+
+常見遺漏型態（必拆成獨立 cue）：
+
+| 錯誤 | 正確（Little Fox） |
+|------|-------------------|
+| `"I don't see any nuts. Where are—Yikes!"` | 三句：`"I don't see any nuts."` → `Silvertail bent deeper.` → `"Where are—Yikes!"` |
+| `"Yes!" …` 後直接跳場 | 補 `"Where are they?"` |
+| `Peter pointed …` 後缺台詞 | 補 `"Right there."` |
+| `"Help! I'm stuck in this net!" cried Peter.` | `"Help!" he cried.` + `"I'm stuck in this net!"` |
+| 按鈕卡住後缺驚叫 | 補 `"Ahh!" he cried.` |
+| 冰水場景 | 補 `"Brr!" said Peter.` |
+| 貓場景 | 補 `"Whew!" whispered Peter.` |
+| 找門場景 | 補 `Scritch, scratch!`（可與 `Peter heard a noise.` 各一 cue） |
+| `"Oh no!" … "We must find Mrs. Tiggy-Winkle," …` 合併 | 各一 cue（Boot Ep.2） |
+| `"We need that boot," … "Can we have it?"` 合併 | 各一 cue |
+
+新故事：在 `scripts/audit-littlefox-srt.py` 的 `STORIES` / `REQUIRED_LINES` / `fix_*()` 加入對照表，或擴充 `REQUIRED_LINES` 後手動補 `fix_*` 規則。
 
 ## 寫入 HTML
 
@@ -151,5 +189,6 @@ python3 scripts/patch-lesson-html.py ...
 | `scripts/align-lesson.py` | **CTC 強制對齊校時（首選）**：torchaudio MMS_FA，回填 HTML/JSON/SRT |
 | `scripts/create-listening-lesson.py` | 新頁 scaffold |
 | `scripts/patch-lesson-html.py` | 注入 DEFAULT_SENTENCES |
+| `scripts/audit-littlefox-srt.py` | **字幕完整性稽核**：對照 Little Fox 台詞，偵測合併/遺漏，修復 SRT + HTML |
 
 詳見 [reference.md](reference.md)、[examples.md](examples.md).

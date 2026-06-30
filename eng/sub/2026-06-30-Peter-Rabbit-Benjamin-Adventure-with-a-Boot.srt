@@ -19,7 +19,7 @@ Suddenly Peter stopped. "Look!" he said.
 "No," Peter said. "Do you?"
 
 6
-00:00:36,280 --> 00:00:38,640
+00:00:36,380 --> 00:00:38,640
 "No," Benjamin said.
 
 7
@@ -111,194 +111,206 @@ The bunnies hopped back to the shop.
 The shopkeeper shook his head. "Sorry," he said. "Mrs. Tiggy-Winkle just bought it."
 
 29
-00:03:19,160 --> 00:03:25,720
-"Oh no!" Peter said. "We must find Mrs. Tiggy-Winkle," Benjamin said.
+00:03:19,160 --> 00:03:21,460
+"Oh no!" Peter said.
 
 30
+00:03:21,510 --> 00:03:25,720
+"We must find Mrs. Tiggy-Winkle," Benjamin said.
+
+31
 00:03:28,660 --> 00:03:31,740
 The bunnies hopped fast to Mrs. Tiggy-Winkle's house.
 
-31
+32
 00:03:32,440 --> 00:03:37,060
 Candies fell out of their pockets, but they did not see them.
 
-32
+33
 00:03:39,640 --> 00:03:42,240
 The bunnies knocked on Mrs. Tiggy-Winkle's door.
 
-33
+34
 00:03:48,900 --> 00:03:51,260
 "Do you have the boot?" Peter asked.
 
-34
+35
 00:03:52,000 --> 00:03:57,360
 Mrs. Tiggy-Winkle sighed. "I painted a pretty picture on it."
 
-35
+36
 00:03:58,060 --> 00:04:02,040
 "I wanted to use it for dirty socks, but it was too heavy."
 
-36
+37
 00:04:05,220 --> 00:04:07,640
 Peter grinned. "Can we have it?"
 
-37
+38
 00:04:09,160 --> 00:04:11,260
 "No," Mrs. Tiggy-Winkle said.
 
-38
+39
 00:04:12,260 --> 00:04:32,940
 She held up an old hat. "Jemima gave me this hat. I gave her the boot."
 
-39
+40
 00:04:38,600 --> 00:04:40,420
 The bunnies hopped to the farm.
 
-40
+41
 00:04:45,540 --> 00:04:50,700
 "Jemima!" Benjamin called. "We are looking for an old boot."
 
-41
+42
 00:04:51,680 --> 00:04:58,920
 "Oh," Jemima said. "I wanted to make a nest in that boot, but it was too small for my eggs."
 
-42
+43
 00:04:59,780 --> 00:05:02,940
 "Great!" Peter said. "Can we have the boot?"
 
-43
+44
 00:05:03,900 --> 00:05:12,260
 "No," Jemima said. "I gave the boot to Tom Kitten. He gave me hay."
 
-44
+45
 00:05:19,920 --> 00:05:21,320
 The bunnies hopped away.
 
-45
+46
 00:05:26,740 --> 00:05:28,960
 They found Tom near some big rocks.
 
-46
+47
 00:05:30,140 --> 00:05:32,900
 "Do you have the boot?" Benjamin called.
 
-47
+48
 00:05:41,120 --> 00:05:45,780
 "Oh," Tom nodded sadly. "Yes."
 
-48
-00:05:45,820 --> 00:05:53,400
+49
+00:05:45,830 --> 00:05:53,400
 But he pointed to the boot. It was stuck between two rocks.
 
-49
-00:05:54,360 --> 00:05:59,980
-"We need that boot," Peter said. "Can we have it?" Benjamin asked.
-
 50
-00:06:02,660 --> 00:06:12,300
-"Oh, okay," Tom said. "I will give you the boot. Will you give me some candy?"
+00:05:54,360 --> 00:05:56,890
+"We need that boot," Peter said.
 
 51
+00:05:56,940 --> 00:05:59,980
+"Can we have it?" Benjamin asked.
+
+52
+00:06:02,660 --> 00:06:07,960
+"Oh, okay," Tom said. "I will give you the boot."
+
+53
+00:06:08,010 --> 00:06:12,300
+"Will you give me some candy?"
+
+54
 00:06:13,600 --> 00:06:18,760
 "Okay." Peter reached into his pockets. He gasped.
 
-52
+55
 00:06:19,880 --> 00:06:21,220
 "Where is all my candy?"
 
-53
+56
 00:06:24,200 --> 00:06:30,220
 Peter had just one piece left. He gave it to Tom.
 
-54
+57
 00:06:35,360 --> 00:06:37,000
 "Bye, Tom!" the bunnies said.
 
-55
+58
 00:06:41,000 --> 00:06:54,820
 The bunnies grabbed the boot. They pulled hard, but it was still stuck.
 
-56
+59
 00:07:11,340 --> 00:07:12,720
 The bunnies were sad.
 
-57
+60
 00:07:14,140 --> 00:07:15,740
 All the candy was gone.
 
-58
+61
 00:07:17,320 --> 00:07:19,240
 The mouse's boot was stuck.
 
-59
+62
 00:07:21,040 --> 00:07:24,080
 "We must tell the mouse," Benjamin said.
 
-60
+63
 00:07:24,580 --> 00:07:26,940
 "She will be mad," Peter said.
 
-61
+64
 00:07:29,060 --> 00:07:30,740
 "Look! Here she comes."
 
-62
+65
 00:07:32,660 --> 00:07:34,700
 The mouse ran toward the bunnies.
 
-63
+66
 00:07:37,340 --> 00:07:44,320
 Suddenly she stopped. "My boot!" the mouse gasped.
 
-64
+67
 00:07:47,940 --> 00:07:51,280
 "Did someone paint a picture on my boot?"
 
-65
+68
 00:07:52,860 --> 00:07:58,480
 "Yes," Benjamin said. "Mrs. Tiggy-Winkle painted a picture on your boot."
 
-66
+69
 00:08:03,220 --> 00:08:05,320
 The mouse looked inside the boot.
 
-67
+70
 00:08:07,040 --> 00:08:10,220
 "Did someone put feathers on my boot?"
 
-68
+71
 00:08:11,620 --> 00:08:16,160
 "Yes," Peter said. "Jemima put feathers on your boot."
 
-69
+72
 00:08:18,040 --> 00:08:19,820
 The mouse looked at the rocks.
 
-70
+73
 00:08:20,520 --> 00:08:23,240
 "Did someone get my boot stuck?"
 
-71
+74
 00:08:25,520 --> 00:08:30,960
 "Yes," Benjamin said sadly. "And we can't get it out."
 
-72
+75
 00:08:38,440 --> 00:08:39,720
 The mouse laughed.
 
-73
+76
 00:08:44,260 --> 00:08:52,620
 "Now my boot is pretty. My bed is soft. And nobody can take my boot."
 
-74
+77
 00:08:53,940 --> 00:08:55,840
 Peter and Benjamin laughed too.
 
-75
+78
 00:08:59,780 --> 00:09:07,400
 "Thank you for finding my house," the mouse said. "I found something for you too."
 
-76
+79
 00:09:10,840 --> 00:09:12,820
 The mouse held out their candy.
 
