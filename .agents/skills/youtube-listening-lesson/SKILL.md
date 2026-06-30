@@ -46,6 +46,7 @@ scripts/.cache/align-venv/bin/python scripts/align-lesson.py \
 - 文本來源 = HTML 的 `DEFAULT_SENTENCES`（只重算 `start`/`end`，不動 `en`/`zh`/章節）。
 - emission 以 ~30s 分段計算後拼接（wav2vec2 self-attention 是 O(T²)，整段會爆記憶體），快取於 `*.emission.pt`。
 - 逐章 `forced_align`，並在每章首句前注入「片頭／各集標題」**錨點**（僅供對齊、不輸出時間），避免章節交界漂移。
+- **每支影片的錨點不同**：在 sentences JSON 加 `"chapter_anchors": {"0": ["..."], ...}`（標題小寫、數字拼字、無標點），`align-lesson.py` 會自動讀取；未提供時用內建預設。
 - 句末會夾到下一句起點，**不**吃到下一句。
 - `-`（blank）與 `*`（star）為 MMS 特殊符號，token 化時必須剔除（如 `Good-bye` → `goodbye`）。
 

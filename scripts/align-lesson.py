@@ -36,9 +36,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-# Alignment-only anchors: spoken lines that are not teaching sentences.
-# Numbers are spelled out so the CTC letter dictionary can consume them.
-CHAPTER_ANCHORS = {
+# Alignment-only anchors: spoken lines that are not teaching sentences
+# (intro jingle, episode titles). They keep CTC alignment monotonic across
+# chapter boundaries; their own times are discarded. Per-video anchors can be
+# supplied via a "chapter_anchors" field in the sentences JSON; otherwise these
+# Harvest Feast defaults are used. Numbers are spelled out so the CTC letter
+# dictionary can consume them.
+DEFAULT_CHAPTER_ANCHORS = {
     0: [
         "little fox",
         "peter and benjamin have a feast episode one gathering nuts",
@@ -110,7 +114,17 @@ def compute_emission(model, wav_path: str, dur: float):
     return torch.cat(cores, dim=0)
 
 
-def align(html: str, wav_path: str):
+def load_chapter_anchors(sentences_json: str | None) -> dict[int, list[str]]:
+    """Per-video anchors from the sentences JSON, else Harvest Feast defaults."""
+    if sentences_json and Path(sentences_json).exists():
+        data = json.loads(Path(sentences_json).read_text(encoding="utf-8"))
+        raw = data.get("chapter_anchors")
+        if raw:
+            return {int(k): list(v) for k, v in raw.items()}
+    return DEFAULT_CHAPTER_ANCHORS
+
+
+def align(html: str, wav_path: str, chapter_anchors: dict[int, list[str]]):
     import torch
     import torchaudio
     import torchaudio.functional as F
@@ -165,7 +179,7 @@ def align(html: str, wav_path: str):
 
         words: list[list[str]] = []
         owners: list[tuple[str, str | None]] = []
-        for anchor in CHAPTER_ANCHORS.get(c, []):
+        for anchor in chapter_anchors.get(c, []):
             for w in anchor.split():
                 ch = norm_chars(w)
                 if ch:
@@ -263,7 +277,8 @@ def main() -> int:
 
     html_path = Path(args.html)
     html = html_path.read_text(encoding="utf-8")
-    sents, final = align(html, args.wav)
+    chapter_anchors = load_chapter_anchors(args.sentences_json)
+    sents, final = align(html, args.wav, chapter_anchors)
 
     moved = 0
     for s in sents:
