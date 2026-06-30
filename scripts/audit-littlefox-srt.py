@@ -57,7 +57,7 @@ REQUIRED_LINES = {
     ],
     "full-story": [
         '"Ahh!" he cried.',
-        '"Help!" he cried.',
+        '"Help!" cried Peter.',
         '"I\'m stuck in this net!"',
         '"Brr!" said Peter.',
         '"Whew!" whispered Peter.',
@@ -257,12 +257,18 @@ def fix_full_story(cues: list[Cue]) -> list[Cue]:
         c = out[m]
         out[m : m + 1] = split_cue(
             c,
-            '"Help!" he cried.',
+            '"Help!" cried Peter.',
             '"I\'m stuck in this net!"',
-            "「救命！」他大喊。",
+            "「救命！」彼得大喊。",
             "「我被困在這張網子裡了！」",
             0.35,
         )
+
+    for c in out:
+        if c.en == '"Help!" he cried.':
+            c.en = '"Help!" cried Peter.'
+            if c.zh in ("「救命！」他大喊。", ""):
+                c.zh = "「救命！」彼得大喊。"
 
     if not any(c.en == '"Brr!" said Peter.' for c in out):
         w = find(out, "icy water")

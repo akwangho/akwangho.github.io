@@ -145,7 +145,7 @@ Whisper 或硬字幕 OCR 常把**連續對白合成一 cue**，導致像 `Silver
 | `"I don't see any nuts. Where are—Yikes!"` | 三句：`"I don't see any nuts."` → `Silvertail bent deeper.` → `"Where are—Yikes!"` |
 | `"Yes!" …` 後直接跳場 | 補 `"Where are they?"` |
 | `Peter pointed …` 後缺台詞 | 補 `"Right there."` |
-| `"Help! I'm stuck in this net!" cried Peter.` | `"Help!" he cried.` + `"I'm stuck in this net!"` |
+| `"Help! I'm stuck in this net!" cried Peter.` | `"Help!" cried Peter.` + `"I'm stuck in this net!"` |
 | 按鈕卡住後缺驚叫 | 補 `"Ahh!" he cried.` |
 | 冰水場景 | 補 `"Brr!" said Peter.` |
 | 貓場景 | 補 `"Whew!" whispered Peter.` |

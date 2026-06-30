@@ -474,7 +474,7 @@ const DEFAULT_SENTENCES = [
     { id:'s47', chapter:1, en:"\"Ahh!\" he cried.", zh:"「啊！」他大叫。", start:305.28, end:306.88 },
     { id:'s48', chapter:1, en:"He kicked and twisted, but it was no help.", zh:"他又踢又扭，但一點用也沒有。", start:309.36, end:315.16 },
     { id:'s49', chapter:1, en:"\"I'm stuck in the farmer's net!\" cried Peter.", zh:"「我被困在農夫的網子裡了！」彼得大喊。", start:316.34, end:320.46 },
-    { id:'s50', chapter:2, en:"\"Help!\" he cried.", zh:"「救命！」他大喊。", start:342.88, end:344.71 },
+    { id:'s50', chapter:2, en:"\"Help!\" cried Peter.", zh:"「救命！」彼得大喊。", start:342.88, end:344.71 },
     { id:'s51', chapter:2, en:"\"I'm stuck in this net!\"", zh:"「我被困在這張網子裡了！」", start:344.76, end:348.12 },
     { id:'s52', chapter:2, en:"Some birds flew over to Peter.", zh:"幾隻小鳥飛到彼得身邊。", start:351.06, end:353.08 },
     { id:'s53', chapter:2, en:"They tried to help him.", zh:"牠們想要幫助他。", start:356.3, end:357.92 },
@@ -701,9 +701,13 @@ function finishPlaySegment(sentenceId, opts){
     if(opts.onEnd) opts.onEnd();
 }
 
-// 播放單句並在句尾自動暫停（闖關 / 跟讀用）— 以 getCurrentTime 判斷句尾，避免 seek 延遲导致 setTimeout 提早停止
+// 播放單句並在句尾自動暫停（闖關 / 跟讀用）
+// 以 getCurrentTime 判斷句尾；t 須落在句段內才算開始，避免隨機順序／下一句時舊時間軸誤判已播完
 function playSegment(sentence, opts={}){
-    if(!playerReady) return;
+    if(!playerReady){
+        stopTimer=setTimeout(()=>playSegment(sentence,opts), 250);
+        return;
+    }
     clearSegmentPlayback();
     const startT=Math.max(0, sentence.start);
     const endT=sentence.end+SEGMENT_TAIL_PAD;
@@ -711,18 +715,34 @@ function playSegment(sentence, opts={}){
     try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
     applySpeed(state.speed);
     currentPlayingId=sentenceId;
-    const startedAt=Date.now();
+    let seekAt=Date.now();
+    let seekRetries=0;
     let reachedStart=false;
-    const maxMs=Math.max(8000, ((endT-startT)+3)/state.speed*1000);
+    let sawPlaying=false;
+    const inSegment=(t)=> t>=startT-0.08 && t<=endT+0.2;
+    const segmentDur=Math.max(0.4, endT-startT);
+    const maxMs=Math.max(12000, (segmentDur+6)/state.speed*1000);
 
     const tick=()=>{
         if(currentPlayingId!==sentenceId) return;
         let t=0, st=-1;
         try{ t=player.getCurrentTime(); st=player.getPlayerState(); }catch(e){}
-        if(t>=startT-0.08) reachedStart=true;
-        if(reachedStart && t>=endT){ finishPlaySegment(sentenceId, opts); return; }
-        if(st===YT.PlayerState.ENDED){ finishPlaySegment(sentenceId, opts); return; }
-        if(Date.now()-startedAt>maxMs){ finishPlaySegment(sentenceId, opts); return; }
+        if(inSegment(t)) reachedStart=true;
+        if(st===YT.PlayerState.PLAYING && inSegment(t)) sawPlaying=true;
+        if(reachedStart && sawPlaying && t>=endT){ finishPlaySegment(sentenceId, opts); return; }
+        if(st===YT.PlayerState.ENDED && reachedStart){ finishPlaySegment(sentenceId, opts); return; }
+        const elapsed=Date.now()-seekAt;
+        if(!reachedStart && elapsed>600 && seekRetries<4 && !inSegment(t)){
+            try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
+            seekAt=Date.now(); seekRetries++;
+        }
+        if(elapsed>maxMs){
+            if(reachedStart && sawPlaying){ finishPlaySegment(sentenceId, opts); return; }
+            if(seekRetries<5){
+                try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
+                seekAt=Date.now(); seekRetries++;
+            } else if(reachedStart){ finishPlaySegment(sentenceId, opts); return; }
+        }
         segmentWatchId=requestAnimationFrame(tick);
     };
     segmentWatchId=requestAnimationFrame(tick);
@@ -1525,6 +1545,9 @@ function advanceShadow(){
     if(shadowSession.advancingFrom===shadowSession.index) return;  // 避免計時器與按鈕重複觸發
     shadowSession.advancingFrom=shadowSession.index;
     clearTimeout(shadowSession.advTimer); shadowSession.advTimer=null;
+    abortShadowRec();
+    clearSegmentPlayback();
+    currentPlayingId=null;
     if(shadowSession.index>=shadowSession.queue.length-1){ finishShadowSession(); return; }
     shadowSession.index++;
     runShadowSentence();
