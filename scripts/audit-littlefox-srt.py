@@ -69,6 +69,8 @@ REQUIRED_LINES = {
     "boot": [
         '"Oh no!" Peter said.',
         '"We must find Mrs. Tiggy-Winkle," Benjamin said.',
+        '"My house is gone!" she cried.',
+        '"It is an old brown boot."',
         '"Did someone put feathers in my boot?"',
         '"Yes," Peter said. "Jemima put feathers in your boot."',
         '"Bye!" Tom said.',
@@ -399,10 +401,15 @@ def fix_boot(cues: list[Cue]) -> list[Cue]:
             c.en = '"Bye!" Tom said.'
             c.zh = "「再見！」湯姆說。"
 
-    # Ep.1 / Ep.2 片尾：Whisper 常把集末音樂算進最後一句 end
+    # Little Fox Ep.1: mouse cry is two beats (video hard subs match)
     m = find(out, "My house is gone")
-    if "old brown boot" in out[m].en and out[m].end > 140:
-        out[m].end = round(out[m].start + 11.0, 2)
+    if "old brown boot" in out[m].en:
+        c = out[m]
+        out[m : m + 1] = [
+            Cue('"My house is gone!" she cried.', c.start, round(c.start + 5.3, 2), "「我的家不見了！」她哭著說。", c.chapter),
+            Cue('"It is an old brown boot."', round(c.start + 5.35, 2), 138.8, "「那是一隻舊的棕色靴子。」", c.chapter),
+        ]
+
     h = find(out, "Jemima gave me this hat")
     if out[h].end > 266:
         out[h].end = round(out[h].start + 10.5, 2)

@@ -147,6 +147,7 @@ Whisper 或硬字幕 OCR 常把**連續對白合成一 cue**，導致像 `Silver
 | `"Yes!" …` 後直接跳場 | 補 `"Where are they?"` |
 | `Peter pointed …` 後缺台詞 | 補 `"Right there."` |
 | `"Help! I'm stuck in this net!" cried Peter.` | `"Help!" cried Peter.` + `"I'm stuck in this net!"` |
+| `"My house is gone!" she cried. "It is an old brown boot."` | 各一 cue（Ep.1 老鼠台詞兩句） |
 | `"Jemima put feathers on your boot."` | `"Jemima put feathers in your boot."`（官網＋影片硬字幕皆用 **in**） |
 | `"Ahh!" he cried.`（Peter 場景） | `"Ahh!" cried Peter.` |
 | 按鈕卡住後缺驚叫 | 補 `"Ahh!" he cried.` |
