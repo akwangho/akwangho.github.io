@@ -123,8 +123,9 @@ Whisper 常把 Little Fox 旁白說的 `he said` 辨成 `Cried the farmer` / `sa
 Whisper 或硬字幕 OCR 常把**連續對白合成一 cue**，導致像 `Silvertail bent deeper.` 整句消失。修正流程：
 
 1. **對照 Little Fox 官方 supplement 台詞**（逐句一行）：
-   - 例：[Harvest Feast Ep.4](https://www.littlefox.com/hk/supplement/org/C0007888)
-   - 例：[Peter Rabbit Ep.1–4](https://www.littlefox.com/en/supplement/org/C0007023)
+   - Harvest Feast：[Ep.1 Gathering Nuts](https://www.littlefox.com/hk/supplement/org/C0007885) · [Ep.2 Nut Thief](https://www.littlefox.com/hk/supplement/org/C0007886) · [Ep.3 Silvertail](https://www.littlefox.com/hk/supplement/org/C0007887) · [Ep.4 Harvest Feast](https://www.littlefox.com/hk/supplement/org/C0007888)
+   - Full Story：[Ep.1–4](https://www.littlefox.com/hk/supplement/org/C0007023)（C0007023–7026）
+   - Boot：[Ep.1–4](https://www.littlefox.com/hk/supplement/org/C0008124)（C0008124–8127）
 2. **跑稽核腳本**（只報告）：
    ```bash
    python3 scripts/audit-littlefox-srt.py all --audit-only
@@ -146,6 +147,8 @@ Whisper 或硬字幕 OCR 常把**連續對白合成一 cue**，導致像 `Silver
 | `"Yes!" …` 後直接跳場 | 補 `"Where are they?"` |
 | `Peter pointed …` 後缺台詞 | 補 `"Right there."` |
 | `"Help! I'm stuck in this net!" cried Peter.` | `"Help!" cried Peter.` + `"I'm stuck in this net!"` |
+| `"Jemima put feathers on your boot."` | `"Jemima put feathers in your boot."`（官網＋影片硬字幕皆用 **in**） |
+| `"Ahh!" he cried.`（Peter 場景） | `"Ahh!" cried Peter.` |
 | 按鈕卡住後缺驚叫 | 補 `"Ahh!" he cried.` |
 | 冰水場景 | 補 `"Brr!" said Peter.` |
 | 貓場景 | 補 `"Whew!" whispered Peter.` |

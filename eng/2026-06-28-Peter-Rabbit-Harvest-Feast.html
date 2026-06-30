@@ -421,7 +421,7 @@
  * ======================================================= */
 const VIDEO_ID = 'ueIkpeMWPYQ';
 const SUBTITLE_DELAY = 1.0; // 延遲字幕：聽到後幾秒才顯示
-const SEGMENT_TAIL_PAD = 0.15; // 句尾緩衝（秒），避免截斷尾音
+const SEGMENT_TAIL_PAD = 1.0; // 句尾緩衝（秒），讓尾音自然收尾
 const COUNTDOWN_MS = 350;   // 跟讀倒數 3·2·1 每格毫秒（加快，讓麥克風盡快出現開始聽）
 
 const DEFAULT_SENTENCES = [
@@ -444,7 +444,7 @@ const DEFAULT_SENTENCES = [
     { id:'s17', chapter:0, en:"Timmy looked at Benjamin and Peter.", zh:"提米看著班傑明和彼得。", start:110.36, end:112.32 },
     { id:'s18', chapter:0, en:"\"No,\" Peter said.", zh:"「沒有。」彼得說。", start:114.02, end:115.56 },
     { id:'s19', chapter:0, en:"\"We collected these nuts.\"", zh:"「這些堅果是我們採的。」", start:116.06, end:117.62 },
-    { id:'s20', chapter:0, en:"\"Hmph!\" Timmy was mad.", zh:"「哼！」提米很生氣。", start:120.44, end:122.86 },
+    { id:'s20', chapter:0, en:"\"Hmph!\" Timmy looked mad.", zh:"「哼！」提米很生氣。", start:120.44, end:122.86 },
     { id:'s21', chapter:0, en:"\"I put my nuts right there.\"", zh:"「我的堅果剛剛就放在那裡。」", start:124.14, end:126.34 },
     { id:'s22', chapter:0, en:"\"Well, these are our nuts,\" Benjamin said.", zh:"「不對，這些是我們的堅果。」班傑明說。", start:127.28, end:130.82 },
     { id:'s23', chapter:0, en:"Timmy frowned.", zh:"提米皺起眉頭。", start:132.44, end:133.6 },
@@ -707,6 +707,23 @@ function finishPlaySegment(sentenceId, opts){
     if(opts.onEnd) opts.onEnd();
 }
 
+function computeSegmentEnd(sentence){
+    const idx=DEFAULT_SENTENCES.findIndex(x=>x.id===sentence.id);
+    const next=(idx>=0 && idx<DEFAULT_SENTENCES.length-1) ? DEFAULT_SENTENCES[idx+1] : null;
+    let end=sentence.end+SEGMENT_TAIL_PAD;
+    if(next && next.chapter!==sentence.chapter){
+        const gap=next.start-sentence.end;
+        const dur=sentence.end-sentence.start;
+        if(gap>4 && dur>10){
+            const words=(sentence.en.match(/\b[\w']+\b/g)||[]).length;
+            const estEnd=sentence.start+Math.max(4, words*0.42+1.2);
+            end=Math.min(end, estEnd+SEGMENT_TAIL_PAD);
+        }
+        end=Math.min(end, next.start-0.25);
+    }
+    return end;
+}
+
 // 播放單句並在句尾自動暫停（闖關 / 跟讀用）
 // 以 getCurrentTime 判斷句尾；t 須落在句段內才算開始，避免隨機順序／下一句時舊時間軸誤判已播完
 function playSegment(sentence, opts={}){
@@ -716,7 +733,7 @@ function playSegment(sentence, opts={}){
     }
     clearSegmentPlayback();
     const startT=Math.max(0, sentence.start);
-    const endT=sentence.end+SEGMENT_TAIL_PAD;
+    const endT=computeSegmentEnd(sentence);
     const sentenceId=sentence.id;
     try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
     applySpeed(state.speed);
@@ -725,7 +742,7 @@ function playSegment(sentence, opts={}){
     let seekRetries=0;
     let reachedStart=false;
     let sawPlaying=false;
-    const inSegment=(t)=> t>=startT-0.08 && t<=endT+0.2;
+    const inSegment=(t)=> t>=startT-0.08 && t<=endT+0.25;
     const segmentDur=Math.max(0.4, endT-startT);
     const maxMs=Math.max(12000, (segmentDur+6)/state.speed*1000);
 
@@ -735,15 +752,16 @@ function playSegment(sentence, opts={}){
         try{ t=player.getCurrentTime(); st=player.getPlayerState(); }catch(e){}
         if(inSegment(t)) reachedStart=true;
         if(st===YT.PlayerState.PLAYING && inSegment(t)) sawPlaying=true;
-        if(reachedStart && sawPlaying && t>=endT){ finishPlaySegment(sentenceId, opts); return; }
+        if(reachedStart && t>=endT && (sawPlaying || t>=endT+0.35)){ finishPlaySegment(sentenceId, opts); return; }
         if(st===YT.PlayerState.ENDED && reachedStart){ finishPlaySegment(sentenceId, opts); return; }
+        if(reachedStart && t>endT+1.5){ finishPlaySegment(sentenceId, opts); return; }
         const elapsed=Date.now()-seekAt;
         if(!reachedStart && elapsed>600 && seekRetries<4 && !inSegment(t)){
             try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
             seekAt=Date.now(); seekRetries++;
         }
         if(elapsed>maxMs){
-            if(reachedStart && sawPlaying){ finishPlaySegment(sentenceId, opts); return; }
+            if(reachedStart && (sawPlaying || t>=startT)){ finishPlaySegment(sentenceId, opts); return; }
             if(seekRetries<5){
                 try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
                 seekAt=Date.now(); seekRetries++;

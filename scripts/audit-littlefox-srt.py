@@ -37,14 +37,17 @@ STORIES = {
     "harvest-feast": {
         "srt": ROOT / "eng/sub/2026-06-28-Peter-Rabbit-Harvest-Feast.srt",
         "html": ROOT / "eng/2026-06-28-Peter-Rabbit-Harvest-Feast.html",
+        # https://www.littlefox.com/hk/supplement/org/C0007885 … C0007888
     },
     "full-story": {
         "srt": ROOT / "eng/sub/2026-06-29-The-Tale-of-Peter-Rabbit-Full-Story.srt",
         "html": ROOT / "eng/2026-06-29-The-Tale-of-Peter-Rabbit-Full-Story.html",
+        # https://www.littlefox.com/hk/supplement/org/C0007023 … C0007026
     },
     "boot": {
         "srt": ROOT / "eng/sub/2026-06-30-Peter-Rabbit-Benjamin-Adventure-with-a-Boot.srt",
         "html": ROOT / "eng/2026-06-30-Peter-Rabbit-Benjamin-Adventure-with-a-Boot.html",
+        # https://www.littlefox.com/hk/supplement/org/C0008124 … C0008127
     },
 }
 
@@ -56,7 +59,7 @@ REQUIRED_LINES = {
         '"We must stop him."',
     ],
     "full-story": [
-        '"Ahh!" he cried.',
+        '"Ahh!" cried Peter.',
         '"Help!" cried Peter.',
         '"I\'m stuck in this net!"',
         '"Brr!" said Peter.',
@@ -66,6 +69,9 @@ REQUIRED_LINES = {
     "boot": [
         '"Oh no!" Peter said.',
         '"We must find Mrs. Tiggy-Winkle," Benjamin said.',
+        '"Did someone put feathers in my boot?"',
+        '"Yes," Peter said. "Jemima put feathers in your boot."',
+        '"Bye!" Tom said.',
     ],
 }
 
@@ -227,7 +233,15 @@ def fix_harvest_feast(cues: list[Cue]) -> list[Cue]:
         )
 
     fix_timing_overlaps(out)
+    fix_harvest_official_wording(out)
     return out
+
+
+def fix_harvest_official_wording(cues: list[Cue]) -> None:
+    """Align wording with Little Fox C0007885–7888 supplements."""
+    for c in cues:
+        if c.en == '"Hmph!" Timmy was mad.':
+            c.en = '"Hmph!" Timmy looked mad.'
 
 
 def fix_full_story(cues: list[Cue]) -> list[Cue]:
@@ -237,9 +251,9 @@ def fix_full_story(cues: list[Cue]) -> list[Cue]:
     if "blackberry bush" in out[j].en:
         out[j : j + 1] = split_cue(
             out[j],
-            '"Look over there," said Mopsy.',
+            '"Look over there!" said Mopsy.',
             '"I see a blackberry bush!"',
-            "「看那邊。」莫普西說。",
+            "「看那边！」莫普西说。",
             "「我看到一叢黑莓！」",
             0.45,
         )
@@ -248,9 +262,27 @@ def fix_full_story(cues: list[Cue]) -> list[Cue]:
     if out[k].en == "Peter gasped. The farmer!":
         out[k].en = 'Peter gasped. "The farmer!"'
 
-    if not any(c.en == '"Ahh!" he cried.' for c in out):
+    if not any(c.en == '"Ahh!" he cried.' or c.en == '"Ahh!" cried Peter.' for c in out):
         b = find(out, "big buttons")
-        insert_after(out, b, Cue('"Ahh!" he cried.', out[b].end + 0.2, out[b].end + 1.8, "「啊！」他大叫。"))
+        insert_after(out, b, Cue('"Ahh!" cried Peter.', out[b].end + 0.2, out[b].end + 1.8, "「啊！」彼得大叫。"))
+
+    for c in out:
+        if c.en == '"Ahh!" he cried.':
+            c.en = '"Ahh!" cried Peter.'
+            if c.zh in ("「啊！」他大叫。", ""):
+                c.zh = "「啊！」彼得大叫。"
+        if "Cottontail" in c.en:
+            c.en = c.en.replace("Cottontail", "Cotton-tail")
+        if c.en == '"Look over there," said Mopsy.':
+            c.en = '"Look over there!" said Mopsy.'
+        if c.en == '"I see green leaves everywhere," said Peter.':
+            c.en = '"I see green leaves everywhere!" said Peter.'
+        if c.en.startswith('"These vegetables are delicious,"'):
+            c.en = c.en.replace(
+                '"These vegetables are delicious,"',
+                '"These vegetables are delicious!"',
+                1,
+            )
 
     m = find(out, '"Help!')
     if "I'm stuck in this net" in out[m].en and "cried Peter" in out[m].en:
@@ -301,6 +333,18 @@ def fix_full_story(cues: list[Cue]) -> list[Cue]:
         out[g].en = 'Suddenly, Peter gasped. "A cat!"'
         out[g].zh = "突然間，彼得倒抽一口氣。「一隻貓！」"
 
+    bird = find(out, "Don't give up")
+    if "Keep trying" in out[bird].en and "get free" not in out[bird].en:
+        c = out[bird]
+        out[bird : bird + 1] = split_cue(
+            c,
+            '"Don\'t give up!" called one bird.',
+            '"Keep trying to get free!"',
+            "「不要放棄！」一隻鳥喊道。",
+            "「繼續設法脫身！」",
+            0.45,
+        )
+
     fix_timing_overlaps(out)
     return out
 
@@ -342,6 +386,26 @@ def fix_boot(cues: list[Cue]) -> list[Cue]:
             Cue('"Oh, okay," Tom said. "I will give you the boot."', c.start, mid, "「噢，好吧。」湯姆說。「我把靴子給你們。」", c.chapter),
             Cue('"Will you give me some candy?"', mid, c.end, "「你們能給我一些糖果嗎？」", c.chapter),
         ]
+
+    for c in out:
+        if c.en == '"Did someone put feathers on my boot?"':
+            c.en = '"Did someone put feathers in my boot?"'
+            if "靴子上" in c.zh:
+                c.zh = c.zh.replace("靴子上", "靴子裡")
+        if c.en == '"Yes," Peter said. "Jemima put feathers on your boot."':
+            c.en = '"Yes," Peter said. "Jemima put feathers in your boot."'
+            c.zh = "「有。」彼得說。「潔咪瑪在你的靴子裡放了羽毛。」"
+        if c.en == '"Bye, Tom!" the bunnies said.':
+            c.en = '"Bye!" Tom said.'
+            c.zh = "「再見！」湯姆說。"
+
+    # Ep.1 / Ep.2 片尾：Whisper 常把集末音樂算進最後一句 end
+    m = find(out, "My house is gone")
+    if "old brown boot" in out[m].en and out[m].end > 140:
+        out[m].end = round(out[m].start + 11.0, 2)
+    h = find(out, "Jemima gave me this hat")
+    if out[h].end > 266:
+        out[h].end = round(out[h].start + 10.5, 2)
 
     fix_timing_overlaps(out)
     return out

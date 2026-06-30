@@ -421,12 +421,12 @@
  * ======================================================= */
 const VIDEO_ID = 'G6FWfjfvrNQ';
 const SUBTITLE_DELAY = 1.0; // 延遲字幕：聽到後幾秒才顯示
-const SEGMENT_TAIL_PAD = 0.15; // 句尾緩衝（秒），避免截斷尾音
+const SEGMENT_TAIL_PAD = 1.0; // 句尾緩衝（秒），讓尾音自然收尾
 const COUNTDOWN_MS = 350;   // 跟讀倒數 3·2·1 每格毫秒（加快，讓麥克風盡快出現開始聽）
 
 const DEFAULT_SENTENCES = [
     { id:'s1', chapter:0, en:"Mrs. Rabbit had four little bunnies.", zh:"兔媽媽有四隻小兔子。", start:17.94, end:20.62 },
-    { id:'s2', chapter:0, en:"Their names were Mopsy, Flopsy, Cottontail, and Peter.", zh:"牠們的名字是莫普西、弗洛普西、棉尾巴和彼得。", start:21.78, end:28.72 },
+    { id:'s2', chapter:0, en:"Their names were Mopsy, Flopsy, Cotton-tail, and Peter.", zh:"牠們的名字是莫普西、弗洛普西、棉尾巴和彼得。", start:21.78, end:28.72 },
     { id:'s3', chapter:0, en:"They lived in a hole under a tree.", zh:"牠們住在一棵樹下的洞裡。", start:30.46, end:32.78 },
     { id:'s4', chapter:0, en:"One day, Mrs. Rabbit said, \"We need bread.\"", zh:"有一天，兔媽媽說：「我們需要麵包。」", start:38.12, end:41.88 },
     { id:'s5', chapter:0, en:"\"I'll go into town to buy some.\"", zh:"「我要進城去買一些。」", start:43.08, end:44.96 },
@@ -442,22 +442,22 @@ const DEFAULT_SENTENCES = [
     { id:'s15', chapter:0, en:"The bunnies put on their jackets and shoes.", zh:"小兔子們穿上外套和鞋子。", start:93.9, end:96.56 },
     { id:'s16', chapter:0, en:"Then they went outside.", zh:"然後牠們走到外面。", start:97.82, end:99.54 },
     { id:'s17', chapter:0, en:"The four bunnies hopped down the path.", zh:"四隻小兔子沿著小路蹦蹦跳跳。", start:101.12, end:103.48 },
-    { id:'s18', chapter:0, en:"\"Look over there,\" said Mopsy.", zh:"「看那邊。」莫普西說。", start:109.54, end:111.82 },
+    { id:'s18', chapter:0, en:"\"Look over there!\" said Mopsy.", zh:"「看那邊。」莫普西說。", start:109.54, end:111.82 },
     { id:'s19', chapter:0, en:"\"I see a blackberry bush!\"", zh:"「我看到一叢黑莓！」", start:111.87, end:114.6 },
-    { id:'s20', chapter:0, en:"\"Yum!\" said Flopsy and Cottontail.", zh:"「好好吃！」弗洛普西和棉尾巴說。", start:116.04, end:118.8 },
-    { id:'s21', chapter:0, en:"Flopsy, Mopsy, and Cottontail ran to the bush.", zh:"弗洛普西、莫普西和棉尾巴跑向那叢黑莓。", start:119.96, end:123.36 },
+    { id:'s20', chapter:0, en:"\"Yum!\" said Flopsy and Cotton-tail.", zh:"「好好吃！」弗洛普西和棉尾巴說。", start:116.04, end:118.8 },
+    { id:'s21', chapter:0, en:"Flopsy, Mopsy, and Cotton-tail ran to the bush.", zh:"弗洛普西、莫普西和棉尾巴跑向那叢黑莓。", start:119.96, end:123.36 },
     { id:'s22', chapter:0, en:"Peter's sisters started to pick blackberries.", zh:"彼得的姊妹們開始摘黑莓。", start:127.24, end:129.92 },
     { id:'s23', chapter:0, en:"\"I don't want blackberries,\" Peter thought.", zh:"「我不想要黑莓。」彼得心想。", start:134.08, end:137.24 },
     { id:'s24', chapter:0, en:"\"I'm going to the farmer's garden.\"", zh:"「我要去農夫的菜園。」", start:138.94, end:141.3 },
     { id:'s25', chapter:1, en:"Peter hopped through the woods.", zh:"彼得蹦蹦跳跳地穿過樹林。", start:157.62, end:159.6 },
     { id:'s26', chapter:1, en:"A path led to the farmer's gate.", zh:"一條小路通往農夫的大門。", start:163.98, end:166.36 },
     { id:'s27', chapter:1, en:"Peter squeezed under the gate and looked around.", zh:"彼得從門底下擠了進去，四處張望。", start:175.1, end:178.68 },
-    { id:'s28', chapter:1, en:"\"I see green leaves everywhere,\" said Peter.", zh:"「我到處都看到綠葉。」彼得說。", start:183.7, end:188.16 },
+    { id:'s28', chapter:1, en:"\"I see green leaves everywhere!\" said Peter.", zh:"「我到處都看到綠葉。」彼得說。", start:183.7, end:188.16 },
     { id:'s29', chapter:1, en:"Peter wandered through the garden.", zh:"彼得在菜園裡四處閒逛。", start:197.88, end:199.92 },
     { id:'s30', chapter:1, en:"He ate some lettuce.", zh:"他吃了一些萵苣。", start:206.12, end:209.19 },
     { id:'s31', chapter:1, en:"He ate some green beans.", zh:"他吃了一些四季豆。", start:209.24, end:210.98 },
     { id:'s32', chapter:1, en:"He ate some radishes.", zh:"他吃了一些小蘿蔔。", start:220.08, end:221.92 },
-    { id:'s33', chapter:1, en:"\"These vegetables are delicious,\" said Peter. \"I'll eat some more.\"", zh:"「這些蔬菜真好吃。」彼得說。「我要再多吃一點。」", start:227.62, end:233.68 },
+    { id:'s33', chapter:1, en:"\"These vegetables are delicious!\" said Peter. \"I'll eat some more.\"", zh:"「這些蔬菜真好吃。」彼得說。「我要再多吃一點。」", start:227.62, end:233.68 },
     { id:'s34', chapter:1, en:"Then he hopped around a corner.", zh:"然後他跳過一個轉角。", start:238.26, end:240.38 },
     { id:'s35', chapter:1, en:"Peter gasped. \"The farmer!\"", zh:"彼得倒抽一口氣。是農夫！", start:243.68, end:246.68 },
     { id:'s36', chapter:1, en:"The farmer gasped. \"A rabbit!\"", zh:"農夫也倒抽一口氣。「一隻兔子！」", start:247.6, end:251.04 },
@@ -471,66 +471,67 @@ const DEFAULT_SENTENCES = [
     { id:'s44', chapter:1, en:"\"Where's the gate?\" cried Peter. He looked around.", zh:"「門在哪裡？」彼得大喊。他四處張望。", start:291.78, end:296.32 },
     { id:'s45', chapter:1, en:"Suddenly, he ran into a net.", zh:"突然間，他撞進了一張網子。", start:299.36, end:301.5 },
     { id:'s46', chapter:1, en:"The big buttons on his jacket got caught.", zh:"他外套上的大鈕扣被勾住了。", start:302.38, end:305.08 },
-    { id:'s47', chapter:1, en:"\"Ahh!\" he cried.", zh:"「啊！」他大叫。", start:305.28, end:306.88 },
+    { id:'s47', chapter:1, en:"\"Ahh!\" cried Peter.", zh:"「啊！」彼得大叫。", start:305.28, end:306.88 },
     { id:'s48', chapter:1, en:"He kicked and twisted, but it was no help.", zh:"他又踢又扭，但一點用也沒有。", start:309.36, end:315.16 },
     { id:'s49', chapter:1, en:"\"I'm stuck in the farmer's net!\" cried Peter.", zh:"「我被困在農夫的網子裡了！」彼得大喊。", start:316.34, end:320.46 },
     { id:'s50', chapter:2, en:"\"Help!\" cried Peter.", zh:"「救命！」彼得大喊。", start:342.88, end:344.71 },
     { id:'s51', chapter:2, en:"\"I'm stuck in this net!\"", zh:"「我被困在這張網子裡了！」", start:344.76, end:348.12 },
     { id:'s52', chapter:2, en:"Some birds flew over to Peter.", zh:"幾隻小鳥飛到彼得身邊。", start:351.06, end:353.08 },
     { id:'s53', chapter:2, en:"They tried to help him.", zh:"牠們想要幫助他。", start:356.3, end:357.92 },
-    { id:'s54', chapter:2, en:"\"Don't give up! Keep trying!\" called one bird.", zh:"「不要放棄！繼續努力！」一隻小鳥喊道。", start:360.6, end:368.06 },
-    { id:'s55', chapter:2, en:"\"Take off your jacket!\" shouted another.", zh:"「把你的外套脫掉！」另一隻喊道。", start:372.52, end:375.32 },
-    { id:'s56', chapter:2, en:"Peter stopped crying.", zh:"彼得停止了哭泣。", start:376.54, end:378.14 },
-    { id:'s57', chapter:2, en:"Quickly, Peter slipped out of his jacket.", zh:"彼得迅速地脫掉了外套。", start:379.4, end:382.18 },
-    { id:'s58', chapter:2, en:"Now he was free.", zh:"現在他自由了。", start:382.92, end:384.34 },
-    { id:'s59', chapter:2, en:"But the farmer was still chasing him.", zh:"但是農夫還在追他。", start:389.8, end:392.12 },
-    { id:'s60', chapter:2, en:"Peter ran away fast.", zh:"彼得飛快地逃跑。", start:393.58, end:395.44 },
-    { id:'s61', chapter:2, en:"\"Get back here!\" cried the farmer.", zh:"「給我回來！」農夫大喊。", start:396.58, end:399.18 },
-    { id:'s62', chapter:2, en:"Peter dashed into a shed.", zh:"彼得衝進了一間小屋。", start:404.42, end:406.34 },
-    { id:'s63', chapter:2, en:"It was filled with garden tools.", zh:"裡面堆滿了園藝工具。", start:409.28, end:411.44 },
-    { id:'s64', chapter:2, en:"Peter leaped into a watering can.", zh:"彼得跳進了一個澆水壺裡。", start:414.18, end:416.54 },
-    { id:'s65', chapter:2, en:"The can was filled with icy water.", zh:"壺裡裝滿了冰冷的水。", start:419.2, end:425.34 },
-    { id:'s66', chapter:2, en:"\"Brr!\" said Peter.", zh:"「好冷！」彼得說。", start:425.44, end:426.24 },
-    { id:'s67', chapter:2, en:"The farmer rushed into the shed.", zh:"農夫衝進了小屋。", start:426.52, end:428.48 },
-    { id:'s68', chapter:2, en:"\"Where is that rabbit?\" said the farmer.", zh:"「那隻兔子在哪裡？」農夫說。", start:430.52, end:433.62 },
-    { id:'s69', chapter:2, en:"Peter shivered.", zh:"彼得發著抖。", start:435.1, end:436.22 },
-    { id:'s70', chapter:2, en:"He heard the farmer moving things around.", zh:"他聽到農夫在翻動東西。", start:437.3, end:439.88 },
-    { id:'s71', chapter:2, en:"\"Where are you, rabbit?\" muttered the farmer.", zh:"「兔子，你在哪裡？」農夫喃喃自語。", start:441.02, end:449.26 },
-    { id:'s72', chapter:2, en:"The farmer's footsteps were close now.", zh:"農夫的腳步聲越來越近了。", start:450.24, end:452.6 },
-    { id:'s73', chapter:2, en:"\"Uh-oh,\" whispered Peter.", zh:"「糟了。」彼得小聲說。", start:454.5, end:456.96 },
-    { id:'s74', chapter:2, en:"He felt a tickle in his nose.", zh:"他覺得鼻子癢癢的。", start:457.44, end:459.52 },
-    { id:'s75', chapter:2, en:"The tickle grew worse.", zh:"那股癢越來越嚴重。", start:460.64, end:462.4 },
-    { id:'s76', chapter:2, en:"\"Ah-choo!\" Peter sneezed.", zh:"「啊——嚏！」彼得打了一個大噴嚏。", start:465.0, end:466.18 },
-    { id:'s77', chapter:3, en:"Peter jumped out of the watering can.", zh:"彼得從澆水壺裡跳了出來。", start:495.56, end:497.82 },
-    { id:'s78', chapter:3, en:"\"Hey!\" cried the farmer.", zh:"「嘿！」農夫大喊。", start:499.02, end:501.14 },
-    { id:'s79', chapter:3, en:"Peter ran and ran.", zh:"彼得不停地跑啊跑。", start:508.88, end:510.72 },
-    { id:'s80', chapter:3, en:"Finally, the farmer stopped chasing him.", zh:"最後，農夫終於不再追他了。", start:516.6, end:519.2 },
-    { id:'s81', chapter:3, en:"Now Peter was lost.", zh:"現在彼得迷路了。", start:525.98, end:527.88 },
-    { id:'s82', chapter:3, en:"\"Where's the gate?\" he asked a mouse.", zh:"「門在哪裡？」他問一隻老鼠。", start:530.1, end:533.0 },
-    { id:'s83', chapter:3, en:"But the mouse ran away.", zh:"但是老鼠跑走了。", start:533.76, end:535.24 },
-    { id:'s84', chapter:3, en:"Suddenly, Peter gasped. \"A cat!\"", zh:"突然間，彼得倒抽一口氣。「一隻貓！」", start:546.32, end:550.5 },
-    { id:'s85', chapter:3, en:"The cat was watching fish in the pond.", zh:"那隻貓正盯著池塘裡的魚看。", start:551.52, end:554.24 },
-    { id:'s86', chapter:3, en:"She didn't see Peter.", zh:"她沒有看到彼得。", start:556.1, end:557.5 },
-    { id:'s87', chapter:3, en:"\"Whew!\" whispered Peter.", zh:"「呼！」彼得小聲說。", start:557.7, end:559.0 },
-    { id:'s88', chapter:3, en:"He quietly slipped away.", zh:"他悄悄地溜走了。", start:563.26, end:565.1 },
-    { id:'s89', chapter:3, en:"\"I must find the gate,\" said Peter.", zh:"「我一定要找到那扇門。」彼得說。", start:570.76, end:574.16 },
-    { id:'s90', chapter:3, en:"Scritch, scratch! Peter heard a noise.", zh:"颳擦、颳擦！彼得聽到一個聲音。", start:578.14, end:579.68 },
-    { id:'s91', chapter:3, en:"He climbed onto a wheelbarrow to see.", zh:"他爬上一臺手推車去看。", start:583.46, end:586.02 },
-    { id:'s92', chapter:3, en:"The farmer was working in the onion patch.", zh:"農夫正在洋蔥田裡工作。", start:587.26, end:589.94 },
-    { id:'s93', chapter:3, en:"Scritch, scratch!", zh:"颳擦、颳擦！", start:594.34, end:596.14 },
-    { id:'s94', chapter:3, en:"Then Peter saw something else.", zh:"然後彼得看到了別的東西。", start:596.34, end:598.4 },
-    { id:'s95', chapter:3, en:"\"The gate!\" he cried.", zh:"「是那扇門！」他大喊。", start:601.6, end:603.66 },
-    { id:'s96', chapter:3, en:"Peter shot across the garden.", zh:"彼得飛奔著穿過菜園。", start:607.54, end:609.52 },
-    { id:'s97', chapter:3, en:"The farmer chased him. \"Stop, rabbit!\"", zh:"農夫追著他。「站住，兔子！」", start:614.0, end:617.32 },
-    { id:'s98', chapter:3, en:"But Peter was too fast.", zh:"但是彼得跑得太快了。", start:618.06, end:620.0 },
-    { id:'s99', chapter:3, en:"He squeezed under the gate and ran home.", zh:"他從門底下擠了出去，跑回了家。", start:620.82, end:623.9 },
-    { id:'s100', chapter:3, en:"Mrs. Rabbit scolded Peter. \"Naughty rabbit!\"", zh:"兔媽媽責備彼得。「淘氣的兔子！」", start:632.32, end:635.94 },
-    { id:'s101', chapter:3, en:"\"You lost your jacket and shoes!\"", zh:"「你把外套和鞋子都弄丟了！」", start:636.92, end:639.08 },
-    { id:'s102', chapter:3, en:"The other bunnies ate bread and blackberries.", zh:"其他的小兔子們吃著麵包和黑莓。", start:644.8, end:647.74 },
-    { id:'s103', chapter:3, en:"But Peter didn't get any.", zh:"但是彼得什麼都沒得吃。", start:650.14, end:651.64 },
-    { id:'s104', chapter:3, en:"Peter sneezed.", zh:"彼得打了個噴嚏。", start:653.5, end:654.92 },
-    { id:'s105', chapter:3, en:"Mrs. Rabbit gave him medicine.", zh:"兔媽媽餵他吃藥。", start:666.18, end:668.34 },
-    { id:'s106', chapter:3, en:"Then she sent him to bed.", zh:"然後她把他送上床睡覺。", start:675.74, end:677.56 },
+    { id:'s54', chapter:2, en:"\"Don't give up!\" called one bird.", zh:"「不要放棄！」一隻鳥喊道。", start:360.6, end:363.96 },
+    { id:'s55', chapter:2, en:"\"Keep trying to get free!\"", zh:"「繼續設法脫身！」", start:364.01, end:368.06 },
+    { id:'s56', chapter:2, en:"\"Take off your jacket!\" shouted another.", zh:"「把你的外套脫掉！」另一隻喊道。", start:372.52, end:375.32 },
+    { id:'s57', chapter:2, en:"Peter stopped crying.", zh:"彼得停止了哭泣。", start:376.54, end:378.14 },
+    { id:'s58', chapter:2, en:"Quickly, Peter slipped out of his jacket.", zh:"彼得迅速地脫掉了外套。", start:379.4, end:382.18 },
+    { id:'s59', chapter:2, en:"Now he was free.", zh:"現在他自由了。", start:382.92, end:384.34 },
+    { id:'s60', chapter:2, en:"But the farmer was still chasing him.", zh:"但是農夫還在追他。", start:389.8, end:392.12 },
+    { id:'s61', chapter:2, en:"Peter ran away fast.", zh:"彼得飛快地逃跑。", start:393.58, end:395.44 },
+    { id:'s62', chapter:2, en:"\"Get back here!\" cried the farmer.", zh:"「給我回來！」農夫大喊。", start:396.58, end:399.18 },
+    { id:'s63', chapter:2, en:"Peter dashed into a shed.", zh:"彼得衝進了一間小屋。", start:404.42, end:406.34 },
+    { id:'s64', chapter:2, en:"It was filled with garden tools.", zh:"裡面堆滿了園藝工具。", start:409.28, end:411.44 },
+    { id:'s65', chapter:2, en:"Peter leaped into a watering can.", zh:"彼得跳進了一個澆水壺裡。", start:414.18, end:416.54 },
+    { id:'s66', chapter:2, en:"The can was filled with icy water.", zh:"壺裡裝滿了冰冷的水。", start:419.2, end:425.34 },
+    { id:'s67', chapter:2, en:"\"Brr!\" said Peter.", zh:"「好冷！」彼得說。", start:425.44, end:426.24 },
+    { id:'s68', chapter:2, en:"The farmer rushed into the shed.", zh:"農夫衝進了小屋。", start:426.52, end:428.48 },
+    { id:'s69', chapter:2, en:"\"Where is that rabbit?\" said the farmer.", zh:"「那隻兔子在哪裡？」農夫說。", start:430.52, end:433.62 },
+    { id:'s70', chapter:2, en:"Peter shivered.", zh:"彼得發著抖。", start:435.1, end:436.22 },
+    { id:'s71', chapter:2, en:"He heard the farmer moving things around.", zh:"他聽到農夫在翻動東西。", start:437.3, end:439.88 },
+    { id:'s72', chapter:2, en:"\"Where are you, rabbit?\" muttered the farmer.", zh:"「兔子，你在哪裡？」農夫喃喃自語。", start:441.02, end:449.26 },
+    { id:'s73', chapter:2, en:"The farmer's footsteps were close now.", zh:"農夫的腳步聲越來越近了。", start:450.24, end:452.6 },
+    { id:'s74', chapter:2, en:"\"Uh-oh,\" whispered Peter.", zh:"「糟了。」彼得小聲說。", start:454.5, end:456.96 },
+    { id:'s75', chapter:2, en:"He felt a tickle in his nose.", zh:"他覺得鼻子癢癢的。", start:457.44, end:459.52 },
+    { id:'s76', chapter:2, en:"The tickle grew worse.", zh:"那股癢越來越嚴重。", start:460.64, end:462.4 },
+    { id:'s77', chapter:2, en:"\"Ah-choo!\" Peter sneezed.", zh:"「啊——嚏！」彼得打了一個大噴嚏。", start:465.0, end:466.18 },
+    { id:'s78', chapter:3, en:"Peter jumped out of the watering can.", zh:"彼得從澆水壺裡跳了出來。", start:495.56, end:497.82 },
+    { id:'s79', chapter:3, en:"\"Hey!\" cried the farmer.", zh:"「嘿！」農夫大喊。", start:499.02, end:501.14 },
+    { id:'s80', chapter:3, en:"Peter ran and ran.", zh:"彼得不停地跑啊跑。", start:508.88, end:510.72 },
+    { id:'s81', chapter:3, en:"Finally, the farmer stopped chasing him.", zh:"最後，農夫終於不再追他了。", start:516.6, end:519.2 },
+    { id:'s82', chapter:3, en:"Now Peter was lost.", zh:"現在彼得迷路了。", start:525.98, end:527.88 },
+    { id:'s83', chapter:3, en:"\"Where's the gate?\" he asked a mouse.", zh:"「門在哪裡？」他問一隻老鼠。", start:530.1, end:533.0 },
+    { id:'s84', chapter:3, en:"But the mouse ran away.", zh:"但是老鼠跑走了。", start:533.76, end:535.24 },
+    { id:'s85', chapter:3, en:"Suddenly, Peter gasped. \"A cat!\"", zh:"突然間，彼得倒抽一口氣。「一隻貓！」", start:546.32, end:550.5 },
+    { id:'s86', chapter:3, en:"The cat was watching fish in the pond.", zh:"那隻貓正盯著池塘裡的魚看。", start:551.52, end:554.24 },
+    { id:'s87', chapter:3, en:"She didn't see Peter.", zh:"她沒有看到彼得。", start:556.1, end:557.5 },
+    { id:'s88', chapter:3, en:"\"Whew!\" whispered Peter.", zh:"「呼！」彼得小聲說。", start:557.7, end:559.0 },
+    { id:'s89', chapter:3, en:"He quietly slipped away.", zh:"他悄悄地溜走了。", start:563.26, end:565.1 },
+    { id:'s90', chapter:3, en:"\"I must find the gate,\" said Peter.", zh:"「我一定要找到那扇門。」彼得說。", start:570.76, end:574.16 },
+    { id:'s91', chapter:3, en:"Scritch, scratch! Peter heard a noise.", zh:"颳擦、颳擦！彼得聽到一個聲音。", start:578.14, end:579.68 },
+    { id:'s92', chapter:3, en:"He climbed onto a wheelbarrow to see.", zh:"他爬上一臺手推車去看。", start:583.46, end:586.02 },
+    { id:'s93', chapter:3, en:"The farmer was working in the onion patch.", zh:"農夫正在洋蔥田裡工作。", start:587.26, end:589.94 },
+    { id:'s94', chapter:3, en:"Scritch, scratch!", zh:"颳擦、颳擦！", start:594.34, end:596.14 },
+    { id:'s95', chapter:3, en:"Then Peter saw something else.", zh:"然後彼得看到了別的東西。", start:596.34, end:598.4 },
+    { id:'s96', chapter:3, en:"\"The gate!\" he cried.", zh:"「是那扇門！」他大喊。", start:601.6, end:603.66 },
+    { id:'s97', chapter:3, en:"Peter shot across the garden.", zh:"彼得飛奔著穿過菜園。", start:607.54, end:609.52 },
+    { id:'s98', chapter:3, en:"The farmer chased him. \"Stop, rabbit!\"", zh:"農夫追著他。「站住，兔子！」", start:614.0, end:617.32 },
+    { id:'s99', chapter:3, en:"But Peter was too fast.", zh:"但是彼得跑得太快了。", start:618.06, end:620.0 },
+    { id:'s100', chapter:3, en:"He squeezed under the gate and ran home.", zh:"他從門底下擠了出去，跑回了家。", start:620.82, end:623.9 },
+    { id:'s101', chapter:3, en:"Mrs. Rabbit scolded Peter. \"Naughty rabbit!\"", zh:"兔媽媽責備彼得。「淘氣的兔子！」", start:632.32, end:635.94 },
+    { id:'s102', chapter:3, en:"\"You lost your jacket and shoes!\"", zh:"「你把外套和鞋子都弄丟了！」", start:636.92, end:639.08 },
+    { id:'s103', chapter:3, en:"The other bunnies ate bread and blackberries.", zh:"其他的小兔子們吃著麵包和黑莓。", start:644.8, end:647.74 },
+    { id:'s104', chapter:3, en:"But Peter didn't get any.", zh:"但是彼得什麼都沒得吃。", start:650.14, end:651.64 },
+    { id:'s105', chapter:3, en:"Peter sneezed.", zh:"彼得打了個噴嚏。", start:653.5, end:654.92 },
+    { id:'s106', chapter:3, en:"Mrs. Rabbit gave him medicine.", zh:"兔媽媽餵他吃藥。", start:666.18, end:668.34 },
+    { id:'s107', chapter:3, en:"Then she sent him to bed.", zh:"然後她把他送上床睡覺。", start:675.74, end:677.56 },
 ];
 
 /* =========================================================
@@ -701,6 +702,23 @@ function finishPlaySegment(sentenceId, opts){
     if(opts.onEnd) opts.onEnd();
 }
 
+function computeSegmentEnd(sentence){
+    const idx=DEFAULT_SENTENCES.findIndex(x=>x.id===sentence.id);
+    const next=(idx>=0 && idx<DEFAULT_SENTENCES.length-1) ? DEFAULT_SENTENCES[idx+1] : null;
+    let end=sentence.end+SEGMENT_TAIL_PAD;
+    if(next && next.chapter!==sentence.chapter){
+        const gap=next.start-sentence.end;
+        const dur=sentence.end-sentence.start;
+        if(gap>4 && dur>10){
+            const words=(sentence.en.match(/\b[\w']+\b/g)||[]).length;
+            const estEnd=sentence.start+Math.max(4, words*0.42+1.2);
+            end=Math.min(end, estEnd+SEGMENT_TAIL_PAD);
+        }
+        end=Math.min(end, next.start-0.25);
+    }
+    return end;
+}
+
 // 播放單句並在句尾自動暫停（闖關 / 跟讀用）
 // 以 getCurrentTime 判斷句尾；t 須落在句段內才算開始，避免隨機順序／下一句時舊時間軸誤判已播完
 function playSegment(sentence, opts={}){
@@ -710,7 +728,7 @@ function playSegment(sentence, opts={}){
     }
     clearSegmentPlayback();
     const startT=Math.max(0, sentence.start);
-    const endT=sentence.end+SEGMENT_TAIL_PAD;
+    const endT=computeSegmentEnd(sentence);
     const sentenceId=sentence.id;
     try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
     applySpeed(state.speed);
@@ -719,7 +737,7 @@ function playSegment(sentence, opts={}){
     let seekRetries=0;
     let reachedStart=false;
     let sawPlaying=false;
-    const inSegment=(t)=> t>=startT-0.08 && t<=endT+0.2;
+    const inSegment=(t)=> t>=startT-0.08 && t<=endT+0.25;
     const segmentDur=Math.max(0.4, endT-startT);
     const maxMs=Math.max(12000, (segmentDur+6)/state.speed*1000);
 
@@ -729,15 +747,16 @@ function playSegment(sentence, opts={}){
         try{ t=player.getCurrentTime(); st=player.getPlayerState(); }catch(e){}
         if(inSegment(t)) reachedStart=true;
         if(st===YT.PlayerState.PLAYING && inSegment(t)) sawPlaying=true;
-        if(reachedStart && sawPlaying && t>=endT){ finishPlaySegment(sentenceId, opts); return; }
+        if(reachedStart && t>=endT && (sawPlaying || t>=endT+0.35)){ finishPlaySegment(sentenceId, opts); return; }
         if(st===YT.PlayerState.ENDED && reachedStart){ finishPlaySegment(sentenceId, opts); return; }
+        if(reachedStart && t>endT+1.5){ finishPlaySegment(sentenceId, opts); return; }
         const elapsed=Date.now()-seekAt;
         if(!reachedStart && elapsed>600 && seekRetries<4 && !inSegment(t)){
             try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
             seekAt=Date.now(); seekRetries++;
         }
         if(elapsed>maxMs){
-            if(reachedStart && sawPlaying){ finishPlaySegment(sentenceId, opts); return; }
+            if(reachedStart && (sawPlaying || t>=startT)){ finishPlaySegment(sentenceId, opts); return; }
             if(seekRetries<5){
                 try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
                 seekAt=Date.now(); seekRetries++;

@@ -4,7 +4,7 @@ Mrs. Rabbit had four little bunnies.
 
 2
 00:00:21,780 --> 00:00:28,720
-Their names were Mopsy, Flopsy, Cottontail, and Peter.
+Their names were Mopsy, Flopsy, Cotton-tail, and Peter.
 
 3
 00:00:30,460 --> 00:00:32,780
@@ -68,7 +68,7 @@ The four bunnies hopped down the path.
 
 18
 00:01:49,540 --> 00:01:51,820
-"Look over there," said Mopsy.
+"Look over there!" said Mopsy.
 
 19
 00:01:51,870 --> 00:01:54,600
@@ -76,11 +76,11 @@ The four bunnies hopped down the path.
 
 20
 00:01:56,040 --> 00:01:58,800
-"Yum!" said Flopsy and Cottontail.
+"Yum!" said Flopsy and Cotton-tail.
 
 21
 00:01:59,960 --> 00:02:03,360
-Flopsy, Mopsy, and Cottontail ran to the bush.
+Flopsy, Mopsy, and Cotton-tail ran to the bush.
 
 22
 00:02:07,240 --> 00:02:09,920
@@ -108,7 +108,7 @@ Peter squeezed under the gate and looked around.
 
 28
 00:03:03,700 --> 00:03:08,160
-"I see green leaves everywhere," said Peter.
+"I see green leaves everywhere!" said Peter.
 
 29
 00:03:17,880 --> 00:03:19,920
@@ -128,7 +128,7 @@ He ate some radishes.
 
 33
 00:03:47,620 --> 00:03:53,680
-"These vegetables are delicious," said Peter. "I'll eat some more."
+"These vegetables are delicious!" said Peter. "I'll eat some more."
 
 34
 00:03:58,260 --> 00:04:00,380
@@ -184,7 +184,7 @@ The big buttons on his jacket got caught.
 
 47
 00:05:05,280 --> 00:05:06,880
-"Ahh!" he cried.
+"Ahh!" cried Peter.
 
 48
 00:05:09,360 --> 00:05:15,160
@@ -211,214 +211,218 @@ Some birds flew over to Peter.
 They tried to help him.
 
 54
-00:06:00,600 --> 00:06:08,060
-"Don't give up! Keep trying!" called one bird.
+00:06:00,600 --> 00:06:03,960
+"Don't give up!" called one bird.
 
 55
+00:06:04,010 --> 00:06:08,060
+"Keep trying to get free!"
+
+56
 00:06:12,520 --> 00:06:15,320
 "Take off your jacket!" shouted another.
 
-56
+57
 00:06:16,540 --> 00:06:18,140
 Peter stopped crying.
 
-57
+58
 00:06:19,400 --> 00:06:22,180
 Quickly, Peter slipped out of his jacket.
 
-58
+59
 00:06:22,920 --> 00:06:24,340
 Now he was free.
 
-59
+60
 00:06:29,800 --> 00:06:32,120
 But the farmer was still chasing him.
 
-60
+61
 00:06:33,580 --> 00:06:35,440
 Peter ran away fast.
 
-61
+62
 00:06:36,580 --> 00:06:39,180
 "Get back here!" cried the farmer.
 
-62
+63
 00:06:44,420 --> 00:06:46,340
 Peter dashed into a shed.
 
-63
+64
 00:06:49,280 --> 00:06:51,440
 It was filled with garden tools.
 
-64
+65
 00:06:54,180 --> 00:06:56,540
 Peter leaped into a watering can.
 
-65
+66
 00:06:59,200 --> 00:07:05,340
 The can was filled with icy water.
 
-66
+67
 00:07:05,440 --> 00:07:06,240
 "Brr!" said Peter.
 
-67
+68
 00:07:06,520 --> 00:07:08,480
 The farmer rushed into the shed.
 
-68
+69
 00:07:10,520 --> 00:07:13,620
 "Where is that rabbit?" said the farmer.
 
-69
+70
 00:07:15,100 --> 00:07:16,220
 Peter shivered.
 
-70
+71
 00:07:17,300 --> 00:07:19,880
 He heard the farmer moving things around.
 
-71
+72
 00:07:21,020 --> 00:07:29,260
 "Where are you, rabbit?" muttered the farmer.
 
-72
+73
 00:07:30,240 --> 00:07:32,600
 The farmer's footsteps were close now.
 
-73
+74
 00:07:34,500 --> 00:07:36,960
 "Uh-oh," whispered Peter.
 
-74
+75
 00:07:37,440 --> 00:07:39,520
 He felt a tickle in his nose.
 
-75
+76
 00:07:40,640 --> 00:07:42,400
 The tickle grew worse.
 
-76
+77
 00:07:45,000 --> 00:07:46,180
 "Ah-choo!" Peter sneezed.
 
-77
+78
 00:08:15,560 --> 00:08:17,820
 Peter jumped out of the watering can.
 
-78
+79
 00:08:19,020 --> 00:08:21,140
 "Hey!" cried the farmer.
 
-79
+80
 00:08:28,880 --> 00:08:30,720
 Peter ran and ran.
 
-80
+81
 00:08:36,600 --> 00:08:39,200
 Finally, the farmer stopped chasing him.
 
-81
+82
 00:08:45,980 --> 00:08:47,880
 Now Peter was lost.
 
-82
+83
 00:08:50,100 --> 00:08:53,000
 "Where's the gate?" he asked a mouse.
 
-83
+84
 00:08:53,760 --> 00:08:55,240
 But the mouse ran away.
 
-84
+85
 00:09:06,320 --> 00:09:10,500
 Suddenly, Peter gasped. "A cat!"
 
-85
+86
 00:09:11,520 --> 00:09:14,240
 The cat was watching fish in the pond.
 
-86
+87
 00:09:16,100 --> 00:09:17,500
 She didn't see Peter.
 
-87
+88
 00:09:17,700 --> 00:09:19,000
 "Whew!" whispered Peter.
 
-88
+89
 00:09:23,260 --> 00:09:25,100
 He quietly slipped away.
 
-89
+90
 00:09:30,760 --> 00:09:34,160
 "I must find the gate," said Peter.
 
-90
+91
 00:09:38,140 --> 00:09:39,680
 Scritch, scratch! Peter heard a noise.
 
-91
+92
 00:09:43,460 --> 00:09:46,020
 He climbed onto a wheelbarrow to see.
 
-92
+93
 00:09:47,260 --> 00:09:49,940
 The farmer was working in the onion patch.
 
-93
+94
 00:09:54,340 --> 00:09:56,140
 Scritch, scratch!
 
-94
+95
 00:09:56,340 --> 00:09:58,400
 Then Peter saw something else.
 
-95
+96
 00:10:01,600 --> 00:10:03,660
 "The gate!" he cried.
 
-96
+97
 00:10:07,540 --> 00:10:09,520
 Peter shot across the garden.
 
-97
+98
 00:10:14,000 --> 00:10:17,320
 The farmer chased him. "Stop, rabbit!"
 
-98
+99
 00:10:18,060 --> 00:10:20,000
 But Peter was too fast.
 
-99
+100
 00:10:20,820 --> 00:10:23,900
 He squeezed under the gate and ran home.
 
-100
+101
 00:10:32,320 --> 00:10:35,940
 Mrs. Rabbit scolded Peter. "Naughty rabbit!"
 
-101
+102
 00:10:36,920 --> 00:10:39,080
 "You lost your jacket and shoes!"
 
-102
+103
 00:10:44,800 --> 00:10:47,740
 The other bunnies ate bread and blackberries.
 
-103
+104
 00:10:50,140 --> 00:10:51,640
 But Peter didn't get any.
 
-104
+105
 00:10:53,500 --> 00:10:54,920
 Peter sneezed.
 
-105
+106
 00:11:06,180 --> 00:11:08,340
 Mrs. Rabbit gave him medicine.
 
-106
+107
 00:11:15,740 --> 00:11:17,560
 Then she sent him to bed.
 

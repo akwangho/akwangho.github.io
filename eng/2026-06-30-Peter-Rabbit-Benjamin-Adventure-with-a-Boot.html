@@ -421,7 +421,7 @@
  * ======================================================= */
 const VIDEO_ID = '-97SJ9SReoU';
 const SUBTITLE_DELAY = 1.0; // 延遲字幕：聽到後幾秒才顯示
-const SEGMENT_TAIL_PAD = 0.15; // 句尾緩衝（秒），避免截斷尾音
+const SEGMENT_TAIL_PAD = 1.0; // 句尾緩衝（秒），讓尾音自然收尾
 const COUNTDOWN_MS = 350;   // 跟讀倒數 3·2·1 每格毫秒（加快，讓麥克風盡快出現開始聽）
 
 const DEFAULT_SENTENCES = [
@@ -445,7 +445,7 @@ const DEFAULT_SENTENCES = [
     { id:'s18', chapter:0, en:"Peter and Benjamin got some candy.", zh:"彼得和班傑明得到了一些糖果。", start:110.06, end:112.1 },
     { id:'s19', chapter:0, en:"The bunnies were happy now.", zh:"小兔子們現在高興極了。", start:114.18, end:115.86 },
     { id:'s20', chapter:0, en:"As they hopped away, they saw a mouse.", zh:"當牠們蹦蹦跳跳離開時，看到了一隻老鼠。", start:121.96, end:124.68 },
-    { id:'s21', chapter:0, en:"\"My house is gone!\" she cried. \"It is an old brown boot.\"", zh:"「我的家不見了！」她哭著說。「那是一隻舊的棕色靴子。」", start:125.46, end:146.8 },
+    { id:'s21', chapter:0, en:"\"My house is gone!\" she cried. \"It is an old brown boot.\"", zh:"「我的家不見了！」她哭著說。「那是一隻舊的棕色靴子。」", start:125.46, end:136.46 },
     { id:'s22', chapter:1, en:"Benjamin gulped. Peter dropped a few candies.", zh:"班傑明嚥了口口水。彼得掉了幾顆糖果。", start:157.48, end:162.14 },
     { id:'s23', chapter:1, en:"\"You lost your boot!\" he said.", zh:"「你把靴子弄丟了！」他說。", start:164.12, end:166.38 },
     { id:'s24', chapter:1, en:"\"Yes!\" the mouse cried. \"What will I do?\"", zh:"「對！」老鼠哭著說。「我該怎麼辦？」", start:167.24, end:173.82 },
@@ -463,7 +463,7 @@ const DEFAULT_SENTENCES = [
     { id:'s36', chapter:1, en:"\"I wanted to use it for dirty socks, but it was too heavy.\"", zh:"「我想用它裝髒襪子，但它太重了。」", start:238.06, end:242.04 },
     { id:'s37', chapter:1, en:"Peter grinned. \"Can we have it?\"", zh:"彼得咧嘴一笑。「我們可以拿走它嗎？」", start:245.22, end:247.64 },
     { id:'s38', chapter:1, en:"\"No,\" Mrs. Tiggy-Winkle said.", zh:"「不行。」提吉溫可爾太太說。", start:249.16, end:251.26 },
-    { id:'s39', chapter:1, en:"She held up an old hat. \"Jemima gave me this hat. I gave her the boot.\"", zh:"她舉起一頂舊帽子。「潔咪瑪給了我這頂帽子。我把靴子給了她。」", start:252.26, end:272.94 },
+    { id:'s39', chapter:1, en:"She held up an old hat. \"Jemima gave me this hat. I gave her the boot.\"", zh:"她舉起一頂舊帽子。「潔咪瑪給了我這頂帽子。我把靴子給了她。」", start:252.26, end:262.76 },
     { id:'s40', chapter:2, en:"The bunnies hopped to the farm.", zh:"小兔子們蹦蹦跳跳地來到農場。", start:278.6, end:280.42 },
     { id:'s41', chapter:2, en:"\"Jemima!\" Benjamin called. \"We are looking for an old boot.\"", zh:"「潔咪瑪！」班傑明喊道。「我們在找一隻舊靴子。」", start:285.54, end:290.7 },
     { id:'s42', chapter:2, en:"\"Oh,\" Jemima said. \"I wanted to make a nest in that boot, but it was too small for my eggs.\"", zh:"「噢。」潔咪瑪說。「我想在那隻靴子裡做個巢，但對我的蛋來說太小了。」", start:291.68, end:298.92 },
@@ -481,7 +481,7 @@ const DEFAULT_SENTENCES = [
     { id:'s54', chapter:2, en:"\"Okay.\" Peter reached into his pockets. He gasped.", zh:"「好吧。」彼得把手伸進口袋。他倒抽一口氣。", start:373.6, end:378.76 },
     { id:'s55', chapter:2, en:"\"Where is all my candy?\"", zh:"「我的糖果都去哪了？」", start:379.88, end:381.22 },
     { id:'s56', chapter:2, en:"Peter had just one piece left. He gave it to Tom.", zh:"彼得只剩下一顆了。他把它給了湯姆。", start:384.2, end:390.22 },
-    { id:'s57', chapter:2, en:"\"Bye, Tom!\" the bunnies said.", zh:"「再見，湯姆！」小兔子們說。", start:395.36, end:397.0 },
+    { id:'s57', chapter:2, en:"\"Bye!\" Tom said.", zh:"「再見！」湯姆說。", start:395.36, end:397.0 },
     { id:'s58', chapter:2, en:"The bunnies grabbed the boot. They pulled hard, but it was still stuck.", zh:"小兔子們抓住靴子。牠們用力拉，但靴子還是卡住了。", start:401.0, end:414.82 },
     { id:'s59', chapter:3, en:"The bunnies were sad.", zh:"小兔子們很難過。", start:431.34, end:432.72 },
     { id:'s60', chapter:3, en:"All the candy was gone.", zh:"糖果全都不見了。", start:434.14, end:435.74 },
@@ -494,8 +494,8 @@ const DEFAULT_SENTENCES = [
     { id:'s67', chapter:3, en:"\"Did someone paint a picture on my boot?\"", zh:"「有人在我的靴子上畫了圖嗎？」", start:467.94, end:471.28 },
     { id:'s68', chapter:3, en:"\"Yes,\" Benjamin said. \"Mrs. Tiggy-Winkle painted a picture on your boot.\"", zh:"「有。」班傑明說。「提吉溫可爾太太在你的靴子上畫了圖。」", start:472.86, end:478.48 },
     { id:'s69', chapter:3, en:"The mouse looked inside the boot.", zh:"老鼠往靴子裡面看。", start:483.22, end:485.32 },
-    { id:'s70', chapter:3, en:"\"Did someone put feathers on my boot?\"", zh:"「有人在我的靴子上放了羽毛嗎？」", start:487.04, end:490.22 },
-    { id:'s71', chapter:3, en:"\"Yes,\" Peter said. \"Jemima put feathers on your boot.\"", zh:"「有。」彼得說。「潔咪瑪在你的靴子上放了羽毛。」", start:491.62, end:496.16 },
+    { id:'s70', chapter:3, en:"\"Did someone put feathers in my boot?\"", zh:"「有人在我的靴子裡放了羽毛嗎？」", start:487.04, end:490.22 },
+    { id:'s71', chapter:3, en:"\"Yes,\" Peter said. \"Jemima put feathers in your boot.\"", zh:"「有。」彼得說。「潔咪瑪在你的靴子裡放了羽毛。」", start:491.62, end:496.16 },
     { id:'s72', chapter:3, en:"The mouse looked at the rocks.", zh:"老鼠看著石頭。", start:498.04, end:499.82 },
     { id:'s73', chapter:3, en:"\"Did someone get my boot stuck?\"", zh:"「有人讓我的靴子卡住了嗎？」", start:500.52, end:503.24 },
     { id:'s74', chapter:3, en:"\"Yes,\" Benjamin said sadly. \"And we can't get it out.\"", zh:"「有。」班傑明難過地說。「而且我們拔不出來。」", start:505.52, end:510.96 },
@@ -674,6 +674,23 @@ function finishPlaySegment(sentenceId, opts){
     if(opts.onEnd) opts.onEnd();
 }
 
+function computeSegmentEnd(sentence){
+    const idx=DEFAULT_SENTENCES.findIndex(x=>x.id===sentence.id);
+    const next=(idx>=0 && idx<DEFAULT_SENTENCES.length-1) ? DEFAULT_SENTENCES[idx+1] : null;
+    let end=sentence.end+SEGMENT_TAIL_PAD;
+    if(next && next.chapter!==sentence.chapter){
+        const gap=next.start-sentence.end;
+        const dur=sentence.end-sentence.start;
+        if(gap>4 && dur>10){
+            const words=(sentence.en.match(/\b[\w']+\b/g)||[]).length;
+            const estEnd=sentence.start+Math.max(4, words*0.42+1.2);
+            end=Math.min(end, estEnd+SEGMENT_TAIL_PAD);
+        }
+        end=Math.min(end, next.start-0.25);
+    }
+    return end;
+}
+
 // 播放單句並在句尾自動暫停（闖關 / 跟讀用）
 // 以 getCurrentTime 判斷句尾；t 須落在句段內才算開始，避免隨機順序／下一句時舊時間軸誤判已播完
 function playSegment(sentence, opts={}){
@@ -683,7 +700,7 @@ function playSegment(sentence, opts={}){
     }
     clearSegmentPlayback();
     const startT=Math.max(0, sentence.start);
-    const endT=sentence.end+SEGMENT_TAIL_PAD;
+    const endT=computeSegmentEnd(sentence);
     const sentenceId=sentence.id;
     try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
     applySpeed(state.speed);
@@ -692,7 +709,7 @@ function playSegment(sentence, opts={}){
     let seekRetries=0;
     let reachedStart=false;
     let sawPlaying=false;
-    const inSegment=(t)=> t>=startT-0.08 && t<=endT+0.2;
+    const inSegment=(t)=> t>=startT-0.08 && t<=endT+0.25;
     const segmentDur=Math.max(0.4, endT-startT);
     const maxMs=Math.max(12000, (segmentDur+6)/state.speed*1000);
 
@@ -702,15 +719,16 @@ function playSegment(sentence, opts={}){
         try{ t=player.getCurrentTime(); st=player.getPlayerState(); }catch(e){}
         if(inSegment(t)) reachedStart=true;
         if(st===YT.PlayerState.PLAYING && inSegment(t)) sawPlaying=true;
-        if(reachedStart && sawPlaying && t>=endT){ finishPlaySegment(sentenceId, opts); return; }
+        if(reachedStart && t>=endT && (sawPlaying || t>=endT+0.35)){ finishPlaySegment(sentenceId, opts); return; }
         if(st===YT.PlayerState.ENDED && reachedStart){ finishPlaySegment(sentenceId, opts); return; }
+        if(reachedStart && t>endT+1.5){ finishPlaySegment(sentenceId, opts); return; }
         const elapsed=Date.now()-seekAt;
         if(!reachedStart && elapsed>600 && seekRetries<4 && !inSegment(t)){
             try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
             seekAt=Date.now(); seekRetries++;
         }
         if(elapsed>maxMs){
-            if(reachedStart && sawPlaying){ finishPlaySegment(sentenceId, opts); return; }
+            if(reachedStart && (sawPlaying || t>=startT)){ finishPlaySegment(sentenceId, opts); return; }
             if(seekRetries<5){
                 try{ player.seekTo(startT,true); player.playVideo(); }catch(e){}
                 seekAt=Date.now(); seekRetries++;

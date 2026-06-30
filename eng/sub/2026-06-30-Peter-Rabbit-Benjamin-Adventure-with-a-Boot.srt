@@ -79,7 +79,7 @@ The bunnies were happy now.
 As they hopped away, they saw a mouse.
 
 21
-00:02:05,460 --> 00:02:26,800
+00:02:05,460 --> 00:02:16,460
 "My house is gone!" she cried. "It is an old brown boot."
 
 22
@@ -151,7 +151,7 @@ Peter grinned. "Can we have it?"
 "No," Mrs. Tiggy-Winkle said.
 
 39
-00:04:12,260 --> 00:04:32,940
+00:04:12,260 --> 00:04:22,760
 She held up an old hat. "Jemima gave me this hat. I gave her the boot."
 
 40
@@ -224,7 +224,7 @@ Peter had just one piece left. He gave it to Tom.
 
 57
 00:06:35,360 --> 00:06:37,000
-"Bye, Tom!" the bunnies said.
+"Bye!" Tom said.
 
 58
 00:06:41,000 --> 00:06:54,820
@@ -276,11 +276,11 @@ The mouse looked inside the boot.
 
 70
 00:08:07,040 --> 00:08:10,220
-"Did someone put feathers on my boot?"
+"Did someone put feathers in my boot?"
 
 71
 00:08:11,620 --> 00:08:16,160
-"Yes," Peter said. "Jemima put feathers on your boot."
+"Yes," Peter said. "Jemima put feathers in your boot."
 
 72
 00:08:18,040 --> 00:08:19,820
