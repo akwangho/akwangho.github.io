@@ -57,6 +57,8 @@ REQUIRED_LINES = {
         '"Where are they?"',
         '"Right there."',
         '"We must stop him."',
+        '"You trapped me in the tree!"',
+        '"And where are all my nuts?"',
     ],
     "full-story": [
         '"Ahh!" cried Peter.',
@@ -65,15 +67,28 @@ REQUIRED_LINES = {
         '"Brr!" said Peter.',
         '"Whew!" whispered Peter.',
         "Scritch, scratch!",
+        '"These vegetables are delicious!" said Peter.',
+        '"I\'ll eat some more."',
+        '"Your father went there."',
+        '"And he never came home."',
     ],
     "boot": [
         '"Oh no!" Peter said.',
         '"We must find Mrs. Tiggy-Winkle," Benjamin said.',
         '"My house is gone!" she cried.',
         '"It is an old brown boot."',
+        '"Let\'s take it to the shopkeeper," Peter said.',
+        '"Then he will give us candy!"',
+        '"Yes!" the mouse cried.',
+        '"What will I do?"',
         '"Did someone put feathers in my boot?"',
-        '"Yes," Peter said. "Jemima put feathers in your boot."',
+        '"Yes," Peter said.',
+        '"Jemima put feathers in your boot."',
         '"Bye!" Tom said.',
+        "She held up an old hat.",
+        "The bunnies grabbed the boot.",
+        "They pulled hard.",
+        "But it was still stuck!",
     ],
 }
 
@@ -172,6 +187,40 @@ def split_cue(c: Cue, a_en: str, b_en: str, a_zh: str, b_zh: str, ratio: float =
     ]
 
 
+def split_if_merged(out: list[Cue], needle: str, b_en: str, a_en: str | None, a_zh: str, b_zh: str, ratio: float = 0.45) -> bool:
+    """Split one cue into two when both parts appear in the same cue."""
+    try:
+        i = find(out, needle)
+    except ValueError:
+        return False
+    if b_en not in out[i].en:
+        return False
+    c = out[i]
+    first = a_en if a_en else c.en[: c.en.index(b_en)].strip()
+    out[i : i + 1] = split_cue(c, first, b_en, a_zh, b_zh, ratio)
+    return True
+
+
+def cap_chapter_last_outro(cues: list[Cue]) -> int:
+    """Trim chapter-final cues whose end times absorb inter-episode outros."""
+    fixes = 0
+    for i, c in enumerate(cues):
+        nxt = cues[i + 1] if i + 1 < len(cues) else None
+        if not nxt or nxt.chapter == c.chapter:
+            continue
+        gap = nxt.start - c.end
+        dur = c.end - c.start
+        if gap < 5 or dur < 9:
+            continue
+        words = len(re.findall(r"\b[\w']+\b", c.en))
+        est_end = c.start + max(4.0, words * 0.42 + 1.0)
+        new_end = min(c.end, est_end, nxt.start - 0.35)
+        if new_end < c.end - 0.4:
+            c.end = round(new_end, 2)
+            fixes += 1
+    return fixes
+
+
 def insert_after(cues: list[Cue], idx: int, new: Cue) -> None:
     new.chapter = cues[idx].chapter
     cues.insert(idx + 1, new)
@@ -236,6 +285,37 @@ def fix_harvest_feast(cues: list[Cue]) -> list[Cue]:
 
     fix_timing_overlaps(out)
     fix_harvest_official_wording(out)
+    cap_chapter_last_outro(out)
+
+    # Silvertail: two shouts in supplement
+    t = find(out, "You trapped me in the tree")
+    if "where are all my nuts" in out[t].en.lower() and "And where" in out[t].en:
+        c = out[t]
+        out[t : t + 1] = split_cue(
+            c,
+            '"You trapped me in the tree!"',
+            '"And where are all my nuts?"',
+            "「你們把我困在樹裡！」",
+            "「我的堅果到底都到哪去了？」",
+            0.45,
+        )
+
+    fix_timing_overlaps(out)
+    cap_chapter_last_outro(out)
+
+    nuts_offer = find(out, "We found lots of nuts")
+    if "Would you like some" in out[nuts_offer].en:
+        c = out[nuts_offer]
+        out[nuts_offer : nuts_offer + 1] = split_cue(
+            c,
+            '"We found lots of nuts.',
+            'Would you like some?"',
+            "「我們找到很多堅果。",
+            "你要一些嗎？」",
+            0.48,
+        )
+
+    fix_timing_overlaps(out)
     return out
 
 
@@ -347,7 +427,32 @@ def fix_full_story(cues: list[Cue]) -> list[Cue]:
             0.45,
         )
 
+    veg = find(out, "These vegetables are delicious")
+    if "I'll eat some more" in out[veg].en:
+        c = out[veg]
+        out[veg : veg + 1] = split_cue(
+            c,
+            '"These vegetables are delicious!" said Peter.',
+            '"I\'ll eat some more."',
+            "「這些蔬菜真好吃。」彼得說。",
+            "「我要再多吃一點。」",
+            0.55,
+        )
+
+    dad = find(out, "Your father went there")
+    if "never came home" in out[dad].en and "And he" not in out[dad].en:
+        c = out[dad]
+        out[dad : dad + 1] = split_cue(
+            c,
+            '"Your father went there."',
+            '"And he never came home."',
+            "「你們的爸爸去了那裡。」",
+            "「就再也沒有回家。」",
+            0.45,
+        )
+
     fix_timing_overlaps(out)
+    cap_chapter_last_outro(out)
     return out
 
 
@@ -410,11 +515,204 @@ def fix_boot(cues: list[Cue]) -> list[Cue]:
             Cue('"It is an old brown boot."', round(c.start + 5.35, 2), 138.8, "「那是一隻舊的棕色靴子。」", c.chapter),
         ]
 
-    h = find(out, "Jemima gave me this hat")
-    if out[h].end > 266:
-        out[h].end = round(out[h].start + 10.5, 2)
+    shop = find(out, "Let's take it to the shopkeeper")
+    if "Then he will give us candy" in out[shop].en:
+        c = out[shop]
+        out[shop : shop + 1] = split_cue(
+            c,
+            '"Let\'s take it to the shopkeeper," Peter said.',
+            '"Then he will give us candy!"',
+            "「我們把它拿給店主吧。」彼得說。",
+            "「這樣他就會給我們糖果！」",
+            0.45,
+        )
+
+    sk = find(out, "shopkeeper looked at the boot again")
+    if "I will take it" in out[sk].en:
+        c = out[sk]
+        mid = c.start + (c.end - c.start) * 0.28
+        out[sk : sk + 1] = [
+            Cue("The shopkeeper looked at the boot again.", c.start, mid, "店主又看了看靴子。", c.chapter),
+            Cue('"Okay," he said. "I will take it."', mid, c.end, "「好吧。」他說。「我收了。」", c.chapter),
+        ]
+
+    sorry = find(out, "shopkeeper shook his head")
+    if "Mrs. Tiggy-Winkle just bought it" in out[sorry].en:
+        c = out[sorry]
+        mid = c.start + (c.end - c.start) * 0.32
+        out[sorry : sorry + 1] = [
+            Cue('The shopkeeper shook his head. "Sorry," he said.', c.start, mid, "店主搖搖頭。「抱歉。」他說。", c.chapter),
+            Cue('"Mrs. Tiggy-Winkle just bought it."', mid, c.end, "「提吉溫可爾太太剛買走了。」", c.chapter),
+        ]
+
+    yesm = find(out, '"Yes!" the mouse cried')
+    if "What will I do" in out[yesm].en:
+        c = out[yesm]
+        out[yesm : yesm + 1] = split_cue(
+            c,
+            '"Yes!" the mouse cried.',
+            '"What will I do?"',
+            "「對！」老鼠哭著說。",
+            "「我該怎麼辦？」",
+            0.4,
+        )
+
+    hat = find(out, "She held up an old hat")
+    if "Jemima gave me this hat" in out[hat].en:
+        c = out[hat]
+        out[hat : hat + 1] = split_cue(
+            c,
+            "She held up an old hat.",
+            '"Jemima gave me this hat. I gave her the boot."',
+            "她舉起一頂舊帽子。",
+            "「潔咪瑪給了我這頂帽子。我把靴子給了她。」",
+            0.22,
+        )
+
+    grab = find(out, "The bunnies grabbed the boot")
+    if "pulled hard" in out[grab].en and "still stuck" in out[grab].en:
+        c = out[grab]
+        t1 = c.start + (c.end - c.start) * 0.32
+        t2 = c.start + (c.end - c.start) * 0.62
+        out[grab : grab + 1] = [
+            Cue("The bunnies grabbed the boot.", c.start, t1, "小兔子們抓住靴子。", c.chapter),
+            Cue("They pulled hard.", round(t1 + 0.05, 2), t2, "牠們用力拉。", c.chapter),
+            Cue("But it was still stuck!", round(t2 + 0.05, 2), round(c.start + 11.0, 2), "但靴子還是卡住了。", c.chapter),
+        ]
+
+    thanks = find(out, "Thank you for finding my house")
+    if "I found something for you too" in out[thanks].en:
+        c = out[thanks]
+        out[thanks : thanks + 1] = split_cue(
+            c,
+            '"Thank you for finding my house," the mouse said.',
+            '"I found something for you too."',
+            "「謝謝你們幫我找到家。」老鼠說。",
+            "「我也幫你們找到了東西。」",
+            0.5,
+        )
+
+    no_p = find(out, '"No," Peter said')
+    if "Do you?" in out[no_p].en:
+        c = out[no_p]
+        out[no_p : no_p + 1] = split_cue(
+            c,
+            '"No," Peter said.',
+            '"Do you?"',
+            "「沒有。」彼得說。",
+            "「你有嗎？」",
+            0.45,
+        )
+
+    jcall = find(out, '"Jemima!" Benjamin called')
+    if "We are looking for an old boot" in out[jcall].en:
+        c = out[jcall]
+        out[jcall : jcall + 1] = split_cue(
+            c,
+            '"Jemima!" Benjamin called.',
+            '"We are looking for an old boot."',
+            "「潔咪瑪！」班傑明喊道。",
+            "「我們在找一隻舊靴子。」",
+            0.35,
+        )
+
+    joh = find(out, '"Oh," Jemima said')
+    if "wanted to make a nest" in out[joh].en:
+        c = out[joh]
+        out[joh : joh + 1] = split_cue(
+            c,
+            '"Oh," Jemima said.',
+            '"I wanted to make a nest in that boot, but it was too small for my eggs."',
+            "「噢。」潔咪瑪說。",
+            "「我想在那隻靴子裡做個巢，但對我的蛋來說太小了。」",
+            0.2,
+        )
+
+    gpb = find(out, '"Great!" Peter said')
+    if "Can we have the boot" in out[gpb].en:
+        c = out[gpb]
+        out[gpb : gpb + 1] = split_cue(
+            c,
+            '"Great!" Peter said.',
+            '"Can we have the boot?"',
+            "「太好了！」彼得說。",
+            "「我們可以拿走靴子嗎？」",
+            0.4,
+        )
+
+    nj = find(out, '"No," Jemima said')
+    if "gave the boot to Tom Kitten" in out[nj].en:
+        c = out[nj]
+        out[nj : nj + 1] = split_cue(
+            c,
+            '"No," Jemima said.',
+            '"I gave the boot to Tom Kitten. He gave me hay."',
+            "「不行。」潔咪瑪說。",
+            "「我把靴子給了湯姆小貓。他給了我乾草。」",
+            0.25,
+        )
+
+    tom_boot = find(out, "Oh, okay")
+    if "I will give you the boot" in out[tom_boot].en and "Will you give me" not in out[tom_boot].en:
+        c = out[tom_boot]
+        out[tom_boot : tom_boot + 1] = split_cue(
+            c,
+            '"Oh, okay," Tom said.',
+            '"I will give you the boot."',
+            "「噢，好吧。」湯姆說。",
+            "「我把靴子給你們。」",
+            0.45,
+        )
+
+    boot_gasp = find(out, "Suddenly she stopped")
+    if "My boot!" in out[boot_gasp].en and "gasped" in out[boot_gasp].en:
+        c = out[boot_gasp]
+        t1 = c.start + (c.end - c.start) * 0.35
+        t2 = c.start + (c.end - c.start) * 0.55
+        out[boot_gasp : boot_gasp + 1] = [
+            Cue("Suddenly she stopped.", c.start, t1, "她突然停了下來。", c.chapter),
+            Cue('"My boot!"', round(t1 + 0.05, 2), t2, "「我的靴子！」", c.chapter),
+            Cue("The mouse gasped.", round(t2 + 0.05, 2), c.end, "老鼠倒吸一口氣。", c.chapter),
+        ]
+
+    yb = find(out, "Mrs. Tiggy-Winkle painted a picture on your boot")
+    if '"Yes," Benjamin said.' in out[yb].en and "Mrs. Tiggy-Winkle painted" in out[yb].en:
+        c = out[yb]
+        out[yb : yb + 1] = split_cue(
+            c,
+            '"Yes," Benjamin said.',
+            '"Mrs. Tiggy-Winkle painted a picture on your boot."',
+            "「有。」班傑明說。",
+            "「提吉溫可爾太太在你的靴子上畫了圖。」",
+            0.35,
+        )
+
+    yp = find(out, "Jemima put feathers in your boot")
+    if '"Yes," Peter said.' in out[yp].en and "Jemima put feathers" in out[yp].en:
+        c = out[yp]
+        out[yp : yp + 1] = split_cue(
+            c,
+            '"Yes," Peter said.',
+            '"Jemima put feathers in your boot."',
+            "「有。」彼得說。",
+            "「潔咪瑪在你的靴子裡放了羽毛。」",
+            0.35,
+        )
+
+    ybs = find(out, '"Yes," Benjamin said sadly')
+    if "can't get it out" in out[ybs].en:
+        c = out[ybs]
+        out[ybs : ybs + 1] = split_cue(
+            c,
+            '"Yes," Benjamin said sadly.',
+            '"And we can\'t get it out."',
+            "「有。」班傑明難過地說。",
+            "「而且我們拔不出來。」",
+            0.4,
+        )
 
     fix_timing_overlaps(out)
+    cap_chapter_last_outro(out)
     return out
 
 
@@ -438,6 +736,31 @@ def audit(story_key: str, cues: list[Cue], check_zh: bool = False) -> list[str]:
                 issues.append(f"MISSING zh: {c.en[:40]}")
             elif c.zh != normalize_zh(c.zh):
                 issues.append(f"NON-TRAD zh: {c.zh[:40]}")
+    return issues
+
+
+TWO_BEAT_RE = re.compile(
+    r'"[^"]+"\s+(?:\w+\s+){0,4}(?:said|cried|asked|shouted|yelled|whispered|called|muttered|gasped)[,.]?\s+"[^"]+"',
+    re.I,
+)
+
+
+def deep_audit(story_key: str, cues: list[Cue]) -> list[str]:
+    """Heuristic scan for cues that may truncate like the mouse/boot merge bug."""
+    issues: list[str] = []
+    for i, c in enumerate(cues):
+        dur = c.end - c.start
+        if TWO_BEAT_RE.search(c.en):
+            issues.append(f"TWO_BEAT #{i+1} ({dur:.1f}s): {c.en[:75]}")
+        if dur > 11:
+            issues.append(f"LONG #{i+1} ({dur:.1f}s): {c.en[:75]}")
+        nxt = cues[i + 1] if i + 1 < len(cues) else None
+        if nxt and nxt.chapter != c.chapter:
+            gap = nxt.start - c.end
+            if dur > 9 and gap > 8:
+                issues.append(
+                    f"CHAPTER_END #{i+1} ch{c.chapter} dur={dur:.1f}s gap={gap:.1f}s: {c.en[:60]}"
+                )
     return issues
 
 
@@ -466,6 +789,7 @@ def apply_story(story_key: str) -> None:
             pass
 
     after = audit(story_key, cues, check_zh=True)
+    deep = deep_audit(story_key, cues)
     sentences = [
         {
             "id": f"s{i}",
@@ -488,12 +812,19 @@ def apply_story(story_key: str) -> None:
         if len(before) > 8:
             print(f"    ... +{len(before)-8} more")
     print("  after:", "OK" if not after else "\n    ".join(after[:8]))
+    if deep:
+        print("  deep warnings:", *deep[:6], sep="\n    ")
+        if len(deep) > 6:
+            print(f"    ... +{len(deep)-6} more")
+    else:
+        print("  deep: OK")
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Audit/repair Little Fox lesson subtitles")
     ap.add_argument("story", nargs="?", choices=[*STORIES, "all"], default="all")
     ap.add_argument("--audit-only", action="store_true")
+    ap.add_argument("--deep", action="store_true", help="Also run TWO_BEAT / chapter-end heuristics")
     args = ap.parse_args()
     keys = list(STORIES) if args.story == "all" else [args.story]
     if args.audit_only:
@@ -503,9 +834,21 @@ def main() -> int:
             merge_html_into_cues(cues, html_sents)
             issues = audit(key, cues, check_zh=True)
             print(f"=== {key} ({len(cues)} cues) ===")
-            print("  OK" if not issues else "\n".join(f"  {x}" for x in issues[:20]))
-            if len(issues) > 20:
-                print(f"  ... +{len(issues)-20} more")
+            if issues:
+                print("\n".join(f"  {x}" for x in issues[:20]))
+                if len(issues) > 20:
+                    print(f"  ... +{len(issues)-20} more")
+            else:
+                print("  OK")
+            if args.deep:
+                deep = deep_audit(key, cues)
+                if deep:
+                    print("  -- deep --")
+                    print("\n".join(f"  {x}" for x in deep[:25]))
+                    if len(deep) > 25:
+                        print(f"  ... +{len(deep)-25} more")
+                else:
+                    print("  -- deep: OK")
         return 0
     for key in keys:
         apply_story(key)
