@@ -48,6 +48,12 @@
         .hp-bar { width:120px; height:11px; background:#FCE7F3; border-radius:999px; overflow:hidden; box-shadow:inset 0 1px 2px rgba(0,0,0,.1); flex:0 0 auto; }
         .hp-fill { display:block; height:100%; width:0%; background:linear-gradient(90deg,#F472B6,#FB923C); border-radius:999px; transition:width .6s cubic-bezier(.4,0,.2,1); }
         .hp-pct { color:#D97706; min-width:36px; text-align:right; }
+        .hstat-reset {
+            padding:3px 10px; font-size:.78rem; border-radius:999px;
+            background:#FEE2E2; color:#B91C1C; border:none; cursor:pointer; font-weight:800;
+            transition:transform .12s, background .12s;
+        }
+        .hstat-reset:hover { transform:translateY(-1px); background:#FECACA; }
 
         main { max-width: 1040px; margin: 0 auto; padding: 16px; }
 
@@ -249,8 +255,9 @@
     <div class="hstats">
         <span class="hstat-pill">⭐ <span id="stars-text">0</span></span>
         <span class="hstat-learn">📚 已學 <span id="learned-text">0 / 0</span></span>
-        <span class="hp-bar" title="總複習進度"><span class="hp-fill" id="hp-fill"></span></span>
+        <span class="hp-bar" title="本課學習進度"><span class="hp-fill" id="hp-fill"></span></span>
         <span id="hp-pct" class="hp-pct">0%</span>
+        <button type="button" class="hstat-reset" onclick="resetLearningProgress()" title="重設本課學習進度">↺ 重設</button>
     </div>
 </header>
 
@@ -627,7 +634,7 @@ function highlightEnglish(text){ return text.split(/(\s+)/).map(part=>{ const w=
 /* =========================================================
  *  狀態 & 儲存
  * ======================================================= */
-const STORAGE_KEY='cat-cow-friendship-v2';
+const STORAGE_KEY='peter-rabbit-harvest-feast-v1';
 function defaultProgress(){ const m={}; DEFAULT_SENTENCES.forEach(s=>{ m[s.id]={ learned:false, playCount:0, quizCorrect:null, quizAttempts:0, shadowed:false, speechScore:null, lastAt:null }; }); return m; }
 function defaultState(){
     return {
@@ -660,14 +667,26 @@ function loadState(){
         const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return defaultState();
         const parsed=JSON.parse(raw); const def=defaultState();
         const merged={...def, ...parsed};
-        merged.progress={...def.progress, ...(parsed.progress||{})};
-        DEFAULT_SENTENCES.forEach(s=>{ merged.progress[s.id]={...def.progress[s.id], ...(merged.progress[s.id]||{})}; });
+        // 只保留本課句子進度，避免與其他頁面混算
+        const savedProgress=parsed.progress||{};
+        merged.progress={};
+        DEFAULT_SENTENCES.forEach(s=>{ merged.progress[s.id]={...def.progress[s.id], ...(savedProgress[s.id]||{})}; });
         merged.maskPos={...def.maskPos, ...(parsed.maskPos||{})};
         if(typeof merged.maskPos.wr!=='number') merged.maskPos={...def.maskPos};
         return merged;
     }catch(e){ return defaultState(); }
 }
 function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+function resetLearningProgress(){
+    if(!confirm('確定要重設本課的學習進度嗎？星星、已學句子與跟讀最佳紀錄都會清除，且無法復原。')) return;
+    state.stars=0;
+    state.shadowBest=0;
+    state.progress=defaultProgress();
+    saveState();
+    updateHeader();
+    updateShadowBestLabel();
+    showToast('已重設本課學習進度', true);
+}
 
 /* =========================================================
  *  YouTube 播放器
@@ -1627,7 +1646,7 @@ function showToast(msg, good){ const t=document.createElement('div'); t.classNam
 function updateHeader(){
     document.getElementById('stars-text').textContent=state.stars;
     const total=DEFAULT_SENTENCES.length;
-    const learned=Object.values(state.progress).filter(p=>p.learned).length;
+    const learned=DEFAULT_SENTENCES.filter(s=>state.progress[s.id]&&state.progress[s.id].learned).length;
     document.getElementById('learned-text').textContent=`${learned} / ${total}`;
     const pct=total?Math.round(learned/total*100):0;
     const fill=document.getElementById('hp-fill'); if(fill) fill.style.width=pct+'%';
