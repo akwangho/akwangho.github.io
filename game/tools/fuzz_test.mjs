@@ -15,11 +15,14 @@ const listeners = globalThis.__harnessListeners;
 const POOL = ["ArrowLeft", "ArrowRight", "Space", "ArrowDown", "ShiftLeft",
               "KeyX", "KeyZ", "KeyW", "KeyA", "KeyS", "KeyD",
               "KeyQ", "Digit1", "KeyF", "KeyL", "KeyY",
-              "KeyU", "KeyE", "KeyR", "KeyP", "KeyM", "Enter"];
+              "KeyU", "KeyE", "KeyR", "KeyP", "KeyM", "Enter",
+              "KeyB", "KeyG", "KeyI"];
 
 const held = [];
 let fails = 0;
 function bad(msg) { fails++; console.log("  FUZZ-FAIL: " + msg); }
+
+const VALID_STATES = new Set(["loading", "title", "play", "dead", "flag", "walkoff", "clear", "gameover", "ending"]);
 
 try {
   await waitTitle();
@@ -71,10 +74,15 @@ try {
     if (ns.state !== prev) { transitions++; prev = ns.state; }
   }
 
+  let pass = 0;
+  function ok(cond, msg) {
+    if (cond) { pass++; console.log("  PASS " + msg); }
+    else { fails++; console.log("  FAIL " + msg); }
+  }
   ok(fails === 0, `fuzz invariants hold (${fails} violations)`);
   ok(pausedFrames < FRAMES * 0.5, `not stuck paused (${pausedFrames} frames)`);
   console.log(`  states/transitions seen: ${transitions}, held keys at end: ${held.length}`);
-  console.log(`\nFUZZ RESULT: ${fails} violations over ${FRAMES} frames`);
+  console.log(`\nFUZZ RESULT: ${pass} passed, ${fails} failed over ${FRAMES} frames`);
   process.exit(fails ? 1 : 0);
 } catch (err) {
   console.error("FUZZ CRASH:", err);

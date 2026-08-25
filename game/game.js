@@ -4,6 +4,7 @@ const TILE = 48, VIEW_W = 960, VIEW_H = 528, ROWS = 11;
 const GRAV = 0.55, MAXFALL = 13;
 const MAX_WALK = 3.4, MAX_RUN = 5.2, ACC_WALK = 0.28, ACC_RUN = 0.38, FRICTION = 0.82;
 const JUMP_VY = -15.5, STOMP_BOUNCE = -9, STOMP_BOUNCE_HELD = -14;
+const POUND_VY = 16, POUND_ACC = 2.4;   // 地震下壓：急降終速與加速度
 const BIG_SCALE = 0.61, SMALL_SCALE = 0.378;
 
 const canvas = document.getElementById("game");
@@ -118,6 +119,7 @@ function sfx(name) {
     case "fire": tone(180, 60, 0.25, "sawtooth", 0.1); break;
     case "throw": tone(620, 180, 0.12, "square", 0.1); break;
     case "crouch": tone(200, 140, 0.07, "square", 0.07); break;
+    case "pound": tone(160, 40, 0.22, "square", 0.18); tone(80, 32, 0.3, "triangle", 0.13); break;
     case "check": [523, 659, 784].forEach((f, i) => tone(f, f, 0.08, "square", 0.11, i * 0.07)); break;
     case "thunder": tone(180, 60, 0.4, "sawtooth", 0.14); tone(90, 40, 0.5, "triangle", 0.12); break;
     case "konami": [262, 330, 392, 523, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.09, "square", 0.13, i * 0.06)); break;
@@ -192,13 +194,14 @@ function handleCheats(code) {
   let live = "";
   for (let i = 0; i < next.length; i++) {
     const suf = next.slice(i);
-    if ("fly".startsWith(suf) || "super".startsWith(suf)) { live = suf; break; }
+    if ("fly".startsWith(suf) || "super".startsWith(suf) || "big".startsWith(suf)) { live = suf; break; }
   }
   cheatProgress = live;
   cheatIdleT = 0;
   if (ch === "p" && prev.length >= 2 && "super".startsWith(next)) return true; // typing "su|p...": don't pause
   if (next === "fly") { cheatProgress = ""; activateFly(); }
   else if (next === "super") { cheatProgress = ""; activateSuper(); }
+  else if (next === "big") { cheatProgress = ""; activateBig(); }
   return false;
 }
 
@@ -223,6 +226,21 @@ function activateSuper() {
   popups.push({ x: player.x, y: player.y - 140, t: 0, text: cheatSuper ? "SUPER ON!" : "SUPER OFF" });
 }
 
+function activateBig() {
+  const p = player;
+  if (p.growT > 0) return;                       // 變身中不重複觸發
+  if (!p.big) {                                  // 小隻 → 蘑菇變大
+    p.growMode = "grow"; p.growT = 40;
+    popups.push({ x: p.x, y: p.y - 120, t: 0, text: "BIG!" });
+  } else if (!p.fire) {                          // 已大隻 → 火焰花
+    p.growMode = "fire"; p.growT = 30;
+    popups.push({ x: p.x, y: p.y - 120, t: 0, text: "FIRE!" });
+  } else {
+    popups.push({ x: p.x, y: p.y - 120, t: 0, text: "MAX POWER!" });
+  }
+  sfx("power");
+}
+
 function superRespawn() {
   const p = player;
   const fromTx = Math.max(1, Math.floor(camX / TILE) + 2);
@@ -240,6 +258,7 @@ function superRespawn() {
   if (!placed) { p.x = fromTx * TILE + TILE / 2; p.y = (ROWS - 2) * TILE; }
   p.vx = 0; p.vy = 0;
   p.crouching = false;
+  p.pounding = false; p.downHeld = false;
   p.h = p.big ? 72 : 46;
   p.invuln = 100;
   particles.push({ type: "smoke", x: p.x, y: p.y - 30, vx: 0, vy: 0, t: 0 });
@@ -995,6 +1014,7 @@ function resetLevel() {
     y: useCp ? cpY : 9 * TILE,
     vx: 0, vy: 0, w: 40, h: 72,
     big: false, fire: false, crouching: false, onGround: false, face: 1, animT: 0, stompChain: 0,
+    pounding: false, downHeld: false,
     invuln: useCp ? 120 : 0, star: 0, growT: 0, growMode: null, skid: false, hitDir: 0,
     fly: cheatFly, super: cheatSuper,
     coyote: 0, landT: 0, prevOnGround: false,
@@ -1009,7 +1029,9 @@ function solidAt(tx, ty) {
   if (tx < 0 || tx >= levelW) return true;
   if (ty < 0 || ty >= ROWS) return false;
   const c = grid[ty][tx];
-  return c > 0 && c !== 10 && c !== 11;
+  // 隱藏磚（12/13）：未敲出前不是實體，只在「上升頂頭」時由
+  // rectVsGrid 的 hiddenCheck 分支處理（敲後變成 used 磚 8 才固化）
+  return c > 0 && c !== 10 && c !== 11 && c !== 12 && c !== 13;
 }
 
 function deadlyAt(tx, ty) {
@@ -1019,13 +1041,16 @@ function deadlyAt(tx, ty) {
 }
 
 function rectVsGrid(e, onBump) {
+  // SUPER 無敵：玩家腳下的岩漿／水視為可行走的固體地面
+  const lavaFloor = e === player && player.super;
+  const sol = (tx, ty) => solidAt(tx, ty) || (lavaFloor && deadlyAt(tx, ty));
   e.hitWall = false; e.hitDir = 0;
   e.x += e.vx;
   let x0 = Math.floor((e.x - e.w / 2) / TILE), x1 = Math.floor((e.x + e.w / 2 - 0.01) / TILE);
   let y0 = Math.floor((e.y - e.h) / TILE), y1 = Math.floor((e.y - 0.01) / TILE);
   for (let ty = y0; ty <= y1; ty++) {
-    if (e.vx > 0 && solidAt(x1, ty)) { e.x = x1 * TILE - e.w / 2; e.hitWall = true; e.hitDir = -1; e.vx = 0; }
-    else if (e.vx < 0 && solidAt(x0, ty)) { e.x = (x0 + 1) * TILE + e.w / 2; e.hitWall = true; e.hitDir = 1; e.vx = 0; }
+    if (e.vx > 0 && sol(x1, ty)) { e.x = x1 * TILE - e.w / 2; e.hitWall = true; e.hitDir = -1; e.vx = 0; }
+    else if (e.vx < 0 && sol(x0, ty)) { e.x = (x0 + 1) * TILE + e.w / 2; e.hitWall = true; e.hitDir = 1; e.vx = 0; }
     x0 = Math.floor((e.x - e.w / 2) / TILE); x1 = Math.floor((e.x + e.w / 2 - 0.01) / TILE);
   }
   e.y += e.vy;
@@ -1034,13 +1059,13 @@ function rectVsGrid(e, onBump) {
   y0 = Math.floor((e.y - e.h) / TILE); y1 = Math.floor((e.y - 0.01) / TILE);
   if (e.vy >= 0) {
     for (let tx = x0; tx <= x1; tx++) {
-      if (solidAt(tx, y1)) { e.y = y1 * TILE; e.vy = 0; e.onGround = true; break; }
+      if (sol(tx, y1)) { e.y = y1 * TILE; e.vy = 0; e.onGround = true; break; }
     }
   } else {
     let best = -1, bestOv = 0;
     for (let tx = x0; tx <= x1; tx++) {
       const hiddenHere = hiddenCheck && (grid[y0] && (grid[y0][tx] === 12 || grid[y0][tx] === 13));
-      if (solidAt(tx, y0) || hiddenHere) {
+      if (sol(tx, y0) || hiddenHere) {
         const ov = Math.min(e.x + e.w / 2, (tx + 1) * TILE) - Math.max(e.x - e.w / 2, tx * TILE);
         if (ov > bestOv) { bestOv = ov; best = tx; }
       }
@@ -1151,6 +1176,34 @@ function flipKill(en, pts) {
   sfx("kick");
 }
 
+// 地震下壓落地衝擊：震動 + 衝擊波掃敵 + 壓擊腳下方塊（碎磚／擠出問號磚獎勵）
+function finishPound() {
+  const p = player;
+  p.pounding = false;
+  hitstop = 2; addShake(6, 4);
+  sfx("pound");
+  particles.push({ type: "smoke", x: p.x - 22, y: p.y - 4, vx: 0, vy: 0, t: 0 });
+  particles.push({ type: "smoke", x: p.x + 22, y: p.y - 4, vx: 0, vy: 0, t: 0 });
+  enemies.forEach((en) => {                    // 落點衝擊波：近距離敵人一併擊倒
+    if (en.dead || !en.active) return;
+    if (!(en.state === "walk" || en.state === "fly" || en.state === "shell" || en.state === "slide")) return;
+    if (Math.abs(en.x - p.x) >= TILE * 1.05 || en.y < p.y - TILE * 0.4) return;
+    // 遮蔽判定：怪物頭頂（或落點與怪物之間）有實心方塊 → 衝擊波被擋住，不受傷
+    const etx = Math.floor(en.x / TILE);
+    const headTy = Math.floor((en.y - en.h - 2) / TILE);
+    if (headTy >= 0 && solidAt(etx, headTy)) return;         // 頭頂緊鄰方塊
+    if (en.y > p.y + 6) {                                    // 怪物在落點下方：逐格檢視
+      const supTy = Math.round(p.y / TILE);                  // 含被壓擊的支撐層本身
+      for (let ty = supTy; ty <= headTy; ty++)
+        if (ty >= 0 && ty < ROWS && solidAt(etx, ty)) return;
+    }
+    flipKill(en, 200);
+  });
+  const supTy = Math.round(p.y / TILE);        // 腳下支撐列：逐欄壓擊
+  const x0 = Math.floor((p.x - p.w / 2 + 6) / TILE), x1 = Math.floor((p.x + p.w / 2 - 6) / TILE);
+  for (let tx = x0; tx <= x1; tx++) if (solidAt(tx, supTy)) bumpBlock(tx, supTy);
+}
+
 function damagePlayer() {
   if (player.invuln > 0 || player.star > 0 || player.super || state !== "play" || player.growT > 0) return;
   if (player.fire) {
@@ -1214,6 +1267,15 @@ function updatePlayer() {
   }
   p.h = p.big ? (p.crouching ? 46 : 72) : 46;
 
+  // ---- 地震下壓：大隻角色在空中「新按下」觸發（蹲坐急降）----
+  const downPressed = keys.down && !p.downHeld;
+  p.downHeld = keys.down;
+  if (p.big && !p.onGround && downPressed && !p.pounding) {
+    p.pounding = true;
+    p.vy = Math.max(p.vy, 6);
+    sfx("crouch");
+  }
+
   const acc = (keys.run ? ACC_RUN : ACC_WALK) * (slip ? 0.55 : 1);
   const max = keys.run ? MAX_RUN : MAX_WALK;
   if (!p.crouching) {
@@ -1237,9 +1299,14 @@ function updatePlayer() {
   if (jumpBuffer > 0) jumpBuffer--;
   if (!keys.jump && p.vy < -6) p.vy = -6;
   p.vy = Math.min(MAXFALL, p.vy + GRAV);
-  if (p.fly && keys.jump && p.vy > -7.2) {
+  if (p.fly && !p.pounding && keys.jump && p.vy > -7.2) {
     p.vy -= 0.85;
     if (frame % 8 === 0) sfx("wing");
+  }
+  if (p.pounding) {                            // 下壓中：急速垂直下墜、橫向速度急減
+    p.vx *= 0.55;
+    if (Math.abs(p.vx) < 0.05) p.vx = 0;
+    p.vy = Math.min(POUND_VY, p.vy + POUND_ACC);
   }
 
   const wasAir = !p.onGround;
@@ -1247,6 +1314,7 @@ function updatePlayer() {
   hiddenCheck = true;
   rectVsGrid(p, bumpBlock);
   hiddenCheck = false;
+  if (p.pounding && p.onGround) finishPound();
   // step-up assist: walking into a 1-tile ledge snaps you on top of it
   if (p.onGround && p.hitWall && Math.abs(prevVX) > 0.5 && !p.crouching) {
     const dir = Math.sign(prevVX);
@@ -1278,7 +1346,8 @@ function updatePlayer() {
 
   const ltx = Math.floor(p.x / TILE);
   const lty = Math.floor((p.y - 4) / TILE);
-  if (deadlyAt(ltx, lty)) { if (p.super) superRespawn(); else killPlayer(); return; }
+  // SUPER 無敵：岩漿／水是可行走地面，不會觸發傷害或救援
+  if (!p.super && deadlyAt(ltx, lty)) { if (p.super) superRespawn(); else killPlayer(); return; }
 
   if (p.y > VIEW_H + 80) { if (p.super) superRespawn(); else killPlayer(); return; }
 
@@ -1288,6 +1357,7 @@ function updatePlayer() {
 function startFlag() {
   state = "flag";
   player.vx = 0; player.vy = 0;
+  player.pounding = false;
   player.x = flagCol * TILE - 2;
   const h = Math.max(1, Math.round((8 * TILE - player.y) / TILE));
   addScore(400 + h * 100, player.x, Math.max(150, Math.min(VIEW_H - 40, player.y - 90)));
@@ -1471,7 +1541,7 @@ function updateEnemies() {
   const minTop = Math.min(...hits.map(h => h.y - h.h));
   const cameFromAbove = (player.prevFeet ?? player.y) <= minTop + 10;
   const onUpperHalf = hits.some(en => (player.y - (en.y - en.h)) < en.h * 0.5);
-  const doStomp = falling && (cameFromAbove || onUpperHalf);
+  const doStomp = player.pounding || (falling && (cameFromAbove || onUpperHalf));
 
   let bounced = false;
   let hurt = false;
@@ -1497,8 +1567,9 @@ function updateEnemies() {
         player.vy = keys.jump ? STOMP_BOUNCE_HELD : STOMP_BOUNCE;
         player.onGround = false;
         bounced = true;
-        hitstop = 2; addShake(3, 3);
+        hitstop = 2; addShake(player.pounding ? 5 : 3, player.pounding ? 4 : 3);
         particles.push({ type: "smoke", x: en.x, y: en.y - 20, vx: 0, vy: 0, t: 0 });
+        // 下壓貫穿：彈起後繼續下砸，直到落地才結束（finishPound）
       }
     } else if (en.state === "shell") {
       en.state = "slide"; en.slideGrace = 14;
@@ -1568,7 +1639,7 @@ function updateFireballs() {
     f.vy += 0.32;
     f.y += f.vy;
     if (f.y > f.y0 + 40) return false;
-    if (player.growT === 0 && player.star <= 0 &&
+    if (player.growT === 0 && player.star <= 0 && !player.super &&
         Math.abs(f.x - player.x) < player.w / 2 + 10 && f.y > player.y - player.h - 8 && f.y < player.y + 8) {
       damagePlayer();
       return false;
@@ -1724,7 +1795,7 @@ function updateBoss() {
     hm.t++;
     hm.vy += 0.35;
     hm.x += hm.vx; hm.y += hm.vy; hm.rot = (hm.rot || 0) + 0.25 * Math.sign(hm.vx);
-    if (player.growT === 0 &&
+    if (player.growT === 0 && !player.super &&
         Math.abs(hm.x - p.x) < p.w / 2 + 10 && hm.y > p.y - p.h - 8 && hm.y < p.y + 8) {
       damagePlayer();
       return false;
@@ -1766,6 +1837,7 @@ function updateParticles() {
 }
 
 function updateTime() {
+  if (player.super) return;              // SUPER 無敵：倒數時間凍結
   timeTick++;
   if (timeTick >= 24) {
     timeTick = 0;
@@ -2185,7 +2257,7 @@ function playerSprite() {
   const p = player;
   if (state === "dead") return IMG.ko;
   if (state === "flag") return IMG.jump_r;
-  if (p.crouching) return IMG.fall_r;
+  if (p.pounding || p.crouching) return IMG.fall_r;
   if (!p.onGround) return p.vy < 0 ? IMG.jump_r : IMG.fall_r;
   if (p.skid) return IMG.skid;
   if (Math.abs(p.vx) > 0.3) {
@@ -2214,6 +2286,7 @@ function drawPlayer() {
     h *= 1 - 0.14 * Math.sin(k * Math.PI);
     w *= 1 + 0.10 * Math.sin(k * Math.PI);
   }
+  if (p.pounding) { h *= 1.1; w *= 0.9; }              // 下壓：縱向拉伸的急墜姿態
   ctx.save();
   ctx.translate(Math.round(p.x), Math.round(p.y));
   if (p.face < 0) ctx.scale(-1, 1);

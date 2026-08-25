@@ -10,12 +10,23 @@ export async function boot() {
   const rafQ = [];
   let oscCount = 0;
 
-  const ctxStub = new Proxy({}, { get: () => () => {}, set: () => true });
+  const ctxCalls = [];
+  globalThis.__ctxCalls = ctxCalls;          // entries: [fnName, args]
   const canvasStub = {
     width: 960, height: 528,
     getContext: () => ctxStub,
     addEventListener: () => {},
   };
+  const ctxStub = new Proxy({}, {
+    get(t, k) {
+      if (k === "canvas") return canvasStub;
+      return (...a) => {
+        if (ctxCalls.length > 60000) ctxCalls.splice(0, 30000);   // 長跑防爆炸
+        ctxCalls.push(k, a);
+      };
+    },
+    set: () => true,
+  });
   globalThis.window = {
     addEventListener: (t, f) => { (listeners[t] ||= []).push(f); },
   };
@@ -53,7 +64,8 @@ export { state, paused, player, keys, lives, score, levelIdx, konamiOn, titleSel
          timeLeft, bananaCount, pipes, enemies, items, shots, fireballs, bananas,
          levelW, resetLevel, damagePlayer, solidAt, deadlyAt,
          boss, plants, bigbananas, hammers, cpActive, cpLevel, cpX, cpY,
-         deathsThisLevel, lastRank, IMG };
+         deathsThisLevel, lastRank, IMG,
+         particles, popups, bumps, shakeT };
 globalThis.__drv = {
   setLevel: (i) => { levelIdx = i; resetLevel(); },
 };

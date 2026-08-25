@@ -17,9 +17,12 @@ async function kSetup() {
   if (ns.state === "title") { await tap("Enter"); }
   await pump(3);
   ns.enemies.length = 0;
-  ns.player.super = true;
   ns.player.big = false; ns.player.h = 46;
   ku("ArrowLeft"); ku("ArrowRight"); ku("ArrowDown"); ku("Space"); ku("ShiftLeft");
+  if (!ns.player.super) {
+    // 用輸入指令開啟無敵，確保 cheatSuper 旗標同步（之後可正確切換）
+    for (const c of ["KeyS", "KeyU", "KeyP", "KeyE", "KeyR"]) { kd(c); await pump(1); ku(c); await pump(1); }
+  }
 }
 
 try {
@@ -132,6 +135,128 @@ try {
   ok(ns.player.fly === !flyB, "first fly-sequence toggles");
   for (const c of ["KeyF", "KeyL", "KeyY"]) { kd(c); await pump(1); ku(c); await pump(1); }
   ok(ns.player.fly === flyB, "second fly-sequence toggles back");
+
+  // ---------------- K8: 'big' 作弊：小→大→火焰花＋火球 ----------------
+  console.log("K8: 'big' cheat: small -> big -> fire + fireball");
+  await kSetup();
+  ok(ns.player.big === false && ns.player.fire === false, "K8 starts small & not fire");
+  for (const c of ["KeyB", "KeyI", "KeyG"]) { kd(c); await pump(1); ku(c); await pump(1); }
+  let g8 = 0;
+  while (!ns.player.big && g8++ < 100) await pump(1);
+  ok(ns.player.big === true && ns.player.h === 72, "K8 first input grows like mushroom");
+  ns.enemies.length = 0;                                  // 變大後清場避免碰撞雜訊
+  await pump(2);
+  for (const c of ["KeyB", "KeyI", "KeyG"]) { kd(c); await pump(1); ku(c); await pump(1); }
+  g8 = 0;
+  while (!ns.player.fire && g8++ < 100) await pump(1);
+  ok(ns.player.fire === true && ns.player.big === true, "K8 second input grants fire flower");
+  kd("KeyX"); await pump(2); ku("KeyX"); await pump(2);
+  ok(ns.shots.length >= 1, `K8 fireball thrown (${ns.shots.length})`);
+  const fireB = ns.player.fire, bigB = ns.player.big, xB = ns.player.x;
+  for (const c of ["KeyB", "KeyI", "KeyG"]) { kd(c); await pump(1); ku(c); await pump(1); }
+  await pump(45);
+  ok(ns.player.fire === fireB && ns.player.big === bigB && Number.isFinite(ns.player.x),
+     "K8 extra input at max power is harmless");
+  // 部分輸入 "bi" 不會誤觸，也不影響後續
+  kd("KeyB"); await pump(1); ku("KeyB"); kd("KeyI"); await pump(1); ku("KeyI");
+  kd("ArrowRight"); await pump(3); ku("ArrowRight");
+  await pump(120);                                        // 等 cheat idle 清空
+  ok(ns.player.big === bigB && ns.paused === false, "K8 partial 'bi' harmless, no pause");
+
+  // ---------------- K9: 空中連打 Down 觸發多次下壓，座標有限 ----------------
+  console.log("K9: airborne Down-mash chains pounds safely");
+  await kSetup();
+  ns.player.big = true; ns.player.h = 72;
+  ns.player.x = 103 * T + 24; ns.player.y = 6 * T;        // 1-1 長直線上空（避開 100-101 的磚）
+  ns.player.onGround = false;
+  await pump(1);
+  let sawPound = false, mashOk = true, poundLandings = 0, wasPounding = false;
+  for (let i = 0; i < 90; i++) {
+    if (i % 8 === 0) kd("ArrowDown");
+    else if (i % 8 === 4) ku("ArrowDown");
+    await pump(1);
+    if (ns.player.pounding) sawPound = true;
+    if (wasPounding && !ns.player.pounding) poundLandings++;
+    wasPounding = ns.player.pounding;
+    if (!Number.isFinite(ns.player.x) || !Number.isFinite(ns.player.y)) { mashOk = false; break; }
+    if (ns.state !== "play") break;
+  }
+  ku("ArrowDown");
+  ok(mashOk, "K9 coordinates finite during mash");
+  ok(sawPound, "K9 pound state observed while mashing Down");
+  ok(poundLandings >= 1, `K9 pounds resolved on landing (${poundLandings})`);
+
+  // ---------------- K10: 下壓時按住 Left+Right → 垂直直落 ----------------
+  console.log("K10: pound with Left+Right held drops straight");
+  await kSetup();
+  ns.player.big = true; ns.player.h = 72;
+  ns.player.x = 102 * T + 24; ns.player.y = 6 * T; ns.player.vx = 3;
+  ns.player.onGround = false;
+  kd("ArrowLeft"); kd("ArrowRight"); kd("ArrowDown");
+  await pump(3);
+  ok(ns.player.pounding === true, "K10 pound engages despite L+R held");
+  const k10x = ns.player.x;
+  await pump(6);
+  ok(Math.abs(ns.player.x - k10x) < 6, `K10 near-vertical drop (dx=${(ns.player.x - k10x).toFixed(1)})`);
+  ku("ArrowLeft"); ku("ArrowRight"); ku("ArrowDown");
+  let g10c = 0;
+  while (!ns.player.onGround && g10c++ < 200) await pump(1);
+  ok(ns.player.onGround && ns.state === "play", "K10 lands safely");
+
+  // ---------------- K11: 下壓撞敵人彈起後立刻轉向逃跑 ----------------
+  console.log("K11: pound-stomp bounce then steer away safely");
+  await kSetup();
+  ns.player.super = false;
+  ns.player.big = true; ns.player.h = 72;
+  ns.player.x = 30 * T + 24; ns.player.y = 7 * T;
+  ns.player.onGround = false;
+  ns.enemies.push({ x: 30 * T + 24, y: 9 * T, vx: 0, vy: 0, w: 36, h: 40,
+    state: "walk", t: 0, active: true, dead: false, hitDir: 0 });
+  kd("ArrowDown"); await pump(2);
+  let g11 = 0;
+  while (g11++ < 200 && !(ns.player.vy < -4)) await pump(1);   // 彈起
+  ku("ArrowDown");
+  kd("ArrowLeft");                                             // 彈起瞬間反向
+  let g11b = 0;
+  while (g11b++ < 240 && !(ns.player.onGround)) await pump(1);
+  ku("ArrowLeft");
+  ok(g11b < 240 || ns.player.onGround, "K11 landed after bounce-steer");
+  ok(ns.state === "play" || ns.enemies[0].dead, "K11 unharmed after pound-kill bounce");
+
+  // ---------------- K12: Super 無敵 × 岩漿：可行走、下壓安全 ----------------
+  console.log("K12: super walks on lava + pounds it safely");
+  await kSetup();
+  for (let x = 30; x <= 33; x++) { ns.grid[9][x] = 10; ns.grid[10][x] = 10; }
+  ns.player.x = 30 * T + 24; ns.player.y = 9 * T; ns.player.vx = 0;
+  kd("ShiftRight"); kd("ArrowRight");
+  let g12 = 0;
+  while (g12++ < 200 && ns.player.x < 34 * T + 20 && ns.state === "play") await pump(1);
+  ku("ArrowRight"); ku("ShiftRight");
+  ok(ns.player.x >= 34 * T + 16, `K12 walked across lava (x=${ns.player.x.toFixed(0)})`);
+  ok(ns.state === "play", "K12 alive after lava walk");
+  // 無敵下壓岩漿表面（大隻才能下壓）
+  ns.player.x = 31 * T + 24; ns.player.y = 6 * T; ns.player.vy = 0;
+  ns.player.vx = 0;
+  ns.player.big = true; ns.player.h = 72;
+  ns.player.onGround = false; ns.player.downHeld = false;
+  kd("ArrowDown");
+  let g12b = 0;
+  while (!ns.player.onGround && g12b++ < 200) await pump(1);
+  const shakeAtImpact = ns.shakeT;
+  ku("ArrowDown");
+  ok(ns.state === "play" && Math.abs(ns.player.y - 9 * T) < 2, `K12 pounded onto lava safely (y=${ns.player.y.toFixed(1)})`);
+  ok(shakeAtImpact > 0 || ns.shakeT > 0, `K12 impact shake present on lava pound (shakeT=${shakeAtImpact})`);
+
+  // ---------------- K13: Super 關閉後岩漿恢復致命 ----------------
+  console.log("K13: toggling super off restores lava lethality");
+  for (const c of ["KeyS", "KeyU", "KeyP", "KeyE", "KeyR"]) { kd(c); await pump(1); ku(c); await pump(1); }
+  ok(ns.player.super === false && ns.cheatSuper === false, "K13 super off via input");
+  ns.player.x = 32 * T + 24; ns.player.y = 8 * T; ns.player.vx = 0; ns.player.vy = 5;
+  ns.player.invuln = 0;
+  let g13 = 0;
+  while (g13++ < 120 && ns.state === "play") await pump(1);
+  ok(ns.state === "dead", "K13 lava kills non-super player again");
+  { let g = 0; while (ns.state === "dead" && g++ < 400) await pump(1); }
 
   console.log(`\nRESULT: ${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

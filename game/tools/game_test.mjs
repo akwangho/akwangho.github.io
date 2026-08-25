@@ -76,7 +76,8 @@ export { state, paused, player, keys, lives, score, levelIdx, konamiOn, titleSel
          cheatFly, cheatSuper, LEVELS, grid, camX, TILE, VIEW_H, ROWS, frame, timeLeft,
          bananaCount, pipes, enemies, bigbananas, plants, boss, hammers,
          cpActive, cpLevel, cpX, cpY, deathsThisLevel,
-         levelW, resetLevel, damagePlayer, solidAt, deadlyAt, IMG };
+         levelW, resetLevel, damagePlayer, solidAt, deadlyAt, IMG,
+         items, particles, shakeT };
 globalThis.__drv = {
   setLevel: (i) => { levelIdx = i; resetLevel(); },
 };
@@ -102,6 +103,16 @@ async function waitTitle(maxMs = 5000) {
   await pump(3);
 }
 async function startGame() { ok(ns.state === "title", "at title"); await tap("Enter"); await pump(5); ok(ns.state === "play", "game started"); }
+
+// 讓遊戲回到 play 狀態（清掉殘留的 flag/clear/gameover 等），供後續 setLevel 測試使用
+async function ensurePlay() {
+  for (let i = 0; i < 80 && ns.state !== "play"; i++) {
+    await pump(20);
+    if (["clear", "title", "gameover", "ending"].includes(ns.state)) {
+      kd("Enter"); await pump(3); ku("Enter");
+    }
+  }
+}
 
 const T = ns.TILE;
 function placeBig(x, y) { ns.player.big = true; ns.player.h = 72; ns.player.x = x; ns.player.y = y; ns.player.vx = 0; ns.player.vy = 0; ns.player.crouching = false; }
@@ -395,17 +406,19 @@ try {
 
   // ---------------- T13c: 兩隻重疊怪物一次踩扁、不受傷 ----------------
   console.log("T13c: two overlapping enemies stomped together");
-  ns.player.x = 8 * T + 24; ns.player.y = 9 * T; ns.player.vy = 0;
-  await pump(2);
+  ns.player.x = 8 * T + 24; ns.player.y = 9 * T - 60; ns.player.vy = 8;
+  ns.player.onGround = false;                       // 從空中落下（地面相交會判定為受傷）
   const px20 = 8 * T + 24;
-  ns.enemies.push({ x: px20b, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
-    active: true, dead: false, hitDir: 0 });
-  ns.enemies.push({ x: px20b + 10, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
-    active: true, dead: false, hitDir: 0 });
+  const t13e0 = { x: px20, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
+    active: true, dead: false, hitDir: 0 };
+  const t13e1 = { x: px20 + 10, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
+    active: true, dead: false, hitDir: 0 };
+  ns.enemies.push(t13e0);
+  ns.enemies.push(t13e1);
   let flatCount = 0;
   for (let i = 0; i < 12; i++) {
     await pump(1);
-    flatCount = ns.enemies.filter(e => e.state === "flat" && e.dead).length;
+    flatCount = [t13e0, t13e1].filter(e => e.state === "flat" && e.dead).length;
     if (flatCount === 2 && ns.player.vy < 0) break;
   }
   ok(flatCount === 2, `both overlapping walkers flattened (${flatCount}/2)`);
@@ -483,6 +496,7 @@ try {
 
   // ---------------- T18: 兩隻重疊怪物一次踩扁、不受傷 ----------------
   console.log("T18: two overlapping enemies stomped together");
+  await ensurePlay();                                // T17 可能停在 flag/clear 狀態
   globalThis.__drv.setLevel(0);
   await pump(3);
   ns.enemies.length = 0;
@@ -502,8 +516,9 @@ try {
   ok(flatCount2 === 2, `both overlapping walkers flattened (${flatCount2}/2)`);
   ok(ns.state === "play" || flatCount === 2, "no damage from double stomp");
 
-  // ---------------- T18 themed enemies ----------------
+  // ---------------- T19 themed enemies ----------------
   console.log("T19: theme-exclusive enemies");
+  await ensurePlay();
   globalThis.__drv.setLevel(9);           // 3-2 ice
   await pump(3);
   const pengs = ns.enemies.filter(e => e.kind === "penguin");
