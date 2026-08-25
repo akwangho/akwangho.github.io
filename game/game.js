@@ -47,11 +47,20 @@ function bindKey(code, down) {
   return false;
 }
 window.addEventListener("keydown", (e) => {
+  if (state === "title" && konamiOn) {
+    if (e.code === "ArrowLeft" || e.code === "KeyA") { titleSel = (titleSel + LEVELS.length - 1) % LEVELS.length; sfx("tick"); e.preventDefault(); return; }
+    if (e.code === "ArrowRight" || e.code === "KeyD") { titleSel = (titleSel + 1) % LEVELS.length; sfx("tick"); e.preventDefault(); return; }
+  }
+  if (handleCheats(e.code)) { e.preventDefault(); return; }
   const handled = bindKey(e.code, true);
   if (handled || ["ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp", "Space"].includes(e.code)) e.preventDefault();
   initAudioOnce();
 });
 window.addEventListener("keyup", (e) => bindKey(e.code, false));
+window.addEventListener("blur", () => {
+  keys.left = keys.right = keys.jump = keys.run = keys.down = false;
+  jumpBuffer = 0; wantFire = false;
+});
 
 document.querySelectorAll("#touch .btn").forEach((b) => {
   const k = b.dataset.k;
@@ -105,6 +114,8 @@ function sfx(name) {
     case "fire": tone(180, 60, 0.25, "sawtooth", 0.1); break;
     case "throw": tone(620, 180, 0.12, "square", 0.1); break;
     case "crouch": tone(200, 140, 0.07, "square", 0.07); break;
+    case "konami": [262, 330, 392, 523, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.09, "square", 0.13, i * 0.06)); break;
+    case "wing": tone(880, 640, 0.06, "triangle", 0.06); break;
     case "ending": [523, 659, 784, 1047, 784, 1047, 1319, 1568].forEach((f, i) => tone(f, f, 0.14, "square", 0.12, i * 0.16)); break;
   }
 }
@@ -133,6 +144,103 @@ function startMusicLoop() {
 function toggleMusic() { musicOn = !musicOn; }
 function togglePause() { if (state === "play") paused = !paused; }
 
+// ---------------- cheat codes ----------------
+const KONAMI = ["U", "U", "D", "D", "L", "R", "L", "R", "B", "A"];
+
+function cheatTokens(code) {
+  switch (code) {
+    case "ArrowUp": case "KeyW": return ["U"];
+    case "ArrowDown": case "KeyS": return ["D"];
+    case "ArrowLeft": return ["L"];
+    case "KeyA": return ["L", "A"]; // WASD-left or NES A button
+    case "ArrowRight": case "KeyD": return ["R"];
+    case "Space": case "KeyZ": case "KeyK": return ["A"]; // NES A ~= jump
+    case "KeyB": case "KeyX": case "KeyJ":
+    case "ShiftLeft": case "ShiftRight": return ["B"]; // NES B ~= run/fire
+    default: return /^Key[A-Z]$/.test(code) ? [code.slice(3)] : [];
+  }
+}
+
+function konamiMatch() {
+  if (konamiEv.length < KONAMI.length) return false;
+  const tail = konamiEv.slice(-KONAMI.length);
+  return KONAMI.every((tok, i) => tail[i].includes(tok));
+}
+
+function handleCheats(code) {
+  const toks = cheatTokens(code);
+  if (toks.length) {
+    konamiEv.push(toks);
+    if (konamiEv.length > KONAMI.length + 2) konamiEv.shift();
+  }
+  if (state === "title" && !konamiOn && konamiMatch()) {
+    konamiUnlock();
+    konamiEv = [];
+    return false;
+  }
+  const m = /^Key([A-Z])$/.exec(code);
+  if (!m || !konamiOn || state !== "play") return false;
+  const ch = m[1].toLowerCase();
+  const prev = cheatProgress;
+  const next = prev + ch;
+  let live = "";
+  for (let i = 0; i < next.length; i++) {
+    const suf = next.slice(i);
+    if ("fly".startsWith(suf) || "super".startsWith(suf)) { live = suf; break; }
+  }
+  cheatProgress = live;
+  cheatIdleT = 0;
+  if (ch === "p" && prev.length >= 2 && "super".startsWith(next)) return true; // typing "su|p...": don't pause
+  if (next === "fly") { cheatProgress = ""; activateFly(); }
+  else if (next === "super") { cheatProgress = ""; activateSuper(); }
+  return false;
+}
+
+function konamiUnlock() {
+  konamiOn = true;
+  lives = 99;
+  titleSel = levelIdx;
+  sfx("konami");
+}
+
+function activateFly() {
+  cheatFly = !cheatFly;
+  player.fly = cheatFly;
+  sfx(cheatFly ? "power" : "shrink");
+  popups.push({ x: player.x, y: player.y - 120, t: 0, text: cheatFly ? "FLY ON!" : "FLY OFF" });
+}
+
+function activateSuper() {
+  cheatSuper = !cheatSuper;
+  player.super = cheatSuper;
+  sfx(cheatSuper ? "power" : "shrink");
+  popups.push({ x: player.x, y: player.y - 140, t: 0, text: cheatSuper ? "SUPER ON!" : "SUPER OFF" });
+}
+
+function superRespawn() {
+  const p = player;
+  const fromTx = Math.max(1, Math.floor(camX / TILE) + 2);
+  let placed = false;
+  for (let tx = fromTx; tx <= Math.min(levelW - 2, fromTx + 14) && !placed; tx++) {
+    for (let ty = ROWS - 2; ty >= 3; ty--) {
+      if (solidAt(tx, ty) && !solidAt(tx, ty - 1) && !solidAt(tx, ty - 2)) {
+        p.x = tx * TILE + TILE / 2;
+        p.y = ty * TILE;
+        placed = true;
+        break;
+      }
+    }
+  }
+  if (!placed) { p.x = fromTx * TILE + TILE / 2; p.y = (ROWS - 2) * TILE; }
+  p.vx = 0; p.vy = 0;
+  p.crouching = false;
+  p.h = p.big ? 72 : 46;
+  p.invuln = 100;
+  particles.push({ type: "smoke", x: p.x, y: p.y - 30, vx: 0, vy: 0, t: 0 });
+  popups.push({ x: p.x, y: p.y - 110, t: 0, text: "SUPER RESCUE!" });
+  sfx("power");
+}
+
 let state = "loading", paused = false, frame = 0;
 let score = 0, bananaCount = 0, lives = 5, timeLeft = 300, timeTick = 0;
 let camX = 0;
@@ -143,6 +251,9 @@ let flagClothY = 0, flagDone = false;
 let clearTimer = 0, bonusLeft = 0, deadTimer = 0, hurryPlayed = false;
 let fireSpots = [], fireballs = [];
 let levelIdx = 0, endT = 0;
+let konamiOn = false, titleSel = 0, cheatProgress = "", cheatIdleT = 0;
+let cheatFly = false, cheatSuper = false;
+let konamiEv = [];
 
 const THEMES = {
   over: { sky: "#5c94fc", top: "tile_grass", fill: "tile_dirt", decor: "over" },
@@ -646,6 +757,7 @@ function resetLevel() {
     x: 2.5 * TILE, y: 9 * TILE, vx: 0, vy: 0, w: 40, h: 72,
     big: false, fire: false, crouching: false, onGround: false, face: 1, animT: 0, stompChain: 0,
     invuln: 0, star: 0, growT: 0, growMode: null, skid: false, hitDir: 0,
+    fly: cheatFly, super: cheatSuper,
   };
   camX = 0; timeLeft = 300; timeTick = 0; hurryPlayed = false;
   flagClothY = 2 * TILE + 6; flagDone = false; clearTimer = 0; bonusLeft = 0;
@@ -787,7 +899,7 @@ function flipKill(en, pts) {
 }
 
 function damagePlayer() {
-  if (player.invuln > 0 || player.star > 0 || state !== "play" || player.growT > 0) return;
+  if (player.invuln > 0 || player.star > 0 || player.super || state !== "play" || player.growT > 0) return;
   if (player.fire) {
     player.fire = false;
     player.invuln = 130;
@@ -838,8 +950,8 @@ function updatePlayer() {
     if (!p.crouching) { p.crouching = true; if (p.onGround) sfx("crouch"); }
   } else if (p.crouching) {
     const ty = Math.floor((p.y - 72) / TILE);
-    let blocked = ty >= 0;
-    if (!blocked) {
+    let blocked = false;
+    if (ty >= 0) {
       const cx0 = Math.floor((p.x - p.w / 2 + 4) / TILE), cx1 = Math.floor((p.x + p.w / 2 - 4) / TILE);
       for (let tx = cx0; tx <= cx1; tx++) if (solidAt(tx, ty)) { blocked = true; break; }
     }
@@ -867,19 +979,24 @@ function updatePlayer() {
   if (jumpBuffer > 0) jumpBuffer--;
   if (!keys.jump && p.vy < -6) p.vy = -6;
   p.vy = Math.min(MAXFALL, p.vy + GRAV);
+  if (p.fly && keys.jump && p.vy > -7.2) {
+    p.vy -= 0.85;
+    if (frame % 8 === 0) sfx("wing");
+  }
 
   rectVsGrid(p, bumpBlock);
   if (p.onGround) p.stompChain = 0;
   p.x = Math.max(p.w / 2, Math.min(levelW * TILE - p.w / 2, p.x));
 
   if (p.invuln > 0) p.invuln--;
+  if (cheatProgress && ++cheatIdleT > 110) { cheatProgress = ""; cheatIdleT = 0; }
   if (p.star > 0) { p.star--; if (p.star === 0) musicTempo = hurryPlayed ? 1.25 : 1; }
 
   const ltx = Math.floor(p.x / TILE);
   const lty = Math.floor((p.y - 4) / TILE);
-  if (deadlyAt(ltx, lty)) { killPlayer(); return; }
+  if (deadlyAt(ltx, lty)) { if (p.super) superRespawn(); else killPlayer(); return; }
 
-  if (p.y > VIEW_H + 80) { killPlayer(); return; }
+  if (p.y > VIEW_H + 80) { if (p.super) superRespawn(); else killPlayer(); return; }
 
   if (p.x >= flagCol * TILE - 24) startFlag();
 }
@@ -1440,6 +1557,7 @@ function drawPlayer() {
   ctx.save();
   ctx.translate(Math.round(p.x), Math.round(p.y));
   if (p.face < 0) ctx.scale(-1, 1);
+  if (p.fly && state !== "dead") drawWings(w, h);
   if (p.star > 0 && (p.star > 60 || (frame >> 2) % 2 === 0)) {
     ctx.filter = `hue-rotate(${(frame * 29) % 360}deg) saturate(1.6) brightness(1.1)`;
   } else if (p.fire && (p.growT === 0 || Math.floor(p.growT / 5) % 2 === 0)) {
@@ -1448,6 +1566,26 @@ function drawPlayer() {
   ctx.drawImage(img, -w / 2, -h, w, h);
   ctx.restore();
   ctx.filter = "none";
+}
+
+function drawWings(w, h) {
+  const flap = player.onGround ? 0.3 : Math.sin(frame * 0.5);
+  for (const side of [-1, 1]) {
+    ctx.save();
+    ctx.translate(side * w * 0.06, -h * (side < 0 ? 0.64 : 0.56));
+    ctx.rotate(side * (0.5 + flap * 0.4));
+    ctx.globalAlpha = side < 0 ? 0.7 : 0.95;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.ellipse(-w * 0.34, 0, w * 0.44, h * 0.13, 0, 0, 7);
+    ctx.fill();
+    ctx.fillStyle = "#cfe0ef";
+    ctx.beginPath();
+    ctx.ellipse(-w * 0.4, h * 0.08, w * 0.3, h * 0.09, 0, 0, 7);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
 }
 
 function drawParticles() {
@@ -1511,6 +1649,8 @@ function drawHUD() {
   ctx.drawImage(IMG.face1, 830, 16, 40, 32);
   hudText("x" + Math.max(0, lives), 878, 42);
   if (player.fire) ctx.drawImage(IMG.fireflower, 296, 18, 30, 30);
+  if (player.fly) hudText("FLY", 452, 34);
+  if (player.super) hudText("SUPER", 452, 60);
 }
 
 function drawTitle() {
@@ -1538,7 +1678,21 @@ function drawTitle() {
   ctx.font = "18px 'Press Start 2P', monospace";
   if ((frame >> 5) % 2 === 0) {
     ctx.fillStyle = "#000";
+    ctx.fillText("PRESS ENTER / TAP TO START", VIEW_W / 2 + 2, 298);
+    ctx.fillStyle = konamiOn ? "#7fff7f" : "#fff";
     ctx.fillText("PRESS ENTER / TAP TO START", VIEW_W / 2, 296);
+  }
+  if (konamiOn) {
+    ctx.font = "11px 'Press Start 2P', monospace";
+    ctx.fillStyle = "#7fff7f";
+    ctx.fillText("KONAMI MODE  LIVES x99", VIEW_W / 2, 274);
+    if ((frame >> 4) % 2 === 0) {
+      ctx.font = "18px 'Press Start 2P', monospace";
+      ctx.fillStyle = "#000";
+      ctx.fillText("< STAGE " + LEVELS[titleSel].name + " >", VIEW_W / 2 + 2, 322);
+      ctx.fillStyle = "#f7c531";
+      ctx.fillText("< STAGE " + LEVELS[titleSel].name + " >", VIEW_W / 2, 320);
+    }
   }
   const img = IMG.powerup;
   const s = 1.35;
@@ -1626,7 +1780,13 @@ function step() {
   if (state === "loading") return;
   if (paused && state === "play") { anyEnter = false; return; }
   if (state === "title") {
-    if (anyEnter) { score = 0; bananaCount = 0; lives = 5; levelIdx = 0; resetLevel(); state = "play"; }
+    if (anyEnter) {
+      score = 0; bananaCount = 0;
+      levelIdx = konamiOn ? titleSel : 0;
+      lives = konamiOn ? 99 : 5;
+      resetLevel();
+      state = "play";
+    }
     anyEnter = false;
     return;
   }
@@ -1710,7 +1870,7 @@ function loadImages(cb) {
       console.error("missing sprite:", n);
       if (--left === 0) cb();
     };
-    im.src = "assets/sprites/" + n + ".png";
+    im.src = "assets/sprites/" + n + ".png?v=5";
     IMG[n] = im;
   });
 }
