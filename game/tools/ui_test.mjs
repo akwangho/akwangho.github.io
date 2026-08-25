@@ -31,6 +31,7 @@ function makeEnv(vw, vh, stored) {
   const env = {
     els, store: storeMap,
     winHandlers: {}, docHandlers: {}, fsCalls: 0, exitCalls: 0, scrollable: undefined,
+    reloads: 0, confirmResult: true,
     setViewport(w, h) { globalThis.window.innerWidth = w; globalThis.window.innerHeight = h; },
     fireResize() { (env.winHandlers.resize || []).forEach(f => f({})); },
     fireDocEvent(t) { (env.docHandlers[t] || []).forEach(f => f({})); },
@@ -45,7 +46,10 @@ function makeEnv(vw, vh, stored) {
   globalThis.localStorage = {
     getItem: (k) => (k in storeMap ? storeMap[k] : null),
     setItem: (k, v) => { storeMap[k] = String(v); },
+    removeItem: (k) => { delete storeMap[k]; },
   };
+  globalThis.location = { reload() { env.reloads++; } };
+  globalThis.window.confirm = function () { return env.confirmResult; };
   globalThis.document = {
     getElementById: el,
     addEventListener(t, f) { (env.docHandlers[t] ||= []).push(f); },
@@ -156,6 +160,23 @@ try {
   env.fireDocEvent("fullscreenchange");
   ok(env.els.szLabel.textContent === "80%" && Math.abs(parseFloat(env.els.game.style.width) - 768) < 0.01,
      "exiting fullscreen restores previous 80%");
+
+  // T11 清除記錄：confirm 後移除所有 smb_* 並重載頁面
+  env.store["smb_rank_v1"] = JSON.stringify({ "1-1": "S" });
+  env.confirmResult = true;
+  const rBefore = env.reloads;
+  env.els.clearRec.fire("click");
+  ok(env.store["smb_rank_v1"] === undefined && env.store["smb_size"] === undefined,
+     "clear removes rank/size records");
+  ok(env.reloads === rBefore + 1, "page reloads after clearing");
+
+  // T12 取消確認 → 不清除、不重載
+  env.store["smb_rank_v1"] = "keep";
+  env.confirmResult = false;
+  const rB2 = env.reloads;
+  env.els.clearRec.fire("click");
+  ok(env.store["smb_rank_v1"] === "keep" && env.reloads === rB2,
+     "cancelling confirm keeps records");
 
   console.log(`\nRESULT: ${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

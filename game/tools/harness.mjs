@@ -53,7 +53,7 @@ export { state, paused, player, keys, lives, score, levelIdx, konamiOn, titleSel
          timeLeft, bananaCount, pipes, enemies, items, shots, fireballs, bananas,
          levelW, resetLevel, damagePlayer, solidAt, deadlyAt,
          boss, plants, bigbananas, hammers, cpActive, cpLevel, cpX, cpY,
-         deathsThisLevel, lastRank };
+         deathsThisLevel, lastRank, IMG };
 globalThis.__drv = {
   setLevel: (i) => { levelIdx = i; resetLevel(); },
 };

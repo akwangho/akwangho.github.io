@@ -19,6 +19,8 @@ const SPRITES = [
   "fx_sparkle", "fx_smoke", "fx_fireball",
   "enemy_a", "enemy_b", "enemy_flat",
   "shell", "enemy_fly", "plant", "boss", "hammer",
+  "mummy", "penguin", "lava_bubble",
+  "boss_rabbit", "boss_shih", "boss_cats", "boss_bowser",
   "tile_checkpoint", "tile_checkpoint_on",
   "face1",
 ];
@@ -319,8 +321,10 @@ const FLY_SPOTS = {
 };
 const PLANT_PIPES = { 1: [32, 40, 94], 9: [44, 104], 12: [104] };
 const BOSS_LEVELS = {
-  3: { hp: 3, clearStairs: [[172, 180]] },
-  15: { hp: 5, clearStairs: [[182, 190]] },
+  3:  { hp: 3, img: "boss_rabbit", bossName: "彼得兔",   clearStairs: [[172, 180]] },
+  7:  { hp: 3, img: "boss_shih",   bossName: "西施惠",   clearStairs: [[158, 163]] },
+  11: { hp: 4, img: "boss_cats",   bossName: "野貓軍團", clearStairs: [[186, 192]] },
+  15: { hp: 5, img: "boss_bowser", bossName: "庫巴",     clearStairs: [[182, 190]] },
 };
 
 function setupLevelExtras(def) {
@@ -340,6 +344,10 @@ function setupLevelExtras(def) {
       vx: -1.3, vy: 0, w: 34, h: 30, state: "fly", t: 0,
       active: false, dead: false, hitDir: 0, kind: "fly" });
   });
+  // ---- theme-exclusive enemies ----
+  if (def.theme === "pyramid") convertWalkersTo("mummy", 3);
+  if (def.theme === "ice") convertWalkersTo("penguin", 3);
+  if (["volcano", "lavacave", "bridge", "castle"].includes(def.theme)) spawnLavaBubbles();
   (PLANT_PIPES[levelIdx] || []).forEach(px => {
     const pi = pipes.find(pp => pp[0] === px);
     if (pi) plants.push({ x: pi[0] * TILE + TILE, topY: (pi[2] - pi[1]) * TILE,
@@ -356,7 +364,8 @@ function setupLevelExtras(def) {
           if (tx !== wallCol && grid[ty] && grid[ty][tx] === 3) grid[ty][tx] = 0;
     });
     for (let ty = 0; ty <= 8; ty++) grid[ty][wallCol] = 3;
-    boss = { x: (wallCol - 8) * TILE, y: 6 * TILE, w: 84, h: 84, hp: bs.hp, maxHp: bs.hp,
+    boss = { x: (wallCol - 8) * TILE, y: 9 * TILE, w: 96, h: 96,
+      hp: bs.hp, maxHp: bs.hp, img: bs.img, bossName: bs.bossName,
       vx: 0, vy: 0, prevVy: 0, t: 0, throwCd: 150, hopCd: 260, dizzy: 0, inv: 0,
       minX: (wallCol - 13) * TILE, maxX: (wallCol - 2) * TILE,
       dead: false, wallCol, face: -1, onGround: false, wasGround: false, hitWall: false, hitDir: 0 };
@@ -373,6 +382,35 @@ function setupLevelExtras(def) {
         if (cp.conflicts.some(ex => Math.abs(en.x - ex) < 4)) en.x += 6 * TILE;
       });
     }
+  }
+}
+function convertWalkersTo(kind, n) {
+  const cands = enemies.filter(e => e.state === "walk" && !e.kind).sort((a, b) => a.x - b.x);
+  const stepI = Math.max(1, Math.floor(cands.length / n));
+  let placed = 0;
+  for (let i = Math.floor(stepI / 2); i < cands.length && placed < n; i += stepI) {
+    cands[i].kind = kind;
+    if (kind === "mummy") cands[i].baseSpd = 0.6;
+    if (kind === "penguin") cands[i].baseSpd = 2.0;
+    placed++;
+  }
+}
+function spawnLavaBubbles() {
+  const spans = [];
+  let s = null;
+  for (let x = 0; x <= levelW; x++) {
+    const isLava = x < levelW && (deadlyAt(x, 9) || deadlyAt(x, 10));
+    if (isLava && s === null) s = x;
+    if (!isLava && s !== null) { spans.push([s, x - 1]); s = null; }
+  }
+  let count = 0;
+  for (const [a, b] of spans) {
+    if (count >= 4 || b - a + 1 < 2) continue;
+    const mid = Math.floor((a + b) / 2);
+    enemies.push({ kind: "bubble", state: "bubble", x: mid * TILE + 24,
+      baseY: 9 * TILE, y: 9 * TILE, vx: 0, vy: 0, w: 32, h: 32,
+      t: (mid * 37) % 260, period: 260, active: false, dead: false, hitDir: 0 });
+    count++;
   }
 }
 function findSurfaceNear(col) {
@@ -1107,6 +1145,7 @@ function throwFire() {
 
 function updatePlayer() {
   const p = player;
+  p.prevFeet = p.y;
   if (fireCd > 0) fireCd--;
   const throwNow = wantFire;
   wantFire = false;
@@ -1166,9 +1205,22 @@ function updatePlayer() {
   }
 
   const wasAir = !p.onGround;
+  const prevVX = p.vx;
   hiddenCheck = true;
   rectVsGrid(p, bumpBlock);
   hiddenCheck = false;
+  // step-up assist: walking into a 1-tile ledge snaps you on top of it
+  if (p.onGround && p.hitWall && Math.abs(prevVX) > 0.5 && !p.crouching) {
+    const dir = Math.sign(prevVX);
+    const ftx = Math.floor((p.x + dir * (p.w / 2 + 2)) / TILE);
+    const supTy = Math.floor(p.y / TILE);                 // 支撐列（腳下）
+    if (solidAt(ftx, supTy - 1) && !solidAt(ftx, supTy - 2) &&
+        (p.big ? !solidAt(ftx, supTy - 3) : true)) {
+      p.y = (supTy - 1) * TILE;                           // 踏上一階
+      p.vx = prevVX * 0.7;
+      p.x += dir * 2;
+    }
+  }
   if (p.onGround && wasAir && p.landT === 0) p.landT = 8;   // landing squash
   if (p.landT > 0) p.landT--;
   if (p.onGround) p.stompChain = 0;
@@ -1276,14 +1328,20 @@ function updateEnemies() {
     en.t++;
     if (en.state === "walk") {
       en.vy = Math.min(MAXFALL, en.vy + GRAV);
-      if (en.vx === 0) en.vx = -1.1;
-      if (en.onGround) {
-        const frontX = en.x + Math.sign(en.vx) * (en.w / 2 + 2);
-        const ftx = Math.floor(frontX / TILE), fty = Math.floor((en.y + 4) / TILE);
-        if (!solidAt(ftx, fty)) en.vx = -en.vx;
+      let spd = en.baseSpd || 1.1;
+      if (en.kind === "penguin") spd = 2.0;
+      if (en.kind === "mummy") {
+        spd = Math.abs(player.x - en.x) < 8 * TILE ? 2.0 : 0.6;
       }
+      en.dir = en.dir || Math.sign(en.vx || -1) || -1;
+      if (en.onGround) {
+        const frontX = en.x + en.dir * (en.w / 2 + 2);
+        const ftx = Math.floor(frontX / TILE), fty = Math.floor((en.y + 4) / TILE);
+        if (!solidAt(ftx, fty)) en.dir = -en.dir;
+      }
+      en.vx = en.dir * spd;
       rectVsGrid(en, null);
-      if (en.hitWall) en.vx = 1.1 * en.hitDir;
+      if (en.hitWall) { en.dir = en.hitDir; en.vx = spd * en.hitDir; }
       const etx = Math.floor(en.x / TILE), ety = Math.floor((en.y - 4) / TILE);
       if (deadlyAt(etx, ety)) {
         en.state = "gone";
@@ -1316,6 +1374,15 @@ function updateEnemies() {
         en.state = "flat"; en.dead = true; en.t = 0;
         particles.push({ type: "smoke", x: en.x, y: en.y - 16, vx: 0, vy: 0, t: 0 });
       }
+    } else if (en.state === "bubble") {
+      en.t++;
+      const cyc = en.t % en.period;
+      let lift = 0;
+      if (cyc < 60) lift = (cyc / 60) * 56;
+      else if (cyc < 160) lift = 56;
+      else if (cyc < 220) lift = 56 * (1 - (cyc - 160) / 60);
+      en.y = en.baseY - lift;
+      en.riseLift = lift;
     } else if (en.state === "flat") {
       if (en.t > 30) en.state = "gone";
     } else if (en.state === "flip") {
@@ -1345,7 +1412,8 @@ function updateEnemies() {
   if (player.star > 0) {
     enemies.forEach((en) => {
       if (!en.dead && en.active && (en.state === "walk" || en.state === "fly" ||
-          en.state === "shell" || en.state === "slide") && overlap(player, en)) {
+          en.state === "shell" || en.state === "slide" || en.state === "bubble") &&
+          overlap(player, en)) {
         player.stompChain = Math.min(player.stompChain + 1, 5);
         flipKill(en, 100 * Math.pow(2, player.stompChain - 1));
       }
@@ -1353,9 +1421,16 @@ function updateEnemies() {
   }
   enemies.forEach((en) => {
     if (en.dead || !en.active) return;
-    if (!(en.state === "walk" || en.state === "fly" || en.state === "shell" || en.state === "slide")) return;
+    if (!(en.state === "walk" || en.state === "fly" || en.state === "shell" ||
+          en.state === "slide" || en.state === "bubble")) return;
     if (!overlap(player, en)) return;
-    const stomp = player.vy > 1.5 && (player.y - en.y + en.h) < en.h * 0.75;
+    if (en.state === "bubble") {
+      if ((en.riseLift || 0) > 18) damagePlayer();
+      return;
+    }
+    const cameFromAbove = (player.prevFeet ?? player.y) <= en.y - en.h + 10;
+    const stomp = player.vy > 1.5 &&
+      ((player.y - (en.y - en.h)) < en.h * 0.5 || cameFromAbove);
     if (stomp) {
       player.stompChain = Math.min(player.stompChain + 1, 5);
       addScore(100 * Math.pow(2, player.stompChain - 1), en.x, en.y - 46);
@@ -1471,7 +1546,8 @@ function updateShots() {
     let hit = false;
     enemies.forEach((en) => {
       if (!hit && !en.dead && en.active &&
-          (en.state === "walk" || en.state === "fly" || en.state === "shell" || en.state === "slide") &&
+          (en.state === "walk" || en.state === "fly" || en.state === "shell" ||
+           en.state === "slide" || en.state === "bubble") &&
           Math.abs(en.x - s.x) < 26 && Math.abs((en.y - en.h / 2) - s.y) < 26) {
         flipKill(en, 200);
         hit = true;
@@ -1567,6 +1643,9 @@ function updateBoss() {
   if (b.x < b.minX && b.vx < 0) b.vx = 0;
   if (b.x > b.maxX && b.vx > 0) b.vx = 0;
   rectVsGrid(b, null);
+  // keep the boss inside its arena (hard positional clamp)
+  if (b.x < b.minX) b.x = b.minX;
+  if (b.x > b.maxX - b.w / 2) b.x = b.maxX - b.w / 2;
   if (b.onGround && !b.wasGround && b.prevVy > 5) {   // heavy landing -> dizzy window
     b.dizzy = 90;
     addShake(8, 5);
@@ -1576,7 +1655,7 @@ function updateBoss() {
   if (b.dizzy <= 0 && b.onGround) {
     if (--b.throwCd <= 0) {
       b.throwCd = 200;
-      hammers.push({ x: b.x + b.face * 34, y: b.y - b.h + 22,
+      hammers.push({ x: b.x + b.face * (b.w / 2 + 4), y: b.y - b.h + 26,
         vx: b.face * 4.2, vy: -7.2, t: 0 });
       sfx("throw");
     }
@@ -1584,7 +1663,8 @@ function updateBoss() {
   }
   // player contact
   if (overlap(p, b)) {
-    const stomp = p.vy > 1.5 && (p.y - b.y + p.h) < b.h * 0.55;
+    const cameFromAboveB = (p.prevFeet ?? p.y) <= b.y - b.h + 14;
+    const stomp = p.vy > 1.5 && ((p.y - (b.y - b.h)) < b.h * 0.5 || cameFromAboveB);
     if (b.dizzy > 0 && stomp) {
       hitBoss();
       p.vy = STOMP_BOUNCE_HELD; p.onGround = false;
@@ -1934,8 +2014,13 @@ function drawFireballs() {
 
 function drawEnemy(en) {
   if (en.state === "gone" || !en.active) return;
+  if (en.state === "gone" || !en.active) return;
+  if (en.state === "bubble" && en.y >= en.baseY - 10) return;   // still inside lava
   let img;
   if (en.state === "flat") img = IMG.enemy_flat;
+  else if (en.kind === "mummy") img = IMG.mummy;
+  else if (en.kind === "penguin") img = IMG.penguin;
+  else if (en.state === "bubble") img = IMG.lava_bubble;
   else if (en.state === "fly") img = IMG.enemy_fly;
   else if ((en.kind === "shell") && (en.state === "shell" || en.state === "slide")) img = IMG.shell;
   else img = (en.t >> 4) % 2 === 0 ? IMG.enemy_a : IMG.enemy_b;
@@ -2005,22 +2090,32 @@ function drawBoss() {
   const b = boss;
   if (!b || b.dead || !b.awake) return;
   if (b.inv > 0 && (frame >> 2) % 2 === 0) return;   // hit flash
-  const bob = Math.sin(b.t * 0.1) * 2;
+  const bob = Math.sin(b.t * 0.1) * 3;
+  // name tag
+  ctx.font = "11px 'Press Start 2P', monospace";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#000";
+  ctx.fillText(b.bossName, b.x + 1, b.y - b.h - 24 + 1);
+  ctx.fillStyle = "#ffd54f";
+  ctx.fillText(b.bossName, b.x, b.y - b.h - 25);
+  const bobY = Math.sin(b.t * 0.1) * 3;
   ctx.save();
-  ctx.translate(b.x, b.y + bob);
+  ctx.translate(Math.round(b.x), Math.round(b.y + bobY));
   if (b.face < 0) ctx.scale(-1, 1);
-  ctx.drawImage(IMG.boss, -b.w / 2, -b.h, b.w, b.h);
+  ctx.imageSmoothingEnabled = true;                   // 照片型素材用平滑縮放
+  ctx.drawImage(IMG[b.img] || IMG.boss_bowser, -b.w / 2, -b.h, b.w, b.h);
+  ctx.imageSmoothingEnabled = false;
   ctx.restore();
   // hp pips
   for (let i = 0; i < b.maxHp; i++) {
     ctx.fillStyle = i < b.hp ? "#ff5252" : "rgba(255,255,255,.25)";
-    ctx.fillRect(b.x - b.maxHp * 9 + i * 18, b.y - b.h - 16, 14, 8);
+    ctx.fillRect(b.x - b.maxHp * 10 + i * 20, b.y - b.h - 18, 16, 8);
   }
   if (b.dizzy > 0) {
     ctx.fillStyle = "#ffe082";
     for (let i = 0; i < 3; i++) {
       const ang = frame * 0.15 + i * 2.1;
-      ctx.fillRect(b.x + Math.cos(ang) * 26 - 2, b.y - b.h - 10 + Math.sin(ang) * 6, 5, 5);
+      ctx.fillRect(b.x + Math.cos(ang) * 30 - 2, b.y - b.h - 12 + Math.sin(ang) * 6, 5, 5);
     }
   }
 }

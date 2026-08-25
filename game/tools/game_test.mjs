@@ -72,7 +72,7 @@ export { state, paused, player, keys, lives, score, levelIdx, konamiOn, titleSel
          cheatFly, cheatSuper, LEVELS, grid, camX, TILE, VIEW_H, ROWS, frame, timeLeft,
          bananaCount, pipes, enemies, bigbananas, plants, boss, hammers,
          cpActive, cpLevel, cpX, cpY, deathsThisLevel,
-         levelW, resetLevel, damagePlayer, solidAt, deadlyAt };
+         levelW, resetLevel, damagePlayer, solidAt, deadlyAt, IMG };
 globalThis.__drv = {
   setLevel: (i) => { levelIdx = i; resetLevel(); },
 };
@@ -364,6 +364,23 @@ try {
   // clean up stray enemies so later tests are stable
   for (const en of ns.enemies) if (en !== victim && en.active && Math.abs(en.x - sh.x) < 400) en.state = "gone";
 
+  // ---------------- T13b big-player stomp ----------------
+  console.log("T13b: big player stomps without damage");
+  ns.player.x = 8 * T + 24; ns.player.y = 9 * T; ns.player.vy = 0;
+  await pump(2);
+  const bwx = ns.player.x + 90;
+  ns.enemies.push({ x: bwx, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk",
+    t: 0, active: true, dead: false, hitDir: 0 });
+  const bw = ns.enemies[ns.enemies.length - 1];
+  ns.player.big = true; ns.player.h = 72;
+  ns.player.x = bw.x; ns.player.y = bw.y - 74; ns.player.vy = 8;
+  const wasBig = true;
+  await pump(14);
+  ok(bw.dead === true || bw.state === "flat", "big player stomps walker flat");
+  ok(ns.player.big === true && wasBig, "big player stays big after stomp");
+  ok(ns.state === "play", "no damage taken from stomp");
+  ns.player.big = false; ns.player.h = 46;
+
   // ---------------- T14 piranha plant + fireball ----------------
   console.log("T14: piranha plant");
   const plX = ns.player.x + 140;
@@ -411,6 +428,65 @@ try {
     ok(ns.score >= scB + 1000, "+1000 score for big banana");
     ok(globalThis.__ctxDraws.some(d => Math.abs(d[3] - 68) < 0.01 && Math.abs(d[4] - 68) < 0.01),
        "drawn as classic banana shape at 68px (4x area)");
+  }
+
+  // ---------------- T18 themed enemies ----------------
+  console.log("T18: theme-exclusive enemies");
+  globalThis.__drv.setLevel(9);           // 3-2 ice
+  await pump(3);
+  const pengs = ns.enemies.filter(e => e.kind === "penguin");
+  ok(pengs.length >= 3, `ice level has penguins (${pengs.length})`);
+  // activate near one, measure from a safe distance
+  ns.player.x = pengs[0].x - 130; ns.player.y = pengs[0].y - 2; ns.player.vy = 0;
+  await pump(12);
+  ok(Math.abs(pengs[0].vx) >= 1.9, `penguin is fast (${Math.abs(pengs[0].vx).toFixed(2)})`);
+  ns.player.x = pengs[0].x - 400; await pump(10);
+  globalThis.__drv.setLevel(7);           // 2-4 pyramid
+  await pump(3);
+  const mum = ns.enemies.filter(e => e.kind === "mummy");
+  ok(mum.length >= 3, `pyramid has mummies (${mum.length})`);
+  // mummy speeds up when player is near
+  const m0 = mum.find(e => e.active) || mum[0];
+  ns.player.x = m0.x + 260; ns.player.y = m0.y - 2;   // inside 8-tile aggro, out of contact
+  await pump(24);
+  ok(Math.abs(m0.vx) >= 1.8, `mummy chases fast when close (${Math.abs(m0.vx).toFixed(2)})`);
+  ok(ns.state === "play", "player safe while observing mummy");
+  ns.player.x = m0.x + 900; await pump(40);           // beyond aggro radius
+  ok(Math.abs(m0.vx) <= 0.75, `mummy slows down when far (${Math.abs(m0.vx).toFixed(2)})`);
+  ok(ns.state === "play", "player still alive after mummy checks");
+  globalThis.__drv.setLevel(12);          // 4-1 volcano
+  await pump(3);
+  const bubbles = ns.enemies.filter(e => e.kind === "bubble");
+  ok(bubbles.length >= 2, `volcano has lava bubbles (${bubbles.length})`);
+  // hover in a bubble's emergence path (fly cheat) -> get burned
+  const bub = bubbles[0];
+  let g18 = 0;
+  while (ns.state === "play" && g18++ < 500) {
+    const p = ns.player;
+    p.x = bub.x;
+    if (p.y > bub.baseY - 28) kd("Space"); else ku("Space");
+    await pump(1);
+  }
+  ku("Space");
+  ok(ns.state === "dead", "lava bubble burns a hovering player");
+
+  // ---------------- T19 four world bosses ----------------
+  console.log("T19: four world bosses with unique sprites");
+  const roster = [[3, "boss_rabbit"], [7, "boss_shih"], [11, "boss_cats"], [15, "boss_bowser"]];
+  for (const [li, imgKey] of roster) {
+    globalThis.__drv.setLevel(li);
+    await pump(2);
+    const b = ns.boss;
+    ok(!!b, `${ns.LEVELS[li].name}: boss exists`);
+    if (!b) continue;
+    ok(b.img === imgKey, `${ns.LEVELS[li].name}: sprite ${b.img}`);
+    ok(b.w === 96 && b.h === 96, `${ns.LEVELS[li].name}: boss occupies 4 tiles (96x96)`);
+    // draw one frame near boss and confirm the correct image is used
+    ns.player.x = b.minX + 80; ns.player.y = b.y - 170; ns.boss.awake = true;
+    const before = globalThis.__ctxDraws.length;
+    await pump(1);
+    const drew = globalThis.__ctxDraws.slice(before).some(d => d[0] === ns.IMG[imgKey]);
+    ok(drew, `${ns.LEVELS[li].name}: draws its own boss image`);
   }
 
   console.log(`\nRESULT: ${pass} passed, ${fail} failed`);

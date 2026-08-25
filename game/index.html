@@ -67,6 +67,7 @@
   <button id="szPlus" title="放大畫面">＋</button>
   <span id="szLabel">填滿</span>
   <button id="szFull" title="全螢幕切換">⛶</button>
+  <button id="clearRec" title="清除排名／記錄並重新開始">🗑</button>
 </div>
 
 <div id="hint">
@@ -174,6 +175,19 @@
   }
   document.addEventListener("fullscreenchange", onFsChange);
   document.addEventListener("webkitfullscreenchange", onFsChange);
+
+  // 清除記錄：排名 / 設定全部移除，並重載頁面重置檢查點等狀態
+  document.getElementById("clearRec").addEventListener("click", function () {
+    var yes = true;
+    try { yes = window.confirm("清除所有記錄（排名/設定/檢查點）並重新開始？"); } catch (e) {}
+    if (!yes) return;
+    try {
+      ["smb_rank_v1", "smb_hard_unlocked", "smb_size"].forEach(function (k) {
+        localStorage.removeItem(k);
+      });
+    } catch (e) {}
+    location.reload();
+  });
 
   window.addEventListener("resize", apply);
 

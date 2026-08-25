@@ -63,7 +63,7 @@ for (let i = 0; i < ns.LEVELS.length; i++) {
     if (!solid(ctxCp, ctyCp)) issues.push(`checkpoint spawn not on solid ground @${ctxCp},${ctyCp}`);
     if (solid(ctxCp, ctyCp - 1)) issues.push(`checkpoint spawn head blocked @${ctxCp},${ctyCp}`);
   }
-  const expectBoss = (i === 3 || i === 15);
+  const expectBoss = [3, 7, 11, 15].includes(i);
   if (expectBoss && !ns.boss) issues.push("missing boss");
   if (!expectBoss && ns.boss) issues.push("unexpected boss");
 
@@ -142,12 +142,16 @@ let framesInPlay = 0;
 let jumpLatch = 0;
 let prev = ns.state;
 let lvlMaxX = -1, noProgress = 0, lastFrameX = 0;
+let pinFrames = 0, lastPinX = 0;
+let wedgeF = 0, dropT = 0, lastPinY = 0;
+let framesThisLevel = 0;
 
 while (cleared.length < ns.LEVELS.length && budget-- > 0) {
   const st = ns.state;
 
   if (st === "play") {
     if (prev !== "play") { lvlMaxX = -1; noProgress = 0; }
+    framesThisLevel++;
     const p = ns.player;
     // genuine forward motion resets the stall counter (respawn setbacks are ok)
     if (p.x > lvlMaxX + 2) { lvlMaxX = p.x; noProgress = 0; }
@@ -155,6 +159,8 @@ while (cleared.length < ns.LEVELS.length && budget-- > 0) {
     else noProgress++;
     lastFrameX = p.x;
     if (noProgress > 0 && noProgress % 3000 === 0) console.log(`    ... ${ns.LEVELS[ns.levelIdx].name} no-progress ${noProgress} pos=(${Math.round(p.x)},${Math.round(p.y)})`);
+    if (framesThisLevel > 0 && framesThisLevel % 1500 === 0)
+      console.log(`    [trace] ${ns.LEVELS[ns.levelIdx].name} f=${framesThisLevel} pos=(${Math.round(p.x)},${Math.round(p.y)}) bossHp=${ns.boss ? ns.boss.hp : "-"} time=${ns.timeLeft}`);
 
     // --- bot policy: hold right; pulse jump when blocked / gap / enemy ahead ---
     const footTy = Math.max(0, Math.floor((p.y - 1) / T));
@@ -174,16 +180,32 @@ while (cleared.length < ns.LEVELS.length && budget-- > 0) {
         if (ns.solidAt(cx, cy)) { elevatedAhead = true; break outer; }
 
     // ---- boss fight override ----
+    let engaged = false;
     if (ns.boss && !ns.boss.dead && p.x > ns.boss.minX - 320) {
+      engaged = true;
       noProgress = 0;
       const b = ns.boss;
+      // universal unwedge: completely stationary -> drop everything briefly
+      if (Math.abs(p.x - lastPinX) < 1 && Math.abs(p.y - lastPinY) < 1) wedgeF++; else wedgeF = 0;
+      lastPinX = p.x; lastPinY = p.y;
+      if (wedgeF > 45) { dropT = 14; wedgeF = 0; }
       const wantY = b.dizzy > 0 ? b.y - b.h - 6 : b.y - b.h - 100;
       if (!b.awake) kd("ArrowRight");
-      if (p.y > wantY + 4) kd("Space"); else ku("Space");
-      if (Math.abs(p.x - b.x) > 14) {
-        if (p.x < b.x) { kd("ArrowRight"); ku("ArrowLeft"); }
-        else { kd("ArrowLeft"); ku("ArrowRight"); }
+      if (dropT > 0) {
+        dropT--;
+        ku("Space"); ku("ArrowRight");
+      } else {
+        if (forceJump || p.y > wantY + 4) kd("Space"); else ku("Space");
+        if (Math.abs(p.x - b.x) > 14) {
+          if (p.x < b.x) { ku("ArrowLeft"); kd("ArrowRight"); }
+          else { ku("ArrowRight"); kd("ArrowLeft"); }
+        } else { ku("ArrowLeft"); ku("ArrowRight"); }
       }
+      // hop over small steps while repositioning near the boss
+      if (Math.abs(p.x - lastPinX) < 1 && p.onGround) pinFrames++; else pinFrames = 0;
+      lastPinX = p.x;
+      var forceJump = pinFrames > 25;
+      if (forceJump) pinFrames = 0;
     } else {
       if (ns.keys.left) ku("ArrowLeft");
       const needJump = wallAhead || !floorAhead || enemyNear || elevatedAhead;
