@@ -183,7 +183,7 @@ try {
   console.log("-- draining lives to return to title --");
   let safety = 0;
   while (ns.state !== "title" && safety++ < 40000) {
-    if (ns.state === "play" || ns.state === "dead") { ns.player.y = VIEW_H_SAFE(); await pump(200); }
+    if (ns.state === "play" || ns.state === "dead") { ns.player.y = 9999; await pump(200); }
     else await pump(60);
     if (ns.state === "gameover") { await tap("Enter"); }
   }
@@ -274,10 +274,18 @@ try {
   ns.player.x = cpx0 - 30; ns.player.y = ns.cpY - 2; ns.player.vy = 0;
   kd("ArrowRight"); await pump(20); ku("ArrowRight"); await pump(2);
   ok(ns.cpActive === true, "checkpoint activated on crossing");
-  ns.player.y = 9999; await pump(200);
-  let g10 = 0; while (ns.state === "dead" && g10++ < 400) await pump(1);
-  ok(ns.state === "play" && Math.abs(ns.player.x - cpx0) < T * 1.5,
-     `respawned at checkpoint (x=${Math.round(ns.player.x)} vs cp=${Math.round(cpx0)})`);
+  ns.player.y = 9999;
+  let sawInv = false, respF = -1, g10 = 0;
+  while (respF === -1 && g10++ < 800) {
+    await pump(1);
+    if (ns.state === "play" && ns.cpActive &&
+        Math.abs(ns.player.x - cpx0) < T * 1.5 && ns.cpY === ns.player.y) {
+      respF = g10;
+      sawInv = ns.player.invuln >= 100;
+    }
+  }
+  ok(respF !== -1, "respawned at checkpoint");
+  ok(sawInv, `checkpoint respawn grants blink invuln (${ns.player.invuln})`);
   // must be STANDING on the checkpoint surface, not spawned mid-air
   await pump(90);
   ok(ns.state === "play" && Math.abs(ns.player.y - ns.cpY) < 2,
@@ -499,4 +507,4 @@ try {
   try { unlinkSync(TMP); } catch {}
 }
 
-function VIEW_H_SAFE() { return 9999; }
+

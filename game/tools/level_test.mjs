@@ -66,6 +66,37 @@ for (let i = 0; i < ns.LEVELS.length; i++) {
   const expectBoss = [3, 7, 11, 15].includes(i);
   if (expectBoss && !ns.boss) issues.push("missing boss");
   if (!expectBoss && ns.boss) issues.push("unexpected boss");
+  if (expectBoss) {
+    for (let ty = 5; ty <= 8; ty++)
+      if (ns.grid[ty][ns.LEVELS[i].flagCol - 6] !== 14)
+        issues.push(`gate wall missing at row ${ty}`);
+    if (ns.grid[4][ns.LEVELS[i].flagCol - 6] === 14)
+      issues.push("gate wall too tall (row 4 filled)");
+  }
+
+  // 重疊零容忍：香蕉/大金蕉/敵人不得嵌在實心方塊裡
+  const solidNow2 = (tx, ty) => {
+    if (ty < 0 || ty >= ns.ROWS || tx < 0 || tx >= ns.levelW) return true;
+    const c = ns.grid[ty][tx];
+    return c !== 0 && c !== 10 && c !== 11 && c !== 12 && c !== 13;
+  };
+  let embCount = 0;
+  ns.bigbananas.forEach(b => { const cx = Math.floor(b.x / ns.TILE), cy = Math.floor(b.y / ns.TILE);
+    if (cy < 2 || solidNow2(cx,cy) || solidNow2(cx,cy-1)) { embCount++; issues.push(`big banana embedded @${cx},${cy}`); } });
+  ns.bananas.forEach(b => { const cx = Math.floor(b.x / ns.TILE), cy = Math.floor(b.y / ns.TILE);
+    if (cy < 2 || solidNow2(cx,cy)) { embCount++; issues.push(`banana embedded @${cx},${cy}`); } });
+  ns.enemies.forEach(e => { if (e.state === "bubble" || e.kind === "fly") return;
+    const hx = Math.floor(e.x / ns.TILE), hy = Math.floor((e.y - e.h) / ns.TILE);
+    if (hy < 2 || solidNow2(hx,hy)) { embCount++; issues.push(`${e.kind||"walk"} embedded @${hx},${hy}`); } });
+
+  // 尾端無立足連續不得超過 6 格（衝刺跳可及）
+  let tailRun = 0, tailMax = 0;
+  for (let tx = Math.max(1, ns.LEVELS[i].flagCol - 20); tx <= Math.min(ns.levelW - 1, ns.LEVELS[i].flagCol + 3); tx++) {
+    let st = false;
+    for (let ty = 2; ty < ns.ROWS; ty++) if (solid(tx,ty) && !solid(tx,ty-1)) { st = true; break; }
+    if (!st) { tailRun++; tailMax = Math.max(tailMax, tailRun); } else tailRun = 0;
+  }
+  if (tailMax > 6) issues.push(`tail gap ${tailMax} tiles before flag`);
 
   // deadly pits: contiguous lava/water spans must be <=7 wide or bridged
   let span = 0;

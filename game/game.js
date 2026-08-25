@@ -363,13 +363,51 @@ function setupLevelExtras(def) {
         for (let ty = 0; ty < ROWS; ty++)
           if (tx !== wallCol && grid[ty] && grid[ty][tx] === 3) grid[ty][tx] = 0;
     });
-    for (let ty = 0; ty <= 8; ty++) grid[ty][wallCol] = 3;
+    for (let ty = 5; ty <= 8; ty++) grid[ty][wallCol] = 14;   // 柵門：頂尖跳躍可翻越
     boss = { x: (wallCol - 8) * TILE, y: 9 * TILE, w: 96, h: 96,
       hp: bs.hp, maxHp: bs.hp, img: bs.img, bossName: bs.bossName,
       vx: 0, vy: 0, prevVy: 0, t: 0, throwCd: 150, hopCd: 260, dizzy: 0, inv: 0,
       minX: (wallCol - 13) * TILE, maxX: (wallCol - 2) * TILE,
       dead: false, wallCol, face: -1, onGround: false, wasGround: false, hitWall: false, hitDir: 0 };
   }
+  // ---- 重疊自動修復：香蕉/大金蕉/敵人不可嵌在實心方塊裡 ----
+  const solidNow = (tx, ty) => {
+    if (ty < 0 || ty >= ROWS || tx < 0 || tx >= levelW) return true;
+    const c = grid[ty][tx];
+    return c !== 0 && c !== 10 && c !== 11 && c !== 12 && c !== 13;
+  };
+  function findFreeCell(tx0, ty0, needAbove) {  // 有界搜尋：上/左右找淨空格
+    for (let d = 0; d <= 20; d++) {
+      const cands = d === 0 ? [[tx0, ty0]] :
+        [[tx0, ty0 - d], [tx0 - d, ty0], [tx0 + d, ty0], [tx0 - d, ty0 - d], [tx0 + d, ty0 - d]];
+      for (const [cx, cy] of cands) {
+        if (cy < 2 || cy >= ROWS || cx < 1 || cx >= levelW - 1) continue;
+        if (!solidNow(cx, cy) && (!needAbove || !solidNow(cx, cy - 1)))
+          return { tx: cx, ty: cy };
+      }
+    }
+    return null;
+  }
+  bigbananas.forEach((bb) => {                 // 大金蕉：中心與上方都要淨空
+    const free = findFreeCell(Math.floor(bb.x / TILE), Math.floor(bb.y / TILE), true);
+    if (free) { bb.x = free.tx * TILE + 24; bb.y = free.ty * TILE + 28; }
+  });
+  bananas.forEach((bn) => {                    // 小香蕉：中心格淨空即可
+    const free = findFreeCell(Math.floor(bn.x / TILE), Math.floor(bn.y / TILE), false);
+    if (free) { bn.x = free.tx * TILE + 24; bn.y = free.ty * TILE + 28; }
+  });
+  enemies.forEach((en) => {                    // 怪物頭部嵌入方塊 → 橫移找淨空
+    if (en.state === "bubble") return;
+    let bx = Math.floor(en.x / TILE), g = 0;
+    while (g++ < 8) {
+      const headTy = Math.floor((en.y - en.h) / TILE);
+      if (!solidNow(bx, headTy)) break;
+      bx += (g % 2 === 1 ? 1 : -1) * Math.ceil(g / 2);   // 左右交替外擴
+      if (bx < 1 || bx > levelW - 2) break;
+      en.x = bx * TILE + 24;
+    }
+  });
+
   // checkpoint: away from enemy spawn points (never respawn into danger)
   cpX = 0; cpY = 0;
   let cpc = Math.floor(def.flagCol / 2);
@@ -957,7 +995,7 @@ function resetLevel() {
     y: useCp ? cpY : 9 * TILE,
     vx: 0, vy: 0, w: 40, h: 72,
     big: false, fire: false, crouching: false, onGround: false, face: 1, animT: 0, stompChain: 0,
-    invuln: 0, star: 0, growT: 0, growMode: null, skid: false, hitDir: 0,
+    invuln: useCp ? 120 : 0, star: 0, growT: 0, growMode: null, skid: false, hitDir: 0,
     fly: cheatFly, super: cheatSuper,
     coyote: 0, landT: 0, prevOnGround: false,
   };
@@ -1419,27 +1457,30 @@ function updateEnemies() {
       }
     });
   }
+  // 收集本帧所有接觸中的敵人（雙怪重疊時一次處理，避免彈起後被第二隻誤判）
+  const hits = [];
   enemies.forEach((en) => {
     if (en.dead || !en.active) return;
     if (!(en.state === "walk" || en.state === "fly" || en.state === "shell" ||
-          en.state === "slide" || en.state === "bubble")) return;
-    if (!overlap(player, en)) return;
-    if (en.state === "bubble") {
-      if ((en.riseLift || 0) > 18) damagePlayer();
-      return;
-    }
-    const cameFromAbove = (player.prevFeet ?? player.y) <= en.y - en.h + 10;
-    const stomp = player.vy > 1.5 &&
-      ((player.y - (en.y - en.h)) < en.h * 0.5 || cameFromAbove);
-    if (stomp) {
+          en.state === "slide")) return;
+    if (overlap(player, en)) hits.push(en);
+  });
+  if (hits.length === 0) return;
+
+  const falling = player.vy > 1.5;
+  const minTop = Math.min(...hits.map(h => h.y - h.h));
+  const cameFromAbove = (player.prevFeet ?? player.y) <= minTop + 10;
+  const onUpperHalf = hits.some(en => (player.y - (en.y - en.h)) < en.h * 0.5);
+  const doStomp = falling && (cameFromAbove || onUpperHalf);
+
+  let bounced = false;
+  let hurt = false;
+  for (const en of hits) {
+    if (doStomp) {
       player.stompChain = Math.min(player.stompChain + 1, 5);
       addScore(100 * Math.pow(2, player.stompChain - 1), en.x, en.y - 46);
-      player.vy = keys.jump ? STOMP_BOUNCE_HELD : STOMP_BOUNCE;
-      player.onGround = false;
-      hitstop = 2; addShake(3, 3);
-      particles.push({ type: "smoke", x: en.x, y: en.y - 20, vx: 0, vy: 0, t: 0 });
       if ((en.kind === "shell") && en.state === "walk") {
-        en.state = "shell"; en.vx = 0; en.t = 0;   // walkers with shells hide instead of dying
+        en.state = "shell"; en.vx = 0; en.t = 0;           // 有殼walker縮殼不死亡
         sfx("stomp");
       } else if (en.state === "shell") {
         en.state = "slide"; en.slideGrace = 14;
@@ -1452,16 +1493,24 @@ function updateEnemies() {
         en.state = "flat"; en.t = 0; en.dead = true;
         sfx("stomp");
       }
+      if (!bounced) {
+        player.vy = keys.jump ? STOMP_BOUNCE_HELD : STOMP_BOUNCE;
+        player.onGround = false;
+        bounced = true;
+        hitstop = 2; addShake(3, 3);
+        particles.push({ type: "smoke", x: en.x, y: en.y - 20, vx: 0, vy: 0, t: 0 });
+      }
+    } else if (en.state === "shell") {
+      en.state = "slide"; en.slideGrace = 14;
+      en.vx = 5.5 * (player.x < en.x ? 1 : -1);
+      sfx("kick");
+    } else if (en.state === "slide" && en.slideGrace > 0) {
+      // 剛踢出去：暫時無害
     } else {
-      if (en.state === "shell") {
-        en.state = "slide"; en.slideGrace = 14;
-        en.vx = 5.5 * (player.x < en.x ? 1 : -1);
-        sfx("kick");
-      } else if (en.state === "slide" && en.slideGrace > 0) {
-        // just kicked: harmless for a moment
-      } else damagePlayer();
+      hurt = true;
     }
-  });
+  }
+  if (hurt && !bounced) damagePlayer();
 }
 
 function updateItems() {
@@ -1611,7 +1660,7 @@ function hitBoss() {
   addScore(500, boss.x, boss.y - boss.h);
   if (boss.hp <= 0) {
     boss.dead = true;
-    for (let ty = 0; ty <= 8; ty++) grid[ty][boss.wallCol] = 0;   // open the gate
+    for (let ty = 5; ty <= 8; ty++) grid[ty][boss.wallCol] = 0;   // open the gate
     for (let i = 0; i < 10; i++) {
       particles.push({ type: "shard", x: boss.x + (Math.random()*60-30), y: boss.y - 40 + (Math.random()*40-20),
         vx: (Math.random()-0.5)*6, vy: -4 - Math.random()*4, rot: Math.random()*6, t: 0 });
@@ -1860,6 +1909,18 @@ function drawTiles() {
         case 3: ctx.drawImage(IMG.tile_solid, dx, dyy, TILE, TILE); break;
         case 4: ctx.drawImage(IMG.tile_brick, dx, dyy, TILE, TILE); break;
         case 8: ctx.drawImage(IMG.tile_used, dx, dyy, TILE, TILE); break;
+        case 14: {                                   // Boss 柵門
+          ctx.fillStyle = "#37474f";
+          ctx.fillRect(dx, dyy, TILE, TILE);
+          ctx.fillStyle = "#ffd54f";
+          ctx.fillRect(dx + 16, dyy + 12, 16, 24);
+          ctx.strokeStyle = "#90a4ae"; ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(dx + 10, dyy + 6); ctx.lineTo(dx + 38, dyy + 42);
+          ctx.moveTo(dx + 38, dyy + 6); ctx.lineTo(dx + 10, dyy + 42);
+          ctx.stroke();
+          break;
+        }
         case 10:
           ctx.drawImage(IMG.tile_lava, dx, dyy, TILE, TILE);
           ctx.fillStyle = `rgba(255,170,50,${0.14 + 0.1 * Math.sin(frame * 0.08 + tx * 0.9)})`;
