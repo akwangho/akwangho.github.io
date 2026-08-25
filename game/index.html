@@ -11,20 +11,40 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
   body {
-    background: #1a1a2e;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 10px; font-family: "Press Start 2P", monospace; overflow: hidden;
+    background: #000; overflow: hidden; font-family: "Press Start 2P", monospace;
     touch-action: manipulation; -webkit-user-select: none; user-select: none;
   }
-  h1 { color: #f7c531; font-size: 14px; letter-spacing: 2px; text-shadow: 2px 2px 0 #000; }
-  #wrap { position: relative; width: min(96vw, 960px); }
+  /* 預設：畫面置中並盡可能佔滿整個瀏覽器（維持 20:11 比例） */
+  #wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
   canvas {
-    display: block; width: 100%; image-rendering: pixelated; image-rendering: crisp-edges;
-    border: 4px solid #000; border-radius: 6px; box-shadow: 0 8px 30px rgba(0,0,0,.6);
+    display: block; image-rendering: pixelated; image-rendering: crisp-edges;
+    border-radius: 4px; box-shadow: 0 0 40px rgba(0,0,0,.85);
     background: #5c94fc;
   }
-  #hint { color: #9aa0c0; font-size: 9px; line-height: 1.9; text-align: center; }
+  /* 手動縮放時允許捲動 */
+  body.scrollable { overflow: auto; height: auto; min-height: 100%; }
+  body.scrollable #wrap { position: static; min-height: calc(100vh - 96px); padding: 50px 8px 44px; }
+
+  #bar {
+    position: fixed; top: 8px; right: 10px; z-index: 10; display: flex; gap: 6px; align-items: center;
+    background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.25); border-radius: 6px;
+    padding: 5px 8px; color: #fff; font-size: 9px;
+  }
+  #bar .title { color: #f7c531; margin-right: 4px; white-space: nowrap; }
+  #bar button {
+    font-family: inherit; font-size: 9px; color: #fff; background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.35); border-radius: 4px; padding: 4px 7px; cursor: pointer;
+  }
+  #bar button:hover { background: rgba(255,255,255,.32); }
+  #szLabel { min-width: 42px; text-align: center; color: #9fe08f; }
+
+  #hint {
+    position: fixed; left: 0; right: 0; bottom: 6px; text-align: center; pointer-events: none;
+    color: #cfd3ea; font-size: 9px; line-height: 1.8; text-shadow: 1px 1px 0 #000; z-index: 9;
+  }
   #hint b { color: #fff; }
+  @media (pointer: coarse) { #hint { display: none; } }
+
   #touch { position: fixed; inset: auto 0 0 0; display: none; justify-content: space-between;
            padding: 0 18px 18px; pointer-events: none; z-index: 9; }
   #touch .grp { display: flex; gap: 14px; pointer-events: auto; }
@@ -34,15 +54,25 @@
     display: flex; align-items: center; justify-content: center; touch-action: none;
   }
   .btn:active { background: rgba(255,255,255,.3); }
-  @media (pointer: coarse) { #touch { display: flex; } body { overflow: auto; } }
+  @media (pointer: coarse) { #touch { display: flex; } body { overflow: hidden; } }
 </style>
 </head>
 <body>
-<h1>🍌 超級猴子兄弟 SUPER MONKEY BROS.</h1>
 <div id="wrap"><canvas id="game" width="960" height="528"></canvas></div>
-<div id="hint">
-  <b>← →</b> 移動　<b>SHIFT/X</b> 跑・丟火球　<b>空白鍵/Z/↑</b> 跳躍　<b>↓</b> 蹲下　<b>M</b> 音樂　<b>P</b> 暫停　<b>ENTER</b> 開始
+
+<div id="bar">
+  <span class="title">🍌 超級猴子兄弟</span>
+  <button id="szMinus" title="縮小畫面">−</button>
+  <button id="szFit" title="填滿瀏覽器（預設）">填滿</button>
+  <button id="szPlus" title="放大畫面">＋</button>
+  <span id="szLabel">填滿</span>
+  <button id="szFull" title="全螢幕切換">⛶</button>
 </div>
+
+<div id="hint">
+  <b>← →</b> 移動　<b>SHIFT/X</b> 跑・丟火球　<b>空白鍵/Z/↑</b> 跳躍　<b>↓</b> 蹲下　<b>M</b> 音樂　<b>P</b> 暫停　<b>ENTER</b> 開始　<b>右上角</b> 調整畫面大小
+</div>
+
 <div id="touch">
   <div class="grp">
     <button class="btn" data-k="left">◀</button>
@@ -54,6 +84,54 @@
     <button class="btn" data-k="jump">A</button>
   </div>
 </div>
-<script src="game.js"></script>
+
+<script src="game.js?v=5"></script>
+<script>
+(function () {
+  var W = 960, H = 528;               // 遊戲內部解析度（20:11）
+  var cv = document.getElementById("game");
+  var label = document.getElementById("szLabel");
+  var bodyEl = document.body;
+  var KEY = "smb_size";
+  function loadMode() {
+    try {
+      var v = localStorage.getItem(KEY);
+      if (v === "fit" || (v && !isNaN(parseFloat(v)))) return v;
+    } catch (e) {}
+    return "fit";
+  }
+  var mode = loadMode();              // "fit" 或百分比字串
+
+  function curPct() {
+    if (mode !== "fit") return parseFloat(mode);
+    return Math.round(Math.min(window.innerWidth / W, window.innerHeight / H) * 100);
+  }
+  function apply() {
+    var pct = (mode === "fit")
+      ? Math.min(window.innerWidth / W, window.innerHeight / H) * 100
+      : parseFloat(mode);
+    cv.style.width = (Math.round(W * pct) / 100) + "px";
+    cv.style.height = (Math.round(H * pct) / 100) + "px";
+    label.textContent = (mode === "fit") ? "填滿" : Math.round(pct) + "%";
+    bodyEl.classList.toggle("scrollable", mode !== "fit");
+    try { localStorage.setItem(KEY, String(mode)); } catch (e) {}
+  }
+  document.getElementById("szFit").addEventListener("click", function () { mode = "fit"; apply(); });
+  document.getElementById("szMinus").addEventListener("click", function () {
+    mode = String(Math.max(40, curPct() - 10)); apply();
+  });
+  document.getElementById("szPlus").addEventListener("click", function () {
+    mode = String(Math.min(300, curPct() + 10)); apply();
+  });
+  document.getElementById("szFull").addEventListener("click", function () {
+    try {
+      if (document.fullscreenElement) { document.exitFullscreen(); }
+      else if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen(); }
+    } catch (e) {}
+  });
+  window.addEventListener("resize", apply);
+  apply();
+})();
+</script>
 </body>
 </html>
