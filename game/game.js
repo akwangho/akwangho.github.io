@@ -11,19 +11,19 @@ const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 
 const SPRITES = [
-  "idle", "idle2", "skid", "walk_r1", "walk_r2", "run_r1", "run_r2", "jump_r", "fall_r",
+  "idle", "idle2", "skid", "run_r1", "run_r2", "jump_r", "fall_r",
   "hurt", "ko", "dead", "powerup", "powerdown",
   "tile_grass", "tile_dirt", "tile_brick", "tile_qblock", "tile_used", "tile_solid",
-  "tile_pipe", "flag_cloth",
-  "banana", "item_star", "item_mushroom",
-  "fx_sparkle", "fx_smoke",
+  "tile_pipe", "tile_lava", "tile_water", "tile_ice", "flag_cloth",
+  "banana", "item_star", "item_mushroom", "fireflower",
+  "fx_sparkle", "fx_smoke", "fx_fireball",
   "enemy_a", "enemy_b", "enemy_flat",
   "face1",
 ];
 const IMG = {};
 
-const keys = { left: false, right: false, jump: false, run: false };
-let jumpBuffer = 0;
+const keys = { left: false, right: false, jump: false, run: false, down: false };
+let jumpBuffer = 0, wantFire = false, fireCd = 0;
 let anyEnter = false;
 
 function bindKey(code, down) {
@@ -34,7 +34,9 @@ function bindKey(code, down) {
       if (down && !keys.jump) jumpBuffer = 7;
       keys.jump = down; return true;
     case "ShiftLeft": case "ShiftRight": case "KeyX": case "KeyJ":
+      if (down && !keys.run) wantFire = true;
       keys.run = down; return true;
+    case "ArrowDown": case "KeyS": keys.down = down; return true;
     case "Enter":
       if (down) anyEnter = true; return true;
     case "KeyP":
@@ -56,6 +58,7 @@ document.querySelectorAll("#touch .btn").forEach((b) => {
   const on = (e) => {
     e.preventDefault(); initAudioOnce();
     if (k === "jump" && !keys.jump) jumpBuffer = 7;
+    if (k === "run" && !keys.run) wantFire = true;
     keys[k] = true;
     if (state !== "play") anyEnter = true;
   };
@@ -99,6 +102,10 @@ function sfx(name) {
     case "flag": [262, 330, 392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, f, 0.12, "square", 0.12, i * 0.11)); break;
     case "tick": tone(1200, 1200, 0.03, "square", 0.08); break;
     case "kick": tone(400, 800, 0.1, "square", 0.12); break;
+    case "fire": tone(180, 60, 0.25, "sawtooth", 0.1); break;
+    case "throw": tone(620, 180, 0.12, "square", 0.1); break;
+    case "crouch": tone(200, 140, 0.07, "square", 0.07); break;
+    case "ending": [523, 659, 784, 1047, 784, 1047, 1319, 1568].forEach((f, i) => tone(f, f, 0.14, "square", 0.12, i * 0.16)); break;
   }
 }
 const LEAD = [[72, 1], [0, 1], [76, 1], [0, 1], [79, 1], [0, 1], [76, 1], [0, 1], [81, 1], [79, 1], [76, 1], [0, 1], [74, 1], [0, 1], [72, 1], [0, 1], [74, 1], [0, 1], [77, 1], [0, 1], [81, 1], [0, 1], [77, 1], [0, 1], [79, 1], [77, 1], [76, 1], [74, 1], [0, 1], [0, 1], [72, 1], [0, 1]];
@@ -129,21 +136,93 @@ function togglePause() { if (state === "play") paused = !paused; }
 let state = "loading", paused = false, frame = 0;
 let score = 0, bananaCount = 0, lives = 5, timeLeft = 300, timeTick = 0;
 let camX = 0;
-let player, enemies, bananas, items, pops, particles, popups, bumps;
+let player, enemies, bananas, items, pops, particles, popups, bumps, shots;
 let levelW = 204, grid = [], pipes = [];
-const flagCol = 172, castleCol = 180;
+let flagCol = 172, castleCol = 180;
 let flagClothY = 0, flagDone = false;
 let clearTimer = 0, bonusLeft = 0, deadTimer = 0, hurryPlayed = false;
+let fireSpots = [], fireballs = [];
+let levelIdx = 0, endT = 0;
+
+const THEMES = {
+  over: { sky: "#5c94fc", top: "tile_grass", fill: "tile_dirt", decor: "over" },
+  under: { sky: "#04060e", top: "tile_brick", fill: "tile_dirt", decor: "none" },
+  sky: { sky: "#8ecbff", top: "tile_grass", fill: "tile_dirt", decor: "sky" },
+  castle: { sky: "#14141f", top: "tile_solid", fill: "tile_solid", decor: "windows" },
+  jungle: { sky: "#0e3b1e", top: "tile_grass", fill: "tile_dirt", decor: "jungle" },
+  cave: { sky: "#06282a", top: "tile_brick", fill: "tile_dirt", decor: "none" },
+  treetop: { sky: "#7ec8ff", top: "tile_grass", fill: "tile_dirt", decor: "sky" },
+  pyramid: { sky: "#d8a95a", top: "tile_solid", fill: "tile_solid", decor: "none" },
+  cloud: { sky: "#9ad4ff", top: "tile_grass", fill: "tile_dirt", decor: "sky" },
+  ice: { sky: "#a8c8e8", top: "tile_ice", fill: "tile_ice", decor: "over" },
+  night: { sky: "#0a0a2a", top: "tile_grass", fill: "tile_dirt", decor: "stars" },
+  rainbow: { sky: "#b18ae8", top: "tile_grass", fill: "tile_dirt", decor: "over" },
+  volcano: { sky: "#3a1208", top: "tile_solid", fill: "tile_solid", decor: "embers" },
+  lavacave: { sky: "#180505", top: "tile_brick", fill: "tile_dirt", decor: "embers" },
+  bridge: { sky: "#2a0a0a", top: "tile_solid", fill: "tile_solid", decor: "embers" },
+  final: { sky: "#101018", top: "tile_solid", fill: "tile_solid", decor: "windows" },
+};
+
+const LEVELS = [
+  { name: "1-1", w: 204, theme: "over", flagCol: 172, castleCol: 180, build: build11 },
+  { name: "1-2", w: 190, theme: "under", flagCol: 174, castleCol: 181, build: build12 },
+  { name: "1-3", w: 200, theme: "sky", flagCol: 176, castleCol: 183, build: build13 },
+  { name: "1-4", w: 210, theme: "castle", flagCol: 190, castleCol: 198, build: build14 },
+  { name: "2-1", w: 200, theme: "jungle", flagCol: 186, castleCol: 192, build: build21 },
+  { name: "2-2", w: 200, theme: "cave", flagCol: 186, castleCol: 192, build: build22 },
+  { name: "2-3", w: 210, theme: "treetop", flagCol: 192, castleCol: 199, build: build23 },
+  { name: "2-4", w: 200, theme: "pyramid", flagCol: 186, castleCol: 192, build: build24 },
+  { name: "3-1", w: 210, theme: "cloud", flagCol: 192, castleCol: 199, build: build31 },
+  { name: "3-2", w: 200, theme: "ice", slippery: true, rain: true, flagCol: 184, castleCol: 191, build: build32 },
+  { name: "3-3", w: 210, theme: "night", stars: true, flagCol: 192, castleCol: 199, build: build33 },
+  { name: "3-4", w: 220, theme: "rainbow", flagCol: 200, castleCol: 207, build: build34 },
+  { name: "4-1", w: 200, theme: "volcano", embers: true, flagCol: 186, castleCol: 193, build: build41 },
+  { name: "4-2", w: 210, theme: "lavacave", embers: true, flagCol: 192, castleCol: 199, build: build42 },
+  { name: "4-3", w: 210, theme: "bridge", embers: true, flagCol: 192, castleCol: 199, build: build43 },
+  { name: "4-4", w: 220, theme: "final", flagCol: 202, castleCol: 209, build: build44 },
+];
 
 function buildLevel() {
+  const def = LEVELS[levelIdx];
+  levelW = def.w;
+  flagCol = def.flagCol;
+  castleCol = def.castleCol;
   grid = Array.from({ length: ROWS }, () => new Int8Array(levelW));
-  pipes = [[28, 2], [36, 3], [44, 4], [52, 4], [128, 2]];
+  pipes = []; bananas = []; enemies = []; fireSpots = []; fireballs = []; shots = [];
   const ground = (a, b) => { for (let x = a; x <= b; x++) { grid[9][x] = 1; grid[10][x] = 2; } };
-  ground(0, 63); ground(66, 95); ground(99, 116); ground(119, 143); ground(146, levelW - 1);
   const blocks = (y, x, s) => {
-    const m = { B: 4, "?": 5, M: 6, "*": 7 };
+    const m = { B: 4, "?": 5, M: 6, "*": 7, "=": 3 };
     [...s].forEach((c, i) => { if (m[c]) grid[y][x + i] = m[c]; });
   };
+  const pipe = (x, h, baseRow) => {
+    const br = baseRow || 9;
+    pipes.push([x, h, br]);
+    for (let i = 0; i < 2; i++) for (let j = 0; j < h; j++) grid[br - 1 - j][x + i] = 9;
+  };
+  const bRow = (y, x0, n) => {
+    for (let i = 0; i < n; i++) bananas.push({ x: (x0 + i) * TILE + 24, y: y * TILE + 24, t: Math.random() * 100 });
+  };
+  const enemyAt = (x, ry) => {
+    enemies.push({ x: x * TILE + 24, y: (ry || 9) * TILE, vx: -1.1, vy: 0, w: 36, h: 40, state: "walk", t: 0, active: false, dead: false, hitDir: 0 });
+  };
+  const stair = (x0, n, dir) => {
+    for (let i = 0; i < n; i++) {
+      const h = dir > 0 ? i + 1 : n - i;
+      for (let j = 0; j < h; j++) grid[8 - j][x0 + i] = 3;
+    }
+  };
+  const column = (x, topRow) => { for (let y = topRow; y <= 8; y++) grid[y][x] = 3; };
+  const plat = (y, a, b) => { for (let x = a; x <= b; x++) grid[y][x] = 1; };
+  const lavaPit = (a, b) => { for (let x = a; x <= b; x++) { grid[9][x] = 10; grid[10][x] = 10; } };
+  const waterPit = (a, b) => { for (let x = a; x <= b; x++) { grid[9][x] = 11; grid[10][x] = 11; } };
+  const fire = (x, period) => fireSpots.push({ x: x * TILE + 24, y0: 9 * TILE, period, t: Math.random() * period });
+  const ceil = (a, b) => { for (let x = a; x <= b; x++) grid[1][x] = 4; };
+  def.build({ ground, blocks, pipe, bRow, enemyAt, stair, column, plat, lavaPit, waterPit, fire, ceil });
+  grid[8][flagCol] = 3;
+}
+
+function build11({ ground, blocks, pipe, bRow, enemyAt, stair }) {
+  ground(0, 63); ground(66, 95); ground(99, 116); ground(119, 143); ground(146, levelW - 1);
   blocks(6, 17, "?");
   blocks(6, 21, "B?BMB"); blocks(3, 23, "?");
   blocks(6, 68, "B?B"); blocks(3, 69, "?");
@@ -152,30 +231,412 @@ function buildLevel() {
   blocks(6, 100, "?*");
   blocks(6, 135, "BMB");
   blocks(6, 147, "B?B?B"); blocks(3, 149, "B");
-  const stair = (x0, n, dir) => {
-    for (let i = 0; i < n; i++) {
-      const h = dir > 0 ? i + 1 : n - i;
-      for (let j = 0; j < h; j++) grid[8 - j][x0 + i] = 3;
-    }
-  };
-  stair(106, 4, 1); stair(111, 4, -1); stair(120, 4, 1); stair(158, 8, 1);
-  pipes.forEach(([px, h]) => {
-    for (let i = 0; i < 2; i++) for (let j = 0; j < h; j++) grid[8 - j][px + i] = 9;
-  });
-  grid[8][flagCol] = 3;
-
-  bananas = [];
-  const bRow = (y, x0, n) => {
-    for (let i = 0; i < n; i++) bananas.push({ x: (x0 + i) * TILE + 24, y: y * TILE + 24, t: Math.random() * 100 });
-  };
+  stair(106, 4, 1); stair(110, 4, -1); stair(120, 4, 1); stair(158, 8, 1);
+  pipe(28, 2); pipe(36, 3); pipe(44, 4); pipe(52, 4); pipe(128, 2);
   bRow(8, 10, 3); bRow(6, 32, 3); bRow(7, 63, 4); bRow(2, 78, 4); bRow(6, 95, 5);
   bRow(8, 104, 2); bRow(8, 110, 1); bRow(5, 116, 4); bRow(7, 125, 2); bRow(7, 143, 4);
   bRow(8, 154, 3); bRow(7, 167, 4);
+  [26, 33, 41, 50, 74, 80, 82, 91, 103, 115, 131, 133, 140, 150, 155, 168].forEach((x) => enemyAt(x));
+}
 
-  enemies = [];
-  [26, 33, 41, 50, 74, 80, 82, 91, 103, 115, 131, 133, 140, 150, 155, 168].forEach((x) => {
-    enemies.push({ x: x * TILE + 24, y: 9 * TILE, vx: -1.1, vy: 0, w: 36, h: 40, state: "walk", t: 0, active: false, dead: false, hitDir: 0 });
-  });
+function build12({ ground, blocks, pipe, bRow, enemyAt, stair, ceil }) {
+  ground(0, 58); ground(61, 105); ground(109, 150); ground(153, levelW - 1);
+  ceil(8, 158);
+  blocks(6, 12, "BBBBB"); bRow(5, 12, 5);
+  blocks(6, 20, "?");
+  blocks(6, 24, "B?B?B");
+  pipe(32, 2); pipe(40, 3);
+  enemyAt(30); enemyAt(38); enemyAt(46);
+  stair(50, 4, 1);
+  blocks(6, 62, "BBBBB?BBBB"); bRow(5, 63, 8);
+  enemyAt(74); enemyAt(76);
+  for (let x = 80; x <= 90; x += 2) { blocks(6, x, "B"); bRow(5, x, 1); }
+  pipe(94, 3); enemyAt(92);
+  bRow(6, 105, 5);
+  stair(112, 4, 1); stair(116, 4, -1);
+  blocks(6, 124, "BBBMBBBBBB"); bRow(5, 125, 9);
+  enemyAt(130); enemyAt(132); enemyAt(138);
+  pipe(142, 2);
+  bRow(7, 150, 4);
+  bRow(8, 8, 3); bRow(8, 59, 2); bRow(8, 110, 2); bRow(8, 156, 3);
+  stair(160, 6, 1);
+}
+
+function build13({ ground, blocks, pipe, bRow, enemyAt, stair, plat }) {
+  ground(0, 14); ground(156, levelW - 1);
+  plat(8, 18, 22); bRow(7, 18, 5);
+  plat(7, 26, 29); bRow(6, 26, 4);
+  plat(6, 34, 37); bRow(5, 34, 4);
+  plat(7, 42, 48); pipe(44, 2, 7); enemyAt(43, 7);
+  plat(6, 52, 56); bRow(5, 52, 5);
+  plat(5, 61, 64); bRow(4, 61, 4);
+  plat(7, 69, 74);
+  plat(8, 78, 82); enemyAt(80, 8); bRow(7, 78, 5);
+  plat(7, 88, 93); pipe(91, 2, 7); enemyAt(89, 7);
+  plat(6, 98, 101); bRow(5, 98, 4);
+  plat(5, 106, 109); bRow(4, 106, 4);
+  plat(6, 115, 119); bRow(5, 115, 5);
+  plat(7, 125, 130); blocks(4, 126, "?*"); enemyAt(128, 7);
+  plat(8, 136, 140); bRow(7, 136, 5);
+  plat(7, 146, 150); enemyAt(148, 7);
+  bRow(8, 15, 3); bRow(4, 30, 3); bRow(3, 48, 3); bRow(4, 84, 3); bRow(3, 110, 4); bRow(6, 152, 4);
+  stair(164, 4, 1);
+  enemyAt(160); enemyAt(162);
+}
+
+function build14({ ground, blocks, bRow, enemyAt, stair, column, lavaPit, fire, ceil }) {
+  ground(0, 29); ground(33, 49); ground(54, 89); ground(98, 120); ground(124, 139); ground(145, levelW - 1);
+  lavaPit(30, 32); lavaPit(50, 53); lavaPit(90, 97); lavaPit(121, 123); lavaPit(140, 144);
+  fire(31, 250); fire(51, 250); fire(91, 250); fire(96, 250); fire(122, 250); fire(141, 250);
+  grid[9][92] = 3; grid[9][93] = 3;
+  ceil(6, 28); ceil(33, 49); ceil(54, 87); ceil(98, 119); ceil(124, 139); ceil(145, 170);
+  column(20, 7); column(38, 7); column(60, 6); column(61, 8); column(112, 7); column(113, 8); column(130, 7); column(140, 7); column(141, 6);
+  blocks(6, 105, "M");
+  bRow(6, 30, 3); bRow(6, 50, 4); bRow(6, 90, 8); bRow(6, 121, 3); bRow(6, 140, 5);
+  bRow(8, 8, 3); bRow(8, 64, 3); bRow(8, 100, 3); bRow(8, 146, 3); bRow(8, 156, 3);
+  [15, 25, 40, 45, 60, 62, 70, 72, 100, 108, 110, 130, 150, 155, 160, 165].forEach((x) => enemyAt(x));
+  stair(172, 8, 1);
+}
+
+function build21({ ground, blocks, pipe, bRow, enemyAt, stair, column }) {
+  ground(0, 43); ground(47, 88); ground(92, 133); ground(137, levelW - 1);
+  blocks(6, 14, "B?B"); bRow(5, 14, 3);
+  blocks(6, 30, "BB?BB");
+  pipe(22, 2); pipe(35, 3);
+  enemyAt(18); enemyAt(27); enemyAt(33); enemyAt(41);
+  column(44, 7); column(45, 8);
+  blocks(6, 52, "BBBB"); bRow(5, 52, 4);
+  enemyAt(56); enemyAt(58);
+  blocks(6, 64, "B?B?B");
+  pipe(72, 2); enemyAt(70); enemyAt(76);
+  stair(80, 4, 1); stair(85, 4, -1);
+  bRow(4, 81, 3);
+  blocks(6, 96, "BBMBB");
+  enemyAt(100); enemyAt(102); enemyAt(110);
+  pipe(116, 3);
+  bRow(8, 120, 4);
+  blocks(6, 126, "B?B");
+  enemyAt(124); enemyAt(130);
+  stair(140, 5, 1);
+  column(148, 6); column(149, 7); column(150, 8);
+  bRow(5, 141, 4);
+  enemyAt(155); enemyAt(160); enemyAt(166);
+  blocks(6, 158, "B?B");
+  stair(172, 6, 1);
+  bRow(8, 180, 4);
+}
+
+function build22({ ground, blocks, pipe, bRow, enemyAt, stair, plat, waterPit, ceil }) {
+  ground(0, 39); waterPit(40, 44); ground(45, 78); waterPit(79, 84); ground(85, 120); waterPit(121, 126); ground(127, levelW - 1);
+  ceil(6, 150);
+  blocks(6, 12, "B?B");
+  enemyAt(18); enemyAt(20);
+  plat(6, 26, 30); bRow(5, 26, 5);
+  blocks(6, 34, "BBB");
+  enemyAt(30); enemyAt(36);
+  blocks(6, 41, "BBB");
+  bRow(4, 40, 5);
+  enemyAt(50); enemyAt(52);
+  blocks(6, 56, "B?B?B");
+  pipe(64, 2);
+  enemyAt(62); enemyAt(70);
+  plat(6, 74, 76);
+  blocks(8, 81, "B"); blocks(8, 84, "B");
+  bRow(4, 79, 6);
+  enemyAt(90); enemyAt(92); enemyAt(100);
+  blocks(6, 96, "BBMBB");
+  stair(104, 4, 1); stair(108, 4, -1);
+  bRow(8, 112, 3);
+  enemyAt(116);
+  blocks(8, 123, "B"); blocks(8, 126, "B");
+  bRow(4, 121, 6);
+  blocks(6, 132, "B?B");
+  enemyAt(136); enemyAt(142); enemyAt(148);
+  blocks(6, 140, "BBBB"); bRow(5, 140, 4);
+  stair(154, 6, 1);
+  bRow(8, 164, 4);
+  blocks(6, 168, "B?B");
+}
+
+function build23({ ground, blocks, pipe, bRow, enemyAt, stair, plat }) {
+  ground(0, 12); ground(190, levelW - 1);
+  plat(8, 16, 20); enemyAt(18, 8);
+  plat(7, 24, 28); bRow(6, 24, 5);
+  plat(6, 32, 36); enemyAt(34, 6);
+  plat(7, 40, 45); blocks(4, 42, "?"); bRow(6, 40, 6);
+  plat(6, 50, 54); enemyAt(52, 6);
+  plat(5, 58, 62); bRow(4, 58, 5);
+  plat(7, 67, 74); pipe(68, 2, 7);
+  plat(6, 77, 82); blocks(4, 79, "M"); enemyAt(80, 6);
+  plat(8, 87, 91); bRow(7, 87, 5);
+  plat(7, 96, 100); enemyAt(98, 7);
+  plat(6, 105, 109); bRow(5, 105, 5);
+  plat(7, 114, 119); enemyAt(116, 7); enemyAt(118, 7);
+  plat(6, 124, 128); blocks(3, 124, "?*");
+  plat(8, 133, 137); bRow(7, 133, 5);
+  plat(7, 142, 147); enemyAt(144, 7);
+  plat(6, 152, 157); bRow(5, 152, 6);
+  plat(7, 162, 167); enemyAt(164, 7);
+  plat(8, 172, 177); bRow(7, 172, 6);
+  plat(7, 182, 186);
+  bRow(8, 13, 3); bRow(5, 48, 3); bRow(4, 63, 3); bRow(7, 92, 4); bRow(4, 120, 3); bRow(6, 168, 3);
+}
+
+function build24({ ground, blocks, bRow, enemyAt, stair, column, ceil }) {
+  ground(0, levelW - 1);
+  ceil(4, 178);
+  blocks(6, 10, "B?B");
+  column(16, 7); column(17, 6);
+  enemyAt(12); enemyAt(20); enemyAt(22);
+  blocks(6, 26, "?M?");
+  column(32, 7); column(33, 7);
+  enemyAt(38); enemyAt(40);
+  blocks(6, 44, "BBBB"); bRow(5, 44, 4);
+  blocks(3, 46, "?");
+  enemyAt(52); enemyAt(54);
+  column(58, 6);
+  blocks(6, 62, "B?B");
+  enemyAt(68); enemyAt(70); enemyAt(76);
+  blocks(6, 72, "BB*BB");
+  column(80, 7); column(81, 6); column(82, 7);
+  bRow(4, 86, 4); blocks(6, 86, "BBBB");
+  enemyAt(92); enemyAt(94);
+  blocks(6, 98, "B?B?B");
+  column(104, 6);
+  enemyAt(110); enemyAt(112);
+  blocks(6, 116, "BBB"); bRow(5, 116, 3);
+  blocks(3, 117, "?");
+  enemyAt(122); enemyAt(124);
+  blocks(6, 128, "?M?");
+  column(134, 7); column(135, 6); column(136, 7);
+  enemyAt(142); enemyAt(144); enemyAt(150);
+  blocks(6, 146, "B?B");
+  bRow(8, 154, 4);
+  stair(158, 5, 1);
+  enemyAt(168); enemyAt(172);
+  blocks(6, 166, "B?B");
+}
+
+function build31({ ground, blocks, bRow, enemyAt, stair, plat }) {
+  ground(0, 20); ground(170, levelW - 1);
+  plat(8, 25, 30); bRow(7, 25, 6);
+  plat(7, 35, 40); bRow(6, 35, 6);
+  plat(8, 45, 50); bRow(7, 45, 6);
+  plat(7, 55, 61); enemyAt(58, 7); blocks(4, 58, "?*");
+  plat(7, 66, 71); bRow(6, 66, 6);
+  plat(8, 76, 81); enemyAt(78, 8);
+  plat(7, 86, 92); enemyAt(89, 7); blocks(4, 89, "?");
+  plat(7, 97, 102); bRow(6, 97, 6);
+  plat(8, 107, 112); enemyAt(109, 8);
+  plat(7, 117, 123); enemyAt(120, 7); blocks(4, 120, "?M?");
+  plat(7, 128, 133); bRow(6, 128, 6);
+  plat(8, 138, 143); enemyAt(140, 8);
+  plat(7, 148, 154); enemyAt(151, 7); blocks(4, 151, "?");
+  plat(7, 159, 164); bRow(6, 159, 6);
+  bRow(8, 21, 4); bRow(7, 42, 3); bRow(8, 63, 3); bRow(6, 104, 3);
+  enemyAt(174); enemyAt(178);
+  bRow(8, 172, 5);
+  stair(178, 4, 1);
+}
+
+function build32({ ground, blocks, pipe, bRow, enemyAt, stair }) {
+  ground(0, 34); ground(39, 71); ground(76, 111); ground(116, 148); ground(153, levelW - 1);
+  blocks(6, 12, "B?B");
+  enemyAt(16); enemyAt(24);
+  blocks(6, 20, "BBBB"); bRow(5, 20, 4);
+  bRow(7, 35, 4);
+  pipe(44, 2); enemyAt(42); enemyAt(48);
+  blocks(6, 54, "B?B?B");
+  enemyAt(60); enemyAt(62);
+  bRow(6, 71, 5);
+  blocks(6, 82, "BBMBB");
+  enemyAt(88); enemyAt(90); enemyAt(98);
+  blocks(6, 94, "BBBB"); bRow(5, 94, 4);
+  pipe(104, 3);
+  bRow(6, 111, 5);
+  blocks(6, 122, "B?B");
+  enemyAt(128); enemyAt(130);
+  blocks(6, 136, "BBBB"); bRow(5, 136, 4);
+  bRow(7, 150, 5);
+  stair(160, 5, 1);
+  enemyAt(166); enemyAt(170);
+  blocks(6, 164, "B?B");
+  bRow(8, 176, 4);
+}
+
+function build33({ ground, blocks, pipe, bRow, enemyAt, stair }) {
+  ground(0, 31); ground(36, 67); ground(72, 101); ground(106, 141); ground(146, levelW - 1);
+  blocks(6, 10, "?*");
+  enemyAt(14); enemyAt(22);
+  blocks(6, 18, "BBBB"); bRow(5, 18, 4);
+  bRow(6, 31, 5);
+  blocks(6, 42, "B?B");
+  pipe(50, 2); enemyAt(48); enemyAt(54);
+  blocks(6, 58, "BB?BB");
+  enemyAt(62);
+  bRow(6, 67, 5);
+  blocks(6, 76, "B?B?B");
+  enemyAt(82); enemyAt(84); enemyAt(90);
+  blocks(6, 88, "BBMBB");
+  bRow(8, 94, 4);
+  bRow(6, 101, 5);
+  blocks(6, 110, "B?B");
+  enemyAt(114); enemyAt(120);
+  blocks(6, 116, "BBBB"); bRow(5, 116, 4);
+  blocks(3, 118, "*");
+  pipe(128, 3); enemyAt(126); enemyAt(134);
+  bRow(7, 141, 5);
+  blocks(6, 152, "B?B?B");
+  enemyAt(158); enemyAt(160); enemyAt(166);
+  blocks(6, 162, "BBB"); bRow(5, 162, 3);
+  stair(172, 6, 1);
+  bRow(8, 182, 4);
+  enemyAt(186);
+}
+
+function build34({ ground, blocks, pipe, bRow, enemyAt, stair, column }) {
+  ground(0, 39); ground(44, 80); ground(85, 121); ground(126, 161); ground(166, levelW - 1);
+  blocks(6, 8, "?????"); bRow(8, 8, 5);
+  blocks(6, 16, "M*M?M");
+  enemyAt(12); enemyAt(20); enemyAt(26);
+  blocks(6, 24, "?????");
+  bRow(6, 40, 4);
+  blocks(6, 48, "???????"); bRow(5, 48, 7);
+  enemyAt(52); enemyAt(58);
+  blocks(6, 62, "?M?");
+  pipe(68, 2); enemyAt(66); enemyAt(72);
+  bRow(6, 80, 5);
+  blocks(6, 88, "*?*?*");
+  enemyAt(92); enemyAt(94); enemyAt(100);
+  blocks(6, 96, "?????");
+  blocks(3, 98, "??");
+  bRow(6, 121, 5);
+  blocks(6, 130, "M?M");
+  enemyAt(136); enemyAt(138); enemyAt(144);
+  blocks(6, 140, "?????");
+  column(148, 7); column(149, 6);
+  blocks(6, 152, "??");
+  bRow(7, 161, 5);
+  blocks(6, 170, "?????");
+  enemyAt(176); enemyAt(180);
+  blocks(6, 178, "*M*");
+  stair(186, 6, 1);
+  bRow(8, 194, 4);
+}
+
+function build41({ ground, blocks, bRow, enemyAt, lavaPit, fire, stair, pipe }) {
+  ground(0, 29); lavaPit(30, 32); ground(33, 59); lavaPit(60, 63); ground(64, 94); lavaPit(95, 98); ground(99, 129); lavaPit(130, 133); ground(134, levelW - 1);
+  fire(31, 140); fire(61, 130); fire(62, 160); fire(96, 140); fire(97, 150); fire(131, 130); fire(132, 155);
+  blocks(6, 12, "B?B");
+  enemyAt(16); enemyAt(24);
+  bRow(6, 30, 3);
+  blocks(6, 40, "BBMBB");
+  enemyAt(44); enemyAt(46);
+  bRow(6, 60, 4);
+  blocks(6, 70, "B?B?B");
+  enemyAt(74); enemyAt(76); enemyAt(84);
+  blocks(6, 80, "BBBB"); bRow(5, 80, 4);
+  bRow(6, 95, 4);
+  pipe(104, 2); enemyAt(102); enemyAt(108);
+  blocks(6, 112, "B?B");
+  enemyAt(118); enemyAt(124);
+  bRow(6, 130, 4);
+  blocks(6, 140, "BB?BB");
+  enemyAt(146); enemyAt(152);
+  bRow(8, 156, 4);
+  stair(166, 6, 1);
+  blocks(6, 176, "B?B");
+}
+
+function build42({ ground, blocks, bRow, enemyAt, lavaPit, fire, stair, ceil, column }) {
+  ground(0, 24); lavaPit(25, 28); ground(29, 55); lavaPit(56, 59); ground(60, 90); lavaPit(91, 94); ground(95, 125); lavaPit(126, 129); ground(130, levelW - 1);
+  ceil(4, 154);
+  fire(26, 120); fire(27, 150); fire(57, 130); fire(59, 145); fire(91, 125); fire(95, 150); fire(127, 130); fire(129, 145);
+  grid[9][92] = 3; grid[9][93] = 3; grid[9][58] = 3; grid[9][128] = 3;
+  blocks(6, 10, "B?B");
+  enemyAt(14); enemyAt(20);
+  bRow(6, 25, 4);
+  blocks(6, 34, "BBMBB");
+  enemyAt(38); enemyAt(40);
+  column(50, 7);
+  bRow(6, 56, 5);
+  blocks(6, 66, "B?B?B");
+  enemyAt(70); enemyAt(72); enemyAt(80);
+  column(80, 7); column(81, 6);
+  bRow(6, 91, 6);
+  blocks(6, 100, "BBBB"); bRow(5, 100, 4);
+  enemyAt(104); enemyAt(106);
+  column(105, 6);
+  blocks(6, 116, "?M?");
+  enemyAt(122);
+  bRow(6, 126, 5);
+  blocks(6, 136, "B?B");
+  enemyAt(140); enemyAt(146); enemyAt(152);
+  blocks(6, 144, "BB*BB");
+  stair(158, 6, 1);
+  bRow(8, 168, 4);
+  blocks(6, 172, "B?B");
+  enemyAt(176);
+}
+
+function build43({ ground, blocks, bRow, enemyAt, lavaPit, fire, stair }) {
+  ground(0, 19);
+  lavaPit(20, 39);
+  blocks(8, 20, "BBBBBBBB"); blocks(8, 30, "BBBBBBBB");
+  fire(28, 120); fire(29, 140); fire(38, 130); fire(39, 145);
+  ground(40, 55);
+  lavaPit(56, 75);
+  blocks(8, 56, "BBBBB"); blocks(8, 63, "BBBBBBB"); blocks(8, 72, "BBBB");
+  fire(61, 125); fire(62, 140); fire(70, 130); fire(71, 150);
+  ground(76, 90);
+  lavaPit(91, 110);
+  blocks(8, 91, "BBBBBB"); blocks(8, 99, "BBBB"); blocks(8, 105, "BBBBBB");
+  fire(97, 120); fire(98, 140); fire(103, 130); fire(104, 145); fire(109, 125); fire(110, 150);
+  ground(111, levelW - 1);
+  blocks(6, 44, "B?B"); blocks(6, 86, "?M?");
+  bRow(6, 20, 4); bRow(6, 56, 5); bRow(6, 91, 5);
+  enemyAt(46); enemyAt(48); enemyAt(50); enemyAt(82); enemyAt(84);
+  enemyAt(116); enemyAt(122); enemyAt(128);
+  blocks(6, 120, "B?B");
+  stair(134, 6, 1);
+  blocks(6, 146, "B?B?B");
+  enemyAt(152); enemyAt(158); enemyAt(164);
+  bRow(8, 168, 4);
+  stair(176, 5, 1);
+}
+
+function build44({ ground, blocks, bRow, enemyAt, lavaPit, fire, stair, ceil, column }) {
+  ground(0, 19); lavaPit(20, 23); ground(24, 44); lavaPit(45, 48); ground(49, 70); lavaPit(71, 74); ground(75, 96); lavaPit(97, 100); ground(101, 124); lavaPit(125, 128); ground(129, 150); lavaPit(151, 154); ground(155, levelW - 1);
+  
+  grid[9][47] = 3; grid[9][73] = 3; grid[9][99] = 3; grid[9][127] = 3;
+  blocks(6, 8, "B?B");
+  enemyAt(12); enemyAt(16);
+  bRow(6, 20, 4);
+  blocks(6, 30, "BBMBB");
+  enemyAt(34); enemyAt(36);
+  column(36, 7);
+  bRow(6, 45, 5);
+  blocks(6, 54, "B?B?B");
+  enemyAt(58); enemyAt(60);
+  column(60, 6);
+  bRow(6, 71, 5);
+  blocks(6, 80, "BB*BB");
+  enemyAt(84); enemyAt(86); enemyAt(88);
+  
+  bRow(6, 97, 6);
+  blocks(6, 106, "B?B?B");
+  enemyAt(110); enemyAt(112);
+  column(112, 6); column(113, 7);
+  bRow(6, 125, 5);
+  blocks(6, 134, "BBMBB");
+  enemyAt(138); enemyAt(140); enemyAt(146);
+  column(148, 7); column(149, 6);
+  bRow(6, 151, 6);
+  blocks(6, 160, "B?B?B");
+  enemyAt(166); enemyAt(168); enemyAt(174); enemyAt(176);
+  blocks(6, 170, "BBBB"); bRow(5, 170, 4);
+  stair(182, 8, 1);
+  bRow(8, 194, 4);
 }
 
 function resetLevel() {
@@ -183,7 +644,7 @@ function resetLevel() {
   items = []; pops = []; particles = []; popups = []; bumps = [];
   player = {
     x: 2.5 * TILE, y: 9 * TILE, vx: 0, vy: 0, w: 40, h: 72,
-    big: false, onGround: false, face: 1, animT: 0, stompChain: 0,
+    big: false, fire: false, crouching: false, onGround: false, face: 1, animT: 0, stompChain: 0,
     invuln: 0, star: 0, growT: 0, growMode: null, skid: false, hitDir: 0,
   };
   camX = 0; timeLeft = 300; timeTick = 0; hurryPlayed = false;
@@ -194,7 +655,14 @@ function resetLevel() {
 function solidAt(tx, ty) {
   if (tx < 0 || tx >= levelW) return true;
   if (ty < 0 || ty >= ROWS) return false;
-  return grid[ty][tx] > 0;
+  const c = grid[ty][tx];
+  return c > 0 && c !== 10 && c !== 11;
+}
+
+function deadlyAt(tx, ty) {
+  if (tx < 0 || tx >= levelW || ty < 0 || ty >= ROWS) return false;
+  const c = grid[ty][tx];
+  return c === 10 || c === 11;
 }
 
 function rectVsGrid(e, onBump) {
@@ -240,19 +708,38 @@ function collectBanana(x, y) {
   addScore(200);
   sfx("banana");
   particles.push({ type: "spark", x, y, vx: 0, vy: 0, t: 0 });
-  if (bananaCount % 100 === 0) {
+  if (bananaCount >= 99) {
+    bananaCount = 0;
     lives++;
     sfx("oneup");
     popups.push({ x: player.x, y: player.y - 90, t: 0, text: "1UP!" });
   }
 }
 
+function updateBananas() {
+  if (player.growT > 0) return;
+  bananas = bananas.filter((b) => {
+    if (Math.abs(b.x - player.x) < player.w / 2 + 14 && b.y > player.y - player.h - 16 && b.y < player.y + 16) {
+      collectBanana(b.x, b.y);
+      return false;
+    }
+    return true;
+  });
+}
+
 function bumpBlock(tx, ty) {
   const code = grid[ty][tx];
-  if (code === 0 || code === 2) return;
+  if (code === 0 || code === 2 || code === 10 || code === 11) return;
   if (code === 8 || code === 9 || code === 1 || code === 3) { sfx("bump"); return; }
   bumps.push({ tx, ty, t: 0 });
   const bx = tx * TILE + 24, byTop = ty * TILE;
+  bananas = bananas.filter((b) => {
+    if (Math.abs(b.x - bx) < TILE && b.y > byTop - TILE * 1.3 && b.y < byTop + 6) {
+      collectBanana(b.x, b.y);
+      return false;
+    }
+    return true;
+  });
   enemies.forEach((en) => {
     if (!en.dead && en.state === "walk" && Math.abs(en.y - byTop) < 8 && Math.abs(en.x - bx) < TILE) flipKill(en, 100);
   });
@@ -262,7 +749,14 @@ function bumpBlock(tx, ty) {
     collectBanana(bx, byTop - 20);
   } else if (code === 6) {
     grid[ty][tx] = 8;
-    items.push({ kind: "mush", x: bx, y: byTop + 20, blockY: byTop, vx: 0, vy: 0, w: 36, h: 36, state: "emerge", et: 0, hitDir: 0 });
+    if (!player.big) {
+      items.push({ kind: "mush", x: bx, y: byTop + 20, blockY: byTop, vx: 0, vy: 0, w: 36, h: 36, state: "emerge", et: 0, hitDir: 0 });
+    } else if (!player.fire) {
+      items.push({ kind: "flower", x: bx, y: byTop + 20, blockY: byTop, vx: 0, vy: 0, w: 36, h: 36, state: "emerge", et: 0, hitDir: 0 });
+    } else {
+      pops.push({ x: bx, y: byTop, vy: -7.2, t: 0 });
+      collectBanana(bx, byTop - 20);
+    }
     sfx("item");
   } else if (code === 7) {
     grid[ty][tx] = 8;
@@ -294,8 +788,13 @@ function flipKill(en, pts) {
 
 function damagePlayer() {
   if (player.invuln > 0 || player.star > 0 || state !== "play" || player.growT > 0) return;
-  if (player.big) {
+  if (player.fire) {
+    player.fire = false;
+    player.invuln = 130;
+    sfx("shrink");
+  } else if (player.big) {
     player.big = false;
+    player.crouching = false;
     player.growMode = "shrink"; player.growT = 40;
     player.invuln = 130;
     sfx("shrink");
@@ -308,25 +807,56 @@ function killPlayer() {
   sfx("die");
 }
 
+function throwFire() {
+  const p = player;
+  if (!p.fire || shots.length >= 2 || fireCd > 0) return;
+  shots.push({ x: p.x + p.face * 16, y: p.y - p.h * 0.6, vx: p.face * 5.5, vy: 2, t: 0 });
+  fireCd = 15;
+  sfx("throw");
+}
+
 function updatePlayer() {
   const p = player;
+  if (fireCd > 0) fireCd--;
+  const throwNow = wantFire;
+  wantFire = false;
   if (p.growT > 0) {
     p.growT--;
     if (p.growT === 0) {
-      if (p.growMode === "grow") { p.big = true; p.h = 72; }
-      else { p.h = 46; }
+      if (p.growMode === "grow") { p.big = true; p.h = p.crouching ? 46 : 72; }
+      else if (p.growMode === "growfire") { p.big = true; p.fire = true; p.h = p.crouching ? 46 : 72; }
+      else if (p.growMode === "fire") { p.fire = true; }
       p.growMode = null;
     }
     return;
   }
-  const acc = keys.run ? ACC_RUN : ACC_WALK;
+  if (throwNow) throwFire();
+
+  const slip = LEVELS[levelIdx].slippery;
+  const wantCrouch = p.big && keys.down;
+  if (wantCrouch) {
+    if (!p.crouching) { p.crouching = true; if (p.onGround) sfx("crouch"); }
+  } else if (p.crouching) {
+    const ty = Math.floor((p.y - 72) / TILE);
+    let blocked = ty >= 0;
+    if (!blocked) {
+      const cx0 = Math.floor((p.x - p.w / 2 + 4) / TILE), cx1 = Math.floor((p.x + p.w / 2 - 4) / TILE);
+      for (let tx = cx0; tx <= cx1; tx++) if (solidAt(tx, ty)) { blocked = true; break; }
+    }
+    if (!blocked) p.crouching = false;
+  }
+  p.h = p.big ? (p.crouching ? 46 : 72) : 46;
+
+  const acc = (keys.run ? ACC_RUN : ACC_WALK) * (slip ? 0.55 : 1);
   const max = keys.run ? MAX_RUN : MAX_WALK;
-  if (keys.left && !keys.right) { p.vx -= acc; p.face = -1; }
-  else if (keys.right && !keys.left) { p.vx += acc; p.face = 1; }
-  else if (p.onGround) p.vx *= FRICTION;
+  if (!p.crouching) {
+    if (keys.left && !keys.right) { p.vx -= acc; p.face = -1; }
+    else if (keys.right && !keys.left) { p.vx += acc; p.face = 1; }
+    else if (p.onGround) p.vx *= (slip ? 0.975 : FRICTION);
+  } else if (p.onGround) p.vx *= (slip ? 0.985 : FRICTION);
   if (Math.abs(p.vx) < 0.05) p.vx = 0;
   p.vx = Math.max(-max, Math.min(max, p.vx));
-  p.skid = p.onGround && ((keys.left && p.vx > 1.6) || (keys.right && p.vx < -1.6));
+  p.skid = !p.crouching && p.onGround && ((keys.left && p.vx > 1.6) || (keys.right && p.vx < -1.6));
 
   if (jumpBuffer > 0 && p.onGround) {
     p.vy = JUMP_VY;
@@ -344,6 +874,10 @@ function updatePlayer() {
 
   if (p.invuln > 0) p.invuln--;
   if (p.star > 0) { p.star--; if (p.star === 0) musicTempo = hurryPlayed ? 1.25 : 1; }
+
+  const ltx = Math.floor(p.x / TILE);
+  const lty = Math.floor((p.y - 4) / TILE);
+  if (deadlyAt(ltx, lty)) { killPlayer(); return; }
 
   if (p.y > VIEW_H + 80) { killPlayer(); return; }
 
@@ -403,8 +937,19 @@ function updateEnemies() {
     if (en.state === "walk") {
       en.vy = Math.min(MAXFALL, en.vy + GRAV);
       if (en.vx === 0) en.vx = -1.1;
+      if (en.onGround) {
+        const frontX = en.x + Math.sign(en.vx) * (en.w / 2 + 2);
+        const ftx = Math.floor(frontX / TILE), fty = Math.floor((en.y + 4) / TILE);
+        if (!solidAt(ftx, fty)) en.vx = -en.vx;
+      }
       rectVsGrid(en, null);
       if (en.hitWall) en.vx = 1.1 * en.hitDir;
+      const etx = Math.floor(en.x / TILE), ety = Math.floor((en.y - 4) / TILE);
+      if (deadlyAt(etx, ety)) {
+        en.state = "gone";
+        particles.push({ type: "smoke", x: en.x, y: en.y - 20, vx: 0, vy: 0, t: 0 });
+        sfx("fire");
+      }
       if (en.y > VIEW_H + 80) en.state = "gone";
     } else if (en.state === "flat") {
       if (en.t > 30) en.state = "gone";
@@ -427,7 +972,7 @@ function updateEnemies() {
       }
     }
   }
-  if (state !== "play" || player.growT > 0) return;
+  if (player.growT > 0) return;
   if (player.star > 0) {
     enemies.forEach((en) => {
       if (!en.dead && en.state === "walk" && en.active && overlap(player, en)) {
@@ -458,21 +1003,24 @@ function updateItems() {
       it.et++;
       it.y -= TILE / 45;
       if (it.et >= 45) {
-        it.state = "move";
-        it.vx = it.kind === "star" ? 2.2 : 1.6;
-        it.vy = it.kind === "star" ? -6 : 0;
+        if (it.kind === "star") { it.state = "move"; it.vx = 2.2; it.vy = -6; }
+        else if (it.kind === "mush") { it.state = "move"; it.vx = 1.6; it.vy = 0; }
+        else { it.state = "sit"; it.y = it.blockY + 4; }
       }
-    } else {
+    } else if (it.state === "move") {
       it.vy = Math.min(MAXFALL, it.vy + (it.kind === "star" ? 0.4 : GRAV));
       rectVsGrid(it, null);
       if (it.hitWall) it.vx = (Math.abs(it.vx) || 1.6) * it.hitDir;
       if (it.kind === "star" && it.onGround) it.vy = -8.5;
       if (it.y > VIEW_H + 80) return false;
     }
-    if (state === "play" && player.growT === 0 && overlap(player, it)) {
+    if (player.growT === 0 && overlap(player, it)) {
       addScore(1000, it.x, it.y - 40);
       if (it.kind === "mush") {
         if (!player.big) { player.growMode = "grow"; player.growT = 40; }
+      } else if (it.kind === "flower") {
+        if (!player.big) { player.growMode = "growfire"; player.growT = 40; }
+        else if (!player.fire) { player.growMode = "fire"; player.growT = 30; }
       } else {
         player.star = 480;
         musicTempo = 1.3;
@@ -487,6 +1035,60 @@ function updateItems() {
     cp.vy += 0.5;
     cp.y += cp.vy;
     return cp.t < 34;
+  });
+}
+
+function updateFireballs() {
+  fireSpots.forEach((s) => {
+    s.t++;
+    if (s.t >= s.period) {
+      s.t = 0;
+      fireballs.push({ x: s.x, y: s.y0 + 10, y0: s.y0, vy: -9.5, t: 0 });
+      if (s.x > camX - 40 && s.x < camX + VIEW_W + 40) sfx("fire");
+    }
+  });
+  fireballs = fireballs.filter((f) => {
+    f.t++;
+    f.vy += 0.32;
+    f.y += f.vy;
+    if (f.y > f.y0 + 40) return false;
+    if (player.growT === 0 && player.star <= 0 &&
+        Math.abs(f.x - player.x) < player.w / 2 + 10 && f.y > player.y - player.h - 8 && f.y < player.y + 8) {
+      damagePlayer();
+      return false;
+    }
+    return f.t < 300;
+  });
+}
+
+function updateShots() {
+  shots = shots.filter((s) => {
+    s.t++;
+    s.vy = Math.min(10, s.vy + 0.4);
+    const nx = s.x + s.vx;
+    const ftx = Math.floor((nx + Math.sign(s.vx) * 8) / TILE), fty = Math.floor(s.y / TILE);
+    if (solidAt(ftx, fty)) {
+      particles.push({ type: "smoke", x: s.x, y: s.y, vx: 0, vy: 0, t: 0 });
+      sfx("bump");
+      return false;
+    }
+    s.x = nx;
+    const ny = s.y + s.vy;
+    const bty = Math.floor((ny + 8) / TILE), btx = Math.floor(s.x / TILE);
+    if (s.vy > 0 && solidAt(btx, bty)) { s.y = bty * TILE - 8; s.vy = -4.5; } else s.y = ny;
+    let hit = false;
+    enemies.forEach((en) => {
+      if (!hit && !en.dead && en.state === "walk" && en.active &&
+          Math.abs(en.x - s.x) < 26 && Math.abs((en.y - en.h / 2) - s.y) < 26) {
+        flipKill(en, 200);
+        hit = true;
+      }
+    });
+    if (hit) {
+      particles.push({ type: "smoke", x: s.x, y: s.y, vx: 0, vy: 0, t: 0 });
+      return false;
+    }
+    return s.x > camX - 60 && s.x < camX + VIEW_W + 60 && s.t < 240 && s.y < VIEW_H + 40;
   });
 }
 
@@ -533,15 +1135,19 @@ function draw() {
   drawBananas();
   drawItems();
   drawPops();
+  drawShots();
+  drawFireballs();
   enemies.forEach(drawEnemy);
   if (state !== "clear") drawPlayer();
   drawParticles();
   drawPopups();
   ctx.restore();
+  drawWeather();
   drawHUD();
   if (state === "title") drawTitle();
   if (state === "gameover") drawGameOver();
   if (state === "clear") drawClear();
+  if (state === "ending") drawEnding();
   if (paused && state === "play") drawPause();
 }
 
@@ -555,14 +1161,36 @@ function drawLoading() {
 }
 
 function drawBackground() {
-  ctx.fillStyle = "#5c94fc";
+  const th = LEVELS[levelIdx].theme;
+  ctx.fillStyle = THEMES[th].sky;
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-  const c1 = -((camX * 0.25) % 560);
-  for (let i = 0; i < 3; i++) drawCloud(c1 + i * 560 + 60, 84 + (i % 2) * 46, 1 + (i % 2) * 0.35);
-  const h1 = -((camX * 0.4) % 780);
-  for (let i = 0; i < 3; i++) drawHill(h1 + i * 780, i % 2 === 0 ? 120 : 78);
-  const b1 = -((camX * 0.65) % 520);
-  for (let i = 0; i < 3; i++) drawBush(b1 + i * 520 + 130, i % 2 === 0 ? 3 : 2);
+  if (th === "over" || th === "ice" || th === "rainbow") {
+    const c1 = -((camX * 0.25) % 560);
+    for (let i = 0; i < 3; i++) drawCloud(c1 + i * 560 + 60, 84 + (i % 2) * 46, 1 + (i % 2) * 0.35);
+    const h1 = -((camX * 0.4) % 780);
+    for (let i = 0; i < 3; i++) drawHill(h1 + i * 780, i % 2 === 0 ? 120 : 78, th === "ice" ? "#7ea8cc" : "#1e9e30", th === "ice" ? "#5d84a8" : "#157322");
+    const b1 = -((camX * 0.65) % 520);
+    for (let i = 0; i < 3; i++) drawBush(b1 + i * 520 + 130, i % 2 === 0 ? 3 : 2, th === "ice" ? "#8fb8dc" : "#26b33a");
+  } else if (th === "sky" || th === "treetop" || th === "cloud") {
+    const c1 = -((camX * 0.2) % 640);
+    for (let i = 0; i < 3; i++) drawCloud(c1 + i * 640 + 40, 70 + (i % 3) * 40, 1.1 + (i % 2) * 0.4);
+    const c2 = -((camX * 0.45) % 520);
+    for (let i = 0; i < 3; i++) drawCloud(c2 + i * 520 + 200, 180 + (i % 2) * 60, 0.8);
+  } else if (th === "jungle") {
+    const h1 = -((camX * 0.35) % 700);
+    for (let i = 0; i < 3; i++) drawHill(h1 + i * 700, 130, "#0c2e18", "#082310");
+    const b1 = -((camX * 0.6) % 460);
+    for (let i = 0; i < 4; i++) drawBush(b1 + i * 460 + 60, i % 2 === 0 ? 4 : 3, "#145229");
+  } else if (th === "castle" || th === "final") {
+    ctx.fillStyle = "#1d1d2e";
+    for (let i = 0; i < 5; i++) {
+      const wx = ((i * 230 - camX * 0.3) % (VIEW_W + 230) + VIEW_W + 230) % (VIEW_W + 230) - 115;
+      ctx.fillRect(wx, 120, 46, 90);
+      ctx.fillStyle = "rgba(255,120,30,0.25)";
+      ctx.fillRect(wx + 8, 130, 30, 70);
+      ctx.fillStyle = "#1d1d2e";
+    }
+  }
 }
 
 function drawCloud(x, y, s) {
@@ -572,25 +1200,24 @@ function drawCloud(x, y, s) {
   ctx.arc(x + 26 * s, y - 12 * s, 24 * s, 0, 7);
   ctx.arc(x + 54 * s, y, 21 * s, 0, 7);
   ctx.fill();
-  ctx.fillStyle = "#ffffff";
   ctx.fillRect(x - 20 * s, y + 2 * s, 94 * s, 14 * s);
 }
 
-function drawHill(x, h) {
-  ctx.fillStyle = "#1e9e30";
+function drawHill(x, h, fill, spot) {
+  ctx.fillStyle = fill || "#1e9e30";
   ctx.beginPath();
   ctx.moveTo(x - h * 1.6, 9 * TILE);
   ctx.quadraticCurveTo(x, 9 * TILE - h * 2.1, x + h * 1.6, 9 * TILE);
   ctx.fill();
-  ctx.fillStyle = "#157322";
+  ctx.fillStyle = spot || "#157322";
   const yy = 9 * TILE - h * 0.5;
   ctx.fillRect(x - 8, yy, 4, 8);
   ctx.fillRect(x - 2, yy - 6, 4, 8);
   ctx.fillRect(x + 4, yy, 4, 8);
 }
 
-function drawBush(x, n) {
-  ctx.fillStyle = "#26b33a";
+function drawBush(x, n, fill) {
+  ctx.fillStyle = fill || "#26b33a";
   for (let i = 0; i < n; i++) {
     ctx.beginPath();
     ctx.arc(x + i * 34, 9 * TILE - 14, 22, 0, 7);
@@ -600,6 +1227,7 @@ function drawBush(x, n) {
 }
 
 function drawTiles() {
+  const th = THEMES[LEVELS[levelIdx].theme];
   const x0 = Math.max(0, Math.floor(camX / TILE) - 1);
   const x1 = Math.min(levelW - 1, Math.ceil((camX + VIEW_W) / TILE) + 1);
   for (let ty = 0; ty < ROWS; ty++) {
@@ -611,11 +1239,21 @@ function drawTiles() {
       if (bk) dy = -Math.sin((bk.t / 12) * Math.PI) * 10;
       const dx = tx * TILE, dyy = ty * TILE + dy;
       switch (code) {
-        case 1: ctx.drawImage(IMG.tile_grass, dx, dyy, TILE, TILE); break;
-        case 2: ctx.drawImage(IMG.tile_dirt, dx, dyy, TILE, TILE); break;
+        case 1: ctx.drawImage(IMG[th.top], dx, dyy, TILE, TILE); break;
+        case 2: ctx.drawImage(IMG[th.fill], dx, dyy, TILE, TILE); break;
         case 3: ctx.drawImage(IMG.tile_solid, dx, dyy, TILE, TILE); break;
         case 4: ctx.drawImage(IMG.tile_brick, dx, dyy, TILE, TILE); break;
         case 8: ctx.drawImage(IMG.tile_used, dx, dyy, TILE, TILE); break;
+        case 10:
+          ctx.drawImage(IMG.tile_lava, dx, dyy, TILE, TILE);
+          ctx.fillStyle = `rgba(255,170,50,${0.14 + 0.1 * Math.sin(frame * 0.08 + tx * 0.9)})`;
+          ctx.fillRect(dx, dyy, TILE, TILE);
+          break;
+        case 11:
+          ctx.drawImage(IMG.tile_water, dx, dyy, TILE, TILE);
+          ctx.fillStyle = `rgba(120,190,255,${0.12 + 0.1 * Math.sin(frame * 0.07 + tx)})`;
+          ctx.fillRect(dx, dyy, TILE, TILE);
+          break;
         case 5: case 6: case 7: {
           const flash = timeLeft <= 100 && (frame >> 4) % 2 === 0;
           if (flash) {
@@ -629,14 +1267,48 @@ function drawTiles() {
       }
     }
   }
-  pipes.forEach(([px, h]) => {
-    const x = px * TILE, top = (9 - h) * TILE;
+  pipes.forEach(([px, h, br]) => {
+    const x = px * TILE, top = (br - h) * TILE;
     const img = IMG.tile_pipe;
     const capSrcH = img.height * 0.42;
     const capDestH = 40;
     ctx.drawImage(img, 0, 0, img.width, capSrcH, x, top, TILE * 2, capDestH);
     ctx.drawImage(img, 0, capSrcH, img.width, img.height - capSrcH, x + 4, top + capDestH, TILE * 2 - 8, h * TILE - capDestH);
   });
+}
+
+function drawWeather() {
+  const lv = LEVELS[levelIdx];
+  if (lv.rain && (state === "play" || state === "title")) {
+    ctx.strokeStyle = "rgba(200,225,255,0.3)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < 36; i++) {
+      const rx = ((i * 173 + frame * 9) % (VIEW_W + 60)) - 30;
+      const ry = ((i * 97 + frame * 19) % (VIEW_H + 60)) - 30;
+      ctx.moveTo(rx, ry);
+      ctx.lineTo(rx - 5, ry + 16);
+    }
+    ctx.stroke();
+  }
+  if (lv.embers && state === "play") {
+    ctx.fillStyle = "rgba(255,140,40,0.55)";
+    for (let i = 0; i < 22; i++) {
+      const ex = ((i * 211 + Math.sin(frame * 0.02 + i) * 40) % VIEW_W + VIEW_W) % VIEW_W;
+      const ey = VIEW_H - ((frame * (1.4 + (i % 3) * 0.6) + i * 89) % (VIEW_H + 40));
+      ctx.fillRect(ex, ey, 4, 4);
+    }
+  }
+  if (lv.stars && state === "play") {
+    for (let i = 0; i < 26; i++) {
+      const sx = (i * 137 + 40) % VIEW_W;
+      const sy = (i * 71 + 20) % 280;
+      ctx.globalAlpha = 0.35 + 0.5 * Math.abs(Math.sin(frame * 0.05 + i));
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(sx, sy, 3, 3);
+    }
+    ctx.globalAlpha = 1;
+  }
 }
 
 function drawFlag() {
@@ -691,13 +1363,37 @@ function drawItems() {
 }
 
 function drawItemSprite(it) {
-  const img = it.kind === "mush" ? IMG.item_mushroom : IMG.item_star;
+  const img = it.kind === "mush" ? IMG.item_mushroom : it.kind === "flower" ? IMG.fireflower : IMG.item_star;
   const wob = it.kind === "star" ? Math.sin(frame * 0.3) * 3 : 0;
   ctx.drawImage(img, it.x - 19 + wob, it.y - it.h - 4, 38, 38);
 }
 
 function drawPops() {
   pops.forEach((cp) => ctx.drawImage(IMG.banana, cp.x - 17, cp.y - 17, 34, 34));
+}
+
+function drawShots() {
+  shots.forEach((s) => {
+    const s2 = 1 + Math.sin(s.t * 0.6) * 0.15;
+    const w = 28 * s2, h = 19 * s2;
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(s.t * 0.35 * Math.sign(s.vx));
+    ctx.drawImage(IMG.fx_fireball, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  });
+}
+
+function drawFireballs() {
+  fireballs.forEach((f) => {
+    const s = 1 + Math.sin(f.t * 0.5) * 0.12;
+    const w = 34 * s, h = 23 * s;
+    ctx.save();
+    ctx.translate(f.x, f.y);
+    ctx.rotate(Math.atan2(f.vy, 3) * 0.4);
+    ctx.drawImage(IMG.fx_fireball, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  });
 }
 
 function drawEnemy(en) {
@@ -717,13 +1413,13 @@ function playerSprite() {
   const p = player;
   if (state === "dead") return IMG.ko;
   if (state === "flag") return IMG.jump_r;
+  if (p.crouching) return IMG.fall_r;
   if (!p.onGround) return p.vy < 0 ? IMG.jump_r : IMG.fall_r;
   if (p.skid) return IMG.skid;
   if (Math.abs(p.vx) > 0.3) {
     const running = Math.abs(p.vx) > 3.6;
-    const seq = running ? ["run_r1", "run_r2"] : ["walk_r1", "walk_r2"];
-    p.animT += Math.abs(p.vx) * 0.55;
-    return IMG[seq[Math.floor(p.animT / 8) % 2]];
+    p.animT += Math.abs(p.vx) * (running ? 0.7 : 0.5);
+    return IMG[["run_r1", "run_r2"][Math.floor(p.animT / 8) % 2]];
   }
   p.animT = 0;
   return (frame % 180) < 168 ? IMG.idle : IMG.idle2;
@@ -735,7 +1431,8 @@ function drawPlayer() {
   let scale = p.big ? BIG_SCALE : SMALL_SCALE;
   if (p.growT > 0) {
     const flip = Math.floor(p.growT / 5) % 2 === 0;
-    scale = p.growMode === "grow" ? (flip ? SMALL_SCALE : BIG_SCALE) : (flip ? BIG_SCALE : SMALL_SCALE);
+    if (p.growMode === "fire") scale = BIG_SCALE;
+    else scale = p.growMode === "grow" || p.growMode === "growfire" ? (flip ? SMALL_SCALE : BIG_SCALE) : (flip ? BIG_SCALE : SMALL_SCALE);
   }
   let img = playerSprite();
   if (state === "dead" && deadTimer < 30) img = IMG.hurt;
@@ -745,6 +1442,8 @@ function drawPlayer() {
   if (p.face < 0) ctx.scale(-1, 1);
   if (p.star > 0 && (p.star > 60 || (frame >> 2) % 2 === 0)) {
     ctx.filter = `hue-rotate(${(frame * 29) % 360}deg) saturate(1.6) brightness(1.1)`;
+  } else if (p.fire && (p.growT === 0 || Math.floor(p.growT / 5) % 2 === 0)) {
+    ctx.filter = "sepia(1) saturate(4) hue-rotate(-28deg) brightness(1.08)";
   }
   ctx.drawImage(img, -w / 2, -h, w, h);
   ctx.restore();
@@ -806,11 +1505,12 @@ function drawHUD() {
   ctx.drawImage(IMG.banana, 330, 18, 30, 30);
   hudText("x" + String(bananaCount).padStart(2, "0"), 368, 42);
   hudText("WORLD", 545, 34);
-  hudText("1-1", 561, 60);
+  hudText(LEVELS[levelIdx].name, 553, 60);
   hudText("TIME", 700, 34);
   hudText(String(timeLeft).padStart(3, "0"), 708, 60);
   ctx.drawImage(IMG.face1, 830, 16, 40, 32);
   hudText("x" + Math.max(0, lives), 878, 42);
+  if (player.fire) ctx.drawImage(IMG.fireflower, 296, 18, 30, 30);
 }
 
 function drawTitle() {
@@ -834,7 +1534,7 @@ function drawTitle() {
   ctx.fillText("MONKEY BROS.", VIEW_W / 2, 199);
   ctx.font = "14px 'Press Start 2P', monospace";
   ctx.fillStyle = "#5a3b1e";
-  ctx.fillText("香蕉大冒險  WORLD 1-1", VIEW_W / 2, 252);
+  ctx.fillText("香蕉大冒險  WORLD 1-1 ~ 4-4", VIEW_W / 2, 252);
   ctx.font = "18px 'Press Start 2P', monospace";
   if ((frame >> 5) % 2 === 0) {
     ctx.fillStyle = "#000";
@@ -879,7 +1579,36 @@ function drawClear() {
   }
   if (bonusLeft <= 0 && clearTimer > 90 && (frame >> 5) % 2 === 0) {
     ctx.fillStyle = "#7fff7f";
-    ctx.fillText("PRESS ENTER TO REPLAY", VIEW_W / 2, 315);
+    ctx.fillText(levelIdx < LEVELS.length - 1 ? "PRESS ENTER FOR NEXT COURSE" : "PRESS ENTER", VIEW_W / 2, 315);
+  }
+}
+
+function drawEnding() {
+  endT++;
+  ctx.fillStyle = "rgba(0,0,0,0.8)";
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  ctx.textAlign = "center";
+  ctx.font = "34px 'Press Start 2P', monospace";
+  ctx.fillStyle = "#f7c531";
+  ctx.fillText("恭喜通關!", VIEW_W / 2, 150);
+  ctx.font = "18px 'Press Start 2P', monospace";
+  ctx.fillStyle = "#fff";
+  ctx.fillText("ALL 16 COURSES CLEAR!", VIEW_W / 2, 200);
+  ctx.font = "13px 'Press Start 2P', monospace";
+  ctx.fillStyle = "#ccc";
+  ctx.fillText("SCORE " + String(score).padStart(6, "0") + "   BANANA " + bananaCount, VIEW_W / 2, 240);
+  const img = IMG.powerup;
+  const s = 1.3 + Math.sin(endT * 0.05) * 0.06;
+  ctx.drawImage(img, VIEW_W / 2 - (img.width * s) / 2, 270, img.width * s, img.height * s);
+  for (let i = 0; i < 6; i++) {
+    const bx = (i * 173 + 60) % VIEW_W;
+    const by = ((endT * 2 + i * 137) % (VIEW_H + 80)) - 40;
+    ctx.drawImage(IMG.banana, bx, by, 30, 30);
+  }
+  if (endT > 120 && (frame >> 5) % 2 === 0) {
+    ctx.font = "16px 'Press Start 2P', monospace";
+    ctx.fillStyle = "#7fff7f";
+    ctx.fillText("PRESS ENTER", VIEW_W / 2, VIEW_H - 40);
   }
 }
 
@@ -897,7 +1626,12 @@ function step() {
   if (state === "loading") return;
   if (paused && state === "play") { anyEnter = false; return; }
   if (state === "title") {
-    if (anyEnter) { score = 0; bananaCount = 0; lives = 5; resetLevel(); state = "play"; }
+    if (anyEnter) { score = 0; bananaCount = 0; lives = 5; levelIdx = 0; resetLevel(); state = "play"; }
+    anyEnter = false;
+    return;
+  }
+  if (state === "ending") {
+    if (anyEnter && endT > 120) { levelIdx = 0; state = "title"; }
     anyEnter = false;
     return;
   }
@@ -908,7 +1642,18 @@ function step() {
   }
   if (state === "clear") {
     updateParticles();
-    if (bonusLeft <= 0 && anyEnter && clearTimer > 90) state = "title";
+    if (bonusLeft <= 0 && anyEnter && clearTimer > 90) {
+      if (levelIdx < LEVELS.length - 1) {
+        levelIdx++;
+        resetLevel();
+        state = "play";
+        sfx("flag");
+      } else {
+        state = "ending";
+        endT = 0;
+        sfx("ending");
+      }
+    }
     anyEnter = false;
     return;
   }
@@ -929,7 +1674,14 @@ function step() {
   }
   if (state === "play") {
     updatePlayer();
-    if (state === "play") { updateEnemies(); updateItems(); updateTime(); }
+    if (state === "play") {
+      updateEnemies();
+      updateBananas();
+      updateItems();
+      updateShots();
+      updateFireballs();
+      updateTime();
+    }
   } else if (state === "flag") {
     updateFlag();
   } else if (state === "walkoff") {
@@ -951,7 +1703,13 @@ function loadImages(cb) {
   SPRITES.forEach((n) => {
     const im = new Image();
     im.onload = () => { if (--left === 0) cb(); };
-    im.onerror = () => { console.error("missing sprite:", n); if (--left === 0) cb(); };
+    im.onerror = () => {
+      const c = document.createElement("canvas");
+      c.width = 2; c.height = 2;
+      IMG[n] = c;
+      console.error("missing sprite:", n);
+      if (--left === 0) cb();
+    };
     im.src = "assets/sprites/" + n + ".png";
     IMG[n] = im;
   });

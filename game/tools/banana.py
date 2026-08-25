@@ -1,24 +1,28 @@
 #!/usr/bin/env python3
-"""Generate a pixel-art banana sprite (coin replacement) from a hand map."""
+"""Generate a pixel-art banana sprite (coin replacement) from a hand map.
+
+A short, plump crescent arc (~210 deg sweep): curved from tip to tip like a
+banana should be, tilted 45 degrees clockwise (mouth faces upper-right).
+"""
 from PIL import Image
 
 MAP = [
+    "......S.........",
+    "......S.........",
+    "......##........",
+    "....##L#........",
+    "...#LLY#........",
+    "..#LLY#.........",
+    "..#LY#..........",
+    "..#LY#..........",
+    "..#LY#..........",
+    "..#LYD#.........",
+    "..#LYYD#....#...",
+    "..#LLYYD####Y#..",
+    "...#LLYYDDDY#...",
+    "....##LYYYY#....",
+    "......#####.....",
     "................",
-    "............SS..",
-    "...........#SS#.",
-    "..........#LYY#.",
-    ".........#LYYY#.",
-    "........#LYYYY#.",
-    ".......#LYYYYD#.",
-    "......#LYYYYD#..",
-    ".....#LYYYDD#...",
-    "....#LYYYDD#....",
-    "....#LYYDD#.....",
-    "...#LYYD#.......",
-    "...#LYD#........",
-    "...#LYD#........",
-    "....#YY#........",
-    ".....###........",
 ]
 
 COLORS = {
@@ -38,5 +42,5 @@ for y, row in enumerate(MAP):
             px[x, y] = COLORS[ch]
 
 img.resize((64, 64), Image.NEAREST).save("assets/sprites/banana.png")
-img.resize((256, 256), Image.NEAREST).save("/var/folders/jm/hpzs129x3y53zdzvfjkkzmg80000gn/T/opencode/banana_big.png")
+img.resize((256, 256), Image.NEAREST).save("/tmp/banana_big.png")
 print("banana saved")
