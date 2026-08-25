@@ -1268,7 +1268,7 @@ function updatePlayer() {
     cpActive = true;
     cpLevel = levelIdx;
     sfx("check");
-    popups.push({ x: cpX, y: cpY - 90, t: 0, text: "CHECKPOINT!" });
+    popups.push({ x: cpX, y: Math.max(120, cpY - 90), t: 0, text: "CHECKPOINT!" });
   }
   p.x = Math.max(p.w / 2, Math.min(levelW * TILE - p.w / 2, p.x));
 
@@ -1290,7 +1290,7 @@ function startFlag() {
   player.vx = 0; player.vy = 0;
   player.x = flagCol * TILE - 2;
   const h = Math.max(1, Math.round((8 * TILE - player.y) / TILE));
-  addScore(400 + h * 100, player.x, player.y - 90);
+  addScore(400 + h * 100, player.x, Math.max(150, Math.min(VIEW_H - 40, player.y - 90)));
   sfx("flag");
   musicPos = 0;
 }

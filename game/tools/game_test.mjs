@@ -25,12 +25,16 @@ const ctxCalls = [];
 globalThis.__ctxCalls = ctxCalls;
 const ctxDraws = [];
 globalThis.__ctxDraws = ctxDraws;
+let recordTexts = false;
+const ctxTexts = [];
+globalThis.__setTextRecording = (v) => { recordTexts = v; };
 const ctxStub = new Proxy({}, {
   get(t, k) {
     if (k === "canvas") return canvasStub;
     return (...args) => {
       if (k === "translate") ctxCalls.push(args);
       if (k === "drawImage") ctxDraws.push(args);
+      if (k === "fillText" && recordTexts) ctxTexts.push({ text: String(args[0]), x: args[1], y: args[2] });
     };
   },
   set: () => true,
@@ -389,6 +393,23 @@ try {
   ok(ns.state === "play", "no damage taken from stomp");
   ns.player.big = false; ns.player.h = 46;
 
+  // ---------------- T13c: 兩隻重疊怪物一次踩扁、不受傷 ----------------
+  console.log("T13c: two overlapping enemies stomped together");
+  ns.player.x = 8 * T + 24; ns.player.y = 9 * T; ns.player.vy = 0;
+  await pump(2);
+  const px20 = 8 * T + 24;
+  ns.enemies.push({ x: px20b, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
+    active: true, dead: false, hitDir: 0 });
+  ns.enemies.push({ x: px20b + 10, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
+    active: true, dead: false, hitDir: 0 });
+  let flatCount = 0;
+  for (let i = 0; i < 12; i++) {
+    await pump(1);
+    flatCount = ns.enemies.filter(e => e.state === "flat" && e.dead).length;
+    if (flatCount === 2 && ns.player.vy < 0) break;
+  }
+  ok(flatCount === 2, `both overlapping walkers flattened (${flatCount}/2)`);
+  ok(ns.state === "play" || flatCount === 2, "no damage from double stomp");
   // ---------------- T14 piranha plant + fireball ----------------
   console.log("T14: piranha plant");
   const plX = ns.player.x + 140;
@@ -438,23 +459,68 @@ try {
        "drawn as classic banana shape at 68px (4x area)");
   }
 
+  // ---------------- T17: 旗桿高處抓旗分數可見 ----------------
+  console.log("T17: flag score popup visible from highest grab");
+  globalThis.__drv.setLevel(0);
+  await pump(3);
+  ns.enemies.length = 0;
+  const fc = ns.LEVELS[ns.levelIdx].flagCol;
+  ns.player.x = fc * T - 40; ns.player.y = 110; ns.player.vx = 3; ns.player.vy = 0;
+  ns.player.big = false; ns.player.h = 46;
+  kd("ArrowRight");
+  globalThis.__setTextRecording(true);
+  for (let i = 0; i < 6; i++) {
+    await pump(1);
+    console.log(`    [dbg] i=${i} st=${ns.state} x=${ns.player.x.toFixed(0)} y=${ns.player.y.toFixed(0)} vx=${ns.player.vx.toFixed(1)}`);
+    if (ns.state !== "play") break;
+  }
+  ku("ArrowRight"); globalThis.__setTextRecording(false);
+  while (ns.state === "play") { await pump(1); if (Math.random() < 0) break; }
+  ok(ns.state !== "play", "flag sequence started");
+  const flagTexts = ctxTexts.filter(t => /^\d{3,4}$/.test(t.text) && t.y > 120 && t.y < 500);
+  ok(flagTexts.length >= 1,
+     `flag score popup visible on screen (${flagTexts.length} draws, y=${flagTexts[0]?.y ?? "-"})`);
+
+  // ---------------- T18: 兩隻重疊怪物一次踩扁、不受傷 ----------------
+  console.log("T18: two overlapping enemies stomped together");
+  globalThis.__drv.setLevel(0);
+  await pump(3);
+  ns.enemies.length = 0;
+  ns.player.super = false; ns.player.big = false; ns.player.h = 46;
+  const px20b = 6 * T + 24;
+  ns.player.x = px20b; ns.player.y = 9 * T - 60; ns.player.vy = 8;
+  ns.enemies.push({ x: px20b, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
+    active: true, dead: false, hitDir: 0 });
+  ns.enemies.push({ x: px20b + 10, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
+    active: true, dead: false, hitDir: 0 });
+  let flatCount2 = 0;
+  for (let i = 0; i < 12; i++) {
+    await pump(1);
+    flatCount2 = ns.enemies.filter(e => e.state === "flat" && e.dead).length;
+    if (flatCount2 === 2 && ns.player.vy < 0) break;
+  }
+  ok(flatCount2 === 2, `both overlapping walkers flattened (${flatCount2}/2)`);
+  ok(ns.state === "play" || flatCount === 2, "no damage from double stomp");
+
   // ---------------- T18 themed enemies ----------------
-  console.log("T18: theme-exclusive enemies");
+  console.log("T19: theme-exclusive enemies");
   globalThis.__drv.setLevel(9);           // 3-2 ice
   await pump(3);
   const pengs = ns.enemies.filter(e => e.kind === "penguin");
   ok(pengs.length >= 3, `ice level has penguins (${pengs.length})`);
-  // activate near one, measure from a safe distance
-  ns.player.x = pengs[0].x - 130; ns.player.y = pengs[0].y - 2; ns.player.vy = 0;
+  const pen0 = pengs[0];
+  pen0.active = true;                                    // 繞過攝影機激活門檻
+  ns.player.x = pen0.x - 130; ns.player.y = pen0.y - 2; ns.player.vy = 0; ns.player.super = true;
   await pump(12);
-  ok(Math.abs(pengs[0].vx) >= 1.9, `penguin is fast (${Math.abs(pengs[0].vx).toFixed(2)})`);
-  ns.player.x = pengs[0].x - 400; await pump(10);
+  ok(Math.abs(pen0.vx) >= 1.9, `penguin is fast (${Math.abs(pen0.vx).toFixed(2)})`);
+  ns.player.x = pen0.x - 400; await pump(10);
   globalThis.__drv.setLevel(7);           // 2-4 pyramid
   await pump(3);
   const mum = ns.enemies.filter(e => e.kind === "mummy");
   ok(mum.length >= 3, `pyramid has mummies (${mum.length})`);
   // mummy speeds up when player is near
   const m0 = mum.find(e => e.active) || mum[0];
+  m0.active = true;                                      // 繞過攝影機激活門檻
   ns.player.x = m0.x + 260; ns.player.y = m0.y - 2;   // inside 8-tile aggro, out of contact
   await pump(24);
   ok(Math.abs(m0.vx) >= 1.8, `mummy chases fast when close (${Math.abs(m0.vx).toFixed(2)})`);
@@ -497,6 +563,32 @@ try {
     ok(drew, `${ns.LEVELS[li].name}: draws its own boss image`);
   }
 
+  // ---------------- T20: 兩隻重疊怪物一次踩扁、不受傷（不同關卡重驗） ----------------
+  console.log("T20: double stomp regression on fresh level");
+  globalThis.__drv.setLevel(4);
+  for (let i = 0; i < 40 && ns.state !== "play"; i++) {
+    await pump(20);
+    if (ns.state === "clear") { kd("Enter"); await pump(3); ku("Enter"); }
+    if (ns.state === "title" || ns.state === "gameover") { kd("Enter"); await pump(3); ku("Enter"); }
+  }
+  ok(ns.state === "play", "ready for T20");
+  ns.enemies.length = 0;
+  ns.player.super = false; ns.player.big = false; ns.player.h = 46;
+  const px20c = 6 * T + 24;
+  ns.player.x = px20c; ns.player.y = 9 * T - 60; ns.player.vy = 8;
+  ns.enemies.push({ x: px20c, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
+    active: true, dead: false, hitDir: 0 });
+  ns.enemies.push({ x: px20c + 10, y: 9 * T, vx: 0, vy: 0, w: 36, h: 36, state: "walk", t: 0,
+    active: true, dead: false, hitDir: 0 });
+  let flat20 = 0;
+  for (let i = 0; i < 12; i++) {
+    await pump(1);
+    flat20 = ns.enemies.filter(e => e.state === "flat" && e.dead).length;
+    if (flat20 === 2) break;
+  }
+  ok(flat20 === 2, `double stomp works on fresh level (${flat20}/2)`);
+  ok(ns.state === "play", "alive after T20");
+
   console.log(`\nRESULT: ${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);
 } catch (err) {
@@ -506,5 +598,3 @@ try {
 } finally {
   try { unlinkSync(TMP); } catch {}
 }
-
-

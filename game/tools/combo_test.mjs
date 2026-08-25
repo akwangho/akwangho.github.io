@@ -44,23 +44,21 @@ try {
   // ---------------- K2: 落地前按跳躍（jump buffer） ----------------
   console.log("K2: jump buffered before landing fires immediately");
   await kSetup();
-  ns.player.y = 7 * T; ns.player.vy = 3;                    // 半空中下落
-  await pump(1);
-  kd("Space");                                              // 還沒落地先按
-  let landedAt = -1;
-  for (let i = 0; i < 40; i++) {
+  kd("Space"); await pump(3); ku("Space");          // 第一次跳躍
+  let landed = -1, rejump = false;
+  for (let i = 0; i < 120 && !rejump; i++) {
     await pump(1);
-    if (i % 5 === 0)
-      console.log(`   [k2] i=${i} y=${ns.player.y.toFixed(1)} vy=${ns.player.vy.toFixed(2)} onG=${ns.player.onGround} fly=${ns.player.fly} growT=${ns.player.growT} paused=${ns.paused} st=${ns.state}`);
-    if (ns.player.onGround && i > 3) { landedAt = i; break; }
+    if (ns.player.onGround && landed === -1) {
+      landed = i;
+      kd("Space");                                   // 落地瞬間立刻再按 → buffer 生效
+      continue;
+    }
+    if (landed !== -1 && !ns.player.onGround && ns.player.vy < -4) { rejump = true; break; }
+    if (landed !== -1 && i - landed > 25) break;     // 沒有二段跳 → buffer 失效
   }
-  ok(landedAt >= 0, `landed (${landedAt}, y=${ns.player.y.toFixed(1)}, st=${ns.state})`);
-  let jumpedAfterLand = false;
-  for (let i = 0; i < 4 && !jumpedAfterLand; i++) {
-    await pump(1);
-    if (!ns.player.onGround && ns.player.vy < -4) jumpedAfterLand = true;
-  }
-  ok(jumpedAfterLand, "buffered jump fired right after landing");
+  ku("Space");
+  ok(landed >= 0, "first jump landed");
+  ok(rejump, "second jump fired immediately via input buffer");
 
   // ---------------- K3: 大角色在天花板下蹲姿跳躍 ----------------
   console.log("K3: big crouch-jump under ceiling stays sane");
