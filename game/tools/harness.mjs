@@ -35,6 +35,11 @@ export async function boot() {
     querySelectorAll: () => [],
   };
   globalThis.requestAnimationFrame = (cb) => { rafQ.push(cb); };
+  const storeMap = {};
+  globalThis.localStorage = {
+    getItem: (k) => (k in storeMap ? storeMap[k] : null),
+    setItem: (k, v) => { storeMap[k] = String(v); },
+  };
   class FakeImage {
     constructor() { this.width = 16; this.height = 16; }
     set src(_v) { queueMicrotask(() => this.onload && this.onload()); }
@@ -46,7 +51,9 @@ export async function boot() {
 export { state, paused, player, keys, lives, score, levelIdx, konamiOn, titleSel,
          cheatFly, cheatSuper, LEVELS, grid, camX, TILE, VIEW_H, ROWS, frame,
          timeLeft, bananaCount, pipes, enemies, items, shots, fireballs, bananas,
-         levelW, resetLevel, damagePlayer, solidAt, deadlyAt };
+         levelW, resetLevel, damagePlayer, solidAt, deadlyAt,
+         boss, plants, bigbananas, hammers, cpActive, cpLevel, cpX, cpY,
+         deathsThisLevel, lastRank };
 globalThis.__drv = {
   setLevel: (i) => { levelIdx = i; resetLevel(); },
 };

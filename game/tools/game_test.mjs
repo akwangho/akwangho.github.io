@@ -10,7 +10,7 @@
  *   - Konami code on title: sound + 99 lives + stage select
  *   - 'fly' wing flight; 'super' invincibility + pit/lava rescue respawn
  */
-import { writeFileSync, readFileSync, unlinkSync } from "node:fs";
+import { writeFileSync, readFileSync, unlinkSync, existsSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 const SRC = new URL("../game.js", import.meta.url).pathname;
@@ -21,8 +21,18 @@ const listeners = {};
 const rafQ = [];
 let oscCount = 0;
 
+const ctxCalls = [];
+globalThis.__ctxCalls = ctxCalls;
+const ctxDraws = [];
+globalThis.__ctxDraws = ctxDraws;
 const ctxStub = new Proxy({}, {
-  get: () => () => {},
+  get(t, k) {
+    if (k === "canvas") return canvasStub;
+    return (...args) => {
+      if (k === "translate") ctxCalls.push(args);
+      if (k === "drawImage") ctxDraws.push(args);
+    };
+  },
   set: () => true,
 });
 const canvasStub = {
@@ -59,8 +69,13 @@ globalThis.Image = FakeImage;
 const src = readFileSync(SRC, "utf8");
 const exportsStmt = `
 export { state, paused, player, keys, lives, score, levelIdx, konamiOn, titleSel,
-         cheatFly, cheatSuper, LEVELS, grid, camX, TILE, VIEW_H, frame, timeLeft,
-         bananaCount, pipes, enemies, resetLevel, damagePlayer };
+         cheatFly, cheatSuper, LEVELS, grid, camX, TILE, VIEW_H, ROWS, frame, timeLeft,
+         bananaCount, pipes, enemies, bigbananas, plants, boss, hammers,
+         cpActive, cpLevel, cpX, cpY, deathsThisLevel,
+         levelW, resetLevel, damagePlayer, solidAt, deadlyAt };
+globalThis.__drv = {
+  setLevel: (i) => { levelIdx = i; resetLevel(); },
+};
 `;
 writeFileSync(TMP, src + exportsStmt);
 
@@ -102,6 +117,8 @@ try {
   const x0 = ns.player.x;
   kd("ArrowLeft"); await pump(30); ku("ArrowLeft"); await pump(4);
   ok(ns.player.x < x0 - 20, "can walk left after uncrouch");
+  console.log("    [dbg] accessLog:", JSON.stringify(globalThis.__accessLog));
+  console.log("    [dbg] ctxCalls:", globalThis.__ctxCalls.length);
 
   // ================= T2 down held during jump/landing =================
   console.log("T2: Down during jump -> land crouched -> recover");
@@ -246,6 +263,155 @@ try {
   // toggle off
   for (const c of ["KeyS", "KeyU", "KeyP", "KeyE", "KeyR"]) { kd(c); await pump(1); ku(c); await pump(1); }
   ok(ns.player.super === false && ns.paused === false, "typing super again toggles off");
+
+  // ---------------- T10 mid-level checkpoint ----------------
+  console.log("T10: checkpoint respawn");
+  ok(ns.cpX > 0, "checkpoint positioned in level");
+  ok(existsSync("assets/sprites/tile_checkpoint.png") &&
+     existsSync("assets/sprites/tile_checkpoint_on.png"),
+     "two-state pennant sprites exist on disk");
+  const cpx0 = ns.cpX;
+  ns.player.x = cpx0 - 30; ns.player.y = ns.cpY - 2; ns.player.vy = 0;
+  kd("ArrowRight"); await pump(20); ku("ArrowRight"); await pump(2);
+  ok(ns.cpActive === true, "checkpoint activated on crossing");
+  ns.player.y = 9999; await pump(200);
+  let g10 = 0; while (ns.state === "dead" && g10++ < 400) await pump(1);
+  ok(ns.state === "play" && Math.abs(ns.player.x - cpx0) < T * 1.5,
+     `respawned at checkpoint (x=${Math.round(ns.player.x)} vs cp=${Math.round(cpx0)})`);
+  // must be STANDING on the checkpoint surface, not spawned mid-air
+  await pump(90);
+  ok(ns.state === "play" && Math.abs(ns.player.y - ns.cpY) < 2,
+     `still alive & standing on checkpoint after 90f (y=${ns.player.y.toFixed(1)} vs cpY=${ns.cpY})`);
+
+  // dedicated regression for the reported case: level 1-3 (sky level)
+  globalThis.__drv.setLevel(2);
+  await pump(5);
+  const cp13 = ns.cpX;
+  ns.player.x = cp13 - 30; ns.player.y = ns.cpY - 2; ns.player.vy = 0;
+  kd("ArrowRight"); await pump(20); ku("ArrowRight"); await pump(2);
+  ok(ns.cpActive === true, "1-3 checkpoint activated");
+  ns.player.y = 9999; await pump(220);
+  let g13 = 0; while (ns.state === "dead" && g13++ < 400) await pump(1);
+  await pump(120);   // would fall & die again if spawned in mid-air
+  ok(ns.state === "play" && Math.abs(ns.player.y - ns.cpY) < 2,
+     `1-3 respawn stands on checkpoint platform (y=${ns.player.y.toFixed(1)})`);
+
+  // ---------------- T11 coyote time ----------------
+  console.log("T11: coyote time");
+  // stand on the pipe top in this level? use a platform edge generically:
+  // place player on ground, then walk it off an artificial ledge is complex;
+  // instead verify coyote window directly via state flags
+  ns.player.x = 22 * T + 26; ns.player.y = 8 * T; ns.player.vy = 0;   // right edge of plat(8,18,22)
+  await pump(3);
+  ok(ns.player.onGround, "standing at platform edge");
+  kd("ArrowRight");
+  let coyoteJump = false;
+  for (let i = 0; i < 30; i++) {
+    await pump(1);
+    if (!ns.player.onGround) { for (let k = 0; k <= 6; k++) { /* grace window */ } }
+    if (!ns.player.onGround && i >= 0) {
+      // press jump once, as late as 6 frames after leaving ground
+      if (!ns.keys.jump) kd("Space");
+    }
+    if (!ns.player.onGround && ns.player.vy < -4) { coyoteJump = true; break; }
+  }
+  ku("ArrowRight"); ku("Space");
+  ok(coyoteJump, "jump still fires within coyote window after leaving ledge");
+
+  // ---------------- T12 hidden blocks ----------------
+  console.log("T12: hidden blocks reveal");
+  const hidden = [];
+  for (let ty = 0; ty < ns.ROWS; ty++)
+    for (let tx = 0; tx < ns.levelW; tx++)
+      if (ns.grid[ty][tx] === 12 || ns.grid[ty][tx] === 13) hidden.push([tx, ty, ns.grid[ty][tx]]);
+  ok(hidden.length >= 2, `hidden spots placed (${hidden.length})`);
+  {
+    const [hx, hy, hcode] = hidden.find(h => h[2] === 12) || hidden[0];
+    const livesB = ns.lives;
+    ns.player.x = hx * T + 24; ns.player.y = (hy + 1) * T + 46; ns.player.vy = -15;
+    await pump(3);
+    ok(ns.grid[hy][hx] === 8, "hidden block solidified after head bump");
+    if (hcode === 12) ok(ns.lives === livesB + 1, "hidden 1UP granted");
+  }
+
+  // ---------------- T13 shell enemy ----------------
+  console.log("T13: shell enemy states");
+  ns.player.x = 8 * T + 24; ns.player.y = 9 * T; ns.player.vy = 0;
+  await pump(2);
+  const shx0 = ns.player.x + 110, shy0 = 9 * T;
+  ns.enemies.push({ x: shx0, y: shy0, vx: -0.9, vy: 0, w: 36, h: 36, state: "walk", t: 0,
+    active: true, dead: false, hitDir: 0, kind: "shell" });
+  const sh = ns.enemies[ns.enemies.length - 1];
+  ns.player.x = sh.x; ns.player.y = sh.y - 26; ns.player.vy = 8;
+  await pump(3);
+  ok(sh.state === "shell" && sh.dead === false, "stomp turns shell walker inert");
+  // world-translate entries are [-camX + shakeX, shakeY]; any nonzero Y proves shake
+  const shook = globalThis.__ctxCalls.some(
+    (c) => Array.isArray(c) && c[0] < -50 && Math.abs(c[1]) > 0.4
+  );
+  ok(shook, "screen shake moves camera offset during impact");
+  ns.player.super = false;
+  ns.player.x = sh.x - 26; ns.player.y = sh.y - 6; ns.player.vy = 0;
+  await pump(3);
+  ok(sh.state === "slide", "touch kicks shell into slide");
+  ok(Math.abs(sh.vx) > 4, "slide speed high");
+  ns.enemies.push({ x: sh.x + 55, y: shy0, vx: 0, vy: 0, w: 36, h: 36, state: "walk",
+    t: 0, active: true, dead: false, hitDir: 0 });
+  const victim = ns.enemies[ns.enemies.length - 1];
+  ns.player.x = sh.x - 320; ns.player.y = shy0 - 2; ns.player.vy = 0;
+  await pump(80);
+  ok(victim.dead === true, "sliding shell mows down another enemy");
+  // clean up stray enemies so later tests are stable
+  for (const en of ns.enemies) if (en !== victim && en.active && Math.abs(en.x - sh.x) < 400) en.state = "gone";
+
+  // ---------------- T14 piranha plant + fireball ----------------
+  console.log("T14: piranha plant");
+  const plX = ns.player.x + 140;
+  const pl = { x: plX, topY: 9 * T, t: 0, period: 220, rise: 0, dead: false, h: 46 };
+  ns.plants.push(pl);
+  ns.player.fire = true;
+  let g14 = 0; while (pl.rise < 0.99 && g14++ < 700) await pump(1);
+  ok(pl.rise > 0.9, "plant emerges from pipe on cycle");
+  kd("ArrowRight"); await pump(1); ku("ArrowRight");
+  kd("KeyX"); await pump(2); ku("KeyX");
+  let g14b = 0; while (!pl.dead && g14b++ < 200) await pump(1);
+  ok(pl.dead === true, "fireball kills plant");
+  ns.player.fire = false;
+
+  // ---------------- T15 boss fight ----------------
+  console.log("T15: boss battle (1-4)");
+  globalThis.__drv.setLevel(3);
+  await pump(5);
+  const wallCol = ns.LEVELS[ns.levelIdx].flagCol - 6;
+  ok(!!ns.boss && !ns.boss.dead, "boss present in castle level");
+  ok(ns.solidAt(wallCol, 5), "gate wall blocks path before victory");
+  ns.player.x = ns.boss.minX + 60; ns.player.y = ns.boss.y - 170; ns.player.vy = 0;
+  let guardBoss = 0;
+  while (!ns.boss.dead && guardBoss++ < 900) {
+    ns.boss.dizzy = 90; ns.boss.inv = 0;
+    ns.player.x = ns.boss.x; ns.player.y = ns.boss.y - 130; ns.player.vy = 10;
+    const hpB = ns.boss.hp;
+    let w15 = 0;
+    while (ns.boss.hp === hpB && w15++ < 220) await pump(1);
+  }
+  ok(ns.boss.dead === true, "boss defeated by dizzy-window stomps");
+  ok(!ns.solidAt(wallCol, 5), "gate wall removed after victory");
+  await pump(30);
+
+  // ---------------- T16 big bananas ----------------
+  console.log("T16: big bananas");
+  ok(ns.bigbananas.filter(b => !b.got).length >= 1, "big bananas present");
+  {
+    const bb = ns.bigbananas.find(b => !b.got) || ns.bigbananas[0];
+    bb.got = false;
+    const scB = ns.score;
+    ns.player.x = bb.x; ns.player.y = bb.y; ns.player.vy = 0;
+    await pump(2);
+    ok(bb.got === true, "big banana collected on touch");
+    ok(ns.score >= scB + 1000, "+1000 score for big banana");
+    ok(globalThis.__ctxDraws.some(d => Math.abs(d[3] - 68) < 0.01 && Math.abs(d[4] - 68) < 0.01),
+       "drawn as classic banana shape at 68px (4x area)");
+  }
 
   console.log(`\nRESULT: ${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

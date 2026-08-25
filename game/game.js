@@ -18,6 +18,8 @@ const SPRITES = [
   "banana", "item_star", "item_mushroom", "fireflower",
   "fx_sparkle", "fx_smoke", "fx_fireball",
   "enemy_a", "enemy_b", "enemy_flat",
+  "shell", "enemy_fly", "plant", "boss", "hammer",
+  "tile_checkpoint", "tile_checkpoint_on",
   "face1",
 ];
 const IMG = {};
@@ -114,6 +116,8 @@ function sfx(name) {
     case "fire": tone(180, 60, 0.25, "sawtooth", 0.1); break;
     case "throw": tone(620, 180, 0.12, "square", 0.1); break;
     case "crouch": tone(200, 140, 0.07, "square", 0.07); break;
+    case "check": [523, 659, 784].forEach((f, i) => tone(f, f, 0.08, "square", 0.11, i * 0.07)); break;
+    case "thunder": tone(180, 60, 0.4, "sawtooth", 0.14); tone(90, 40, 0.5, "triangle", 0.12); break;
     case "konami": [262, 330, 392, 523, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.09, "square", 0.13, i * 0.06)); break;
     case "wing": tone(880, 640, 0.06, "triangle", 0.06); break;
     case "ending": [523, 659, 784, 1047, 784, 1047, 1319, 1568].forEach((f, i) => tone(f, f, 0.14, "square", 0.12, i * 0.16)); break;
@@ -255,6 +259,158 @@ let konamiOn = false, titleSel = 0, cheatProgress = "", cheatIdleT = 0;
 let cheatFly = false, cheatSuper = false;
 let konamiEv = [];
 
+// ---- gameplay expansion state ----
+let hitstop = 0, shakeT = 0, shakeMag = 0;
+let cpActive = false, cpLevel = -1, cpX = 0, cpY = 0;
+let deathsThisLevel = 0, bananasTotalLevel = 0, bigGot = 0, lastRank = "C";
+let allBigGotSession = 0;
+let boss = null, plants = [], bigbananas = [], hammers = [];
+let hiddenCheck = false;
+function addShake(t, m) { shakeT = Math.max(shakeT, t); shakeMag = m; }
+
+// per-level extras: hidden blocks / big bananas / new enemies / plants / bosses
+const HIDDEN_SPOTS = {
+  0: [[50, 5, "1UP"], [90, 5, "banana"]],
+  1: [[45, 5, "banana"], [130, 5, "1UP"]],
+  2: [[20, 6, "1UP"], [107, 3, "banana"]],
+  3: [[35, 5, "banana"], [100, 5, "1UP"]],
+  4: [[60, 5, "banana"], [120, 5, "1UP"]],
+  5: [[95, 5, "banana"], [110, 6, "1UP"]],
+  6: [[30, 5, "banana"], [155, 4, "1UP"]],
+  7: [[70, 5, "banana"], [140, 5, "1UP"]],
+  8: [[40, 5, "banana"], [130, 5, "1UP"]],
+  9: [[52, 5, "banana"], [125, 5, "1UP"]],
+  10: [[45, 5, "banana"], [115, 5, "1UP"]],
+  11: [[65, 5, "banana"], [155, 5, "1UP"]],
+  12: [[75, 5, "banana"], [120, 5, "1UP"]],
+  13: [[63, 5, "banana"], [105, 5, "1UP"]],
+  14: [[125, 5, "banana"], [60, 5, "1UP"]],
+  15: [[118, 5, "banana"], [165, 5, "1UP"]],
+};
+const BIG_SPOTS = {
+  0: [[97, 6], [45, 3], [161, 4]],
+  1: [[59, 5], [107, 4], [152, 5]],
+  2: [[16, 6], [51, 4], [126, 4]],
+  3: [[31, 5], [91, 4], [141, 5]],
+  4: [[45, 6], [89, 5], [149, 5]],
+  5: [[42, 5], [80, 5], [122, 5]],
+  6: [[21, 6], [64, 5], [168, 6]],
+  7: [[65, 5], [105, 5], [147, 4]],
+  8: [[17, 6], [60, 4], [165, 6]],
+  9: [[37, 4], [72, 4], [154, 5]],
+  10: [[34, 5], [69, 5], [143, 5]],
+  11: [[41, 5], [82, 5], [163, 5]],
+  12: [[31, 5], [97, 4], [135, 5]],
+  13: [[27, 5], [58, 4], [130, 5]],
+  14: [[22, 5], [100, 5], [171, 5]],
+  15: [[22, 5], [73, 4], [152, 5]],
+};
+const SHELL_SPOTS = {
+  0: [33, 83], 1: [47, 77, 131], 2: [], 3: [36, 101], 4: [57, 111],
+  5: [51, 90], 6: [], 7: [41, 99], 8: [], 9: [66, 107],
+  10: [66, 107], 11: [49, 131], 12: [67, 106], 13: [33, 105], 14: [],
+  15: [26, 139],
+};
+const FLY_SPOTS = {
+  2: [[24, 300], [52, 260]], 3: [[70, 240], [110, 230]],
+  6: [[27, 320], [78, 330], [146, 310]], 8: [[30, 300], [110, 290]],
+  10: [[45, 280], [95, 270]], 11: [[70, 300], [130, 290]],
+  14: [[60, 280], [120, 300]],
+};
+const PLANT_PIPES = { 1: [32, 40, 94], 9: [44, 104], 12: [104] };
+const BOSS_LEVELS = {
+  3: { hp: 3, clearStairs: [[172, 180]] },
+  15: { hp: 5, clearStairs: [[182, 190]] },
+};
+
+function setupLevelExtras(def) {
+  plants = []; bigbananas = []; hammers = []; boss = null;
+  (HIDDEN_SPOTS[levelIdx] || []).forEach(([hx, hy, kind]) => {
+    if (grid[hy] && grid[hy][hx] === 0) grid[hy][hx] = kind === "1UP" ? 12 : 13;
+  });
+  (BIG_SPOTS[levelIdx] || []).forEach(([bx, by]) => {
+    bigbananas.push({ x: bx * TILE + 24, y: by * TILE + 24, got: false });
+  });
+  (SHELL_SPOTS[levelIdx] || []).forEach(sx => {
+    enemies.push({ x: sx * TILE + 24, y: 9 * TILE, vx: -0.9, vy: 0,
+      w: 36, h: 36, state: "walk", t: 0, active: false, dead: false, hitDir: 0, kind: "shell" });
+  });
+  (FLY_SPOTS[levelIdx] || []).forEach(([fx, fy]) => {
+    enemies.push({ x: fx * TILE + 24, y: fy * TILE, baseY: fy * TILE,
+      vx: -1.3, vy: 0, w: 34, h: 30, state: "fly", t: 0,
+      active: false, dead: false, hitDir: 0, kind: "fly" });
+  });
+  (PLANT_PIPES[levelIdx] || []).forEach(px => {
+    const pi = pipes.find(pp => pp[0] === px);
+    if (pi) plants.push({ x: pi[0] * TILE + TILE, topY: (pi[2] - pi[1]) * TILE,
+      t: Math.floor(Math.random() * 120), period: 220,
+      rise: 0, dead: false, h: 46 });
+  });
+  const bs = BOSS_LEVELS[levelIdx];
+  if (bs) {
+    const wallCol = def.flagCol - 6;
+    // victory staircase would collide with the boss arena -> remove it
+    (bs.clearStairs || []).forEach(([a, b]) => {
+      for (let tx = a; tx < b; tx++)
+        for (let ty = 0; ty < ROWS; ty++)
+          if (tx !== wallCol && grid[ty] && grid[ty][tx] === 3) grid[ty][tx] = 0;
+    });
+    for (let ty = 0; ty <= 8; ty++) grid[ty][wallCol] = 3;
+    boss = { x: (wallCol - 8) * TILE, y: 6 * TILE, w: 84, h: 84, hp: bs.hp, maxHp: bs.hp,
+      vx: 0, vy: 0, prevVy: 0, t: 0, throwCd: 150, hopCd: 260, dizzy: 0, inv: 0,
+      minX: (wallCol - 13) * TILE, maxX: (wallCol - 2) * TILE,
+      dead: false, wallCol, face: -1, onGround: false, wasGround: false, hitWall: false, hitDir: 0 };
+  }
+  // checkpoint: away from enemy spawn points (never respawn into danger)
+  cpX = 0; cpY = 0;
+  let cpc = Math.floor(def.flagCol / 2);
+  if (bs) cpc = def.flagCol - 14;
+  const cp = findCheckpoint(cpc);
+  if (cp) {
+    cpX = cp.surf.tx * TILE + 24; cpY = cp.surf.ty * TILE;
+    if (cp.conflicts) {
+      enemies.forEach(en => {
+        if (cp.conflicts.some(ex => Math.abs(en.x - ex) < 4)) en.x += 6 * TILE;
+      });
+    }
+  }
+}
+function findSurfaceNear(col) {
+  for (let d = 0; d <= 8; d++) {
+    const cands = d === 0 ? [col] : [col - d, col + d];
+    for (const tx of cands) {
+      if (tx < 1 || tx >= levelW - 1) continue;
+      for (let ty = 2; ty <= ROWS - 2; ty++)
+        if (solidAt(tx, ty) && !solidAt(tx, ty - 1)) return { tx, ty };
+    }
+  }
+  return null;
+}
+function surfaceAtExact(tx) {
+  for (let ty = 2; ty <= ROWS - 2; ty++)
+    if (solidAt(tx, ty) && !solidAt(tx, ty - 1)) return ty;
+  return null;
+}
+// checkpoint: exact-column surface near col AND away from enemy spawn points
+function findCheckpoint(col) {
+  const spawnX = enemies.filter(e => e.kind !== "fly").map(e => e.x);
+  let fallback = null;
+  for (let d = 0; d <= 24; d++) {
+    const cands = d === 0 ? [col] : [col - d, col + d];
+    for (const tx of cands) {
+      if (tx < 1 || tx >= levelW - 1) continue;
+      const ty = surfaceAtExact(tx);
+      if (ty === null) continue;
+      const px = tx * TILE + 24;
+      const safe = spawnX.every(ex => Math.abs(px - ex) >= TILE * 6);
+      if (safe) return { surf: { tx, ty }, conflicts: null };
+      if (!fallback) fallback = { surf: { tx, ty },
+        conflicts: spawnX.filter(ex => Math.abs(px - ex) < TILE * 3.5) };
+    }
+  }
+  return fallback;
+}
+
 const THEMES = {
   over: { sky: "#5c94fc", top: "tile_grass", fill: "tile_dirt", decor: "over" },
   under: { sky: "#04060e", top: "tile_brick", fill: "tile_dirt", decor: "none" },
@@ -329,7 +485,9 @@ function buildLevel() {
   const fire = (x, period) => fireSpots.push({ x: x * TILE + 24, y0: 9 * TILE, period, t: Math.random() * period });
   const ceil = (a, b) => { for (let x = a; x <= b; x++) grid[1][x] = 4; };
   def.build({ ground, blocks, pipe, bRow, enemyAt, stair, column, plat, lavaPit, waterPit, fire, ceil });
+  setupLevelExtras(def);
   grid[8][flagCol] = 3;
+  bananasTotalLevel = bananas.length;
 }
 
 function build11({ ground, blocks, pipe, bRow, enemyAt, stair }) {
@@ -753,13 +911,20 @@ function build44({ ground, blocks, bRow, enemyAt, lavaPit, fire, stair, ceil, co
 function resetLevel() {
   buildLevel();
   items = []; pops = []; particles = []; popups = []; bumps = [];
+  if (cpLevel !== levelIdx) { cpActive = false; deathsThisLevel = 0; bigGot = 0; }
+  const useCp = cpActive && cpLevel === levelIdx && cpX > 0;
   player = {
-    x: 2.5 * TILE, y: 9 * TILE, vx: 0, vy: 0, w: 40, h: 72,
+    // 站在檢查點表面上（其他位置可能是空中）
+    x: useCp ? cpX : 2.5 * TILE,
+    y: useCp ? cpY : 9 * TILE,
+    vx: 0, vy: 0, w: 40, h: 72,
     big: false, fire: false, crouching: false, onGround: false, face: 1, animT: 0, stompChain: 0,
     invuln: 0, star: 0, growT: 0, growMode: null, skid: false, hitDir: 0,
     fly: cheatFly, super: cheatSuper,
+    coyote: 0, landT: 0, prevOnGround: false,
   };
-  camX = 0; timeLeft = 300; timeTick = 0; hurryPlayed = false;
+  camX = Math.max(0, Math.min(levelW * TILE - VIEW_W, player.x - VIEW_W * 0.42));
+  timeLeft = 300; timeTick = 0; hurryPlayed = false;
   flagClothY = 2 * TILE + 6; flagDone = false; clearTimer = 0; bonusLeft = 0;
   musicTempo = 1; musicPos = 0;
 }
@@ -798,7 +963,8 @@ function rectVsGrid(e, onBump) {
   } else {
     let best = -1, bestOv = 0;
     for (let tx = x0; tx <= x1; tx++) {
-      if (solidAt(tx, y0)) {
+      const hiddenHere = hiddenCheck && (grid[y0] && (grid[y0][tx] === 12 || grid[y0][tx] === 13));
+      if (solidAt(tx, y0) || hiddenHere) {
         const ov = Math.min(e.x + e.w / 2, (tx + 1) * TILE) - Math.max(e.x - e.w / 2, tx * TILE);
         if (ov > bestOv) { bestOv = ov; best = tx; }
       }
@@ -879,6 +1045,7 @@ function bumpBlock(tx, ty) {
       grid[ty][tx] = 0;
       addScore(50);
       sfx("brick");
+      addShake(6, 4);
       for (let i = 0; i < 4; i++) {
         particles.push({
           type: "shard",
@@ -888,6 +1055,16 @@ function bumpBlock(tx, ty) {
         });
       }
     } else sfx("bump");
+  } else if (code === 12) {           // hidden block: 1UP
+    grid[ty][tx] = 8;
+    lives++;
+    sfx("oneup");
+    popups.push({ x: bx, y: byTop - 24, t: 0, text: "1UP!" });
+  } else if (code === 13) {           // hidden block: banana burst
+    grid[ty][tx] = 8;
+    sfx("item");
+    for (let i = 0; i < 4; i++) collectBanana(bx - 18 + i * 12, byTop - 20);
+    popups.push({ x: bx, y: byTop - 24, t: 0, text: "SECRET!" });
   }
 }
 
@@ -915,6 +1092,7 @@ function damagePlayer() {
 
 function killPlayer() {
   state = "dead"; deadTimer = 0;
+  deathsThisLevel++;
   player.vx = 0; player.vy = 0;
   sfx("die");
 }
@@ -970,9 +1148,12 @@ function updatePlayer() {
   p.vx = Math.max(-max, Math.min(max, p.vx));
   p.skid = !p.crouching && p.onGround && ((keys.left && p.vx > 1.6) || (keys.right && p.vx < -1.6));
 
-  if (jumpBuffer > 0 && p.onGround) {
+  // coyote time: brief grace to jump right after leaving the ground
+  p.coyote = p.onGround ? 6 : Math.max(0, (p.coyote || 0) - 1);
+  if (jumpBuffer > 0 && (p.onGround || p.coyote > 0)) {
     p.vy = JUMP_VY;
     p.onGround = false;
+    p.coyote = 0;
     jumpBuffer = 0;
     sfx("jump");
   }
@@ -984,8 +1165,21 @@ function updatePlayer() {
     if (frame % 8 === 0) sfx("wing");
   }
 
+  const wasAir = !p.onGround;
+  hiddenCheck = true;
   rectVsGrid(p, bumpBlock);
+  hiddenCheck = false;
+  if (p.onGround && wasAir && p.landT === 0) p.landT = 8;   // landing squash
+  if (p.landT > 0) p.landT--;
   if (p.onGround) p.stompChain = 0;
+
+  // checkpoint activation
+  if (cpX > 0 && !cpActive && p.x >= cpX) {
+    cpActive = true;
+    cpLevel = levelIdx;
+    sfx("check");
+    popups.push({ x: cpX, y: cpY - 90, t: 0, text: "CHECKPOINT!" });
+  }
   p.x = Math.max(p.w / 2, Math.min(levelW * TILE - p.w / 2, p.x));
 
   if (p.invuln > 0) p.invuln--;
@@ -1036,7 +1230,36 @@ function updateWalkoff() {
     state = "clear";
     clearTimer = 0;
     bonusLeft = timeLeft * 10;
+    lastRank = computeRank();
+    saveBestRank();
   }
+}
+
+function computeRank() {
+  const ratio = bananasTotalLevel ? 1 - bananas.length / bananasTotalLevel : 1;
+  if (deathsThisLevel === 0 && ratio >= 0.9 && timeLeft >= 200 && bigGot >= 3) return "S";
+  if (deathsThisLevel <= 1 && ratio >= 0.7 && timeLeft >= 120) return "A";
+  if (deathsThisLevel <= 3) return "B";
+  return "C";
+}
+function rankColor(r) { return r === "S" ? "#ffd700" : r === "A" ? "#7fff7f" : r === "B" ? "#7fbfff" : "#cccccc"; }
+function bestRankFor(name) {
+  try {
+    const map = JSON.parse(localStorage.getItem("smb_rank_v1") || "{}");
+    return map[name] || "";
+  } catch (e) { return ""; }
+}
+function saveBestRank() {
+  try {
+    const k = "smb_rank_v1";
+    const map = JSON.parse(localStorage.getItem(k) || "{}");
+    const name = LEVELS[levelIdx].name;
+    const order = { C: 0, B: 1, A: 2, S: 3 };
+    if (!map[name] || order[lastRank] > order[map[name]]) {
+      map[name] = lastRank;
+      localStorage.setItem(k, JSON.stringify(map));
+    }
+  } catch (e) {}
 }
 
 function overlap(a, b) {
@@ -1068,6 +1291,31 @@ function updateEnemies() {
         sfx("fire");
       }
       if (en.y > VIEW_H + 80) en.state = "gone";
+    } else if (en.state === "shell") {
+      // stomped shell: inert; revives after a while
+      en.vy = Math.min(MAXFALL, en.vy + GRAV);
+      en.vx = 0;
+      rectVsGrid(en, null);
+      if (en.t > 420) { en.state = "walk"; en.vx = -1.1; en.t = 0; }
+    } else if (en.state === "slide") {
+      // kicked shell: ricochets and mows down other enemies
+      if (en.slideGrace > 0) en.slideGrace--;
+      en.vy = Math.min(MAXFALL, en.vy + GRAV);
+      rectVsGrid(en, null);
+      if (en.hitWall) { en.vx = 5.5 * en.hitDir; sfx("bump"); }
+      const etx = Math.floor(en.x / TILE), ety = Math.floor((en.y - 4) / TILE);
+      if (deadlyAt(etx, ety) || en.y > VIEW_H + 80) { en.state = "gone"; sfx("fire"); }
+    } else if (en.state === "fly") {
+      en.t++;
+      en.x += en.vx;
+      en.y = en.baseY + Math.sin(en.t * 0.05) * 36;
+      const ftx = Math.floor((en.x + Math.sign(en.vx) * (en.w / 2 + 2)) / TILE);
+      const fty = Math.floor(en.y / TILE);
+      if (solidAt(ftx, fty)) en.vx = -en.vx;
+      if (deadlyAt(Math.floor(en.x / TILE), Math.floor((en.y - 4) / TILE))) {
+        en.state = "flat"; en.dead = true; en.t = 0;
+        particles.push({ type: "smoke", x: en.x, y: en.y - 16, vx: 0, vy: 0, t: 0 });
+      }
     } else if (en.state === "flat") {
       if (en.t > 30) en.state = "gone";
     } else if (en.state === "flip") {
@@ -1078,11 +1326,15 @@ function updateEnemies() {
   });
   for (let i = 0; i < enemies.length; i++) {
     const a = enemies[i];
-    if (a.dead || a.state !== "walk" || !a.active) continue;
+    if (a.dead || !a.active || a.state === "gone" || a.state === "flat" || a.state === "flip") continue;
     for (let j = i + 1; j < enemies.length; j++) {
       const b = enemies[j];
-      if (b.dead || b.state !== "walk" || !b.active) continue;
-      if (Math.abs(a.x - b.x) < (a.w + b.w) / 2 && Math.abs((a.y - a.h / 2) - (b.y - b.h / 2)) < (a.h + b.h) / 2) {
+      if (b.dead || !b.active || b.state === "gone" || b.state === "flat" || b.state === "flip") continue;
+      const nearX = Math.abs(a.x - b.x) < (a.w + b.w) / 2 && Math.abs((a.y - a.h / 2) - (b.y - b.h / 2)) < (a.h + b.h) / 2;
+      if (!nearX) continue;
+      if (a.state === "slide" && b.state === "walk") flipKill(b, 200);
+      else if (b.state === "slide" && a.state === "walk") flipKill(a, 200);
+      else if (a.state === "walk" && b.state === "walk") {
         const s = Math.sign(a.x - b.x) || 1;
         a.vx = Math.abs(a.vx) * s;
         b.vx = -Math.abs(b.vx) * s;
@@ -1092,25 +1344,48 @@ function updateEnemies() {
   if (player.growT > 0) return;
   if (player.star > 0) {
     enemies.forEach((en) => {
-      if (!en.dead && en.state === "walk" && en.active && overlap(player, en)) {
+      if (!en.dead && en.active && (en.state === "walk" || en.state === "fly" ||
+          en.state === "shell" || en.state === "slide") && overlap(player, en)) {
         player.stompChain = Math.min(player.stompChain + 1, 5);
         flipKill(en, 100 * Math.pow(2, player.stompChain - 1));
       }
     });
   }
   enemies.forEach((en) => {
-    if (en.dead || en.state !== "walk" || !en.active) return;
+    if (en.dead || !en.active) return;
+    if (!(en.state === "walk" || en.state === "fly" || en.state === "shell" || en.state === "slide")) return;
     if (!overlap(player, en)) return;
     const stomp = player.vy > 1.5 && (player.y - en.y + en.h) < en.h * 0.75;
     if (stomp) {
-      en.state = "flat"; en.t = 0; en.dead = true;
       player.stompChain = Math.min(player.stompChain + 1, 5);
       addScore(100 * Math.pow(2, player.stompChain - 1), en.x, en.y - 46);
       player.vy = keys.jump ? STOMP_BOUNCE_HELD : STOMP_BOUNCE;
       player.onGround = false;
-      sfx("stomp");
+      hitstop = 2; addShake(3, 3);
       particles.push({ type: "smoke", x: en.x, y: en.y - 20, vx: 0, vy: 0, t: 0 });
-    } else damagePlayer();
+      if ((en.kind === "shell") && en.state === "walk") {
+        en.state = "shell"; en.vx = 0; en.t = 0;   // walkers with shells hide instead of dying
+        sfx("stomp");
+      } else if (en.state === "shell") {
+        en.state = "slide"; en.slideGrace = 14;
+        en.vx = 5.5 * (player.x < en.x ? 1 : -1);
+        sfx("kick");
+      } else if (en.state === "slide") {
+        en.state = "shell"; en.vx = 0; en.t = 0;
+        sfx("stomp");
+      } else {
+        en.state = "flat"; en.t = 0; en.dead = true;
+        sfx("stomp");
+      }
+    } else {
+      if (en.state === "shell") {
+        en.state = "slide"; en.slideGrace = 14;
+        en.vx = 5.5 * (player.x < en.x ? 1 : -1);
+        sfx("kick");
+      } else if (en.state === "slide" && en.slideGrace > 0) {
+        // just kicked: harmless for a moment
+      } else damagePlayer();
+    }
   });
 }
 
@@ -1195,17 +1470,154 @@ function updateShots() {
     if (s.vy > 0 && solidAt(btx, bty)) { s.y = bty * TILE - 8; s.vy = -4.5; } else s.y = ny;
     let hit = false;
     enemies.forEach((en) => {
-      if (!hit && !en.dead && en.state === "walk" && en.active &&
+      if (!hit && !en.dead && en.active &&
+          (en.state === "walk" || en.state === "fly" || en.state === "shell" || en.state === "slide") &&
           Math.abs(en.x - s.x) < 26 && Math.abs((en.y - en.h / 2) - s.y) < 26) {
         flipKill(en, 200);
         hit = true;
       }
     });
+    // fireballs defeat piranha plants and damage the boss
+    plants.forEach((pl) => {
+      if (!hit && !pl.dead && pl.rise > 0.5 &&
+          Math.abs(pl.x - s.x) < 22 && Math.abs((pl.topY - 20) - s.y) < 34) {
+        pl.dead = true; hit = true;
+        addScore(200, pl.x, pl.topY - 40);
+        sfx("kick");
+      }
+    });
+    if (!hit && boss && !boss.dead && boss.inv <= 0 &&
+        Math.abs(boss.x - s.x) < boss.w / 2 + 10 &&
+        s.y > boss.y - boss.h && s.y < boss.y) {
+      hitBoss(); hit = true;
+    }
     if (hit) {
       particles.push({ type: "smoke", x: s.x, y: s.y, vx: 0, vy: 0, t: 0 });
       return false;
     }
     return s.x > camX - 60 && s.x < camX + VIEW_W + 60 && s.t < 240 && s.y < VIEW_H + 40;
+  });
+}
+
+function updatePlants() {
+  plants.forEach((pl) => {
+    if (pl.dead) return;
+    pl.t++;
+    const cyc = pl.t % pl.period;
+    const near = Math.abs(player.x - pl.x) < VIEW_W * 0.6;
+    const tooClose = Math.abs(player.x - pl.x) < 90;
+    let r = 0;
+    if (near && !tooClose) {
+      if (cyc > pl.period - 140 && cyc <= pl.period - 100) r = (cyc - (pl.period - 140)) / 40;
+      else if (cyc > pl.period - 100 && cyc <= pl.period - 40) r = 1;
+      else if (cyc > pl.period - 40) r = (pl.period - cyc) / 40;
+    }
+    pl.rise = Math.max(0, Math.min(1, r));
+    if (pl.rise > 0.5) {
+      // bite box while emerged
+      const bx0 = pl.x - 16, bx1 = pl.x + 16, by1 = pl.topY, by0 = pl.topY - 46 * pl.rise;
+      if (player.growT === 0 &&
+          player.x + player.w / 2 > bx0 && player.x - player.w / 2 < bx1 &&
+          player.y > by0 && player.y - player.h < by1) {
+        damagePlayer();
+      }
+    }
+  });
+}
+
+function hitBoss() {
+  if (!boss || boss.dead || boss.inv > 0) return;
+  boss.hp--;
+  boss.inv = 110;
+  boss.dizzy = 0;
+  hitstop = 5; addShake(12, 6);
+  sfx("kick");
+  addScore(500, boss.x, boss.y - boss.h);
+  if (boss.hp <= 0) {
+    boss.dead = true;
+    for (let ty = 0; ty <= 8; ty++) grid[ty][boss.wallCol] = 0;   // open the gate
+    for (let i = 0; i < 10; i++) {
+      particles.push({ type: "shard", x: boss.x + (Math.random()*60-30), y: boss.y - 40 + (Math.random()*40-20),
+        vx: (Math.random()-0.5)*6, vy: -4 - Math.random()*4, rot: Math.random()*6, t: 0 });
+    }
+    addScore(5000, boss.x, boss.y - boss.h - 20);
+    popups.push({ x: boss.x, y: boss.y - boss.h - 50, t: 0, text: "GATE OPENED!" });
+    addShake(16, 8); hitstop = 8;
+    sfx("die");
+  }
+}
+
+function updateBoss() {
+  const b = boss;
+  if (!b || b.dead) return;
+  b.t++;
+  if (b.inv > 0) b.inv--;
+  if (b.dizzy > 0) b.dizzy--;
+  const p = player;
+  // activate once the player is close
+  if (!b.awake) {
+    if (p.x > b.minX - 320) { b.awake = true; sfx("thunder"); }
+    else return;
+  }
+  b.vy = Math.min(MAXFALL, b.prevVy + GRAV);
+  b.prevVy = b.vy;
+  const dir = Math.sign(p.x - b.x) || 1;
+  b.face = dir;
+  b.vx = b.dizzy > 0 ? 0 : dir * 0.8;
+  if (b.x < b.minX && b.vx < 0) b.vx = 0;
+  if (b.x > b.maxX && b.vx > 0) b.vx = 0;
+  rectVsGrid(b, null);
+  if (b.onGround && !b.wasGround && b.prevVy > 5) {   // heavy landing -> dizzy window
+    b.dizzy = 90;
+    addShake(8, 5);
+    sfx("stomp");
+  }
+  b.wasGround = b.onGround;
+  if (b.dizzy <= 0 && b.onGround) {
+    if (--b.throwCd <= 0) {
+      b.throwCd = 200;
+      hammers.push({ x: b.x + b.face * 34, y: b.y - b.h + 22,
+        vx: b.face * 4.2, vy: -7.2, t: 0 });
+      sfx("throw");
+    }
+    if (--b.hopCd <= 0) { b.hopCd = 430; b.vy = -8.5; b.prevVy = b.vy; }
+  }
+  // player contact
+  if (overlap(p, b)) {
+    const stomp = p.vy > 1.5 && (p.y - b.y + p.h) < b.h * 0.55;
+    if (b.dizzy > 0 && stomp) {
+      hitBoss();
+      p.vy = STOMP_BOUNCE_HELD; p.onGround = false;
+    } else if (b.inv <= 0) damagePlayer();
+  }
+  // hammers
+  hammers = hammers.filter((hm) => {
+    hm.t++;
+    hm.vy += 0.35;
+    hm.x += hm.vx; hm.y += hm.vy; hm.rot = (hm.rot || 0) + 0.25 * Math.sign(hm.vx);
+    if (player.growT === 0 &&
+        Math.abs(hm.x - p.x) < p.w / 2 + 10 && hm.y > p.y - p.h - 8 && hm.y < p.y + 8) {
+      damagePlayer();
+      return false;
+    }
+    return hm.t < 400 && hm.y < VIEW_H + 80 && hm.x > camX - 80 && hm.x < camX + VIEW_W + 80;
+  });
+}
+
+function updateBigBananas() {
+  bigbananas.forEach((bb) => {
+    if (bb.got) return;
+    if (Math.abs(bb.x - player.x) < player.w / 2 + 18 &&
+        bb.y > player.y - player.h - 18 && bb.y < player.y + 18) {
+      bb.got = true; bigGot++; allBigGotSession++;
+      addScore(1000, bb.x, bb.y - 30, "BIG!");
+      if (allBigGotSession === 48) {
+        popups.push({ x: bb.x, y: bb.y - 60, t: 0, text: "48/48 全收集!" });
+        sfx("konami");
+      }
+      sfx("power");
+      particles.push({ type: "spark", x: bb.x, y: bb.y, vx: 0, vy: 0, t: 0 });
+    }
   });
 }
 
@@ -1245,16 +1657,23 @@ function draw() {
   if (state === "loading") { drawLoading(); return; }
   drawBackground();
   ctx.save();
-  ctx.translate(-Math.round(camX), 0);
+  const shx = shakeT > 0 ? Math.round((Math.random() * 2 - 1) * shakeMag) : 0;
+  const shy = shakeT > 0 ? Math.round((Math.random() * 2 - 1) * shakeMag) : 0;
+  ctx.translate(-Math.round(camX) + shx, shy);
   drawCastle();
   drawFlag();
-  drawTiles();
+  drawCheckpoint();
+  drawPlants();
+  drawTiles();          // tiles cover plant stems so they emerge from pipes
   drawBananas();
+  drawBigBananas();
   drawItems();
   drawPops();
   drawShots();
   drawFireballs();
+  drawHammers();
   enemies.forEach(drawEnemy);
+  drawBoss();
   if (state !== "clear") drawPlayer();
   drawParticles();
   drawPopups();
@@ -1517,13 +1936,93 @@ function drawEnemy(en) {
   if (en.state === "gone" || !en.active) return;
   let img;
   if (en.state === "flat") img = IMG.enemy_flat;
+  else if (en.state === "fly") img = IMG.enemy_fly;
+  else if ((en.kind === "shell") && (en.state === "shell" || en.state === "slide")) img = IMG.shell;
   else img = (en.t >> 4) % 2 === 0 ? IMG.enemy_a : IMG.enemy_b;
   ctx.save();
   ctx.translate(en.x, en.y);
   if (en.state === "flip") ctx.scale(1, -1);
-  if (en.state === "flat") ctx.drawImage(img, -22, -40, 44, 44);
+  if (en.state === "shell" || en.state === "slide") {
+    if (en.state === "slide" && Math.sign(en.vx) < 0) ctx.scale(-1, 1);
+    const wob = en.state === "slide" ? Math.sin(frame * 0.7) * 2 : 0;
+    ctx.drawImage(img, -20, -34 + wob, 40, 36);
+  } else if (en.state === "flat") ctx.drawImage(img, -22, -40, 44, 44);
   else ctx.drawImage(img, -22, -44, 44, 44);
   ctx.restore();
+}
+
+function drawCheckpoint() {
+  if (!cpX) return;
+  const px = cpX, py = cpY;
+  ctx.fillStyle = "#b0bec5";
+  ctx.fillRect(px - 3, py - 64, 6, 64);
+  ctx.fillStyle = "#78909c";
+  ctx.fillRect(px - 1, py - 64, 2, 64);
+  const wave = Math.sin(frame * 0.12) * 4;
+  const img = cpActive && cpLevel === levelIdx ? IMG.tile_checkpoint_on : IMG.tile_checkpoint;
+  ctx.drawImage(img, px + 2 + wave * 0.4, py - 64, 30, 22);
+}
+
+function drawPlants() {
+  plants.forEach((pl) => {
+    if (pl.dead || pl.rise <= 0.02) return;
+    const hgt = 46 * pl.rise;
+    const top = pl.topY - hgt;
+    // stem
+    ctx.fillStyle = "#3c963c";
+    ctx.fillRect(pl.x - 6, top + 18, 12, hgt - 14);
+    // head
+    ctx.drawImage(IMG.plant, pl.x - 22, top - 8, 44, 54);
+  });
+}
+
+function drawBigBananas() {
+  bigbananas.forEach((bb) => {
+    if (bb.got) return;
+    const bob = Math.sin(frame * 0.08 + bb.x) * 5;
+    ctx.save();
+    ctx.translate(bb.x, bb.y + bob);
+    // soft gold halo: special item, same beloved banana shape
+    ctx.fillStyle = "rgba(255,213,79,0.22)";
+    ctx.beginPath(); ctx.arc(0, 0, 40, 0, 7); ctx.fill();
+    ctx.rotate(Math.sin(frame * 0.04) * 0.18);
+    ctx.drawImage(IMG.banana, -34, -34, 68, 68);   // 34->68: exactly 4x area
+    ctx.restore();
+  });
+}
+
+function drawHammers() {
+  hammers.forEach((hm) => {
+    ctx.save();
+    ctx.translate(hm.x, hm.y);
+    ctx.rotate(hm.rot || 0);
+    ctx.drawImage(IMG.hammer, -15, -12, 30, 24);
+    ctx.restore();
+  });
+}
+
+function drawBoss() {
+  const b = boss;
+  if (!b || b.dead || !b.awake) return;
+  if (b.inv > 0 && (frame >> 2) % 2 === 0) return;   // hit flash
+  const bob = Math.sin(b.t * 0.1) * 2;
+  ctx.save();
+  ctx.translate(b.x, b.y + bob);
+  if (b.face < 0) ctx.scale(-1, 1);
+  ctx.drawImage(IMG.boss, -b.w / 2, -b.h, b.w, b.h);
+  ctx.restore();
+  // hp pips
+  for (let i = 0; i < b.maxHp; i++) {
+    ctx.fillStyle = i < b.hp ? "#ff5252" : "rgba(255,255,255,.25)";
+    ctx.fillRect(b.x - b.maxHp * 9 + i * 18, b.y - b.h - 16, 14, 8);
+  }
+  if (b.dizzy > 0) {
+    ctx.fillStyle = "#ffe082";
+    for (let i = 0; i < 3; i++) {
+      const ang = frame * 0.15 + i * 2.1;
+      ctx.fillRect(b.x + Math.cos(ang) * 26 - 2, b.y - b.h - 10 + Math.sin(ang) * 6, 5, 5);
+    }
+  }
 }
 
 function playerSprite() {
@@ -1553,7 +2052,12 @@ function drawPlayer() {
   }
   let img = playerSprite();
   if (state === "dead" && deadTimer < 30) img = IMG.hurt;
-  const w = img.width * scale, h = img.height * scale;
+  let w = img.width * scale, h = img.height * scale;
+  if (p.landT > 0) {                                   // landing squash
+    const k = p.landT / 8;
+    h *= 1 - 0.14 * Math.sin(k * Math.PI);
+    w *= 1 + 0.10 * Math.sin(k * Math.PI);
+  }
   ctx.save();
   ctx.translate(Math.round(p.x), Math.round(p.y));
   if (p.face < 0) ctx.scale(-1, 1);
@@ -1628,11 +2132,11 @@ function drawPopups() {
   });
 }
 
-function hudText(text, x, y) {
+function hudText(text, x, y, color) {
   ctx.textAlign = "left";
   ctx.fillStyle = "#000";
   ctx.fillText(text, x + 2, y + 2);
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = color || "#fff";
   ctx.fillText(text, x, y);
 }
 
@@ -1688,10 +2192,12 @@ function drawTitle() {
     ctx.fillText("KONAMI MODE  LIVES x99", VIEW_W / 2, 274);
     if ((frame >> 4) % 2 === 0) {
       ctx.font = "18px 'Press Start 2P', monospace";
+      const br = bestRankFor(LEVELS[titleSel].name);
+      const label = "< STAGE " + LEVELS[titleSel].name + (br ? " *" + br : "") + " >";
       ctx.fillStyle = "#000";
-      ctx.fillText("< STAGE " + LEVELS[titleSel].name + " >", VIEW_W / 2 + 2, 322);
+      ctx.fillText(label, VIEW_W / 2 + 2, 322);
       ctx.fillStyle = "#f7c531";
-      ctx.fillText("< STAGE " + LEVELS[titleSel].name + " >", VIEW_W / 2, 320);
+      ctx.fillText(label, VIEW_W / 2, 320);
     }
   }
   const img = IMG.powerup;
@@ -1722,9 +2228,21 @@ function drawClear() {
   ctx.font = "30px 'Press Start 2P', monospace";
   ctx.fillStyle = "#f7c531";
   ctx.fillText("COURSE CLEAR!", VIEW_W / 2, 215);
+  // rank
+  const rc = rankColor(lastRank);
+  if (clearTimer > 20) {
+    ctx.font = "26px 'Press Start 2P', monospace";
+    ctx.fillStyle = "#000";
+    ctx.fillText("RANK " + lastRank, VIEW_W / 2 + 3, 258);
+    ctx.fillStyle = rc;
+    ctx.fillText("RANK " + lastRank, VIEW_W / 2, 255);
+    ctx.font = "11px 'Press Start 2P', monospace";
+    ctx.fillStyle = "#cfd3ea";
+    ctx.fillText("BIG BANANA " + bigGot + "/3   DEATHS " + deathsThisLevel, VIEW_W / 2, 276);
+  }
   ctx.font = "16px 'Press Start 2P', monospace";
   ctx.fillStyle = "#fff";
-  ctx.fillText("BANANA BONUS  " + bonusLeft, VIEW_W / 2, 265);
+  ctx.fillText("BANANA BONUS  " + bonusLeft, VIEW_W / 2, 300);
   if (clearTimer % 8 === 0 && bonusLeft > 0) {
     const d = Math.min(100, bonusLeft);
     bonusLeft -= d;
@@ -1733,7 +2251,7 @@ function drawClear() {
   }
   if (bonusLeft <= 0 && clearTimer > 90 && (frame >> 5) % 2 === 0) {
     ctx.fillStyle = "#7fff7f";
-    ctx.fillText(levelIdx < LEVELS.length - 1 ? "PRESS ENTER FOR NEXT COURSE" : "PRESS ENTER", VIEW_W / 2, 315);
+    ctx.fillText(levelIdx < LEVELS.length - 1 ? "PRESS ENTER FOR NEXT COURSE" : "PRESS ENTER", VIEW_W / 2, 340);
   }
 }
 
@@ -1748,12 +2266,18 @@ function drawEnding() {
   ctx.font = "18px 'Press Start 2P', monospace";
   ctx.fillStyle = "#fff";
   ctx.fillText("ALL 16 COURSES CLEAR!", VIEW_W / 2, 200);
+  ctx.fillStyle = "#9fe08f";
+  ctx.fillText("香蕉王國拯救成功!", VIEW_W / 2, 226);
+  if (allBigGotSession >= 48) {
+    ctx.fillStyle = "#ffd700";
+    ctx.fillText("全部大金蕉收集達成 48/48!", VIEW_W / 2, 252);
+  }
   ctx.font = "13px 'Press Start 2P', monospace";
   ctx.fillStyle = "#ccc";
-  ctx.fillText("SCORE " + String(score).padStart(6, "0") + "   BANANA " + bananaCount, VIEW_W / 2, 240);
+  ctx.fillText("SCORE " + String(score).padStart(6, "0") + "   BANANA " + bananaCount, VIEW_W / 2, 284);
   const img = IMG.powerup;
   const s = 1.3 + Math.sin(endT * 0.05) * 0.06;
-  ctx.drawImage(img, VIEW_W / 2 - (img.width * s) / 2, 270, img.width * s, img.height * s);
+  ctx.drawImage(img, VIEW_W / 2 - (img.width * s) / 2, 310, img.width * s, img.height * s);
   for (let i = 0; i < 6; i++) {
     const bx = (i * 173 + 60) % VIEW_W;
     const by = ((endT * 2 + i * 137) % (VIEW_H + 80)) - 40;
@@ -1777,11 +2301,13 @@ function drawPause() {
 
 function step() {
   frame++;
+  if (hitstop > 0) { hitstop--; return; }        // impact freeze-frames
+  if (shakeT > 0) shakeT--;
   if (state === "loading") return;
   if (paused && state === "play") { anyEnter = false; return; }
   if (state === "title") {
     if (anyEnter) {
-      score = 0; bananaCount = 0;
+      score = 0; bananaCount = 0; allBigGotSession = 0;
       levelIdx = konamiOn ? titleSel : 0;
       lives = konamiOn ? 99 : 5;
       resetLevel();
@@ -1840,6 +2366,9 @@ function step() {
       updateItems();
       updateShots();
       updateFireballs();
+      updatePlants();
+      updateBoss();
+      updateBigBananas();
       updateTime();
     }
   } else if (state === "flag") {

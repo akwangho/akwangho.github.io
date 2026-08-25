@@ -46,6 +46,27 @@ for (let i = 0; i < ns.LEVELS.length; i++) {
   if (ns.bananas.length === 0) issues.push("no bananas placed");
   if (ns.enemies.length === 0) issues.push("no enemies placed");
 
+  // gameplay extras
+  let hiddenCount = 0;
+  for (let ty = 0; ty < ns.ROWS; ty++)
+    for (let tx = 0; tx < ns.levelW; tx++)
+      if (ns.grid[ty][tx] === 12 || ns.grid[ty][tx] === 13) hiddenCount++;
+  if (hiddenCount < 2) issues.push(`hidden blocks ${hiddenCount} < 2`);
+  if (ns.bigbananas.length !== 3) issues.push(`big bananas ${ns.bigbananas.length} !== 3`);
+  if (!(ns.cpX > 0)) {
+    issues.push("no checkpoint placed");
+  } else {
+    const walkerX = ns.enemies.filter(e => e.kind !== "fly").map(e => e.x);
+    const minD = walkerX.length ? Math.min(...walkerX.map(ex => Math.abs(ns.cpX - ex))) : Infinity;
+    if (minD < ns.TILE * 5) issues.push(`checkpoint only ${minD.toFixed(0)}px from enemy spawn`);
+    const ctxCp = Math.floor(ns.cpX / ns.TILE), ctyCp = Math.floor(ns.cpY / ns.TILE);
+    if (!solid(ctxCp, ctyCp)) issues.push(`checkpoint spawn not on solid ground @${ctxCp},${ctyCp}`);
+    if (solid(ctxCp, ctyCp - 1)) issues.push(`checkpoint spawn head blocked @${ctxCp},${ctyCp}`);
+  }
+  const expectBoss = (i === 3 || i === 15);
+  if (expectBoss && !ns.boss) issues.push("missing boss");
+  if (!expectBoss && ns.boss) issues.push("unexpected boss");
+
   // deadly pits: contiguous lava/water spans must be <=7 wide or bridged
   let span = 0;
   for (let x = 0; x < ns.levelW; x++) {
@@ -58,6 +79,9 @@ for (let i = 0; i < ns.LEVELS.length; i++) {
 
   // jump reachability: BFS over standable surfaces
   // node=(tx,ty surface top). edge if |dx|<=6 and dy within [-3 up, +12 down]
+  if (i === 3 || i === 15) {          // boss gate wall is removable on victory
+    for (let ty = 2; ty <= 8; ty++) ns.grid[ty][ns.LEVELS[i].flagCol - 6] = 0;
+  }
   const standable = [];
   const idOf = new Map();
   for (let tx = 0; tx < ns.levelW; tx++)
@@ -149,13 +173,26 @@ while (cleared.length < ns.LEVELS.length && budget-- > 0) {
       for (let cy = Math.max(0, footTy - 4); cy <= footTy - 1; cy++)
         if (ns.solidAt(cx, cy)) { elevatedAhead = true; break outer; }
 
-    const needJump = wallAhead || !floorAhead || enemyNear || elevatedAhead;
-    if (needJump) jumpLatch = 24;           // hold jump long enough to clear obstacles
-    else if (jumpLatch > 0) jumpLatch--;
-
-    if (jumpLatch > 0) { if (!ns.keys.jump) kd("Space"); }
-    else if (ns.keys.jump) ku("Space");
-    if (!ns.keys.right) kd("ArrowRight");
+    // ---- boss fight override ----
+    if (ns.boss && !ns.boss.dead && p.x > ns.boss.minX - 320) {
+      noProgress = 0;
+      const b = ns.boss;
+      const wantY = b.dizzy > 0 ? b.y - b.h - 6 : b.y - b.h - 100;
+      if (!b.awake) kd("ArrowRight");
+      if (p.y > wantY + 4) kd("Space"); else ku("Space");
+      if (Math.abs(p.x - b.x) > 14) {
+        if (p.x < b.x) { kd("ArrowRight"); ku("ArrowLeft"); }
+        else { kd("ArrowLeft"); ku("ArrowRight"); }
+      }
+    } else {
+      if (ns.keys.left) ku("ArrowLeft");
+      const needJump = wallAhead || !floorAhead || enemyNear || elevatedAhead;
+      if (needJump) jumpLatch = 24;         // hold jump long enough to clear obstacles
+      else if (jumpLatch > 0) jumpLatch--;
+      if (jumpLatch > 0) { if (!ns.keys.jump) kd("Space"); }
+      else if (ns.keys.jump) ku("Space");
+      if (!ns.keys.right) kd("ArrowRight");
+    }
 
     if (noProgress > 9000) {
       console.log(`STALL lvl=${ns.LEVELS[ns.levelIdx].name} pos=(${p.x.toFixed(1)},${p.y.toFixed(1)}) vx=${p.vx.toFixed(2)} vy=${p.vy.toFixed(2)} onG=${p.onGround} lvlMaxX=${Math.round(lvlMaxX)} camX=${Math.round(ns.camX)} timeLeft=${ns.timeLeft} lives=${ns.lives}`);
@@ -179,6 +216,10 @@ while (cleared.length < ns.LEVELS.length && budget-- > 0) {
     cleared.push(lvlName);
     console.log(`  CLEAR ${lvlName}  (score=${ns.score}, lives=${ns.lives})`);
     ok(ns.lives >= 99, `${lvlName}: lives >= 99 after clear (got ${ns.lives}, 1UPs allowed)`);
+    try {
+      const rmap = JSON.parse(globalThis.localStorage.getItem("smb_rank_v1") || "{}");
+      ok(!!rmap[lvlName], `${lvlName}: rank saved (${rmap[lvlName] || "none"})`);
+    } catch (e) { ok(false, `${lvlName}: rank read failed`); }
     ok(Number.isFinite(ns.player.x) && Number.isFinite(ns.player.y), `${lvlName}: player coords finite`);
     // bonus drain then advance to next course
     let guard = 0;

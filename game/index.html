@@ -70,7 +70,7 @@
 </div>
 
 <div id="hint">
-  <b>← →</b> 移動　<b>SHIFT/X</b> 跑・丟火球　<b>空白鍵/Z/↑</b> 跳躍　<b>↓</b> 蹲下　<b>M</b> 音樂　<b>P</b> 暫停　<b>ENTER</b> 開始　<b>右上角</b> 調整畫面大小
+  <b>← →</b> 移動　<b>SHIFT/X</b> 跑・丟火球　<b>空白鍵/Z/↑</b> 跳躍　<b>↓</b> 蹲下　<b>M</b> 音樂　<b>P</b> 暫停　<b>ENTER</b> 開始　<b>F×2</b> 全螢幕　<b>右上角</b> 調整畫面大小
 </div>
 
 <div id="touch">
@@ -85,14 +85,17 @@
   </div>
 </div>
 
-<script src="game.js?v=5"></script>
+<script src="game.js?v=7"></script>
 <script>
 (function () {
   var W = 960, H = 528;               // 遊戲內部解析度（20:11）
   var cv = document.getElementById("game");
   var label = document.getElementById("szLabel");
-  var bodyEl = document.body;
   var KEY = "smb_size";
+  var mode = "fit";                   // 使用者偏好："fit" 或百分比字串
+  var fsAuto = false;                 // 全螢幕期間自動填滿中
+  var preFsMode = null;               // 進全螢幕前的大小
+
   function loadMode() {
     try {
       var v = localStorage.getItem(KEY);
@@ -100,38 +103,85 @@
     } catch (e) {}
     return "fit";
   }
-  var mode = loadMode();              // "fit" 或百分比字串
-
+  function isFull() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+  function effMode() {
+    return fsAuto ? "fit" : mode;
+  }
   function curPct() {
-    if (mode !== "fit") return parseFloat(mode);
+    var m = effMode();
+    if (m !== "fit") return parseFloat(m);
     return Math.round(Math.min(window.innerWidth / W, window.innerHeight / H) * 100);
   }
   function apply() {
-    var pct = (mode === "fit")
+    var m = effMode();
+    var pct = (m === "fit")
       ? Math.min(window.innerWidth / W, window.innerHeight / H) * 100
-      : parseFloat(mode);
+      : parseFloat(m);
     cv.style.width = (Math.round(W * pct) / 100) + "px";
     cv.style.height = (Math.round(H * pct) / 100) + "px";
-    label.textContent = (mode === "fit") ? "填滿" : Math.round(pct) + "%";
-    bodyEl.classList.toggle("scrollable", mode !== "fit");
-    try { localStorage.setItem(KEY, String(mode)); } catch (e) {}
+    label.textContent = (m === "fit") ? "填滿" : Math.round(pct) + "%";
+    document.body.classList.toggle("scrollable", !isFull() && m !== "fit");
+    if (!fsAuto) { try { localStorage.setItem(KEY, String(mode)); } catch (e) {} }
   }
-  document.getElementById("szFit").addEventListener("click", function () { mode = "fit"; apply(); });
+
+  document.getElementById("szFit").addEventListener("click", function () {
+    fsAuto = false; preFsMode = null;
+    mode = "fit"; apply();
+  });
   document.getElementById("szMinus").addEventListener("click", function () {
+    fsAuto = false;
     mode = String(Math.max(40, curPct() - 10)); apply();
   });
   document.getElementById("szPlus").addEventListener("click", function () {
+    fsAuto = false;
     mode = String(Math.min(300, curPct() + 10)); apply();
   });
-  document.getElementById("szFull").addEventListener("click", function () {
+
+  function toggleFull() {
     try {
-      if (document.fullscreenElement) { document.exitFullscreen(); }
-      else if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen(); }
+      var root = document.documentElement;
+      if (isFull()) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+      }
     } catch (e) {}
+  }
+  document.getElementById("szFull").addEventListener("click", toggleFull);
+  // 連按兩下 F 切換全螢幕（單按 F 保留給 fly 作弊碼）
+  var lastFTap = -1;
+  window.addEventListener("keydown", function (e) {
+    if (e.code === "KeyF" && !e.repeat) {
+      var now = performance.now();
+      if (lastFTap >= 0 && now - lastFTap < 350) { toggleFull(); lastFTap = -1; }
+      else { lastFTap = now; }
+      e.preventDefault();
+    }
   });
+
+  // 全螢幕：預設自動填滿；離開時還原進入前的大小
+  function onFsChange() {
+    if (isFull()) {
+      if (!fsAuto && mode !== "fit") { preFsMode = mode; fsAuto = true; }
+    } else if (fsAuto) {
+      fsAuto = false;
+      mode = preFsMode || "fit";
+      preFsMode = null;
+    }
+    apply();
+  }
+  document.addEventListener("fullscreenchange", onFsChange);
+  document.addEventListener("webkitfullscreenchange", onFsChange);
+
   window.addEventListener("resize", apply);
+
+  mode = loadMode();
+  if (isFull() && mode !== "fit") { preFsMode = mode; fsAuto = true; }
   apply();
 })();
 </script>
+
 </body>
 </html>
