@@ -22,6 +22,9 @@ const SPRITES = [
   "shell", "enemy_fly", "plant", "boss", "hammer",
   "mummy", "penguin", "lava_bubble",
   "boss_rabbit", "boss_shih", "boss_cats", "boss_bowser",
+  "boss_rabbit_walk", "boss_rabbit_atk", "boss_shih_walk", "boss_shih_atk",
+  "boss_cats_walk", "boss_cats_atk", "boss_bowser_walk", "boss_bowser_atk",
+  "proj_carrot", "proj_star", "proj_flame",
   "tile_checkpoint", "tile_checkpoint_on",
   "face1",
 ];
@@ -340,10 +343,10 @@ const FLY_SPOTS = {
 };
 const PLANT_PIPES = { 1: [32, 40, 94], 9: [44, 104], 12: [104] };
 const BOSS_LEVELS = {
-  3:  { hp: 3, img: "boss_rabbit", bossName: "彼得兔",   clearStairs: [[172, 180]] },
-  7:  { hp: 3, img: "boss_shih",   bossName: "西施惠",   clearStairs: [[158, 163]] },
-  11: { hp: 4, img: "boss_cats",   bossName: "野貓軍團", clearStairs: [[186, 192]] },
-  15: { hp: 5, img: "boss_bowser", bossName: "庫巴",     clearStairs: [[182, 190]] },
+  3:  { hp: 3, img: "boss_rabbit", bossName: "彼得兔",   atk: "carrot", clearStairs: [[172, 180]] },
+  7:  { hp: 3, img: "boss_shih",   bossName: "西施惠",   atk: "star",   clearStairs: [[158, 163]] },
+  11: { hp: 4, img: "boss_cats",   bossName: "野貓軍團", atk: "dash",   clearStairs: [[186, 192]] },
+  15: { hp: 5, img: "boss_bowser", bossName: "庫巴",     atk: "flame",  clearStairs: [[182, 190]] },
 };
 
 function setupLevelExtras(def) {
@@ -385,7 +388,13 @@ function setupLevelExtras(def) {
     for (let ty = 5; ty <= 8; ty++) grid[ty][wallCol] = 14;   // 柵門：頂尖跳躍可翻越
     boss = { x: (wallCol - 8) * TILE, y: 9 * TILE, w: 96, h: 96,
       hp: bs.hp, maxHp: bs.hp, img: bs.img, bossName: bs.bossName,
-      vx: 0, vy: 0, prevVy: 0, t: 0, throwCd: 150, hopCd: 260, dizzy: 0, inv: 0,
+      kind: bs.atk, speed: { carrot: 1.0, star: 0.55, dash: 0.7, flame: 0.78 }[bs.atk],
+      hopFull: { carrot: 280, star: 520, dash: 640, flame: 400 }[bs.atk],
+      hopV: { carrot: -10.2, star: -7.5, dash: -8.2, flame: -9.6 }[bs.atk],
+      vx: 0, vy: 0, prevVy: 0, t: 0,
+      throwCd: { carrot: 130, star: 150, dash: 300, flame: 140 }[bs.atk],
+      hamCd: 320, dashCd: 200, dashT: 0, tele: 0, restT: 0, dashDir: 1, atkPoseT: 0,
+      hopCd: 200, dizzy: 0, inv: 0,
       minX: (wallCol - 13) * TILE, maxX: (wallCol - 2) * TILE,
       dead: false, wallCol, face: -1, onGround: false, wasGround: false, hitWall: false, hitDir: 0 };
   }
@@ -1759,9 +1768,17 @@ function updateBoss() {
   b.prevVy = b.vy;
   const dir = Math.sign(p.x - b.x) || 1;
   b.face = dir;
-  b.vx = b.dizzy > 0 ? 0 : dir * 0.8;
-  if (b.x < b.minX && b.vx < 0) b.vx = 0;
-  if (b.x > b.maxX && b.vx > 0) b.vx = 0;
+
+  // ---- 專屬移動：野貓軍團的衝刺 ----
+  if (b.kind === "dash" && b.dashT > 0 && b.dizzy <= 0) {
+    b.dashT--;
+    b.atkPoseT = Math.max(b.atkPoseT, 2);
+    b.vx = b.dashDir * 6.5;                       // 衝刺速度遠高於一般移動
+  } else {
+    b.vx = b.dizzy > 0 ? 0 : dir * b.speed;
+  }
+  if (b.x < b.minX && b.vx < 0) { b.vx = 0; b.dashT = 0; }
+  if (b.x > b.maxX - b.w / 2 && b.vx > 0) { b.vx = 0; b.dashT = 0; }
   rectVsGrid(b, null);
   // keep the boss inside its arena (hard positional clamp)
   if (b.x < b.minX) b.x = b.minX;
@@ -1772,14 +1789,70 @@ function updateBoss() {
     sfx("stomp");
   }
   b.wasGround = b.onGround;
-  if (b.dizzy <= 0 && b.onGround) {
-    if (--b.throwCd <= 0) {
-      b.throwCd = 200;
-      hammers.push({ x: b.x + b.face * (b.w / 2 + 4), y: b.y - b.h + 26,
-        vx: b.face * 4.2, vy: -7.2, t: 0 });
-      sfx("throw");
+
+  // ---- 專屬攻擊型態（暈眩時無法攻擊） ----
+  if (b.dizzy <= 0) {
+    switch (b.kind) {
+      case "carrot":                             // 彼得兔：紅蘿卜轟炸
+        if (--b.throwCd <= 0 && b.onGround && Math.abs(p.x - b.x) < 560) {
+          const dxx = Math.sign(p.x - b.x) || b.face;
+          bossShoot("carrot", b.x + dxx * (b.w / 2 - 6), b.y - b.h * 0.55,
+            dxx * 4.6, -6.6);
+          b.throwCd = 118; b.atkPoseT = 20;
+          sfx("throw");
+        }
+        break;
+      case "star":                               // 西施惠：禮物星星扇形
+        if (--b.throwCd <= 0 && b.onGround && Math.abs(p.x - b.x) < 520) {
+          const dxx = Math.sign(p.x - b.x) || b.face;
+          for (const ang of [-0.42, 0, 0.42]) {
+            bossShoot("star", b.x + dxx * (b.w / 2 - 4), b.y - b.h * 0.45,
+              dxx * 4.3 * Math.cos(ang), 4.3 * Math.sin(ang) * 0.8 - 0.3,
+              { wob: (b.t % 7) });
+          }
+          b.throwCd = 185; b.atkPoseT = 26;
+          sfx("kick");
+        }
+        break;
+      case "dash": {                             // 野貓軍團：蓄力衝刺撲擊
+        if (b.restT > 0) b.restT--;
+        else if (b.dashT > 0) { /* 移動區已處理 */ }
+        else if (b.tele > 0) {
+          b.vx = 0;
+          if (--b.tele <= 0) {
+            b.dashT = 52;
+            b.dashDir = Math.sign(p.x - b.x) || b.face;
+            sfx("dash");
+          }
+        } else if (--b.dashCd <= 0 && Math.abs(p.x - b.x) < 540) {
+          b.tele = 32; b.atkPoseT = 36;
+          sfx("wing");
+        }
+        if (--b.hamCd <= 0 && b.onGround) {       // 偶發鎖鏈錘（保留經典）
+          bossShoot("hammer", b.x + b.face * (b.w / 2 + 4), b.y - b.h + 26,
+            b.face * 4.2, -7.2);
+          b.hamCd = 330; sfx("throw");
+        }
+        break;
+      }
+      case "flame":                               // 庫巴：雙段火焰吐息
+        if (--b.throwCd <= 0 && b.onGround && Math.abs(p.x - b.x) < 600) {
+          const dxx = Math.sign(p.x - b.x) || b.face;
+          bossShoot("flame", b.x + dxx * (b.w / 2 - 2), b.y - b.h * 0.62,
+            dxx * 6.2, 0);
+          bossShoot("flame", b.x + dxx * (b.w / 2 - 2), b.y - b.h * 0.38,
+            dxx * 5.4, 0);
+          b.throwCd = 148; b.atkPoseT = 28;
+          sfx("fire");
+        }
+        break;
     }
-    if (--b.hopCd <= 0) { b.hopCd = 430; b.vy = -8.5; b.prevVy = b.vy; }
+    if (b.atkCd > 0) b.atkCd--;
+  }
+
+  // 跳躍（各 Boss 節奏不同）
+  if (b.dizzy <= 0 && b.onGround) {
+    if (--b.hopCd <= 0) { b.hopCd = b.hopFull; b.vy = b.hopV; b.prevVy = b.vy; }
   }
   // player contact
   if (overlap(p, b)) {
@@ -1790,18 +1863,35 @@ function updateBoss() {
       p.vy = STOMP_BOUNCE_HELD; p.onGround = false;
     } else if (b.inv <= 0) damagePlayer();
   }
-  // hammers
+  // 彈幕（錘／紅蘿蔔／星星／火焰）
   hammers = hammers.filter((hm) => {
     hm.t++;
-    hm.vy += 0.35;
-    hm.x += hm.vx; hm.y += hm.vy; hm.rot = (hm.rot || 0) + 0.25 * Math.sign(hm.vx);
+    if (hm.kind === "star") {
+      hm.x += hm.vx;
+      hm.y += hm.vy + Math.sin(hm.t * 0.12 + (hm.wob || 0)) * 1.4;
+      hm.rot = (hm.rot || 0) + 0.3;
+    } else if (hm.kind === "flame") {
+      hm.x += hm.vx; hm.y += Math.sin(hm.t * 0.25) * 0.9;
+      hm.rot = (hm.rot || 0) + 0.5 * Math.sign(hm.vx || 1);
+    } else if (hm.kind === "carrot") {
+      hm.vy += 0.22; hm.x += hm.vx; hm.y += hm.vy;
+      hm.rot = (hm.rot || 0) + 0.2 * Math.sign(hm.vx || 1);
+    } else {
+      hm.vy += 0.35; hm.x += hm.vx; hm.y += hm.vy;
+      hm.rot = (hm.rot || 0) + 0.25 * Math.sign(hm.vx);
+    }
     if (player.growT === 0 && !player.super &&
         Math.abs(hm.x - p.x) < p.w / 2 + 10 && hm.y > p.y - p.h - 8 && hm.y < p.y + 8) {
       damagePlayer();
       return false;
     }
-    return hm.t < 400 && hm.y < VIEW_H + 80 && hm.x > camX - 80 && hm.x < camX + VIEW_W + 80;
+    const life = hm.kind === "star" ? 230 : hm.kind === "flame" ? 150 : 400;
+    return hm.t < life && hm.y < VIEW_H + 80 && hm.x > camX - 90 && hm.x < camX + VIEW_W + 90;
   });
+}
+
+function bossShoot(kind, x, y, vx, vy, extra = {}) {
+  hammers.push({ kind, x, y, vx, vy, t: 0, rot: 0, ...extra });
 }
 
 function updateBigBananas() {
@@ -2211,10 +2301,17 @@ function drawBigBananas() {
 
 function drawHammers() {
   hammers.forEach((hm) => {
+    const img = hm.kind === "carrot" ? IMG.proj_carrot
+      : hm.kind === "star" ? IMG.proj_star
+      : hm.kind === "flame" ? IMG.proj_flame
+      : IMG.hammer;
+    const flick = hm.kind === "flame" ? 1 + Math.sin((hm.t || 0) * 0.5) * 0.18 : 1;
+    const w = (hm.kind === "hammer" ? 30 : 26) * flick;
+    const h = (hm.kind === "hammer" ? 24 : 22) * flick;
     ctx.save();
     ctx.translate(hm.x, hm.y);
     ctx.rotate(hm.rot || 0);
-    ctx.drawImage(IMG.hammer, -15, -12, 30, 24);
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
     ctx.restore();
   });
 }
@@ -2223,7 +2320,12 @@ function drawBoss() {
   const b = boss;
   if (!b || b.dead || !b.awake) return;
   if (b.inv > 0 && (frame >> 2) % 2 === 0) return;   // hit flash
-  const bob = Math.sin(b.t * 0.1) * 3;
+  // ---- 像素動畫影格：攻擊姿勢 → 行走交替 → 待機 ----
+  let imgKey = b.img;
+  const dashing = b.kind === "cats" && (b.dashT > 0 || b.tele > 0);
+  if (b.atkPoseT > 0 || dashing) imgKey += "_atk";
+  else if (Math.abs(b.vx || 0) > 0.12 && ((b.t >> 4) & 1) === 1) imgKey += "_walk";
+  const img = IMG[imgKey] || IMG[b.img] || IMG.boss_bowser;
   // name tag
   ctx.font = "11px 'Press Start 2P', monospace";
   ctx.textAlign = "center";
@@ -2235,9 +2337,10 @@ function drawBoss() {
   ctx.save();
   ctx.translate(Math.round(b.x), Math.round(b.y + bobY));
   if (b.face < 0) ctx.scale(-1, 1);
-  ctx.imageSmoothingEnabled = true;                   // 照片型素材用平滑縮放
-  ctx.drawImage(IMG[b.img] || IMG.boss_bowser, -b.w / 2, -b.h, b.w, b.h);
-  ctx.imageSmoothingEnabled = false;
+  if (b.dizzy > 0) {                                  // 暈眩：左右搖晃
+    ctx.rotate(Math.sin(b.t * 0.3) * 0.08);
+  }
+  ctx.drawImage(img, -b.w / 2, -b.h, b.w, b.h);
   ctx.restore();
   // hp pips
   for (let i = 0; i < b.maxHp; i++) {
