@@ -144,10 +144,11 @@ export function createBot(env, opts = {}) {
 
     checkInvariants(p);
 
-    // ---- Boss 戰 ----
+    // ---- Boss 戰（暫時收翅：避免 hold-jump 把飛行單位釘在天花板）----
     const footTy = Math.max(0, Math.floor((p.y - 1) / T));
     if (ns.boss && !ns.boss.dead && p.x > ns.boss.minX - 320) {
       noProgress = 0;
+      const savedFly = p.fly; p.fly = false;
       const b = ns.boss;
       if (!b.awake) kd("ArrowRight");
       if (b.dizzy > 0) {
@@ -165,6 +166,7 @@ export function createBot(env, opts = {}) {
         hold("jump", false);
       }
       await pump(1);
+      p.fly = savedFly;
       return null;
     }
 
@@ -278,27 +280,46 @@ export function createBot(env, opts = {}) {
 
     // ---- 貼牆助跑保險：原地跳不過的矮牆（小隻常見）→ 後退助跑滿速衝跳 ----
     if (o.backjump) {
-      const wallFaceX = (gapStartCol !== -1 ? gapStartCol : aheadTx) * T;
+      // 牆面座標只在觸發時鎖定（每幀重量測會把管頂誤當地板而飄移）
       if (vault === 0 && wedged) {
-        vault = 1; vaultT = 80;
+        vault = 1; vaultT = 90;
+        bot._vaultWall = Math.floor((p.x + p.w / 2 + 2) / T) * T;   // 前緣所在欄的左界
         bot._retreatFrom = p.x;
         ku(CODE.jump); held.jump = false;            // 先鬆開跳，避免持續原地小跳
+        if (process.env.VLOG) console.log(`    [vault] start retreat from ${p.x | 0} wall=${bot._vaultWall}`);
       }
-      if (vault === 1) {                              // 後退拉開 ≥160px 助跑
-        hold("right", false); hold("left", true); hold("run", false); hold("jump", false);
-        if (p.x <= wallFaceX - 160 || vaultT-- <= 0) { vault = 2; vaultT = 240; }
-      } else if (vault === 2) {                        // 滿速助跑，距牆 84px 提前滿弧起跳
-        hold("left", false); hold("right", true); hold("run", true);
-        const distToWall = wallFaceX - (p.x + p.w / 2);
-        if (p.onGround && distToWall <= 84 && distToWall > -12) {
-          if (ns.keys.jump) { ku(CODE.jump); held.jump = false; }
-          kd(CODE.jump); held.jump = true;
+      const vaultWall = bot._vaultWall ?? 0;
+      if (vault === 1) {                              // 後退拉開 ≥180px 助跑
+        ku(CODE.right); held.right = false;
+        kd(CODE.left); held.left = true;
+        ku(CODE.run); held.run = false;
+        ku(CODE.jump); held.jump = false;
+        if (p.x <= vaultWall - 200 || vaultT-- <= 0) {
+          if (process.env.VLOG) console.log(`    [vault] charge at ${p.x | 0} dist=${(vaultWall - p.x - p.w / 2) | 0}`);
+          vault = 2; vaultT = 300;
+        }
+      } else if (vault === 2) {                        // 滿速助跑：壓住跳躍，進入起跳窗口才放
+        kd(CODE.right); held.right = true;
+        ku(CODE.left); held.left = false;
+        kd(CODE.run); held.run = true;
+        ku(CODE.jump); held.jump = false;              // 壓制一般跳躍邏輯
+        const distToWall = vaultWall - (p.x + p.w / 2);
+        if (p.onGround && distToWall <= 96 && distToWall >= 24) {
+          kd(CODE.jump); held.jump = true;             // 窗口：滿弧起跳
           airF = 0; hopMode = 0;
-          vault = 3; vaultT = 140;
-        } else if (vaultT-- <= 0) { vault = 0; stuckT = 0; }
+          if (process.env.VLOG) console.log(`    [vault] JUMP at ${p.x | 0} dist=${distToWall | 0} vx=${ns.player.vx.toFixed(1)}`);
+          vault = 3; vaultT = 180;
+        } else if (vaultT-- <= 0 || distToWall < 18) {
+          if (process.env.VLOG) console.log(`    [vault] phase2 fail d=${distToWall | 0}`);
+          vault = 0; stuckT = 0;
+        }
       } else if (vault === 3) {                        // 滯空越牆：保持右+滿弧
-        hold("right", true); hold("run", true);
-        if (p.onGround && !wallAhead || vaultT-- <= 0) { vault = 0; stuckT = 0; }
+        kd(CODE.right); held.right = true;
+        kd(CODE.run); held.run = true;
+        if (p.onGround || vaultT-- <= 0) {
+          if (process.env.VLOG) console.log(`    [vault] landed at ${p.x | 0} y=${ns.player.y | 0}`);
+          vault = 0; stuckT = 0;
+        }
       }
     }
 
@@ -340,6 +361,7 @@ export function createBot(env, opts = {}) {
     get framesThisLevel() { return framesThisLevel; },
     get levelIdx() { return ns.levelIdx; },
     assistUsed: () => assistUsed,
+    setOpts(patch) { Object.assign(o, patch); },
     step, releaseAll() { for (const k of Object.keys(held)) if (held[k]) { ku(CODE[k]); held[k] = false; } },
   };
   return bot;

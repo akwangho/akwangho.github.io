@@ -25,13 +25,16 @@ try {
   const bot = createBot(env, { super: true, small: true });
   let budget = 420000;
 
+  await typeWord(env, WORDS.fly);
+  ok(ns.player.fly === true, "fly enabled (small-form flight)");
+
   let lastLog = 0;
   while (!bot.done && budget-- > 0) {
     const ev = await bot.step();
     if (ev === "ending") break;
-    if (bot.noProgress > 0 && bot.noProgress % 3000 === 0 && bot.noProgress !== lastLog) {
+    if (bot.noProgress > 0 && bot.noProgress % 2000 === 0 && bot.noProgress !== lastLog) {
       lastLog = bot.noProgress;
-      console.log(`  [stuck] lvl=${ns.LEVELS[ns.levelIdx].name} pos=(${ns.player.x | 0},${ns.player.y | 0}) vy=${ns.player.vy.toFixed(1)} onG=${ns.player.onGround} j=${ns.keys.jump} r=${ns.keys.right} l=${ns.keys.left} run=${ns.keys.run} v=${bot._vaultDbg()}`);
+      console.log(`  [stuck] lvl=${ns.LEVELS[ns.levelIdx].name} pos=(${ns.player.x | 0},${ns.player.y | 0}) vy=${ns.player.vy.toFixed(1)} onG=${ns.player.onGround} j=${ns.keys.jump} fly=${ns.player.fly}`);
     }
   }
 
