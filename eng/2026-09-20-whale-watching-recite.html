@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐋 Whale Watching 背誦闖關</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+        body {
+            font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 45%, #e0f2fe 100%);
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7dd3fc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.12) rotate(2deg); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop { animation: pop 0.4s ease-out; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-7px); }
+            75% { transform: translateX(7px); }
+        }
+        .animate-shake { animation: shake 0.35s ease-in-out; }
+
+        @keyframes bubble-rise {
+            0% { transform: translateY(0) scale(1); opacity: .55; }
+            100% { transform: translateY(-115vh) scale(1.5); opacity: 0; }
+        }
+        .bubble {
+            position: fixed; bottom: -60px; border-radius: 9999px;
+            background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.92), rgba(255,255,255,.14) 62%);
+            border: 1.5px solid rgba(255,255,255,.5);
+            pointer-events: none; z-index: 0;
+            animation: bubble-rise linear infinite;
+        }
+
+        @keyframes wave-move {
+            from { background-position: 0 0; }
+            to { background-position: 1600px 0; }
+        }
+        .sea-wave {
+            position: fixed; bottom: 0; left: 0; width: 200vw; height: 90px; z-index: 0;
+            background:
+                radial-gradient(60px 34px at 40px 22px, rgba(255,255,255,.5) 98%, transparent) repeat-x,
+                radial-gradient(46px 26px at 28px 40px, rgba(255,255,255,.32) 98%, transparent) repeat-x;
+            background-size: 160px 60px, 112px 44px;
+            animation: wave-move 12s linear infinite;
+        }
+
+        @keyframes swim {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-14px) rotate(3deg); }
+        }
+        .swim { animation: swim 3.4s ease-in-out infinite; }
+
+        .card-active {
+            border-color: #facc15 !important;
+            box-shadow: 0 0 18px rgba(250, 204, 21, 0.7);
+            transform: scale(1.03);
+            background-color: #fffbeb;
+        }
+
+        .word-btn { transition: transform .12s ease, background-color .15s ease, box-shadow .15s ease; }
+        .word-btn:hover { transform: translateY(-3px) scale(1.04); }
+        .word-btn:active { transform: scale(.94); }
+
+        .num-badge {
+            background: radial-gradient(circle at 30% 30%, #f87171, #dc2626);
+            box-shadow: 0 3px 0 rgba(0,0,0,.15);
+        }
+
+        .stage-chip.done { background-color: #86efac !important; border-color: #22c55e !important; }
+        .stage-chip.locked { opacity: .45; }
+
+        .hide { display: none !important; }
+
+        @media print {
+            body { background: #fff; }
+            .no-print, .bubble, .sea-wave, .stage { display: none !important; }
+        }
+    </style>
+</head>
+<body class="text-gray-800 relative">
+
+    <!-- 海底泡泡與海浪裝飾 -->
+    <div class="sea-wave"></div>
+    <div id="bubble-layer" aria-hidden="true"></div>
+
+    <div class="relative z-10 max-w-3xl mx-auto px-4 pb-32 pt-6">
+
+        <!-- ==================== 標題區 ==================== -->
+        <header class="text-center mb-6">
+            <div class="inline-flex items-center gap-2 bg-white/80 rounded-full px-5 py-1.5 shadow-sm border-2 border-sky-200 text-sky-700 font-bold">
+                <span>Unit 1</span><span class="text-sky-300">•</span><span>課文朗讀背誦</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-white mt-3 drop-shadow-[3px_3px_0_rgba(3,105,161,.55)]">
+                🐋 Whale Watching
+            </h1>
+            <p class="mt-2 text-sky-900/70 font-bold">跟著 Tommy 和朋友們去賞鯨，一邊玩一邊把課文背起來！</p>
+            <a href="index.html" class="inline-block mt-2 text-sky-700/70 hover:text-sky-700 font-bold text-sm no-print">
+                ← 回課程列表
+            </a>
+        </header>
+
+        <!-- ==================== 關卡選擇 ==================== -->
+        <nav id="stage-nav" class="flex flex-wrap justify-center gap-2 mb-6 no-print">
+            <!-- 關卡 chips 由 JS 產生 -->
+        </nav>
+
+        <main id="app" class="relative z-10">
+
+            <!-- ==================== 關卡 1：跟讀熱身 ==================== -->
+            <section id="stage-1" class="stage hide">
+                <div class="bg-white/95 rounded-3xl shadow-xl p-5 md:p-7 border-4 border-sky-100">
+                    <div class="text-center mb-5">
+                        <div class="text-5xl swim">🚢</div>
+                        <h2 class="text-2xl font-black text-sky-600 mt-2">第 1 關：跟讀熱身</h2>
+                        <p class="text-gray-500 mt-1">按 ▶ 播放整篇課文，看著編號跟著唸一遍，再按「我讀完了！」</p>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-3 mb-5 no-print">
+                        <button onclick="playAll()" id="btn-play-all"
+                            class="bg-sky-500 hover:bg-sky-600 text-white font-bold px-6 py-3 rounded-full shadow-lg transition text-lg">
+                            <i class="fa-solid fa-play mr-1"></i> 播放整篇
+                        </button>
+                        <button onclick="stopSpeech()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold px-5 py-3 rounded-full transition">
+                            ⏹ 停止
+                        </button>
+                    </div>
+
+                    <div id="story-list" class="space-y-3"></div>
+
+                    <div class="text-center mt-6 no-print">
+                        <button onclick="finishStage(1)"
+                            class="bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-200 transition">
+                            我讀完了！ <i class="fa-solid fa-check ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== 關卡 2：排序拼句子 ==================== -->
+            <section id="stage-2" class="stage hide">
+                <div class="bg-white/95 rounded-3xl shadow-xl p-5 md:p-7 border-4 border-amber-100">
+                    <div class="text-center mb-4">
+                        <div class="text-5xl swim">🧩</div>
+                        <h2 class="text-2xl font-black text-amber-500 mt-2">第 2 關：排句子</h2>
+                        <p class="text-gray-500 mt-1">把打亂的字點回正確順序，排出完整的課文句子！</p>
+                        <p class="mt-2 inline-block bg-amber-50 border-2 border-amber-200 rounded-full px-4 py-1 text-amber-700 font-bold">
+                            第 <span id="s2-progress">1</span> / 18 句
+                        </p>
+                    </div>
+
+                    <div id="s2-target" class="min-h-[4.5rem] bg-sky-50 border-2 border-dashed border-sky-300 rounded-2xl p-3 mb-4 flex flex-wrap gap-2 items-center"></div>
+
+                    <div id="s2-words" class="flex flex-wrap gap-2 justify-center min-h-[3rem] mb-4"></div>
+
+                    <div class="flex justify-center gap-3 no-print">
+                        <button onclick="s2Hint()" class="bg-sky-100 hover:bg-sky-200 text-sky-600 font-bold px-5 py-3 rounded-full transition">
+                            💡 提示下一個字
+                        </button>
+                        <button onclick="s2Skip()" class="bg-gray-100 hover:bg-gray-200 text-gray-500 font-bold px-5 py-3 rounded-full transition">
+                            🙈 先跳過
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== 關卡 3：接龍補單字 ==================== -->
+            <section id="stage-3" class="stage hide">
+                <div class="bg-white/95 rounded-3xl shadow-xl p-5 md:p-7 border-4 border-rose-100">
+                    <div class="text-center mb-4">
+                        <div class="text-5xl swim">✏️</div>
+                        <h2 class="text-2xl font-black text-rose-500 mt-2">第 3 關：接龍補空格</h2>
+                        <p class="text-gray-500 mt-1">句子少了一個字，點選正確的單字把句子補完吧！</p>
+                        <p class="mt-2 inline-block bg-rose-50 border-2 border-rose-200 rounded-full px-4 py-1 text-rose-700 font-bold">
+                            第 <span id="s3-progress">1</span> / 12 題
+                        </p>
+                    </div>
+
+                    <div class="bg-rose-50/60 border-2 border-rose-100 rounded-2xl p-5 mb-5 text-center">
+                        <span class="num-badge text-white text-xs font-black rounded-full px-2 py-0.5 mr-2 align-middle" id="s3-sent-num">1</span>
+                        <div id="s3-sentence" class="text-xl md:text-2xl font-bold leading-relaxed inline-block align-middle"></div>
+                        <div id="s3-hint-text" class="text-sky-500 font-bold mt-3 text-sm min-h-[1.25rem]"></div>
+                    </div>
+
+                    <div id="s3-choices" class="flex flex-wrap justify-center gap-3 mb-4"></div>
+                </div>
+            </section>
+
+            <!-- ==================== 關卡 4：聽音選句 ==================== -->
+            <section id="stage-4" class="stage hide">
+                <div class="bg-white/95 rounded-3xl shadow-xl p-5 md:p-7 border-4 border-violet-100">
+                    <div class="text-center mb-4">
+                        <div class="text-5xl swim">🎧</div>
+                        <h2 class="text-2xl font-black text-violet-500 mt-2">第 4 關：小耳朵大考驗</h2>
+                        <p id="s4-instruction" class="text-gray-500 mt-1">仔細聽！點選你聽到的那一句課文。</p>
+                        <p class="mt-2 inline-block bg-violet-50 border-2 border-violet-200 rounded-full px-4 py-1 text-violet-700 font-bold">
+                            第 <span id="s4-progress">1</span> / 10 題
+                        </p>
+                    </div>
+
+                    <div class="text-center mb-6 no-print" id="s4-play-zone">
+                        <button onclick="s4Play()" id="btn-s4-play"
+                            class="bg-violet-500 hover:bg-violet-600 text-white font-black text-2xl w-24 h-24 rounded-full shadow-xl transition">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <div class="mt-2">
+                            <button onclick="s4Play()" class="text-violet-400 hover:text-violet-600 font-bold text-sm underline">再聽一次</button>
+                        </div>
+                    </div>
+
+                    <div id="s4-prompt" class="hide bg-violet-50 border-2 border-violet-200 rounded-2xl p-4 mb-4 text-center text-xl font-bold text-violet-700"></div>
+
+                    <div id="s4-choices" class="grid grid-cols-1 gap-3"></div>
+                </div>
+            </section>
+
+            <!-- ==================== 關卡 5：盲背大挑戰 ==================== -->
+            <section id="stage-5" class="stage hide">
+                <div class="bg-white/95 rounded-3xl shadow-xl p-5 md:p-7 border-4 border-emerald-100">
+                    <div class="text-center mb-4">
+                        <div class="text-5xl swim">🏆</div>
+                        <h2 class="text-2xl font-black text-emerald-500 mt-2">第 5 關：盲背大挑戰</h2>
+                        <p class="text-gray-500 mt-1">畫面上只有數字！看著編號，把課文從第 1 句背到第 18 句。</p>
+                        <p class="mt-2 inline-block bg-emerald-50 border-2 border-emerald-200 rounded-full px-4 py-1 text-emerald-700 font-bold">
+                            第 <span id="s5-progress">1</span> / 18 句
+                        </p>
+                    </div>
+
+                    <div class="bg-sky-50/80 rounded-2xl p-5 mb-4 text-center min-h-[7rem] flex flex-col justify-center">
+                        <div class="text-sm text-gray-400 font-bold mb-1">請背出這一句</div>
+                        <div class="num-badge text-white font-black text-3xl w-14 h-14 rounded-full mx-auto flex items-center justify-center" id="s5-num">1</div>
+                        <button onclick="s5Whisper()"
+                            class="mt-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold px-4 py-2 rounded-full transition text-sm no-print mx-auto">
+                            🤫 偷看提示
+                        </button>
+                        <div id="s5-whisper" class="hide text-sky-700 font-bold text-lg mt-2"></div>
+                        <div id="s5-feedback" class="text-lg font-black mt-2 min-h-[1.5rem]"></div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 no-print">
+                        <input id="s5-input" type="text" placeholder="打出這一句英文（或直接按下一步）"
+                            class="flex-1 w-full sm:w-auto border-4 border-emerald-200 focus:border-emerald-400 rounded-2xl px-4 py-3 text-lg outline-none">
+                        <button onclick="s5Next()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-7 py-3 rounded-full shadow-lg transition">
+                            下一步 →
+                        </button>
+                    </div>
+                    <p class="text-center text-sm text-gray-400 mt-2 no-print">打對了會得到 ⭐；也可以不打字，自己大聲念出來再按「下一步」</p>
+                </div>
+            </section>
+
+            <!-- ==================== 過關獎勵畫面 ==================== -->
+            <section id="stage-award" class="hide">
+                <div class="bg-white/95 rounded-3xl shadow-xl p-8 text-center border-4 border-yellow-200">
+                    <div class="text-7xl mb-3 swim">🎉</div>
+                    <h2 class="text-3xl font-black text-amber-500">全部過關！你太棒了！</h2>
+                    <p class="text-gray-500 mt-2">你已經把 Unit 1「Whale Watching」的課文完整背起來了！</p>
+
+                    <div class="my-6 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                        <div class="bg-sky-50 rounded-2xl p-4">
+                            <div class="text-3xl font-black text-sky-500" id="award-stars">0</div>
+                            <div class="text-xs text-gray-500 font-bold mt-1">星星</div>
+                        </div>
+                        <div class="bg-amber-50 rounded-2xl p-4">
+                            <div class="text-3xl font-black text-amber-500" id="award-attempts">0</div>
+                            <div class="text-xs text-gray-500 font-bold mt-1">答題次數</div>
+                        </div>
+                        <div class="bg-rose-50 rounded-2xl p-4">
+                            <div class="text-3xl font-black text-rose-400" id="award-accuracy">0%</div>
+                            <div class="text-xs text-gray-500 font-bold mt-1">正確率</div>
+                        </div>
+                        <div class="bg-emerald-50 rounded-2xl p-4">
+                            <div class="text-3xl font-black text-emerald-500" id="award-time">0:00</div>
+                            <div class="text-xs text-gray-500 font-bold mt-1">使用時間</div>
+                        </div>
+                    </div>
+
+                    <div id="award-badge" class="text-4xl font-black text-emerald-600 mb-4"></div>
+
+                    <div class="flex flex-wrap justify-center gap-3 no-print">
+                        <button onclick="goStage(1)" class="bg-sky-100 hover:bg-sky-200 text-sky-600 font-bold px-5 py-3 rounded-full transition">
+                            🔁 再玩一次
+                        </button>
+                        <button onclick="window.print()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold px-5 py-3 rounded-full transition">
+                            🖨️ 列印獎狀
+                        </button>
+                        <a href="index.html" class="bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold px-5 py-3 rounded-full transition inline-block">
+                            🏠 回課程列表
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* ==========================================================
+           課文資料：Unit 1 Whale Watching，共 18 句（課本編號 1-18）
+           ========================================================== */
+        const story = [
+            { n: 1,  en: "Welcome, everyone.", zh: "歡迎大家。" },
+            { n: 2,  en: "I can't wait to go whale watching.", zh: "我等不及要去賞鯨了。" },
+            { n: 3,  en: "My name is Ella. Nice to meet you.", zh: "我叫 Ella。很高興認識你。" },
+            { n: 4,  en: "Hi! I'm Tommy. It's my first time in Taiwan.", zh: "嗨！我是 Tommy。這是我第一次來台灣。" },
+            { n: 5,  en: "Hi, Tommy! I'm from the UK. Where are you from?", zh: "嗨，Tommy！我來自英國。你來自哪裡？" },
+            { n: 6,  en: "I'm from Canada.", zh: "我來自加拿大。" },
+            { n: 7,  en: "Are you from the USA?", zh: "你是從美國來的嗎？" },
+            { n: 8,  en: "No, I'm not. I'm from France.", zh: "不，我不是。我來自法國。" },
+            { n: 9,  en: "Look! There's a whale.", zh: "看！那裡有一隻鯨魚。" },
+            { n: 10, en: "That's not a whale. It's a dolphin.", zh: "那不是鯨魚。牠是海豚。" },
+            { n: 11, en: "Wow! There are more dolphins.", zh: "哇！還有更多海豚。" },
+            { n: 12, en: "Is that a whale?", zh: "那是一隻鯨魚嗎？" },
+            { n: 13, en: "Yes, it is.", zh: "是的。" },
+            { n: 14, en: "What a big fish!", zh: "好大一條魚！" },
+            { n: 15, en: "A whale is not a fish. It's a mammal.", zh: "鯨魚不是魚。牠是哺乳類動物。" },
+            { n: 16, en: "This is amazing!", zh: "這太驚奇了！" },
+            { n: 17, en: "We're so lucky.", zh: "我們真幸運。" },
+            { n: 18, en: "I like whales.", zh: "我喜歡鯨魚。" }
+        ];
+
+        const TOTAL = story.length;
+        const S3_QUESTIONS = 12;   // 第 3 關題數
+        const S4_QUESTIONS = 10;   // 第 4 關題數
+        const stageNames = ["跟讀熱身", "排句子", "接龍補空格", "小耳朵大考驗", "盲背大挑戰"];
+        const TTS_OK = "speechSynthesis" in window;
+
+        const state = {
+            current: 1,
+            completed: {},
+            s2: { idx: 0, tokens: [], placed: [], pool: [], locked: false },
+            s3: { idx: 0, puzzle: null, solved: false, hintUsed: false, tries: 0 },
+            s4: { idx: 0, q: null, solved: false, tries: 0 },
+            s5: { idx: 0, whisperUsed: false },
+            stats: { attempts: 0, correct: 0, stars: 0, startTime: null, badge: "" }
+        };
+
+        /* ---------- 工具 ---------- */
+        function $(id) { return document.getElementById(id); }
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+        function norm(s) {
+            return (s || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[^a-z0-9' ]/g, "").replace(/\s+/g, " ").trim();
+        }
+        function burst(opts) { if (typeof confetti === "function") confetti(opts); }
+
+        /* ---------- 語音朗讀 (Web Speech API) ---------- */
+        function speak(text, onend) {
+            if (!TTS_OK) { if (onend) onend(); return; }
+            try { speechSynthesis.cancel(); } catch (e) {}
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = "en-US";
+            u.rate = 0.85;   // 放慢一點，適合小朋友跟讀
+            u.pitch = 1.05;
+            const voices = speechSynthesis.getVoices();
+            const v = voices.find(x => x.lang === "en-US") || voices.find(x => /^en/i.test(x.lang));
+            if (v) u.voice = v;
+            if (onend) u.onend = onend;
+            speechSynthesis.speak(u);
+        }
+        /* 朗讀完（或逾時備援）再繼續，避免某些瀏覽器 onend 不觸發而卡關 */
+        function speakThen(text, cb) {
+            let done = false;
+            const fin = () => { if (!done) { done = true; if (cb) cb(); } };
+            speak(text, fin);
+            setTimeout(fin, Math.max(2600, text.length * 95));
+        }
+        let playingAll = false;
+        function stopSpeech() {
+            playingAll = false;
+            if (TTS_OK) { try { speechSynthesis.cancel(); } catch (e) {} }
+        }
+
+        /* ---------- 進度統計 ---------- */
+        function addAttempt(ok) {
+            state.stats.attempts++;
+            if (ok) state.stats.correct++;
+        }
+        function addStars(n) { state.stats.stars += n; }
+        function fmtTime(ms) {
+            const s = Math.floor(ms / 1000);
+            return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+        }
+
+        /* ---------- 關卡導覽 ---------- */
+        function renderNav() {
+            const nav = $("stage-nav");
+            nav.innerHTML = "";
+            stageNames.forEach((name, i) => {
+                const num = i + 1;
+                const done = state.completed[num];
+                const unlocked = num === 1 || state.completed[num - 1];
+                const chip = document.createElement("button");
+                chip.className = "stage-chip font-bold px-4 py-2 rounded-full border-2 transition " +
+                    (num === state.current
+                        ? "bg-sky-500 text-white border-sky-500 shadow-lg"
+                        : "bg-white/90 text-sky-700 border-sky-200 hover:border-sky-400") +
+                    (done ? " done" : "") + (unlocked ? "" : " locked");
+                chip.innerHTML = (unlocked ? "🎬" : "🔒") + " 第" + num + "關 " + name + (done ? " ✅" : "");
+                chip.onclick = () => { if (unlocked) goStage(num); };
+                nav.appendChild(chip);
+            });
+        }
+
+        function goStage(n) {
+            state.current = n;
+            stopSpeech();
+            document.querySelectorAll(".stage").forEach(el => el.classList.add("hide"));
+            const target = $("stage-" + n);
+            if (target) target.classList.remove("hide");
+            renderNav();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            if (!state.stats.startTime) state.stats.startTime = Date.now();
+
+            if (n === 1) renderStoryList();
+            if (n === 2) s2Start();
+            if (n === 3) s3Start();
+            if (n === 4) s4Start();
+            if (n === 5) s5Start();
+        }
+
+        function finishStage(n) {
+            stopSpeech();
+            state.completed[n] = true;
+            addStars(5);
+            burst({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
+            if (n < 5) {
+                goStage(n + 1);
+            } else {
+                showAward();
+            }
+        }
+
+        function showAward() {
+            document.querySelectorAll(".stage").forEach(el => el.classList.add("hide"));
+            $("stage-award").classList.remove("hide");
+            renderNav();
+            const st = state.stats;
+            $("award-stars").textContent = st.stars;
+            $("award-attempts").textContent = st.attempts;
+            $("award-accuracy").textContent = (st.attempts ? Math.round(st.correct / st.attempts * 100) : 0) + "%";
+            $("award-time").textContent = fmtTime(st.startTime ? Date.now() - st.startTime : 0);
+            $("award-badge").textContent = st.stars >= 50 ? "👑 背誦小狀元" : st.stars >= 35 ? "🌟 賞鯨小達人" : st.stars >= 20 ? "🐬 海洋小尖兵" : "🐟 小小見習生";
+            burst({ particleCount: 260, spread: 100, origin: { y: 0.5 } });
+            setTimeout(() => burst({ particleCount: 200, angle: 60, spread: 80, origin: { x: 0, y: 0.7 } }), 400);
+            setTimeout(() => burst({ particleCount: 200, angle: 120, spread: 80, origin: { x: 1, y: 0.7 } }), 800);
+        }
+
+        /* ==========================================================
+           關卡 1：跟讀熱身
+           ========================================================== */
+        function renderStoryList() {
+            const box = $("story-list");
+            box.innerHTML = "";
+            story.forEach(line => {
+                const row = document.createElement("div");
+                row.className = "flex items-start gap-3 bg-sky-50/70 rounded-2xl p-3 border-2 border-transparent hover:border-sky-200 transition";
+                row.innerHTML =
+                    '<span class="num-badge text-white font-black text-sm w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">' + line.n + '</span>' +
+                    '<div class="flex-1"><div class="font-bold text-lg leading-snug text-gray-800">' + line.en + '</div>' +
+                    '<div class="text-sm text-gray-400 mt-0.5">' + line.zh + '</div></div>' +
+                    '<button class="speak-btn bg-sky-100 hover:bg-sky-200 text-sky-600 font-bold w-10 h-10 rounded-full transition flex-shrink-0 no-print" aria-label="朗讀第' + line.n + '句"><i class="fa-solid fa-volume-high"></i></button>';
+                row.querySelector(".speak-btn").onclick = () => {
+                    row.classList.add("card-active");
+                    speak(line.en, () => row.classList.remove("card-active"));
+                    setTimeout(() => row.classList.remove("card-active"), 2600);
+                };
+                box.appendChild(row);
+            });
+            if (!TTS_OK) {
+                $("btn-play-all").classList.add("hide");
+                box.querySelectorAll(".speak-btn").forEach(b => b.classList.add("hide"));
+            }
+        }
+        function playAll() {
+            stopSpeech();
+            playingAll = true;
+            let i = 0;
+            const btn = $("btn-play-all");
+            btn.disabled = true;
+            btn.classList.add("opacity-60");
+            const next = () => {
+                if (!playingAll || i >= story.length) {
+                    btn.disabled = false;
+                    btn.classList.remove("opacity-60");
+                    if (playingAll && i >= story.length) burst({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+                    return;
+                }
+                const rows = $("story-list").children;
+                const row = rows[i];
+                if (row) {
+                    row.classList.add("card-active");
+                    row.scrollIntoView({ block: "center", behavior: "smooth" });
+                }
+                const line = story[i++];
+                speak(line.en, () => {
+                    if (row) row.classList.remove("card-active");
+                    setTimeout(next, 250);
+                });
+                setTimeout(() => { if (row) row.classList.remove("card-active"); }, 4000);
+            };
+            next();
+        }
+
+        /* ==========================================================
+           關卡 2：排序拼句子
+           ========================================================== */
+        function s2Start() {
+            state.s2 = { idx: 0, tokens: [], placed: [], pool: [], locked: false };
+            s2Load();
+        }
+        function s2Load() {
+            const line = story[state.s2.idx];
+            // 每個字給唯一 id：句子裡重複的字（如 I'm、a）才不會互相干擾
+            state.s2.tokens = line.en.split(" ").map((w, i) => ({ id: i, w: w }));
+            state.s2.placed = [];
+            state.s2.pool = shuffle(state.s2.tokens);
+            state.s2.locked = false;
+            $("s2-target").className = "min-h-[4.5rem] bg-sky-50 border-2 border-dashed border-sky-300 rounded-2xl p-3 mb-4 flex flex-wrap gap-2 items-center";
+            s2Render();
+        }
+        function s2Render() {
+            const line = story[state.s2.idx];
+            $("s2-progress").textContent = state.s2.idx + 1;
+            const target = $("s2-target");
+            target.innerHTML = "";
+            if (state.s2.placed.length === 0) {
+                const tip = document.createElement("span");
+                tip.className = "text-gray-400 text-sm";
+                tip.textContent = "👆 點下面的字，排出第 " + line.n + " 句";
+                target.appendChild(tip);
+            }
+            state.s2.placed.forEach(tok => {
+                const chip = document.createElement("button");
+                chip.className = "bg-white border-2 border-sky-300 text-sky-700 font-bold px-3 py-2 rounded-xl shadow-sm hover:border-rose-300 transition";
+                chip.textContent = tok.w;
+                chip.title = "點一下可以收回";
+                chip.onclick = () => {
+                    if (state.s2.locked) return;
+                    state.s2.placed = state.s2.placed.filter(t => t.id !== tok.id);
+                    state.s2.pool.push(tok);
+                    s2Render();
+                };
+                target.appendChild(chip);
+            });
+            const wordsBox = $("s2-words");
+            wordsBox.innerHTML = "";
+            state.s2.pool.forEach(tok => {
+                const btn = document.createElement("button");
+                btn.className = "word-btn bg-amber-100 border-2 border-amber-300 text-amber-800 font-black text-lg px-4 py-2.5 rounded-xl shadow-md";
+                btn.textContent = tok.w;
+                btn.onclick = () => {
+                    if (state.s2.locked) return;
+                    state.s2.pool = state.s2.pool.filter(t => t.id !== tok.id);
+                    state.s2.placed.push(tok);
+                    s2Render();
+                    if (state.s2.placed.length === state.s2.tokens.length) s2Check(true);
+                };
+                wordsBox.appendChild(btn);
+            });
+        }
+        function s2Check(auto) {
+            const line = story[state.s2.idx];
+            if (state.s2.placed.length !== state.s2.tokens.length) return;
+            const target = $("s2-target");
+            if (norm(state.s2.placed.map(t => t.w).join(" ")) === norm(line.en)) {
+                state.s2.locked = true;
+                if (!auto) addAttempt(true);   // 全靠自己排對才算得分題
+                addStars(2);
+                target.classList.remove("bg-sky-50", "border-sky-300");
+                target.classList.add("bg-emerald-50", "border-emerald-300");
+                burst({ particleCount: 60, spread: 55, origin: { y: 0.6 } });
+                speakThen(line.en, () => {
+                    state.s2.idx++;
+                    if (state.s2.idx >= TOTAL) finishStage(2);
+                    else s2Load();
+                });
+            } else {
+                if (!auto) addAttempt(false);
+                target.classList.add("animate-shake");
+                setTimeout(() => target.classList.remove("animate-shake"), 400);
+            }
+        }
+        function s2Hint() {
+            if (state.s2.locked) return;
+            const want = state.s2.tokens[state.s2.placed.length];
+            if (!want) return;
+            const tok = state.s2.pool.find(t => norm(t.w) === norm(want.w));
+            if (tok) {
+                state.s2.pool = state.s2.pool.filter(t => t.id !== tok.id);
+                state.s2.placed.push(tok);
+                s2Render();
+                if (state.s2.placed.length === state.s2.tokens.length) s2Check(true);
+            }
+        }
+        function s2Skip() {
+            if (state.s2.locked) return;
+            addAttempt(false);
+            state.s2.placed = [...state.s2.tokens];
+            state.s2.pool = [];
+            s2Render();
+            s2Check(true);
+        }
+
+        /* ==========================================================
+           關卡 3：接龍補單字（一題一個空格）
+           ========================================================== */
+        function s3Start() {
+            state.s3 = { idx: 0, puzzle: null, solved: false, hintUsed: false, tries: 0 };
+            s3Render();
+        }
+        function s3MakePuzzle() {
+            const line = story[state.s3.idx];
+            const words = line.en.split(" ");
+            // 挑一個兩個字母以上的字當答案，比較有挑戰性
+            const candidates = words.map((w, i) => ({ w, i })).filter(o => o.w.replace(/[^A-Za-z']/g, "").length >= 2);
+            const pick = candidates[Math.floor(Math.random() * candidates.length)] || { w: words[0], i: 0 };
+            const pool = [...new Set(story.flatMap(s => s.en.split(" ")))].filter(w => w !== pick.w);
+            const distractors = shuffle(pool).slice(0, 3);
+            return { line, words, blankPos: pick.i, answer: pick.w, options: shuffle([pick.w, ...distractors]) };
+        }
+        function s3Render() {
+            if (state.s3.idx >= S3_QUESTIONS) { finishStage(3); return; }
+            $("s3-progress").textContent = state.s3.idx + 1;
+            const puzzle = s3MakePuzzle();
+            state.s3.puzzle = puzzle;
+            state.s3.solved = false;
+            state.s3.hintUsed = false;
+            state.s3.tries = 0;
+            $("s3-sent-num").textContent = puzzle.line.n;
+            $("s3-hint-text").textContent = "";
+            const box = $("s3-sentence");
+            box.innerHTML = "";
+            puzzle.words.forEach((w, i) => {
+                const span = document.createElement("span");
+                span.className = "mx-1";
+                if (i === puzzle.blankPos) {
+                    span.className = "inline-block min-w-[4.5rem] border-b-4 border-rose-400 mx-1 text-rose-300 font-black";
+                    span.textContent = "＿＿＿";
+                    span.id = "s3-blank";
+                } else {
+                    span.textContent = w;
+                }
+                box.appendChild(span);
+            });
+            const choiceBox = $("s3-choices");
+            choiceBox.innerHTML = "";
+            puzzle.options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "word-btn bg-white border-4 border-rose-200 hover:border-rose-400 text-gray-700 font-black text-lg px-5 py-3 rounded-2xl shadow";
+                btn.textContent = opt;
+                btn.onclick = () => s3Pick(opt, btn);
+                choiceBox.appendChild(btn);
+            });
+        }
+        function s3Pick(opt, btn) {
+            if (state.s3.solved) return;
+            const p = state.s3.puzzle;
+            if (opt === p.answer) {
+                state.s3.solved = true;
+                addAttempt(state.s3.tries === 0);
+                addStars(state.s3.hintUsed ? 1 : 2);
+                const blank = $("s3-blank");
+                blank.textContent = p.answer;
+                blank.className = "mx-1 text-emerald-600 font-black";
+                if (btn) btn.className = "word-btn bg-emerald-400 border-4 border-emerald-500 text-white font-black text-lg px-5 py-3 rounded-2xl shadow";
+                burst({ particleCount: 45, spread: 50, origin: { y: 0.65 } });
+                speakThen(p.line.en, s3Next);
+            } else {
+                state.s3.tries++;
+                addAttempt(false);
+                if (btn) {
+                    btn.classList.add("animate-shake", "opacity-40");
+                    btn.disabled = true;
+                }
+            }
+        }
+        function s3Hint() {
+            if (state.s3.solved) return;
+            state.s3.hintUsed = true;
+            const a = state.s3.puzzle.answer;
+            const letters = a.replace(/[^A-Za-z']/g, "");
+            $("s3-hint-text").textContent = "💡 這個字的第一個字母是「" + letters[0] + "」，共 " + letters.length + " 個字母";
+        }
+        function s3Next() {
+            state.s3.idx++;
+            s3Render();
+        }
+        function s3Skip() {
+            if (state.s3.solved) return;
+            addAttempt(false);
+            const btn = [...$("s3-choices").children].find(b => b.textContent === state.s3.puzzle.answer);
+            s3Pick(state.s3.puzzle.answer, btn);
+        }
+
+        /* ==========================================================
+           關卡 4：聽音選句（不支援語音時改為「看中文選英文」）
+           ========================================================== */
+        function s4Start() {
+            state.s4 = { idx: 0, q: null, solved: false, tries: 0 };
+            if (!TTS_OK) {
+                $("s4-play-zone").classList.add("hide");
+                $("s4-prompt").classList.remove("hide");
+                $("s4-instruction").textContent = "這個瀏覽器不支援語音播放，改成看中文、選出正確的英文句子！";
+            } else {
+                $("s4-play-zone").classList.remove("hide");
+                $("s4-prompt").classList.add("hide");
+                $("s4-instruction").textContent = "仔細聽！點選你聽到的那一句課文。";
+            }
+            s4Render();
+        }
+        function s4MakeQuestion() {
+            const correct = story[Math.floor(Math.random() * TOTAL)];
+            const set = new Set([correct.en]);
+            while (set.size < 4) {
+                const w = story[Math.floor(Math.random() * TOTAL)].en;
+                set.add(w);
+            }
+            return { correct, options: shuffle([...set]) };
+        }
+        function s4Render() {
+            if (state.s4.idx >= S4_QUESTIONS) { finishStage(4); return; }
+            $("s4-progress").textContent = state.s4.idx + 1;
+            const q = s4MakeQuestion();
+            state.s4.q = q;
+            state.s4.solved = false;
+            state.s4.tries = 0;
+            if (!TTS_OK) $("s4-prompt").textContent = "中文：「" + q.correct.zh + "」";
+            const box = $("s4-choices");
+            box.innerHTML = "";
+            q.options.forEach(opt => {
+                const line = story.find(s => s.en === opt);
+                const btn = document.createElement("button");
+                btn.className = "text-left bg-white border-4 border-violet-100 hover:border-violet-400 rounded-2xl p-4 font-bold text-lg transition shadow-sm";
+                btn.innerHTML = '<span class="num-badge text-white text-xs font-black rounded-full px-2 py-0.5 mr-2 align-middle">' + line.n + '</span>' + opt;
+                btn.onclick = () => s4Pick(opt, btn);
+                box.appendChild(btn);
+            });
+            if (TTS_OK) setTimeout(s4Play, 400);
+        }
+        function s4Play() {
+            if (state.s4.q) speak(state.s4.q.correct.en);
+        }
+        function s4Pick(opt, btn) {
+            if (state.s4.solved) return;
+            if (opt === state.s4.q.correct.en) {
+                state.s4.solved = true;
+                addAttempt(state.s4.tries === 0);
+                addStars(state.s4.tries === 0 ? 2 : 1);
+                btn.classList.add("bg-emerald-50", "border-emerald-400");
+                btn.innerHTML += ' <i class="fa-solid fa-circle-check text-emerald-500"></i>';
+                burst({ particleCount: 50, spread: 55, origin: { y: 0.65 } });
+                setTimeout(s4Next, 800);
+            } else {
+                state.s4.tries++;
+                addAttempt(false);
+                btn.classList.add("animate-shake", "opacity-40");
+                btn.disabled = true;
+            }
+        }
+        function s4Next() {
+            state.s4.idx++;
+            s4Render();
+        }
+
+        /* ==========================================================
+           關卡 5：盲背大挑戰
+           ========================================================== */
+        function s5Start() {
+            state.s5 = { idx: 0, whisperUsed: false };
+            s5Render();
+        }
+        function s5Render() {
+            if (state.s5.idx >= TOTAL) { finishStage(5); return; }
+            $("s5-progress").textContent = state.s5.idx + 1;
+            $("s5-num").textContent = story[state.s5.idx].n;
+            $("s5-whisper").classList.add("hide");
+            $("s5-feedback").textContent = "";
+            $("s5-feedback").className = "text-lg font-black mt-2 min-h-[1.5rem]";
+            $("s5-input").value = "";
+        }
+        function s5Whisper() {
+            if (state.s5.idx >= TOTAL) return;
+            const line = story[state.s5.idx];
+            state.s5.whisperUsed = true;
+            const w = $("s5-whisper");
+            w.classList.remove("hide");
+            w.textContent = line.en + "　（" + line.zh + "）";
+            speak(line.en);
+        }
+        function s5Next() {
+            if (state.s5.idx >= TOTAL) return;
+            const input = $("s5-input").value.trim();
+            const line = story[state.s5.idx];
+            const fb = $("s5-feedback");
+            if (input === "") {
+                // 自己念出來的模式：不計分，直接前進
+                fb.textContent = "👍 真棒，繼續下一句！";
+                fb.className = "text-lg font-black mt-2 min-h-[1.5rem] text-emerald-500";
+                state.s5.idx++;
+                setTimeout(s5Render, 500);
+                return;
+            }
+            if (norm(input) === norm(line.en)) {
+                addAttempt(!state.s5.whisperUsed);
+                addStars(state.s5.whisperUsed ? 1 : 2);
+                fb.textContent = "⭐ 完全正確！";
+                fb.className = "text-lg font-black mt-2 min-h-[1.5rem] text-emerald-500";
+                burst({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+                state.s5.idx++;
+                setTimeout(s5Render, 800);
+            } else {
+                addAttempt(false);
+                fb.textContent = "再想想看，或按「🤫 偷看提示」";
+                fb.className = "text-lg font-black mt-2 min-h-[1.5rem] text-rose-400";
+                $("s5-num").classList.add("animate-shake");
+                setTimeout(() => $("s5-num").classList.remove("animate-shake"), 400);
+            }
+        }
+
+        /* ==========================================================
+           泡泡背景動畫
+           ========================================================== */
+        function makeBubbles() {
+            const layer = $("bubble-layer");
+            for (let i = 0; i < 14; i++) {
+                const b = document.createElement("div");
+                const size = 10 + Math.random() * 34;
+                b.className = "bubble";
+                b.style.width = b.style.height = size + "px";
+                b.style.left = Math.random() * 100 + "vw";
+                b.style.animationDuration = (9 + Math.random() * 10) + "s";
+                b.style.animationDelay = (Math.random() * 10) + "s";
+                layer.appendChild(b);
+            }
+        }
+
+        /* ==========================================================
+           初始化
+           ========================================================== */
+        document.addEventListener("DOMContentLoaded", () => {
+            makeBubbles();
+            const input = $("s5-input");
+            input.addEventListener("keydown", e => { if (e.key === "Enter") s5Next(); });
+            goStage(1);
+        });
+    </script>
+</body>
+</html>
