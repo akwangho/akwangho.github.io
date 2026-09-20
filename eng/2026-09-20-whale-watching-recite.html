@@ -84,7 +84,6 @@
         }
 
         .stage-chip.done { background-color: #86efac !important; border-color: #22c55e !important; }
-        .stage-chip.locked { opacity: .45; }
 
         .hide { display: none !important; }
 
@@ -111,6 +110,7 @@
                 🐋 Whale Watching
             </h1>
             <p class="mt-2 text-sky-900/70 font-bold">跟著 Tommy 和朋友們去賞鯨，一邊玩一邊把課文背起來！</p>
+            <p class="mt-1 text-sky-700/80 font-bold text-sm">🎯 五個關卡可自由點選，想挑戰哪一關就直接跳過去！</p>
             <a href="index.html" class="inline-block mt-2 text-sky-700/70 hover:text-sky-700 font-bold text-sm no-print">
                 ← 回課程列表
             </a>
@@ -409,15 +409,15 @@
             stageNames.forEach((name, i) => {
                 const num = i + 1;
                 const done = state.completed[num];
-                const unlocked = num === 1 || state.completed[num - 1];
                 const chip = document.createElement("button");
                 chip.className = "stage-chip font-bold px-4 py-2 rounded-full border-2 transition " +
                     (num === state.current
                         ? "bg-sky-500 text-white border-sky-500 shadow-lg"
                         : "bg-white/90 text-sky-700 border-sky-200 hover:border-sky-400") +
-                    (done ? " done" : "") + (unlocked ? "" : " locked");
-                chip.innerHTML = (unlocked ? "🎬" : "🔒") + " 第" + num + "關 " + name + (done ? " ✅" : "");
-                chip.onclick = () => { if (unlocked) goStage(num); };
+                    (done ? " done" : "");
+                chip.title = "直接跳到第 " + num + " 關";
+                chip.innerHTML = "🎬 第" + num + "關 " + name + (done ? " ✅" : "");
+                chip.onclick = () => goStage(num);
                 nav.appendChild(chip);
             });
         }
