@@ -114,6 +114,16 @@
             <a href="index.html" class="inline-block mt-2 text-sky-700/70 hover:text-sky-700 font-bold text-sm no-print">
                 ← 回課程列表
             </a>
+
+            <!-- 語音設定：選擇 TTS 發音人員 -->
+            <div id="voice-settings" class="no-print mt-3 inline-flex items-center gap-2 bg-white/80 border-2 border-sky-200 rounded-full px-4 py-1.5 shadow-sm">
+                <label for="voice-select" class="text-sky-700 font-bold text-sm whitespace-nowrap">🗣️ 發音人員</label>
+                <select id="voice-select" onchange="changeVoice()"
+                    class="bg-sky-50 border-2 border-sky-200 focus:border-sky-400 rounded-full px-3 py-1 text-sm font-bold text-sky-800 outline-none max-w-[14rem]">
+                </select>
+                <button onclick="previewVoice()" title="試聽目前發音人員"
+                    class="bg-sky-100 hover:bg-sky-200 text-sky-600 font-bold w-8 h-8 rounded-full transition text-sm">🔊</button>
+            </div>
         </header>
 
         <!-- ==================== 關卡選擇 ==================== -->
@@ -365,6 +375,58 @@
         function burst(opts) { if (typeof confetti === "function") confetti(opts); }
 
         /* ---------- 語音朗讀 (Web Speech API) ---------- */
+        const VOICE_KEY = "ww-recite-voice";
+        let ttsVoices = [];        // 系統提供的英文語音
+        let chosenVoiceURI = null; // 使用者選的發音人員（以 voiceURI 記住）
+
+        function loadVoices() {
+            if (!TTS_OK) return;
+            const all = speechSynthesis.getVoices() || [];
+            ttsVoices = all.filter(v => /^en/i.test(v.lang));
+            if (!ttsVoices.length) ttsVoices = all;
+            populateVoiceSelect();
+        }
+        if (TTS_OK) {
+            loadVoices();
+            speechSynthesis.onvoiceschanged = loadVoices;  // 部分瀏覽器的語音清單是非同步載入
+        }
+
+        function pickVoice() {
+            return ttsVoices.find(v => v.voiceURI === chosenVoiceURI) || null;
+        }
+
+        function populateVoiceSelect() {
+            const sel = $("voice-select");
+            if (!sel || !ttsVoices.length) return;
+            const prev = chosenVoiceURI;
+            sel.innerHTML = "";
+            ttsVoices.forEach(v => {
+                const o = document.createElement("option");
+                o.value = v.voiceURI;
+                o.textContent = v.name.replace(/Microsoft |Google /, "") + "（" + v.lang + "）";
+                sel.appendChild(o);
+            });
+            // 還原上次的選擇；沒有就預設一個聽起來自然的
+            let uri = prev;
+            if (!uri || !ttsVoices.some(v => v.voiceURI === uri)) {
+                const pref = ttsVoices.find(v => /Samantha|Jenny|Aria|Zira|Google US English/i.test(v.name)) ||
+                             ttsVoices.find(v => v.lang === "en-US") || ttsVoices[0];
+                uri = pref.voiceURI;
+            }
+            chosenVoiceURI = uri;
+            sel.value = uri;
+        }
+
+        function changeVoice() {
+            chosenVoiceURI = $("voice-select").value;
+            try { localStorage.setItem(VOICE_KEY, chosenVoiceURI); } catch (e) {}
+            previewVoice();
+        }
+
+        function previewVoice() {
+            speak("Hello! I can read the story for you.");
+        }
+
         function speak(text, onend) {
             if (!TTS_OK) { if (onend) onend(); return; }
             try { speechSynthesis.cancel(); } catch (e) {}
@@ -372,9 +434,8 @@
             u.lang = "en-US";
             u.rate = 0.85;   // 放慢一點，適合小朋友跟讀
             u.pitch = 1.05;
-            const voices = speechSynthesis.getVoices();
-            const v = voices.find(x => x.lang === "en-US") || voices.find(x => /^en/i.test(x.lang));
-            if (v) u.voice = v;
+            const v = pickVoice();
+            if (v) { u.voice = v; u.lang = v.lang; }
             if (onend) u.onend = onend;
             speechSynthesis.speak(u);
         }
@@ -862,6 +923,10 @@
             makeBubbles();
             const input = $("s5-input");
             input.addEventListener("keydown", e => { if (e.key === "Enter") s5Next(); });
+            // 還原使用者上次選的發音人員；不支援語音時隱藏設定區
+            try { chosenVoiceURI = localStorage.getItem(VOICE_KEY); } catch (e) {}
+            loadVoices();
+            if (!TTS_OK) $("voice-settings").classList.add("hide");
             goStage(1);
         });
     </script>
